@@ -1,15 +1,13 @@
-# Liquity: Decentralized Borrowing Protocol
+# Mosaic: Decentralized Borrowing Protocol
 
-<a href="https://www.defisafety.com/pqrs/376"><img src="https://defi-safety.s3.amazonaws.com/Liquity_Badge_78e39d44ca.png" alt="DeFiSafetyBadge" align="right" style="width:228px;height:76px;"></a>
-
-![Tests](https://github.com/liquity/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.liquity.org) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/700620821198143498?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/2up5U32) [![Docker Pulls](https://img.shields.io/docker/pulls/liquity/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/liquity/dev-frontend) [![codecov](https://codecov.io/gh/liquity/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/liquity/dev)
+![Tests](https://github.com/liquity/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.liquity.org) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/700620821198143498?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/liquity/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/liquity/dev-frontend) [![codecov](https://codecov.io/gh/liquity/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/liquity/dev)
 
 
-Liquity is a decentralized protocol that allows Ether holders to obtain maximum liquidity against
-their collateral without paying interest. After locking up ETH as collateral in a smart contract and
-creating an individual position called a "trove", the user can get instant liquidity by minting LUSD,
+Mosaic is a decentralized protocol that allows REEF holders to obtain maximum liquidity against
+their collateral without paying interest. After locking up REEF as collateral in a smart contract and
+creating an individual position called a "trove", the user can get instant liquidity by minting USDM,
 a USD-pegged stablecoin. Each trove is required to be collateralized at a minimum of 110%. Any
-owner of LUSD can redeem their stablecoins for the underlying collateral at any time. The redemption
+owner of USDM can redeem their stablecoins for the underlying collateral at any time. The redemption
 mechanism along with algorithmically adjusted fees guarantee a minimum stablecoin value of USD 1.
 
 An unprecedented liquidation mechanism based on incentivized stability deposits and a redistribution
@@ -22,19 +20,19 @@ multiple front ends, enhancing decentralization.
 
 ## More information
 
-Visit [liquity.org](https://www.liquity.org) to find out more and join the discussion.
+Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join the discussion.
 
 ## Liquity System Summary
 
 - [Disclaimer](#disclaimer)
-- [Liquity Overview](#liquity-overview)
+- [Mosaic Overview](#liquity-overview)
 - [Liquidation and the Stability Pool](#liquidation-and-the-stability-pool)
   - [Liquidation gas costs](#liquidation-gas-costs)
   - [Liquidation Logic](#liquidation-logic)
     - [Liquidations in Normal Mode: TCR >= 150%](#liquidations-in-normal-mode-tcr--150)
     - [Liquidations in Recovery Mode: TCR < 150%](#liquidations-in-recovery-mode-tcr--150)
 - [Gains From Liquidations](#gains-from-liquidations)
-- [LUSD Token Redemption](#lusd-token-redemption)
+- [USDM Token Redemption](#lusd-token-redemption)
   - [Partial redemption](#partial-redemption)
   - [Full redemption](#full-redemption)
   - [Redemptions create a price floor](#redemptions-create-a-price-floor)
@@ -42,13 +40,13 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
 - [Project Structure](#project-structure)
   - [Directories](#directories)
   - [Branches](#branches)
-- [LQTY Token Architecture](#lqty-token-architecture)
-  - [LQTY Lockup contracts and token vesting](#lqty-lockup-contracts-and-token-vesting)
+- [MSIC Token Architecture](#lqty-token-architecture)
+  - [MSIC Lockup contracts and token vesting](#lqty-lockup-contracts-and-token-vesting)
   - [Lockup Implementation and admin transfer restriction](#lockup-implementation-and-admin-transfer-restriction)
   - [Launch sequence and vesting process](#launch-sequence-and-vesting-process)
-    - [Deploy LQTY Contracts](#deploy-lqty-contracts)
+    - [Deploy MSIC Contracts](#deploy-lqty-contracts)
     - [Deploy and fund Lockup Contracts](#deploy-and-fund-lockup-contracts)
-    - [Deploy Liquity Core](#deploy-liquity-core)
+    - [Deploy MSIC Core](#deploy-liquity-core)
     - [During one year lockup period](#during-one-year-lockup-period)
     - [Upon end of one year lockup period](#upon-end-of-one-year-lockup-period)
     - [Post-lockup period](#post-lockup-period)
@@ -61,9 +59,9 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
   - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
   - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
   - [Keeping a sorted list of Troves ordered by ICR](#keeping-a-sorted-list-of-troves-ordered-by-icr)
-  - [Flow of Ether in Liquity](#flow-of-ether-in-liquity)
-  - [Flow of LUSD tokens in Liquity](#flow-of-lusd-tokens-in-liquity)
-  - [Flow of LQTY Tokens in Liquity](#flow-of-lqty-tokens-in-liquity)
+  - [Flow of REEF in Mosaic](#flow-of-ether-in-liquity)
+  - [Flow of USDM tokens in Mosaic](#flow-of-lusd-tokens-in-liquity)
+  - [Flow of MSIC Tokens in Mosaic](#flow-of-lqty-tokens-in-liquity)
 - [Expected User Behaviors](#expected-user-behaviors)
 - [Contract Ownership and Function Permissions](#contract-ownership-and-function-permissions)
 - [Deployment to a Development Blockchain](#deployment-to-a-development-blockchain)
@@ -79,10 +77,10 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
   - [TroveManager Functions - `TroveManager.sol`](#trovemanager-functions---trovemanagersol)
   - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
   - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
-  - [LQTY Staking Functions  `LQTYStaking.sol`](#lqty-staking-functions--lqtystakingsol)
+  - [MSIC Staking Functions  `LQTYStaking.sol`](#lqty-staking-functions--lqtystakingsol)
   - [Lockup Contract Factory `LockupContractFactory.sol`](#lockup-contract-factory-lockupcontractfactorysol)
   - [Lockup contract - `LockupContract.sol`](#lockup-contract---lockupcontractsol)
-  - [LUSD token `LUSDToken.sol` and LQTY token `LQTYToken.sol`](#lusd-token-lusdtokensol-and-lqty-token-lqtytokensol)
+  - [USDM token `LUSDToken.sol` and MSIC token `LQTYToken.sol`](#lusd-token-lusdtokensol-and-lqty-token-lqtytokensol)
 - [Supplying Hints to Trove operations](#supplying-hints-to-trove-operations)
   - [Hints for `redeemCollateral`](#hints-for-redeemcollateral)
     - [First redemption hint](#first-redemption-hint)
@@ -98,19 +96,19 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
   - [Stability Pool example](#stability-pool-example)
   - [Stability Pool implementation](#stability-pool-implementation)
   - [How deposits and ETH gains are tracked](#how-deposits-and-eth-gains-are-tracked)
-- [LQTY Issuance to Stability Providers](#lqty-issuance-to-stability-providers)
-  - [LQTY Issuance schedule](#lqty-issuance-schedule)
-  - [LQTY Issuance implementation](#lqty-issuance-implementation)
-  - [Handling the front end LQTY gain](#handling-the-front-end-lqty-gain)
-  - [LQTY reward events and payouts](#lqty-reward-events-and-payouts)
-- [LQTY issuance to liquity providers](#lqty-issuance-to-liquity-providers)
+- [MSIC Issuance to Stability Providers](#lqty-issuance-to-stability-providers)
+  - [MSIC Issuance schedule](#lqty-issuance-schedule)
+  - [MSIC Issuance implementation](#lqty-issuance-implementation)
+  - [Handling the front end MSIC gain](#handling-the-front-end-lqty-gain)
+  - [MSIC reward events and payouts](#lqty-reward-events-and-payouts)
+- [MSIC issuance to liquity providers](#lqty-issuance-to-liquity-providers)
 - [Liquity System Fees](#liquity-system-fees)
   - [Redemption Fee](#redemption-fee)
   - [Issuance fee](#issuance-fee)
   - [Fee Schedule](#fee-schedule)
   - [Intuition behind fees](#intuition-behind-fees)
   - [Fee decay Implementation](#fee-decay-implementation)
-  - [Staking LQTY and earning fees](#staking-lqty-and-earning-fees)
+  - [Staking MSIC and earning fees](#staking-lqty-and-earning-fees)
 - [Redistributions and Corrected Stakes](#redistributions-and-corrected-stakes)
   - [Corrected Stake Solution](#corrected-stake-solution)
 - [Math Proofs](#math-proofs)
@@ -143,19 +141,19 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
   - [Front-running issues](#front-running-issues)
 - [Disclaimer](#disclaimer)
 
-## Liquity Overview
+## Mosaic Overview
 
-Liquity is a collateralized debt platform. Users can lock up Ether, and issue stablecoin tokens (LUSD) to their own Ethereum address, and subsequently transfer those tokens to any other Ethereum address. The individual collateralized debt positions are called Troves.
+Mosaic is a collateralized debt platform. Users can lock up REEF, and issue stablecoin tokens (USDM) to their own Reef address, and subsequently transfer those tokens to any other Reef address. The individual collateralized debt positions are called Troves.
 
-The stablecoin tokens are economically geared towards maintaining value of 1 LUSD = \$1 USD, due to the following properties:
+The stablecoin tokens are economically geared towards maintaining value of 1 USDM = \$1 USD, due to the following properties:
 
 1. The system is designed to always be over-collateralized - the dollar value of the locked Ether exceeds the dollar value of the issued stablecoins
 
-2. The stablecoins are fully redeemable - users can always swap $x worth of LUSD for $x worth of ETH (minus fees), directly with the system.
+2. The stablecoins are fully redeemable - users can always swap $x worth of USDM for $x worth of REEF (minus fees), directly with the system.
 
-3. The system algorithmically controls the generation of LUSD through a variable issuance fee.
+3. The system algorithmically controls the generation of USDM through a variable issuance fee.
 
-After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of ETH in a Trove can issue up to 909.09 LUSD.
+After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of REEF in a Trove can issue up to 909.09 USDM.
 
 The tokens are freely exchangeable - anyone with an Ethereum address can send or receive LUSD tokens, whether they have an open Trove or not. The tokens are burned upon repayment of a Trove's debt.
 
