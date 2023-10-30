@@ -73,7 +73,7 @@ const StakingManagerActionDescription: React.FC<StakingManagerActionDescriptionP
 }) => {
   const stakeMSIC = change.stakeMSIC?.prettify().concat(" ", GT);
   const unstakeMSIC = change.unstakeMSIC?.prettify().concat(" ", GT);
-  const collateralGain = originalStake.collateralGain.nonZero?.prettify(4).concat(" ETH");
+  const collateralGain = originalStake.collateralGain.nonZero?.prettify(4).concat(" REEF");
   const msicGain = originalStake.msicGain.nonZero?.prettify().concat(" ", COIN);
 
   if (originalStake.isEmpty && stakeMSIC) {

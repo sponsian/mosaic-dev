@@ -35,7 +35,7 @@
 \section{Introduction}
 
 
-The Mosaic protocol $\cite{Whitepaper}$ issues a USD-pegged stablecoin MoUSD that is redeemable at face value against ETH: any owner of MoUSD can exchange their stablecoins for equivalent value in the underlying collateral at any time. The ETH paid to the redeemer is taken from the borrowers' collateralized debt positions (“troves”) in ascending order of collateral ratio. In other words, the system uses the redeemed MoUSD to repay the debt on the riskiest trove with the currently lowest individual collateral ratio (ICR), and transfers a corresponding amount of ETH from the trove to the redeemer. If the redeemed MoUSD is larger than the debt on the riskiest trove, the system proceeds with the second riskiest trove, and so on. \\
+The Mosaic protocol $\cite{Whitepaper}$ issues a USD-pegged stablecoin MoUSD that is redeemable at face value against REEF: any owner of MoUSD can exchange their stablecoins for equivalent value in the underlying collateral at any time. The REEF paid to the redeemer is taken from the borrowers' collateralized debt positions (“troves”) in ascending order of collateral ratio. In other words, the system uses the redeemed MoUSD to repay the debt on the riskiest trove with the currently lowest individual collateral ratio (ICR), and transfers a corresponding amount of REEF from the trove to the redeemer. If the redeemed MoUSD is larger than the debt on the riskiest trove, the system proceeds with the second riskiest trove, and so on. \\
 
 To allow for efficient redemptions despite Ethereum's gas constraints, the system keeps troves ordered by ICR, so that it can iterate over the linked list starting from the bottom. It is not feasible to sort the list after every operation. \\
 
@@ -53,7 +53,7 @@ This discrepancy means that the reward distribution scheme described in $\cite{B
 
 
 \section{Troves and Liquidations}
-Troves are collateralized debt positions held by individual borrowers, defined by their amount of debt $d$ (in MoUSD) and collateral $c$ (in ETH).
+Troves are collateralized debt positions held by individual borrowers, defined by their amount of debt $d$ (in MoUSD) and collateral $c$ (in REEF).
 
 Let $\gamma_i$ denote the individual collateral ratio (ICR) of a trove $i$, i.e. the ratio of its collateral to its debt:
 

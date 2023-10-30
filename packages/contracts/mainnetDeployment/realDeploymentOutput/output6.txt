@@ -4,7 +4,7 @@ deployer address: 0xa850535D3628CD4dFEB528dC85cfA93051Ff2984
 deployerETHBalance before: 2420137528000000000
 Uniswp addr: 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
 Uniswap Factory number of pairs: 32207
-deployer's ETH balance before deployments: 2420137528000000000
+deployer's REEF balance before deployments: 2420137528000000000
 Using previously deployed priceFeed contract at address 0x4c517D4e2C851CA76d7eC94B805269Df0f2201De
 Using previously deployed sortedTroves contract at address 0x8FdD3fbFEb32b28fb73555518f8b361bCeA741A6
 Using previously deployed troveManager contract at address 0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2
@@ -58,8 +58,8 @@ account2 MSIC bal before withdrawal attempt: .000000000000000000
 account2's LC MSIC bal before withdrawal attempt: 21.000000000000000000
 account2's MSIC bal after LC withdrawal attempt: .000000000000000000
 account2's LC MSIC bal LC withdrawal attempt: 21.000000000000000000
-MoUSD-ETH Pair's current MoUSD reserves: 1890.941734972325910671
-MoUSD-ETH Pair's current ETH reserves: 1.089530474048812502
+MoUSD-REEF Pair's current MoUSD reserves: 1890.941734972325910671
+MoUSD-REEF Pair's current REEF reserves: 1.089530474048812502
 number of troves: 2 
 Trove list size: 2 
 Entire system debt: 4415.000000000000000000
@@ -69,7 +69,7 @@ Base rate: .000000000000000000
 Current borrowing rate: .005000000000000000
 Total MoUSD SP deposits: 34.959359097674089329
 Total MSIC staked: 26.000000000000000000
-Total LP (MoUSD-ETH) tokens staked in unipool: .000000000000000001
+Total LP (MoUSD-REEF) tokens staked in unipool: .000000000000000001
 TroveManager state variables:
 Total trove stakes: 6.500000000000000000
 Snapshot of total trove stakes before last liq. : .000000000000000000

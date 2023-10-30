@@ -76,7 +76,7 @@ const getBytecodeSize = (contractABI) => {
 
 const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, ETHPrice) => {
   const dollarCost = (deploymentGasTotal * gasPriceInGwei * ETHPrice) / 1e9
-  console.log(`At gas price ${gasPriceInGwei} GWei, and ETH Price $${ETHPrice} per ETH, the total cost of deployment in USD is: $${dollarCost}`)
+  console.log(`At gas price ${gasPriceInGwei} GWei, and REEF Price $${ETHPrice} per REEF, the total cost of deployment in USD is: $${dollarCost}`)
 }
 
 const logContractDeploymentCosts = async (contracts) => {

@@ -4,7 +4,7 @@
 
 ## SendableEthersMosaic.stakeUniTokens() method
 
-Stake Uniswap ETH/MoUSD LP tokens to participate in liquidity mining and earn MSIC.
+Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC.
 
 <b>Signature:</b>
 

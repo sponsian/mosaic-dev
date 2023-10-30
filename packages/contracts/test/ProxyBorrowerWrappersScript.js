@@ -95,17 +95,17 @@ contract('BorrowerWrappers', async accounts => {
     MoUSD_GAS_COMPENSATION = await borrowerOperations.MoUSD_GAS_COMPENSATION()
   })
 
-  it('proxy owner can recover ETH', async () => {
+  it('proxy owner can recover REEF', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some ETH to proxy
+    // send some REEF to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount, gasPrice: GAS_PRICE })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // recover ETH
+    // recover REEF
     const gas_Used = th.gasUsed(await borrowerWrappers.transferETH(alice, amount, { from: alice, gasPrice: GAS_PRICE }))
     
     const balanceAfter = toBN(await web3.eth.getBalance(alice))
@@ -113,17 +113,17 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(balanceAfter.sub(expectedBalance), amount.toString())
   })
 
-  it('non proxy owner cannot recover ETH', async () => {
+  it('non proxy owner cannot recover REEF', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some ETH to proxy
+    // send some REEF to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // try to recover ETH
+    // try to recover REEF
     const proxy = borrowerWrappers.getProxyFromUser(alice)
     const signature = 'transferETH(address,uint256)'
     const calldata = th.getTransactionData(signature, [alice, amount])
@@ -329,9 +329,9 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
     assert.equal(msicBalanceAfter.toString(), msicBalanceBefore.toString())
     assert.equal(msicBalanceAfter.toString(), msicBalanceBefore.toString())
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to REEF gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalMoUSD))
-    // check trove has increased collateral by the ETH gain
+    // check trove has increased collateral by the REEF gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -343,7 +343,7 @@ contract('BorrowerWrappers', async accounts => {
     // MSIC staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedMSICGain_A))
 
-    // Expect Alice has withdrawn all ETH gain
+    // Expect Alice has withdrawn all REEF gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
     assert.equal(alice_pendingETHGain, 0)
   })
@@ -453,12 +453,12 @@ contract('BorrowerWrappers', async accounts => {
     // MSIC staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore)
 
-    // Expect Alice has withdrawn all ETH gain
+    // Expect Alice has withdrawn all REEF gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
     assert.equal(alice_pendingETHGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with only ETH gain', async () => {
+  it('claimStakingGainsAndRecycle(): with only REEF gain', async () => {
     const price = toBN(dec(200, 18))
 
     // Whale opens Trove
@@ -487,7 +487,7 @@ contract('BorrowerWrappers', async accounts => {
     const redeemedAmount = toBN(dec(100, 18))
     await th.redeemCollateral(whale, contracts, redeemedAmount, GAS_PRICE)
 
-    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice REEF gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
@@ -528,9 +528,9 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(msicBalanceAfter.toString(), msicBalanceBefore.toString())
     // check proxy msic balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(msicBalanceAfter, msicBalanceBefore.add(expectedNewMoUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to REEF gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalMoUSD), 10000)
-    // check trove has increased collateral by the ETH gain
+    // check trove has increased collateral by the REEF gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -542,7 +542,7 @@ contract('BorrowerWrappers', async accounts => {
     // MSIC staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedMSICGain_A))
 
-    // Expect Alice has withdrawn all ETH gain
+    // Expect Alice has withdrawn all REEF gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
     assert.equal(alice_pendingETHGain, 0)
   })
@@ -600,9 +600,9 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(msicBalanceAfter.toString(), msicBalanceBefore.toString())
     // check proxy msic balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(msicBalanceAfter, msicBalanceBefore)
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to REEF gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore, 10000)
-    // check trove has increased collateral by the ETH gain
+    // check trove has increased collateral by the REEF gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore)
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -611,12 +611,12 @@ contract('BorrowerWrappers', async accounts => {
     // check msic balance remains the same
     th.assertIsApproximatelyEqual(msicBalanceBefore, msicBalanceAfter)
 
-    // Expect Alice has withdrawn all ETH gain
+    // Expect Alice has withdrawn all REEF gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
     assert.equal(alice_pendingETHGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with both ETH and MoUSD gains', async () => {
+  it('claimStakingGainsAndRecycle(): with both REEF and MoUSD gains', async () => {
     const price = toBN(dec(200, 18))
 
     // Whale opens Trove
@@ -648,7 +648,7 @@ contract('BorrowerWrappers', async accounts => {
     const redeemedAmount = toBN(dec(100, 18))
     await th.redeemCollateral(whale, contracts, redeemedAmount, GAS_PRICE)
 
-    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice REEF gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
@@ -689,9 +689,9 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(msicBalanceAfter.toString(), msicBalanceBefore.toString())
     // check proxy msic balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(msicBalanceAfter, msicBalanceBefore.add(expectedNewMoUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to REEF gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalMoUSD), 10000)
-    // check trove has increased collateral by the ETH gain
+    // check trove has increased collateral by the REEF gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -703,7 +703,7 @@ contract('BorrowerWrappers', async accounts => {
     // MSIC staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedMSICGain_A))
 
-    // Expect Alice has withdrawn all ETH gain
+    // Expect Alice has withdrawn all REEF gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
     assert.equal(alice_pendingETHGain, 0)
   })

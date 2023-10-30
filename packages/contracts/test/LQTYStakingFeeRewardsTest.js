@@ -17,10 +17,10 @@ const ZERO = th.toBN('0')
 
 const GAS_PRICE = 10000000
 
-/* NOTE: These tests do not test for specific ETH and MoUSD gain values. They only test that the 
+/* NOTE: These tests do not test for specific REEF and MoUSD gain values. They only test that the 
  * gains are non-zero, occur when they should, and are in correct proportion to the user's stake. 
  *
- * Specific ETH/MoUSD gain values will depend on the final fee schedule used, and the final choices for
+ * Specific REEF/MoUSD gain values will depend on the final fee schedule used, and the final choices for
  * parameters BETA and MINUTE_DECAY_FACTOR in the TroveManager, which are still TBD based on economic
  * modelling.
  * 
@@ -86,7 +86,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     await assertRevert(msicStaking.stake(0, {from: A}), "MSICStaking: Amount must be non-zero")
   })
 
-  it("ETH fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
+  it("REEF fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -104,7 +104,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     await msicToken.approve(msicStaking.address, dec(100, 18), {from: A})
     await msicStaking.stake(dec(100, 18), {from: A})
 
-    // Check ETH fee per unit staked is zero
+    // Check REEF fee per unit staked is zero
     const F_ETH_Before = await msicStaking.F_ETH()
     assert.equal(F_ETH_Before, '0')
 
@@ -115,11 +115,11 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee emitted in event is non-zero
+    // check REEF fee emitted in event is non-zero
     const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
     assert.isTrue(emittedETHFee.gt(toBN('0')))
 
-    // Check ETH fee per unit staked has increased by correct amount
+    // Check REEF fee per unit staked has increased by correct amount
     const F_ETH_After = await msicStaking.F_ETH()
 
     // Expect fee per unit staked = fee/100, since there is 100 MoUSD totalStaked
@@ -128,7 +128,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isTrue(expected_F_ETH_After.eq(F_ETH_After))
   })
 
-  it("ETH fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
+  it("REEF fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -141,7 +141,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     // multisig transfers MSIC to staker A
     await msicToken.transfer(A, dec(100, 18), {from: multisig, gasPrice: GAS_PRICE})
 
-    // Check ETH fee per unit staked is zero
+    // Check REEF fee per unit staked is zero
     const F_ETH_Before = await msicStaking.F_ETH()
     assert.equal(F_ETH_Before, '0')
 
@@ -152,11 +152,11 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee emitted in event is non-zero
+    // check REEF fee emitted in event is non-zero
     const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
     assert.isTrue(emittedETHFee.gt(toBN('0')))
 
-    // Check ETH fee per unit staked has not increased 
+    // Check REEF fee per unit staked has not increased 
     const F_ETH_After = await msicStaking.F_ETH()
     assert.equal(F_ETH_After, '0')
   })
@@ -249,7 +249,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.equal(F_MoUSD_After, '0')
   })
 
-  it("MSIC Staking: A single staker earns all ETH and MSIC fees that occur", async () => {
+  it("MSIC Staking: A single staker earns all REEF and MSIC fees that occur", async () => {
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -273,7 +273,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee 1 emitted in event is non-zero
+    // check REEF fee 1 emitted in event is non-zero
     const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
     assert.isTrue(emittedETHFee_1.gt(toBN('0')))
 
@@ -284,7 +284,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const C_BalAfterRedemption = await msicToken.balanceOf(C)
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
  
-     // check ETH fee 2 emitted in event is non-zero
+     // check REEF fee 2 emitted in event is non-zero
      const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
@@ -322,7 +322,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedTotalMoUSDGain, A_MoUSDGain), 1000)
   })
 
-  it("stake(): Top-up sends out all accumulated ETH and MoUSD gains to the staker", async () => { 
+  it("stake(): Top-up sends out all accumulated REEF and MoUSD gains to the staker", async () => { 
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -346,7 +346,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee 1 emitted in event is non-zero
+    // check REEF fee 1 emitted in event is non-zero
     const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
     assert.isTrue(emittedETHFee_1.gt(toBN('0')))
 
@@ -357,7 +357,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const C_BalAfterRedemption = await msicToken.balanceOf(C)
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
  
-     // check ETH fee 2 emitted in event is non-zero
+     // check REEF fee 2 emitted in event is non-zero
      const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
@@ -394,7 +394,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedTotalMoUSDGain, A_MoUSDGain), 1000)
   })
 
-  it("getPendingETHGain(): Returns the staker's correct pending ETH gain", async () => { 
+  it("getPendingETHGain(): Returns the staker's correct pending REEF gain", async () => { 
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -418,7 +418,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee 1 emitted in event is non-zero
+    // check REEF fee 1 emitted in event is non-zero
     const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
     assert.isTrue(emittedETHFee_1.gt(toBN('0')))
 
@@ -429,7 +429,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const C_BalAfterRedemption = await msicToken.balanceOf(C)
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
  
-     // check ETH fee 2 emitted in event is non-zero
+     // check REEF fee 2 emitted in event is non-zero
      const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
@@ -464,7 +464,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const B_BalAfterRedemption = await msicToken.balanceOf(B)
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
 
-    // check ETH fee 1 emitted in event is non-zero
+    // check REEF fee 1 emitted in event is non-zero
     const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
     assert.isTrue(emittedETHFee_1.gt(toBN('0')))
 
@@ -475,7 +475,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const C_BalAfterRedemption = await msicToken.balanceOf(C)
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
  
-     // check ETH fee 2 emitted in event is non-zero
+     // check REEF fee 2 emitted in event is non-zero
      const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
@@ -500,7 +500,7 @@ contract('MSICStaking revenue share tests', async accounts => {
   })
 
   // - multi depositors, several rewards
-  it("MSIC Staking: Multiple stakers earn the correct share of all ETH and MSIC fees, based on their stake size", async () => {
+  it("MSIC Staking: Multiple stakers earn the correct share of all REEF and MSIC fees, based on their stake size", async () => {
     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -584,7 +584,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     D_MoUSD:                                               (100*MoUSDFee_3)/650
     */
 
-    // Expected ETH gains
+    // Expected REEF gains
     const expectedETHGain_A = toBN('100').mul(emittedETHFee_1).div( toBN('600'))
                             .add(toBN('100').mul(emittedETHFee_2).div( toBN('600')))
                             .add(toBN('100').mul(emittedETHFee_3).div( toBN('650')))
@@ -636,7 +636,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.equal((await msicToken.balanceOf(msicStaking.address)), '0')
     assert.equal((await msicStaking.totalMSICStaked()), '0')
 
-    // Get A-D ETH and MoUSD balances
+    // Get A-D REEF and MoUSD balances
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
     const A_MoUSDBalance_After = toBN(await msicToken.balanceOf(A))
     const B_ETHBalance_After = toBN(await web3.eth.getBalance(B))
@@ -646,7 +646,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     const D_ETHBalance_After = toBN(await web3.eth.getBalance(D))
     const D_MoUSDBalance_After = toBN(await msicToken.balanceOf(D))
 
-    // Get ETH and MoUSD gains
+    // Get REEF and MoUSD gains
     const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(A_GAS_Used * GAS_PRICE))
     const A_MoUSDGain = A_MoUSDBalance_After.sub(A_MoUSDBalance_Before)
     const B_ETHGain = B_ETHBalance_After.sub(B_ETHBalance_Before).add(toBN(B_GAS_Used * GAS_PRICE))
@@ -667,7 +667,7 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedMoUSDGain_D, D_MoUSDGain), 1000)
   })
  
-  it("unstake(): reverts if caller has ETH gains and can't receive ETH",  async () => {
+  it("unstake(): reverts if caller has REEF gains and can't receive REEF",  async () => {
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -689,22 +689,22 @@ contract('MSICStaking revenue share tests', async accounts => {
     await nonPayable.forward(msicStaking.address, proxystakeTxData, {from: A})
 
 
-    // B makes a redemption, creating ETH gain for proxy
+    // B makes a redemption, creating REEF gain for proxy
     const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(45, 18), gasPrice = GAS_PRICE)
     
     const proxy_ETHGain = await msicStaking.getPendingETHGain(nonPayable.address)
     assert.isTrue(proxy_ETHGain.gt(toBN('0')))
 
-    // Expect this tx to revert: stake() tries to send nonPayable proxy's accumulated ETH gain (albeit 0),
+    // Expect this tx to revert: stake() tries to send nonPayable proxy's accumulated REEF gain (albeit 0),
     //  A tells proxy to unstake
     const proxyUnStakeTxData = await th.getTransactionData('unstake(uint256)', ['0x56bc75e2d63100000'])  // proxy stakes 100 MSIC
     const proxyUnstakeTxPromise = nonPayable.forward(msicStaking.address, proxyUnStakeTxData, {from: A})
    
-    // but nonPayable proxy can not accept ETH - therefore stake() reverts.
+    // but nonPayable proxy can not accept REEF - therefore stake() reverts.
     await assertRevert(proxyUnstakeTxPromise)
   })
 
-  it("receive(): reverts when it receives ETH from an address that is not the Active Pool",  async () => { 
+  it("receive(): reverts when it receives REEF from an address that is not the Active Pool",  async () => { 
     const ethSendTxPromise1 = web3.eth.sendTransaction({to: msicStaking.address, from: A, value: dec(1, 'ether')})
     const ethSendTxPromise2 = web3.eth.sendTransaction({to: msicStaking.address, from: owner, value: dec(1, 'ether')})
 

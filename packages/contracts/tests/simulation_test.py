@@ -264,9 +264,9 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
 
             [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MoUSD, SP_ETH] = logGlobalState(contracts)
             print('Total redempted ', total_msic_redempted)
-            print('Total ETH added ', total_coll_added)
-            print('Total ETH liquid', total_coll_liquidated)
-            print(f'Ratio ETH liquid {100 * total_coll_liquidated / total_coll_added}%')
+            print('Total REEF added ', total_coll_added)
+            print('Total REEF liquid', total_coll_liquidated)
+            print(f'Ratio REEF liquid {100 * total_coll_liquidated / total_coll_added}%')
             print(' ----------------------\n')
 
             datawriter.writerow([index, ETH_price, price_MoUSD, price_MSIC_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MoUSD, SP_ETH, total_coll_added, total_coll_liquidated, total_msic_redempted])

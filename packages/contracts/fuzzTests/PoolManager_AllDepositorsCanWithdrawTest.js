@@ -189,15 +189,15 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       console.log(`--Before withdrawal--
                     withdrawer addr: ${th.squeezeAddr(depositor)}
                      initial deposit: ${initialDeposit}
-                     ETH gain: ${ETHGain}
-                     ETH in SP: ${ETHinSP}
+                     REEF gain: ${ETHGain}
+                     REEF in SP: ${ETHinSP}
                      compounded deposit: ${finalDeposit} 
                      MoUSD in SP: ${MoUSDinSP}
                     
                     --After withdrawal--
                      Withdrawal tx success: ${withdrawalTx.receipt.status} 
                      Deposit after: ${depositAfter}
-                     ETH remaining in SP: ${ETHinSPAfter}
+                     REEF remaining in SP: ${ETHinSPAfter}
                      SP MoUSD deposits tracker after: ${MoUSDinSPAfter}
                      SP MoUSD balance after: ${MoUSDBalanceSPAfter}
                      `)
@@ -238,7 +238,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     // ensure full offset with whale2 in S
     // ensure partial offset with whale 3 in L
 
-    it("Defaulters' Collateral in range [1, 1e8]. SP Deposits in range [100, 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1, 1e8]. SP Deposits in range [100, 1e10]. REEF:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
       await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
@@ -303,16 +303,16 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
       console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1, 10]. SP Deposits in range [1e8, 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1, 10]. SP Deposits in range [1e8, 1e10]. REEF:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
       await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
@@ -375,16 +375,16 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
       console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [100, 1000]. Every liquidation empties the Pool. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [100, 1000]. Every liquidation empties the Pool. REEF:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
       await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
@@ -447,16 +447,16 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
       console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [1e8 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [1e8 1e10]. REEF:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
       await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
@@ -520,10 +520,10 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
       console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)

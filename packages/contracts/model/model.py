@@ -14,7 +14,7 @@ class ModelParams:
         self.T = 5 # weighting for price change in trove issuance
         self.F = 5 # weighting for momentum change in trove issuance
 
-        self.lookback = 5 # Lookback parameter for ETH price momentum
+        self.lookback = 5 # Lookback parameter for REEF price momentum
 
         self.max_redemption_fraction = 0.5 # Maximum fraction of supply that can be redeemed in a timestep
 
@@ -125,12 +125,12 @@ def get_new_token_supply(trove_issuance, redeemed):
     else: 
         return new_supply
   
-### Various ETH price functions
+### Various REEF price functions
 
 def constant_ETH_price(last_price):
     return last_price
 
-# ETH price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
+# REEF price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
 def randomwalk_ETH_price(last_price):
     big_event = 0
     big_event_chance = np.random.normal()
@@ -167,7 +167,7 @@ params = ModelParams()
 data = Data() # initialize data timeseries
 
 for i in range(1, 100):
-    # update exogenous ETH price
+    # update exogenous REEF price
     last_ETH_price =  data.ETH_price[-1]
 
     # ETH_price = last_ETH_price
@@ -195,7 +195,7 @@ for i in range(1, 100):
     
     # display all new data
     print(f'step: {i}')
-    print(f'ETH price: {ETH_price}')
+    print(f'REEF price: {ETH_price}')
     print(f'momentum: {momentum}')
     print(f'redeemed amount: {redeemed_amount}')
     print(f'base fee: {base_fee}')
@@ -232,7 +232,7 @@ ax2.set_title('Redeemed amount')
 plt.plot(data.redeemed_amount)
 
 ax3 = fig.add_subplot(223)
-ax3.set_title('ETH Price')
+ax3.set_title('REEF Price')
 plt.plot(data.ETH_price)
 
 ax4 = fig.add_subplot(224)

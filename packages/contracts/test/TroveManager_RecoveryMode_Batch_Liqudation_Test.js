@@ -136,7 +136,7 @@ contract('TroveManager - in Recovery Mode - back to normal mode in 1 tx', async 
       const expectedGainInMoUSD = expectedCollateralLiquidatedA.mul(price).div(mv._1e18BN).sub(A_totalDebt)
       const realGainInMoUSD = spEthAfter.sub(spEthBefore).mul(price).div(mv._1e18BN).sub(spMousdBefore.sub(spMousdAfter))
 
-      assert.equal(spEthAfter.sub(spEthBefore).toString(), expectedCollateralLiquidatedA.toString(), 'Stability Pool ETH doesn’t match')
+      assert.equal(spEthAfter.sub(spEthBefore).toString(), expectedCollateralLiquidatedA.toString(), 'Stability Pool REEF doesn’t match')
       assert.equal(spMousdBefore.sub(spMousdAfter).toString(), A_totalDebt.toString(), 'Stability Pool MoUSD doesn’t match')
       assert.equal(realGainInMoUSD.toString(), expectedGainInMoUSD.toString(), 'Stability Pool gains don’t match')
     })

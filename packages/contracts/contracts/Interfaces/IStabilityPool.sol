@@ -9,7 +9,7 @@ pragma solidity 0.6.11;
  * MoUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of MoUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a MoUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an ETH gain, as the ETH collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an REEF gain, as the REEF collateral of the liquidated trove is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -18,7 +18,7 @@ pragma solidity 0.6.11;
  * A deposit that has experienced a series of liquidations is termed a "compounded deposit": each liquidation depletes the deposit,
  * multiplying it by some factor in range ]0,1[
  *
- * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
+ * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / REEF gain derivations:
  * https://github.com/mosaic/mosaic/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  * --- MSIC ISSUANCE TO STABILITY POOL DEPOSITORS ---
@@ -92,7 +92,7 @@ interface IStabilityPool {
      * ---
      * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
      * - Tags the deposit with the provided front end tag param, if it's a new deposit
-     * - Sends depositor's accumulated gains (MSIC, ETH) to depositor
+     * - Sends depositor's accumulated gains (MSIC, REEF) to depositor
      * - Sends the tagged front end's accumulated MSIC gains to the tagged front end
      * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
      */
@@ -105,7 +105,7 @@ interface IStabilityPool {
      * ---
      * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
      * - Removes the deposit's front end tag if it is a full withdrawal
-     * - Sends all depositor's accumulated gains (MSIC, ETH) to depositor
+     * - Sends all depositor's accumulated gains (MSIC, REEF) to depositor
      * - Sends the tagged front end's accumulated MSIC gains to the tagged front end
      * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
      *
@@ -117,12 +117,12 @@ interface IStabilityPool {
      * Initial checks:
      * - User has a non zero deposit
      * - User has an open trove
-     * - User has some ETH gain
+     * - User has some REEF gain
      * ---
      * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
      * - Sends all depositor's MSIC gain to  depositor
      * - Sends all tagged front end's MSIC gain to the tagged front end
-     * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+     * - Transfers the depositor's entire REEF gain from the Stability Pool to the caller's trove
      * - Leaves their compounded deposit in the Stability Pool
      * - Updates snapshots for deposit and tagged front end stake
      */
@@ -143,14 +143,14 @@ interface IStabilityPool {
      * - Caller is TroveManager
      * ---
      * Cancels out the specified debt against the MoUSD contained in the Stability Pool (as far as possible)
-     * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
+     * and transfers the Trove's REEF collateral from ActivePool to StabilityPool.
      * Only called by liquidation functions in the TroveManager.
      */
     function offset(uint _debt, uint _coll) external;
 
     /*
-     * Returns the total amount of ETH held by the pool, accounted in an internal variable instead of `balance`,
-     * to exclude edge cases like ETH received from a self-destruct.
+     * Returns the total amount of REEF held by the pool, accounted in an internal variable instead of `balance`,
+     * to exclude edge cases like REEF received from a self-destruct.
      */
     function getETH() external view returns (uint);
 
@@ -160,7 +160,7 @@ interface IStabilityPool {
     function getTotalMoUSDDeposits() external view returns (uint);
 
     /*
-     * Calculates the ETH gain earned by the deposit since its last snapshots were taken.
+     * Calculates the REEF gain earned by the deposit since its last snapshots were taken.
      */
     function getDepositorETHGain(address _depositor) external view returns (uint);
 
@@ -191,7 +191,7 @@ interface IStabilityPool {
 
     /*
      * Fallback function
-     * Only callable by Active Pool, it just accounts for ETH received
+     * Only callable by Active Pool, it just accounts for REEF received
      * receive() external payable;
      */
 }

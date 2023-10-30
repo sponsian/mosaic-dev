@@ -106,7 +106,7 @@ async function main() {
   const chainlinkPrice = await chainlinkProxy.latestAnswer();
   // chainlink price has only 8 decimals
   const eth_price = chainlinkPrice.mul(toBigNum(dec(1, 10)));
-  th.logBN('ETH price', eth_price);
+  th.logBN('REEF price', eth_price);
   // Tokens must be in the same order
   // Values must be decimal-normalized!
   const weth_balance = INITIAL_FUNDING.mul(weights[1]).div(eth_price);

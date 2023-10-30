@@ -4,7 +4,7 @@
 
 ## SendableEthersMosaic.approveUniTokens() method
 
-Allow the liquidity mining contract to use Uniswap ETH/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->.
+Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->.
 
 <b>Signature:</b>
 

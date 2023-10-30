@@ -4,7 +4,7 @@
 
 ## EthersMosaic.getTotalStakedUniTokens() method
 
-Get the total amount of Uniswap ETH/MoUSD LP tokens currently staked in liquidity mining.
+Get the total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining.
 
 <b>Signature:</b>
 

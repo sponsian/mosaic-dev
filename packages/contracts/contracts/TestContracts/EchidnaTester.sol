@@ -139,17 +139,17 @@ contract EchidnaTester {
         require(price > 0);
         uint minETH = ratio.mul(MoUSD_GAS_COMPENSATION).div(price);
         require(actorBalance > minETH);
-        uint ETH = minETH + _ETH % (actorBalance - minETH);
-        return ETH;
+        uint REEF = minETH + _ETH % (actorBalance - minETH);
+        return REEF;
     }
 
-    function getAdjustedMoUSD(uint ETH, uint _MoUSDAmount, uint ratio) internal view returns (uint) {
+    function getAdjustedMoUSD(uint REEF, uint _MoUSDAmount, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         uint MoUSDAmount = _MoUSDAmount;
         uint compositeDebt = MoUSDAmount.add(MoUSD_GAS_COMPENSATION);
-        uint ICR = MosaicMath._computeCR(ETH, compositeDebt, price);
+        uint ICR = MosaicMath._computeCR(REEF, compositeDebt, price);
         if (ICR < ratio) {
-            compositeDebt = ETH.mul(price).div(ratio);
+            compositeDebt = REEF.mul(price).div(ratio);
             MoUSDAmount = compositeDebt.sub(MoUSD_GAS_COMPENSATION);
         }
         return MoUSDAmount;
@@ -161,13 +161,13 @@ contract EchidnaTester {
         uint actorBalance = address(echidnaProxy).balance;
 
         // we pass in CCR instead of MCR in case it’s the first one
-        uint ETH = getAdjustedETH(actorBalance, _ETH, CCR);
-        uint MoUSDAmount = getAdjustedMoUSD(ETH, _MoUSDAmount, CCR);
+        uint REEF = getAdjustedETH(actorBalance, _ETH, CCR);
+        uint MoUSDAmount = getAdjustedMoUSD(REEF, _MoUSDAmount, CCR);
 
-        //console.log('ETH', ETH);
+        //console.log('REEF', REEF);
         //console.log('MoUSDAmount', MoUSDAmount);
 
-        echidnaProxy.openTrovePrx(ETH, MoUSDAmount, address(0), address(0), 0);
+        echidnaProxy.openTrovePrx(REEF, MoUSDAmount, address(0), address(0), 0);
 
         numberOfTroves = troveManager.getTroveOwnersCount();
         assert(numberOfTroves > 0);
@@ -185,9 +185,9 @@ contract EchidnaTester {
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
         uint actorBalance = address(echidnaProxy).balance;
 
-        uint ETH = getAdjustedETH(actorBalance, _ETH, MCR);
+        uint REEF = getAdjustedETH(actorBalance, _ETH, MCR);
 
-        echidnaProxy.addCollPrx(ETH, address(0), address(0));
+        echidnaProxy.addCollPrx(REEF, address(0), address(0));
     }
 
     function addCollRawExt(uint _i, uint _ETH, address _upperHint, address _lowerHint) external payable {
@@ -220,14 +220,14 @@ contract EchidnaTester {
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
         uint actorBalance = address(echidnaProxy).balance;
 
-        uint ETH = getAdjustedETH(actorBalance, _ETH, MCR);
+        uint REEF = getAdjustedETH(actorBalance, _ETH, MCR);
         uint debtChange = _debtChange;
         if (_isDebtIncrease) {
             // TODO: add current amount already withdrawn:
-            debtChange = getAdjustedMoUSD(ETH, uint(_debtChange), MCR);
+            debtChange = getAdjustedMoUSD(REEF, uint(_debtChange), MCR);
         }
         // TODO: collWithdrawal, debtChange
-        echidnaProxy.adjustTrovePrx(ETH, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
+        echidnaProxy.adjustTrovePrx(REEF, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
     }
 
     function adjustTroveRawExt(uint _i, uint _ETH, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFee) external payable {

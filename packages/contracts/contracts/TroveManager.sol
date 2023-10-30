@@ -91,7 +91,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     /*
     * L_ETH and L_MoUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
     *
-    * An ETH gain of ( stake * [L_ETH - L_ETH(0)] )
+    * An REEF gain of ( stake * [L_ETH - L_ETH(0)] )
     * A MoUSDDebt increase  of ( stake * [L_MoUSDDebt - L_MoUSDDebt(0)] )
     *
     * Where L_ETH(0) and L_MoUSDDebt(0) are snapshots of L_ETH and L_MoUSDDebt for the active Trove taken at the instant the stake was made
@@ -102,8 +102,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     // Map addresses with active troves to their RewardSnapshot
     mapping (address => RewardSnapshot) public rewardSnapshots;
 
-    // Object containing the ETH and MoUSD snapshots for a given active trove
-    struct RewardSnapshot { uint ETH; uint MoUSDDebt;}
+    // Object containing the REEF and MoUSD snapshots for a given active trove
+    struct RewardSnapshot { uint REEF; uint MoUSDDebt;}
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] public TroveOwners;
@@ -462,7 +462,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     }
 
     /*
-    *  Get its offset coll/debt and ETH gas comp, and close the trove.
+    *  Get its offset coll/debt and REEF gas comp, and close the trove.
     */
     function _getCappedOffsetVals
     (
@@ -521,7 +521,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated ETH and MoUSD to the appropriate pools
+        // Move liquidated REEF and MoUSD to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(contractsCache.activePool, contractsCache.defaultPool, totals.totalDebtToRedistribute, totals.totalCollToRedistribute);
         if (totals.totalCollSurplus > 0) {
@@ -663,7 +663,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated ETH and MoUSD to the appropriate pools
+        // Move liquidated REEF and MoUSD to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(activePoolCached, defaultPoolCached, totals.totalDebtToRedistribute, totals.totalCollToRedistribute);
         if (totals.totalCollSurplus > 0) {
@@ -830,7 +830,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         // Get the ETHLot of equivalent value in USD
         singleRedemption.ETHLot = singleRedemption.MoUSDLot.mul(DECIMAL_PRECISION).div(_price);
 
-        // Decrease the debt and collateral of the current Trove according to the MoUSD lot and corresponding ETH to send
+        // Decrease the debt and collateral of the current Trove according to the MoUSD lot and corresponding REEF to send
         uint newDebt = (Troves[_borrower].debt).sub(singleRedemption.MoUSDLot);
         uint newColl = (Troves[_borrower].coll).sub(singleRedemption.ETHLot);
 
@@ -874,17 +874,17 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     /*
     * Called when a full redemption occurs, and closes the trove.
-    * The redeemer swaps (debt - liquidation reserve) MoUSD for (debt - liquidation reserve) worth of ETH, so the MoUSD liquidation reserve left corresponds to the remaining debt.
+    * The redeemer swaps (debt - liquidation reserve) MoUSD for (debt - liquidation reserve) worth of REEF, so the MoUSD liquidation reserve left corresponds to the remaining debt.
     * In order to close the trove, the MoUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
     * The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
-    * Any surplus ETH left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
+    * Any surplus REEF left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
     */
     function _redeemCloseTrove(ContractsCache memory _contractsCache, address _borrower, uint _MoUSD, uint _ETH) internal {
         _contractsCache.msicToken.burn(gasPoolAddress, _MoUSD);
-        // Update Active Pool MoUSD, and send ETH to account
+        // Update Active Pool MoUSD, and send REEF to account
         _contractsCache.activePool.decreaseMoUSDDebt(_MoUSD);
 
-        // send ETH from Active Pool to CollSurplus Pool
+        // send REEF from Active Pool to CollSurplus Pool
         _contractsCache.collSurplusPool.accountSurplus(_borrower, _ETH);
         _contractsCache.activePool.sendETH(address(_contractsCache.collSurplusPool), _ETH);
     }
@@ -1002,12 +1002,12 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         // Use the saved total MoUSD supply value, from before it was reduced by the redemption.
         _updateBaseRateFromRedemption(totals.totalETHDrawn, totals.price, totals.totalMoUSDSupplyAtStart);
 
-        // Calculate the ETH fee
+        // Calculate the REEF fee
         totals.ETHFee = _getRedemptionFee(totals.totalETHDrawn);
 
         _requireUserAcceptsFee(totals.ETHFee, totals.totalETHDrawn, _maxFeePercentage);
 
-        // Send the ETH fee to the MSIC staking contract
+        // Send the REEF fee to the MSIC staking contract
         contractsCache.activePool.sendETH(address(contractsCache.msicStaking), totals.ETHFee);
         contractsCache.msicStaking.increaseF_ETH(totals.ETHFee);
 
@@ -1015,9 +1015,9 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         emit Redemption(_MoUSDamount, totals.totalMoUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
 
-        // Burn the total MoUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
+        // Burn the total MoUSD that is cancelled with debt, and send the redeemed REEF to msg.sender
         contractsCache.msicToken.burn(msg.sender, totals.totalMoUSDToRedeem);
-        // Update Active Pool MoUSD, and send ETH to account
+        // Update Active Pool MoUSD, and send REEF to account
         contractsCache.activePool.decreaseMoUSDDebt(totals.totalMoUSDToRedeem);
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
@@ -1090,14 +1090,14 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     }
 
     function _updateTroveRewardSnapshots(address _borrower) internal {
-        rewardSnapshots[_borrower].ETH = L_ETH;
+        rewardSnapshots[_borrower].REEF = L_ETH;
         rewardSnapshots[_borrower].MoUSDDebt = L_MoUSDDebt;
         emit TroveSnapshotsUpdated(L_ETH, L_MoUSDDebt);
     }
 
-    // Get the borrower's pending accumulated ETH reward, earned by their stake
+    // Get the borrower's pending accumulated REEF reward, earned by their stake
     function getPendingETHReward(address _borrower) public view override returns (uint) {
-        uint snapshotETH = rewardSnapshots[_borrower].ETH;
+        uint snapshotETH = rewardSnapshots[_borrower].REEF;
         uint rewardPerUnitStaked = L_ETH.sub(snapshotETH);
 
         if ( rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) { return 0; }
@@ -1131,7 +1131,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         */
         if (Troves[_borrower].status != Status.active) {return false;}
        
-        return (rewardSnapshots[_borrower].ETH < L_ETH);
+        return (rewardSnapshots[_borrower].REEF < L_ETH);
     }
 
     // Return the Troves entire debt and coll, including pending rewards from redistributions.
@@ -1251,7 +1251,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         Troves[_borrower].coll = 0;
         Troves[_borrower].debt = 0;
 
-        rewardSnapshots[_borrower].ETH = 0;
+        rewardSnapshots[_borrower].REEF = 0;
         rewardSnapshots[_borrower].MoUSDDebt = 0;
 
         _removeTroveOwner(_borrower, TroveOwnersArrayLength);
@@ -1264,9 +1264,9 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     *
     * The calculation excludes a portion of collateral that is in the ActivePool:
     *
-    * the total ETH gas compensation from the liquidation sequence
+    * the total REEF gas compensation from the liquidation sequence
     *
-    * The ETH as compensation must be excluded as it is always sent out at the very end of the liquidation sequence.
+    * The REEF as compensation must be excluded as it is always sent out at the very end of the liquidation sequence.
     */
     function _updateSystemSnapshots_excludeCollRemainder(IActivePool _activePool, uint _collRemainder) internal {
         totalStakesSnapshot = totalStakes;
@@ -1332,7 +1332,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         return _checkRecoveryMode(_price);
     }
 
-    // Check whether or not the system *would be* in Recovery Mode, given an ETH:USD price, and the entire system coll and debt.
+    // Check whether or not the system *would be* in Recovery Mode, given an REEF:USD price, and the entire system coll and debt.
     function _checkPotentialRecoveryMode(
         uint _entireSystemColl,
         uint _entireSystemDebt,
@@ -1358,7 +1358,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     function _updateBaseRateFromRedemption(uint _ETHDrawn,  uint _price, uint _totalMoUSDSupply) internal returns (uint) {
         uint decayedBaseRate = _calcDecayedBaseRate();
 
-        /* Convert the drawn ETH back to MoUSD at face value rate (1 MoUSD:1 USD), in order to get
+        /* Convert the drawn REEF back to MoUSD at face value rate (1 MoUSD:1 USD), in order to get
         * the fraction of total supply that was redeemed at face value. */
         uint redeemedMoUSDFraction = _ETHDrawn.mul(_price).div(_totalMoUSDSupply);
 

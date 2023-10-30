@@ -31,19 +31,19 @@ export interface MosaicStoreBaseState {
   /** User's MSIC token balance. */
   msicBalance: Decimal;
 
-  /** User's Uniswap ETH/MoUSD LP token balance. */
+  /** User's Uniswap REEF/MoUSD LP token balance. */
   uniTokenBalance: Decimal;
 
-  /** The liquidity mining contract's allowance of user's Uniswap ETH/MoUSD LP tokens. */
+  /** The liquidity mining contract's allowance of user's Uniswap REEF/MoUSD LP tokens. */
   uniTokenAllowance: Decimal;
 
   /** Remaining MSIC that will be collectively rewarded to liquidity miners. */
   remainingLiquidityMiningMSICReward: Decimal;
 
-  /** Amount of Uniswap ETH/MoUSD LP tokens the user has staked in liquidity mining. */
+  /** Amount of Uniswap REEF/MoUSD LP tokens the user has staked in liquidity mining. */
   liquidityMiningStake: Decimal;
 
-  /** Total amount of Uniswap ETH/MoUSD LP tokens currently staked in liquidity mining. */
+  /** Total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. */
   totalStakedUniTokens: Decimal;
 
   /** Amount of MSIC the user has earned through mining liquidity. */

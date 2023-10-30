@@ -806,7 +806,7 @@ interface TroveManagerCalls {
   msicToken(_overrides?: CallOverrides): Promise<string>;
   owner(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
-  rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ ETH: BigNumber; MoUSDDebt: BigNumber }>;
+  rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ REEF: BigNumber; MoUSDDebt: BigNumber }>;
   sortedTroves(_overrides?: CallOverrides): Promise<string>;
   stabilityPool(_overrides?: CallOverrides): Promise<string>;
   totalCollateralSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;

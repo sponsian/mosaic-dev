@@ -4,7 +4,7 @@
 
 ## MosaicStoreBaseState.liquidityMiningStake property
 
-Amount of Uniswap ETH/MoUSD LP tokens the user has staked in liquidity mining.
+Amount of Uniswap REEF/MoUSD LP tokens the user has staked in liquidity mining.
 
 <b>Signature:</b>
 

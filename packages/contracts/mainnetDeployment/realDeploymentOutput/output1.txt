@@ -3,7 +3,7 @@ deployer address: 0xa850535D3628CD4dFEB528dC85cfA93051Ff2984
 deployerETHBalance before: 13800000000000000000
 Uniswp addr: 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
 Uniswap Factory number of pairs: 32194
-deployer's ETH balance before deployments: 13800000000000000000
+deployer's REEF balance before deployments: 13800000000000000000
 No Etherscan Url defined, skipping verification
 Contract objects addresses:
 priceFeed: 0x4c517D4e2C851CA76d7eC94B805269Df0f2201De

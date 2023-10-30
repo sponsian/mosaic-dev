@@ -15,12 +15,12 @@ async function main() {
   })
   console.log(`whale address from import: ${ETH_WHALE}`)
 
-  // Get the ETH whale signer 
+  // Get the REEF whale signer 
   const whale = await ethers.provider.getSigner(ETH_WHALE)
   console.log(`whale addr : ${await whale.getAddress()}`)
-  console.log(`whale ETH balance: ${ await ethers.provider.getBalance(whale.getAddress())}`)
+  console.log(`whale REEF balance: ${ await ethers.provider.getBalance(whale.getAddress())}`)
 
-  // Send ETH to the deployer's address
+  // Send REEF to the deployer's address
   await whale.sendTransaction({
     to:  deployerWallet.address,
     value: ethers.utils.parseEther("20.0")

@@ -24,7 +24,7 @@ Implemented by [SendableEthersMosaic](./lib-ethers.sendableethersmosaic.md)<!-- 
 |  Method | Description |
 |  --- | --- |
 |  [adjustTrove(params, maxBorrowingRate)](./lib-base.sendablemosaic.adjusttrove.md) | Adjust existing Trove by changing its collateral, debt, or both. |
-|  [approveUniTokens(allowance)](./lib-base.sendablemosaic.approveunitokens.md) | Allow the liquidity mining contract to use Uniswap ETH/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
+|  [approveUniTokens(allowance)](./lib-base.sendablemosaic.approveunitokens.md) | Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
 |  [borrowMoUSD(amount, maxBorrowingRate)](./lib-base.sendablemosaic.borrowmsic.md) | Adjust existing Trove by borrowing more MoUSD. |
 |  [claimCollateralSurplus()](./lib-base.sendablemosaic.claimcollateralsurplus.md) | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove()](./lib-base.sendablemosaic.closetrove.md) | Close existing Trove by repaying all debt and withdrawing all collateral. |
@@ -40,10 +40,10 @@ Implemented by [SendableEthersMosaic](./lib-ethers.sendableethersmosaic.md)<!-- 
 |  [sendMSIC(toAddress, amount)](./lib-base.sendablemosaic.sendmsic.md) | Send MSIC tokens to an address. |
 |  [sendMoUSD(toAddress, amount)](./lib-base.sendablemosaic.sendmsic.md) | Send MoUSD tokens to an address. |
 |  [stakeMSIC(amount)](./lib-base.sendablemosaic.stakemsic.md) | Stake MSIC to start earning fee revenue or increase existing stake. |
-|  [stakeUniTokens(amount)](./lib-base.sendablemosaic.stakeunitokens.md) | Stake Uniswap ETH/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
+|  [stakeUniTokens(amount)](./lib-base.sendablemosaic.stakeunitokens.md) | Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
 |  [transferCollateralGainToTrove()](./lib-base.sendablemosaic.transfercollateralgaintotrove.md) | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
 |  [unstakeMSIC(amount)](./lib-base.sendablemosaic.unstakemsic.md) | Withdraw MSIC from staking. |
-|  [unstakeUniTokens(amount)](./lib-base.sendablemosaic.unstakeunitokens.md) | Withdraw Uniswap ETH/MoUSD LP tokens from liquidity mining. |
+|  [unstakeUniTokens(amount)](./lib-base.sendablemosaic.unstakeunitokens.md) | Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining. |
 |  [withdrawCollateral(amount)](./lib-base.sendablemosaic.withdrawcollateral.md) | Adjust existing Trove by withdrawing some of its collateral. |
 |  [withdrawGainsFromStabilityPool()](./lib-base.sendablemosaic.withdrawgainsfromstabilitypool.md) | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [MSIC reward](./lib-base.stabilitydeposit.msicreward.md) from Stability Deposit. |
 |  [withdrawGainsFromStaking()](./lib-base.sendablemosaic.withdrawgainsfromstaking.md) | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |

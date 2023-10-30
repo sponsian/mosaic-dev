@@ -35,13 +35,13 @@ async function mainnetDeploy(configParams) {
   console.log(`Uniswap Factory number of pairs: ${uniAllPairsLength}`)
 
   deployerETHBalance = await ethers.provider.getBalance(deployerWallet.address)
-  console.log(`deployer's ETH balance before deployments: ${deployerETHBalance}`)
+  console.log(`deployer's REEF balance before deployments: ${deployerETHBalance}`)
 
   // Deploy core logic contracts
   const mosaicCore = await mdh.deployMosaicCoreMainnet(configParams.externalAddrs.TELLOR_MASTER, deploymentState)
   await mdh.logContractObjects(mosaicCore)
 
-  // Check Uniswap Pair MoUSD-ETH pair before pair creation
+  // Check Uniswap Pair MoUSD-REEF pair before pair creation
   let MoUSDWETHPairAddr = await uniswapV2Factory.getPair(mosaicCore.msicToken.address, configParams.externalAddrs.WETH_ERC20)
   let WETHMoUSDPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, mosaicCore.msicToken.address)
   assert.equal(MoUSDWETHPairAddr, WETHMoUSDPairAddr)
@@ -159,7 +159,7 @@ async function mainnetDeploy(configParams) {
   console.log(`current Chainlink price: ${chainlinkPrice}`)
 
   // Check Tellor price directly (through our TellorCaller)
-  let tellorPriceResponse = await mosaicCore.tellorCaller.getTellorCurrentValue(1) // id == 1: the ETH-USD request ID
+  let tellorPriceResponse = await mosaicCore.tellorCaller.getTellorCurrentValue(1) // id == 1: the REEF-USD request ID
   console.log(`current Tellor price: ${tellorPriceResponse[1]}`)
   console.log(`current Tellor timestamp: ${tellorPriceResponse[2]}`)
 
@@ -238,9 +238,9 @@ async function mainnetDeploy(configParams) {
 
   // // --- Unipool ---
 
-  // // Check Unipool's MoUSD-ETH Uniswap Pair address
+  // // Check Unipool's MoUSD-REEF Uniswap Pair address
   // const unipoolUniswapPairAddr = await unipool.uniToken()
-  // console.log(`Unipool's stored MoUSD-ETH Uniswap Pair address: ${unipoolUniswapPairAddr}`)
+  // console.log(`Unipool's stored MoUSD-REEF Uniswap Pair address: ${unipoolUniswapPairAddr}`)
 
   // console.log("SYSTEM GLOBAL VARS CHECKS")
   // // --- Sorted Troves ---
@@ -257,13 +257,13 @@ async function mainnetDeploy(configParams) {
   // th.logBN('system liquidation reserve', liqReserve)
   // th.logBN('system min net debt      ', minNetDebt)
 
-  // // --- Make first MoUSD-ETH liquidity provision ---
+  // // --- Make first MoUSD-REEF liquidity provision ---
 
   // // Open trove if not yet opened
   // const troveStatus = await mosaicCore.troveManager.getTroveStatus(deployerWallet.address)
   // if (troveStatus.toString() != '1') {
   //   let _3kMoUSDWithdrawal = th.dec(3000, 18) // 3000 MoUSD
-  //   let _3ETHcoll = th.dec(3, 'ether') // 3 ETH
+  //   let _3ETHcoll = th.dec(3, 'ether') // 3 REEF
   //   console.log('Opening trove...')
   //   await mdh.sendAndWaitForTransaction(
   //     mosaicCore.borrowerOperations.openTrove(
@@ -300,15 +300,15 @@ async function mainnetDeploy(configParams) {
 
   // const token0Addr = await MoUSDETHPair.token0()
   // const token1Addr = await MoUSDETHPair.token1()
-  // console.log(`MoUSD-ETH Pair token 0: ${th.squeezeAddr(token0Addr)},
+  // console.log(`MoUSD-REEF Pair token 0: ${th.squeezeAddr(token0Addr)},
   //       MoUSDToken contract addr: ${th.squeezeAddr(mosaicCore.msicToken.address)}`)
-  // console.log(`MoUSD-ETH Pair token 1: ${th.squeezeAddr(token1Addr)},
+  // console.log(`MoUSD-REEF Pair token 1: ${th.squeezeAddr(token1Addr)},
   //       WETH ERC20 contract addr: ${th.squeezeAddr(configParams.externalAddrs.WETH_ERC20)}`)
 
-  // // Check initial MoUSD-ETH pair reserves before provision
+  // // Check initial MoUSD-REEF pair reserves before provision
   // let reserves = await MoUSDETHPair.getReserves()
-  // th.logBN("MoUSD-ETH Pair's MoUSD reserves before provision", reserves[0])
-  // th.logBN("MoUSD-ETH Pair's ETH reserves before provision", reserves[1])
+  // th.logBN("MoUSD-REEF Pair's MoUSD reserves before provision", reserves[0])
+  // th.logBN("MoUSD-REEF Pair's REEF reserves before provision", reserves[1])
 
   // // Get the UniswapV2Router contract
   // const uniswapV2Router02 = new ethers.Contract(
@@ -317,7 +317,7 @@ async function mainnetDeploy(configParams) {
   //   deployerWallet
   // )
 
-  // // --- Provide liquidity to MoUSD-ETH pair if not yet done so ---
+  // // --- Provide liquidity to MoUSD-REEF pair if not yet done so ---
   // let deployerLPTokenBal = await MoUSDETHPair.balanceOf(deployerWallet.address)
   // if (deployerLPTokenBal.toString() == '0') {
   //   console.log('Providing liquidity to Uniswap...')
@@ -331,7 +331,7 @@ async function mainnetDeploy(configParams) {
   //   // Get amounts for liquidity provision
   //   const LP_ETH = dec(1, 'ether')
 
-  //   // Convert 8-digit CL price to 18 and multiply by ETH amount
+  //   // Convert 8-digit CL price to 18 and multiply by REEF amount
   //   const MoUSDAmount = toBigNum(chainlinkPrice)
   //     .mul(toBigNum(dec(1, 10)))
   //     .mul(toBigNum(LP_ETH))
@@ -343,13 +343,13 @@ async function mainnetDeploy(configParams) {
   //   now = (await ethers.provider.getBlock(latestBlock)).timestamp
   //   let tenMinsFromNow = now + (60 * 60 * 10)
 
-  //   // Provide liquidity to MoUSD-ETH pair
+  //   // Provide liquidity to MoUSD-REEF pair
   //   await mdh.sendAndWaitForTransaction(
   //     uniswapV2Router02.addLiquidityETH(
   //       mosaicCore.msicToken.address, // address of MoUSD token
   //       MoUSDAmount, // MoUSD provision
   //       minMoUSDAmount, // minimum MoUSD provision
-  //       LP_ETH, // minimum ETH provision
+  //       LP_ETH, // minimum REEF provision
   //       deployerWallet.address, // address to send LP tokens to
   //       tenMinsFromNow, // deadline for this tx
   //       {
@@ -362,10 +362,10 @@ async function mainnetDeploy(configParams) {
   // } else {
   //   console.log('Liquidity already provided to Uniswap')
   // }
-  // // Check MoUSD-ETH reserves after liquidity provision:
+  // // Check MoUSD-REEF reserves after liquidity provision:
   // reserves = await MoUSDETHPair.getReserves()
-  // th.logBN("MoUSD-ETH Pair's MoUSD reserves after provision", reserves[0])
-  // th.logBN("MoUSD-ETH Pair's ETH reserves after provision", reserves[1])
+  // th.logBN("MoUSD-REEF Pair's MoUSD reserves after provision", reserves[0])
+  // th.logBN("MoUSD-REEF Pair's REEF reserves after provision", reserves[1])
 
 
 
@@ -492,7 +492,7 @@ async function mainnetDeploy(configParams) {
   // if (trove2Status.toString() != '1') {
   //   console.log("Acct 2 opens a trove ...")
   //   let _2kMoUSDWithdrawal = th.dec(2000, 18) // 2000 MoUSD
-  //   let _1pt5_ETHcoll = th.dec(15, 17) // 1.5 ETH
+  //   let _1pt5_ETHcoll = th.dec(15, 17) // 1.5 REEF
   //   const borrowerOpsEthersFactory = await ethers.getContractFactory("BorrowerOperations", account2Wallet)
   //   const borrowerOpsAcct2 = await new ethers.Contract(mosaicCore.borrowerOperations.address, borrowerOpsEthersFactory.interface, account2Wallet)
 
@@ -528,10 +528,10 @@ async function mainnetDeploy(configParams) {
 
   // // --- System stats  ---
 
-  // Uniswap MoUSD-ETH pool size
+  // Uniswap MoUSD-REEF pool size
   reserves = await MoUSDETHPair.getReserves()
-  th.logBN("MoUSD-ETH Pair's current MoUSD reserves", reserves[0])
-  th.logBN("MoUSD-ETH Pair's current ETH reserves", reserves[1])
+  th.logBN("MoUSD-REEF Pair's current MoUSD reserves", reserves[0])
+  th.logBN("MoUSD-REEF Pair's current REEF reserves", reserves[1])
 
   // Number of troves
   const numTroves = await mosaicCore.troveManager.getTroveOwnersCount()
@@ -567,7 +567,7 @@ async function mainnetDeploy(configParams) {
 
   // total LP tokens staked in Unipool
   const totalLPTokensStaked = await unipool.totalSupply()
-  th.logBN("Total LP (MoUSD-ETH) tokens staked in unipool", totalLPTokensStaked)
+  th.logBN("Total LP (MoUSD-REEF) tokens staked in unipool", totalLPTokensStaked)
 
   // --- State variables ---
 
@@ -612,7 +612,7 @@ async function mainnetDeploy(configParams) {
   th.logBN("Total MSIC issued to depositors / front ends", totalMSICIssued)
 
 
-  // TODO: Uniswap *MSIC-ETH* pool size (check it's deployed?)
+  // TODO: Uniswap *MSIC-REEF* pool size (check it's deployed?)
 
 
 

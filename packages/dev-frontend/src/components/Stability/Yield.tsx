@@ -49,7 +49,7 @@ export const Yield: React.FC = () => {
           <Card variant="tooltip" sx={{ width: ["220px", "518px"] }}>
             <Paragraph>
               An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the MSIC return on the MoUSD
-              deposited to the Stability Pool over the next year, not including your ETH gains from
+              deposited to the Stability Pool over the next year, not including your REEF gains from
               liquidations.
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace", mt: 2 }}>

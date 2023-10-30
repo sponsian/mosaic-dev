@@ -29,7 +29,7 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
   <ActionDescription>
     {params.depositCollateral && params.borrowMoUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and receive{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} REEF</Amount> and receive{" "}
         <Amount>
           {params.borrowMoUSD.prettify()} {COIN}
         </Amount>
@@ -40,29 +40,29 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
         <Amount>
           {params.repayMoUSD.prettify()} {COIN}
         </Amount>{" "}
-        and receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
+        and receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount>
       </>
     ) : params.depositCollateral && params.repayMoUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and pay{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} REEF</Amount> and pay{" "}
         <Amount>
           {params.repayMoUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : params.borrowMoUSD && params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount> and{" "}
+        You will receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount> and{" "}
         <Amount>
           {params.borrowMoUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount>
+        You will deposit <Amount>{params.depositCollateral.prettify()} REEF</Amount>
       </>
     ) : params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
+        You will receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount>
       </>
     ) : params.borrowMoUSD ? (
       <>
@@ -215,7 +215,7 @@ const validateTroveCreation = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} ETH</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} REEF</Amount>.
       </ErrorDescription>
     );
   }
@@ -311,7 +311,7 @@ const validateTroveAdjustment = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} ETH</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} REEF</Amount>.
       </ErrorDescription>
     );
   }

@@ -21,7 +21,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     mapping( address => uint) public stakes;
     uint public totalMSICStaked;
 
-    uint public F_ETH;  // Running sum of ETH fees per-MSIC-staked
+    uint public F_ETH;  // Running sum of REEF fees per-MSIC-staked
     uint public F_MoUSD; // Running sum of MSIC fees per-MSIC-staked
 
     // User snapshots of F_ETH and F_MoUSD, taken at the point at which their latest deposit was made
@@ -90,7 +90,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         _renounceOwnership();
     }
 
-    // If caller has a pre-existing stake, send any accumulated ETH and MoUSD gains to them. 
+    // If caller has a pre-existing stake, send any accumulated REEF and MoUSD gains to them. 
     function stake(uint _MSICamount) external override {
         _requireNonZeroAmount(_MSICamount);
 
@@ -98,7 +98,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
 
         uint ETHGain;
         uint MoUSDGain;
-        // Grab any accumulated ETH and MoUSD gains from the current stake
+        // Grab any accumulated REEF and MoUSD gains from the current stake
         if (currentStake != 0) {
             ETHGain = _getPendingETHGain(msg.sender);
             MoUSDGain = _getPendingMoUSDGain(msg.sender);
@@ -119,20 +119,20 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         emit StakeChanged(msg.sender, newStake);
         emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
 
-         // Send accumulated MoUSD and ETH gains to the caller
+         // Send accumulated MoUSD and REEF gains to the caller
         if (currentStake != 0) {
             msicToken.transfer(msg.sender, MoUSDGain);
             _sendETHGainToUser(ETHGain);
         }
     }
 
-    // Unstake the MSIC and send the it back to the caller, along with their accumulated MoUSD & ETH gains. 
+    // Unstake the MSIC and send the it back to the caller, along with their accumulated MoUSD & REEF gains. 
     // If requested amount > stake, send their entire stake.
     function unstake(uint _MSICamount) external override {
         uint currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
-        // Grab any accumulated ETH and MoUSD gains from the current stake
+        // Grab any accumulated REEF and MoUSD gains from the current stake
         uint ETHGain = _getPendingETHGain(msg.sender);
         uint MoUSDGain = _getPendingMoUSDGain(msg.sender);
         
@@ -156,7 +156,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
 
         emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
 
-        // Send accumulated MoUSD and ETH gains to the caller
+        // Send accumulated MoUSD and REEF gains to the caller
         msicToken.transfer(msg.sender, MoUSDGain);
         _sendETHGainToUser(ETHGain);
     }

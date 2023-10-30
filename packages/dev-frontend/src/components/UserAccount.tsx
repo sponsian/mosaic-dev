@@ -53,7 +53,7 @@ export const UserAccount: React.FC = () => {
         <Icon name="wallet" size="lg" />
 
         {([
-          ["ETH", accountBalance],
+          ["REEF", accountBalance],
           [COIN, Decimal.from(msicBalance || 0)],
           [GT, Decimal.from(msicBalance)],
           ["bMoUSD", Decimal.from(bMousdBalance || 0)]

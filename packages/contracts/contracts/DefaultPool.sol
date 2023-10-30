@@ -9,10 +9,10 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 /*
- * The Default Pool holds the ETH and MoUSD debt (but not MoUSD tokens) from liquidations that have been redistributed
+ * The Default Pool holds the REEF and MoUSD debt (but not MoUSD tokens) from liquidations that have been redistributed
  * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
  *
- * When a trove makes an operation that applies its pending ETH and MoUSD debt, its pending ETH and MoUSD debt is moved
+ * When a trove makes an operation that applies its pending REEF and MoUSD debt, its pending REEF and MoUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is Ownable, CheckContract, IDefaultPool {
@@ -22,7 +22,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     address public troveManagerAddress;
     address public activePoolAddress;
-    uint256 internal ETH;  // deposited ETH tracker
+    uint256 internal REEF;  // deposited REEF tracker
     uint256 internal MoUSDDebt;  // debt
 
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
@@ -53,12 +53,12 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     // --- Getters for public variables. Required by IPool interface ---
 
     /*
-    * Returns the ETH state variable.
+    * Returns the REEF state variable.
     *
-    * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
+    * Not necessarily equal to the the contract's raw REEF balance - ether can be forcibly sent to contracts.
     */
     function getETH() external view override returns (uint) {
-        return ETH;
+        return REEF;
     }
 
     function getMoUSDDebt() external view override returns (uint) {
@@ -70,12 +70,12 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     function sendETHToActivePool(uint _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        ETH = ETH.sub(_amount);
-        emit DefaultPoolETHBalanceUpdated(ETH);
+        REEF = REEF.sub(_amount);
+        emit DefaultPoolETHBalanceUpdated(REEF);
         emit EtherSent(activePool, _amount);
 
         (bool success, ) = activePool.call{ value: _amount }("");
-        require(success, "DefaultPool: sending ETH failed");
+        require(success, "DefaultPool: sending REEF failed");
     }
 
     function increaseMoUSDDebt(uint _amount) external override {
@@ -104,7 +104,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-        emit DefaultPoolETHBalanceUpdated(ETH);
+        REEF = REEF.add(msg.value);
+        emit DefaultPoolETHBalanceUpdated(REEF);
     }
 }

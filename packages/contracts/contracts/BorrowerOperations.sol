@@ -209,18 +209,18 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         emit MoUSDBorrowingFeePaid(msg.sender, vars.MoUSDFee);
     }
 
-    // Send ETH as collateral to a trove
+    // Send REEF as collateral to a trove
     function addColl(address _upperHint, address _lowerHint) external payable override {
         _adjustTrove(msg.sender, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Send ETH as collateral to a trove. Called by only the Stability Pool.
+    // Send REEF as collateral to a trove. Called by only the Stability Pool.
     function moveETHGainToTrove(address _borrower, address _upperHint, address _lowerHint) external payable override {
         _requireCallerIsStabilityPool();
         _adjustTrove(_borrower, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Withdraw ETH collateral from a trove
+    // Withdraw REEF collateral from a trove
     function withdrawColl(uint _collWithdrawal, address _upperHint, address _lowerHint) external override {
         _adjustTrove(msg.sender, _collWithdrawal, 0, false, _upperHint, _lowerHint, 0);
     }
@@ -261,12 +261,12 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         _requireNonZeroAdjustment(_collWithdrawal, _MoUSDChange);
         _requireTroveisActive(contractsCache.troveManager, _borrower);
 
-        // Confirm the operation is either a borrower adjusting their own trove, or a pure ETH transfer from the Stability Pool to a trove
+        // Confirm the operation is either a borrower adjusting their own trove, or a pure REEF transfer from the Stability Pool to a trove
         assert(msg.sender == _borrower || (msg.sender == stabilityPoolAddress && msg.value > 0 && _MoUSDChange == 0));
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
-        // Get the collChange based on whether or not ETH was sent in the transaction
+        // Get the collChange based on whether or not REEF was sent in the transaction
         (vars.collChange, vars.isCollIncrease) = _getCollChange(msg.value, _collWithdrawal);
 
         vars.netDebtChange = _MoUSDChange;
@@ -354,7 +354,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
      * Claim remaining collateral from a redemption or from a liquidation with ICR > MCR in Recovery Mode
      */
     function claimCollateral() external override {
-        // send ETH from CollSurplus Pool to owner
+        // send REEF from CollSurplus Pool to owner
         collSurplusPool.claimColl(msg.sender);
     }
 
@@ -442,10 +442,10 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         }
     }
 
-    // Send ETH to Active Pool and increase its recorded ETH balance
+    // Send REEF to Active Pool and increase its recorded REEF balance
     function _activePoolAddColl(IActivePool _activePool, uint _amount) internal {
         (bool success, ) = address(_activePool).call{value: _amount}("");
-        require(success, "BorrowerOps: Sending ETH to ActivePool failed");
+        require(success, "BorrowerOps: Sending REEF to ActivePool failed");
     }
 
     // Issue the specified amount of MoUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a MoUSDFee)

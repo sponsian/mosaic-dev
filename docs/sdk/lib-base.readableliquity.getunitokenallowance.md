@@ -4,7 +4,7 @@
 
 ## ReadableMosaic.getUniTokenAllowance() method
 
-Get the liquidity mining contract's allowance of a holder's Uniswap ETH/MoUSD LP tokens.
+Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens.
 
 <b>Signature:</b>
 
@@ -16,7 +16,7 @@ getUniTokenAllowance(address?: string): Promise<Decimal>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  address | string | Address holding the Uniswap ETH/MoUSD LP tokens. |
+|  address | string | Address holding the Uniswap REEF/MoUSD LP tokens. |
 
 <b>Returns:</b>
 

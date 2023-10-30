@@ -22,7 +22,7 @@ export const NoDeposit: React.FC = () => {
       </Heading>
       <Box sx={{ p: [2, 3] }}>
         <InfoMessage title="You have no MoUSD in the Stability Pool.">
-          You can earn ETH and MSIC rewards by depositing MoUSD.
+          You can earn REEF and MSIC rewards by depositing MoUSD.
         </InfoMessage>
 
         <Flex variant="layout.actions">

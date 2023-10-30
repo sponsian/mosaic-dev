@@ -69,7 +69,7 @@ $ hardhat test
   Contract: BorrowerOperations
     Without proxy
       ✓ addColl(): reverts when top-up would leave trove with ICR < MCR (278ms)
-      ✓ addColl(): Increases the activePool ETH and raw ether balance by correct amount (203ms)
+      ✓ addColl(): Increases the activePool REEF and raw ether balance by correct amount (203ms)
       ✓ addColl(), active Trove: adds the correct collateral amount to the Trove (194ms)
       ✓ addColl(), active Trove: Trove is in sortedList before and after (213ms)
       ✓ addColl(), active Trove: updates the stake and updates the total stakes (225ms)
@@ -79,15 +79,15 @@ $ hardhat test
       ✓ withdrawColl(): reverts when withdrawal would leave trove with ICR < MCR (349ms)
       ✓ withdrawColl(): reverts when calling address does not have active trove (328ms)
       ✓ withdrawColl(): reverts when system is in Recovery Mode (420ms)
-      ✓ withdrawColl(): reverts when requested ETH withdrawal is > the trove's collateral (508ms)
+      ✓ withdrawColl(): reverts when requested REEF withdrawal is > the trove's collateral (508ms)
       ✓ withdrawColl(): reverts when withdrawal would bring the user's ICR < MCR (313ms)
       ✓ withdrawColl(): reverts if system is in Recovery Mode (323ms)
       ✓ withdrawColl(): doesn’t allow a user to completely withdraw all collateral from their Trove (due to gas compensation) (352ms)
       ✓ withdrawColl(): leaves the Trove active when the user withdraws less than all the collateral (263ms)
       ✓ withdrawColl(): reduces the Trove's collateral by the correct amount (316ms)
-      ✓ withdrawColl(): reduces ActivePool ETH and raw ether by correct amount (291ms)
+      ✓ withdrawColl(): reduces ActivePool REEF and raw ether by correct amount (291ms)
       ✓ withdrawColl(): updates the stake and updates the total stakes (342ms)
-      ✓ withdrawColl(): sends the correct amount of ETH to the user (289ms)
+      ✓ withdrawColl(): sends the correct amount of REEF to the user (289ms)
       ✓ withdrawColl(): applies pending rewards and updates user's L_ETH, L_MoUSDDebt snapshots (1205ms)
       ✓ withdrawMoUSD(): reverts when withdrawal would leave trove with ICR < MCR (516ms)
       ✓ withdrawMoUSD(): decays a non-zero base rate (1192ms)
@@ -148,7 +148,7 @@ $ hardhat test
       ✓ adjustTrove(): debt increase in Recovery Mode charges no fee (543ms)
       ✓ adjustTrove(): reverts when change would cause the TCR of the system to fall below the CCR (587ms)
       ✓ adjustTrove(): reverts when MoUSD repaid is > debt of the trove (451ms)
-      ✓ adjustTrove(): reverts when attempted ETH withdrawal is >= the trove's collateral (683ms)
+      ✓ adjustTrove(): reverts when attempted REEF withdrawal is >= the trove's collateral (683ms)
       ✓ adjustTrove(): reverts when change would cause the ICR of the trove to fall below the MCR (521ms)
       ✓ adjustTrove(): With 0 coll change, doesnt change borrower's coll or ActivePool coll (289ms)
       ✓ adjustTrove(): With 0 debt change, doesnt change borrower's debt or ActivePool debt (354ms)
@@ -160,8 +160,8 @@ $ hardhat test
       ✓ adjustTrove():  updates borrower's stake and totalStakes with a coll decrease (553ms)
       ✓ adjustTrove(): changes MoUSDToken balance by the requested decrease (529ms)
       ✓ adjustTrove(): changes MoUSDToken balance by the requested increase (577ms)
-      ✓ adjustTrove(): Changes the activePool ETH and raw ether balance by the requested decrease (1371ms)
-      ✓ adjustTrove(): Changes the activePool ETH and raw ether balance by the amount of ETH sent (548ms)
+      ✓ adjustTrove(): Changes the activePool REEF and raw ether balance by the requested decrease (1371ms)
+      ✓ adjustTrove(): Changes the activePool REEF and raw ether balance by the amount of REEF sent (548ms)
       ✓ adjustTrove(): Changes the MoUSD debt in ActivePool by requested decrease (541ms)
       ✓ adjustTrove(): Changes the MoUSD debt in ActivePool by requested increase (397ms)
       ✓ adjustTrove(): new coll = 0 and new debt = 0 is not allowed, as gas compensation still counts toward ICR (385ms)
@@ -180,10 +180,10 @@ $ hardhat test
       ✓ closeTrove(): sets Trove's stake to zero (504ms)
       ✓ closeTrove(): zero's the troves reward snapshots (1002ms)
       ✓ closeTrove(): sets trove's status to closed and removes it from sorted troves list (526ms)
-      ✓ closeTrove(): reduces ActivePool ETH and raw ether by correct amount (466ms)
+      ✓ closeTrove(): reduces ActivePool REEF and raw ether by correct amount (466ms)
       ✓ closeTrove(): reduces ActivePool debt by correct amount (522ms)
       ✓ closeTrove(): updates the the total stakes (790ms)
-      ✓ closeTrove(): sends the correct amount of ETH to the user (390ms)
+      ✓ closeTrove(): sends the correct amount of REEF to the user (390ms)
       ✓ closeTrove(): subtracts the debt of the closed Trove from the Borrower's MoUSDToken balance (405ms)
       ✓ closeTrove(): applies pending rewards (1267ms)
       ✓ closeTrove(): reverts if borrower has insufficient MoUSD balance to repay his entire debt (347ms)
@@ -215,14 +215,14 @@ $ hardhat test
       ✓ openTrove(): adds Trove owner to TroveOwners array (136ms)
       ✓ openTrove(): creates a stake and adds it to total stakes (281ms)
       ✓ openTrove(): inserts Trove to Sorted Troves list (370ms)
-      ✓ openTrove(): Increases the activePool ETH and raw ether balance by correct amount (294ms)
+      ✓ openTrove(): Increases the activePool REEF and raw ether balance by correct amount (294ms)
       ✓ openTrove(): records up-to-date initial snapshots of L_ETH and L_MoUSDDebt (639ms)
       ✓ openTrove(): allows a user to open a Trove, then close it, then re-open it (687ms)
       ✓ openTrove(): increases the Trove's MoUSD debt by the correct amount (129ms)
       ✓ openTrove(): increases MoUSD debt in ActivePool by the debt of the trove (162ms)
       ✓ openTrove(): increases user MoUSDToken balance by correct amount (85ms)
       ✓ getCompositeDebt(): returns debt + gas comp
-      ✓ closeTrove(): fails if owner cannot receive ETH (440ms)
+      ✓ closeTrove(): fails if owner cannot receive REEF (440ms)
       getNewICRFromTroveChange() returns the correct ICR
         ✓ collChange = 0, debtChange = 0
         ✓ collChange = 0, debtChange is positive
@@ -245,11 +245,11 @@ $ hardhat test
         ✓ collChange is negative, debtChange is positive (381ms)
 
   Contract: CollSurplusPool
-    ✓ CollSurplusPool::getETH(): Returns the ETH balance of the CollSurplusPool after redemption (2203ms)
+    ✓ CollSurplusPool::getETH(): Returns the REEF balance of the CollSurplusPool after redemption (2203ms)
     ✓ CollSurplusPool: claimColl(): Reverts if caller is not Borrower Operations
     ✓ CollSurplusPool: claimColl(): Reverts if nothing to claim
-    ✓ CollSurplusPool: claimColl(): Reverts if owner cannot receive ETH surplus (723ms)
-    ✓ CollSurplusPool: reverts trying to send ETH to it
+    ✓ CollSurplusPool: claimColl(): Reverts if owner cannot receive REEF surplus (723ms)
+    ✓ CollSurplusPool: reverts trying to send REEF to it
     ✓ CollSurplusPool: accountSurplus: reverts if caller is not Trove Manager
 
   Contract: Deployment script - Sets correct contract addresses dependencies after deployment
@@ -292,7 +292,7 @@ $ hardhat test
     ✓ Sets the correct StabilityPool address in CommunityIssuance
 
   Contract: DefaultPool
-    ✓ sendETHToActivePool(): fails if receiver cannot receive ETH
+    ✓ sendETHToActivePool(): fails if receiver cannot receive REEF
 
   Contract: Fee arithmetic tests
     ✓ minutesPassedSinceLastFeeOp(): returns minutes passed for no time increase (197ms)
@@ -545,17 +545,17 @@ issuance fraction after: 949066037374286
 
   Contract: MSICStaking revenue share tests
     ✓ stake(): reverts if amount is zero (74ms)
-    ✓ ETH fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1562ms)
-    ✓ ETH fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (3540ms)
+    ✓ REEF fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1562ms)
+    ✓ REEF fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (3540ms)
     ✓ MoUSD fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1757ms)
     ✓ MoUSD fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (1705ms)
-    ✓ MSIC Staking: A single staker earns all ETH and MSIC fees that occur (2143ms)
-    ✓ stake(): Top-up sends out all accumulated ETH and MoUSD gains to the staker (2138ms)
-    ✓ getPendingETHGain(): Returns the staker's correct pending ETH gain (1856ms)
+    ✓ MSIC Staking: A single staker earns all REEF and MSIC fees that occur (2143ms)
+    ✓ stake(): Top-up sends out all accumulated REEF and MoUSD gains to the staker (2138ms)
+    ✓ getPendingETHGain(): Returns the staker's correct pending REEF gain (1856ms)
     ✓ getPendingMoUSDGain(): Returns the staker's correct pending MoUSD gain (1965ms)
-    ✓ MSIC Staking: Multiple stakers earn the correct share of all ETH and MSIC fees, based on their stake size (3133ms)
-    ✓ unstake(): reverts if caller has ETH gains and can't receive ETH (1149ms)
-    ✓ receive(): reverts when it receives ETH from an address that is not the Active Pool
+    ✓ MSIC Staking: Multiple stakers earn the correct share of all REEF and MSIC fees, based on their stake size (3133ms)
+    ✓ unstake(): reverts if caller has REEF gains and can't receive REEF (1149ms)
+    ✓ receive(): reverts when it receives REEF from an address that is not the Active Pool
     ✓ unstake(): reverts if user has no stake
     ✓ Test requireCallerIsTroveManager
 
@@ -627,22 +627,22 @@ issuance fraction after: 949066037374286
       ✓ setMSICAddress(): reverts when called by non-owner, with wrong address, or twice (216ms)
 
   Contract: StabilityPool
-    ✓ getETH(): gets the recorded ETH balance
+    ✓ getETH(): gets the recorded REEF balance
     ✓ getTotalMoUSDDeposits(): gets the recorded MoUSD balance
 
   Contract: ActivePool
-    ✓ getETH(): gets the recorded ETH balance
+    ✓ getETH(): gets the recorded REEF balance
     ✓ getMoUSDDebt(): gets the recorded MoUSD balance
     ✓ increaseMoUSD(): increases the recorded MoUSD balance by the correct amount
     ✓ decreaseMoUSD(): decreases the recorded MoUSD balance by the correct amount
-    ✓ sendETH(): decreases the recorded ETH balance by the correct amount
+    ✓ sendETH(): decreases the recorded REEF balance by the correct amount
 
   Contract: DefaultPool
     ✓ getETH(): gets the recorded MoUSD balance
     ✓ getMoUSDDebt(): gets the recorded MoUSD balance
     ✓ increaseMoUSD(): increases the recorded MoUSD balance by the correct amount
     ✓ decreaseMoUSD(): decreases the recorded MoUSD balance by the correct amount (57ms)
-    ✓ sendETHToActivePool(): decreases the recorded ETH balance by the correct amount (50ms)
+    ✓ sendETHToActivePool(): decreases the recorded REEF balance by the correct amount (50ms)
 
   Contract: PriceFeed
     ✓ C1 Chainlink working: fetchPrice should return the correct price, taking into account the number of decimal digits on the aggregator (286ms)
@@ -763,8 +763,8 @@ issuance fraction after: 949066037374286
       ✓ setAddresses should fail after address has already been set (42ms)
 
   Contract: BorrowerWrappers
-    ✓ proxy owner can recover ETH (85ms)
-    ✓ non proxy owner cannot recover ETH
+    ✓ proxy owner can recover REEF (85ms)
+    ✓ non proxy owner cannot recover REEF
     ✓ claimCollateralAndOpenTrove(): reverts if nothing to claim (388ms)
     ✓ claimCollateralAndOpenTrove(): without sending any value (1227ms)
     ✓ claimCollateralAndOpenTrove(): sending value in the transaction (3969ms)
@@ -772,9 +772,9 @@ issuance fraction after: 949066037374286
     ✓ claimSPRewardsAndRecycle(): (1272ms)
     ✓ claimStakingGainsAndRecycle(): only owner can call it (1384ms)
     ✓ claimStakingGainsAndRecycle(): reverts if user has no trove (1253ms)
-    ✓ claimStakingGainsAndRecycle(): with only ETH gain (1595ms)
+    ✓ claimStakingGainsAndRecycle(): with only REEF gain (1595ms)
     ✓ claimStakingGainsAndRecycle(): with only MoUSD gain (821ms)
-    ✓ claimStakingGainsAndRecycle(): with both ETH and MoUSD gains (1593ms)
+    ✓ claimStakingGainsAndRecycle(): with both REEF and MoUSD gains (1593ms)
 
   Contract: SortedTroves
     SortedTroves
@@ -822,70 +822,70 @@ totalMSICIssued_2: 30370113195977152000000
 
   Contract: StabilityPool - Withdrawal of stability deposit - Reward calculations
     Stability Pool Withdrawal
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after one liquidation (757ms)
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two identical liquidations (868ms)
-      ✓ withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three identical liquidations (1051ms)
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two liquidations of increasing MoUSD (965ms)
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three liquidations of increasing MoUSD (1152ms)
-      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after two identical liquidations (934ms)
-      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three identical liquidations (1130ms)
-      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three varying liquidations (1193ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after one liquidation (757ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two identical liquidations (868ms)
+      ✓ withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three identical liquidations (1051ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MoUSD (965ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MoUSD (1152ms)
+      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after two identical liquidations (934ms)
+      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three identical liquidations (1130ms)
+      ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three varying liquidations (1193ms)
 
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1512ms)
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1637ms)
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1645ms)
-      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1704ms)
-      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1753ms)
-      ✓ withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (1537ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1512ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1637ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1645ms)
+      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1704ms)
+      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1753ms)
+      ✓ withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1537ms)
       ✓ withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool (3424ms)
       ✓ withdrawFromSP(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18 (1678ms)
       ✓ withdrawFromSP(): Depositors withdraw correct compounded deposit after liquidation empties the pool (1100ms)
-      ✓ withdrawFromSP(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the ETH Gain from one liquidation (1049ms)
+      ✓ withdrawFromSP(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the REEF Gain from one liquidation (1049ms)
       ✓ withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool (4540ms)
-      ✓ withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation (918ms)
-      ✓ withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and ETH Gain after one liquidation (1187ms)
-      ✓ withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation (778ms)
-      ✓ withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation (3494ms)
+      ✓ withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation (918ms)
+      ✓ withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and REEF Gain after one liquidation (1187ms)
+      ✓ withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation (778ms)
+      ✓ withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (3494ms)
 alice deposit: 0
       ✓ withdrawFromSP(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0 (365ms)
-      ✓ withdrawFromSP(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation (1676ms)
+      ✓ withdrawFromSP(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (1676ms)
       ✓ withdrawFromSP(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation (1848ms)
-      ✓ withdrawFromSP(): Depositor's ETH gain stops increasing after two scale changes (4134ms)
-      ✓ withdrawFromSP(): Large liquidated coll/debt, deposits and ETH price (932ms)
-      ✓ withdrawFromSP(): Small liquidated coll/debt, large deposits and ETH price (832ms)
+      ✓ withdrawFromSP(): Depositor's REEF gain stops increasing after two scale changes (4134ms)
+      ✓ withdrawFromSP(): Large liquidated coll/debt, deposits and REEF price (932ms)
+      ✓ withdrawFromSP(): Small liquidated coll/debt, large deposits and REEF price (832ms)
 
   Contract: StabilityPool - Withdrawal of stability deposit - Reward calculations
     Stability Pool Withdrawal
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after one liquidation (1227ms)
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two identical liquidations (1400ms)
-      ✓ withdrawETHGainToTrove():  Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three identical liquidations (1827ms)
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two liquidations of increasing MoUSD (1597ms)
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three liquidations of increasing MoUSD (1711ms)
-      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after two identical liquidations (1782ms)
-      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three identical liquidations (1798ms)
-      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three varying liquidations (4488ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after one liquidation (1227ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two identical liquidations (1400ms)
+      ✓ withdrawETHGainToTrove():  Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three identical liquidations (1827ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MoUSD (1597ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MoUSD (1711ms)
+      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after two identical liquidations (1782ms)
+      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three identical liquidations (1798ms)
+      ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three varying liquidations (4488ms)
 
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (2168ms)
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (5085ms)
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (2304ms)
-      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (2335ms)
-      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and ETH Gain (2145ms)
-      ✓ withdrawETHGainToTrove(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and ETH Gain (2543ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2168ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (5085ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2304ms)
+      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2335ms)
+      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2145ms)
+      ✓ withdrawETHGainToTrove(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2543ms)
       ✓ withdrawETHGainToTrove(): Depositor withdraws correct compounded deposit after liquidation empties the pool (1889ms)
       ✓ withdrawETHGainToTrove(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18 (1891ms)
       ✓ withdrawETHGainToTrove(): Depositors withdraw correct compounded deposit after liquidation empties the pool (2324ms)
-      ✓ withdrawETHGainToTrove(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the ETH Gain from one liquidation (1719ms)
+      ✓ withdrawETHGainToTrove(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the REEF Gain from one liquidation (1719ms)
       ✓ withdrawETHGainToTrove(): Depositor withdraws correct compounded deposit after liquidation empties the pool (3958ms)
-      ✓ withdrawETHGainToTrove(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation (1276ms)
-      ✓ withdrawETHGainToTrove(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and ETH Gain after one liquidation (4690ms)
-      ✓ withdrawETHGainToTrove(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation (1460ms)
-      ✓ withdrawETHGainToTrove(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation (1986ms)
+      ✓ withdrawETHGainToTrove(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation (1276ms)
+      ✓ withdrawETHGainToTrove(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and REEF Gain after one liquidation (4690ms)
+      ✓ withdrawETHGainToTrove(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation (1460ms)
+      ✓ withdrawETHGainToTrove(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (1986ms)
 alice deposit: 0
       ✓ withdrawETHGainToTrove(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0 (3725ms)
-      ✓ withdrawETHGainToTrove(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation (2361ms)
+      ✓ withdrawETHGainToTrove(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (2361ms)
       ✓ withdrawETHGainToTrove(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation (3814ms)
-      ✓ withdrawETHGainToTrove(): Large liquidated coll/debt, deposits and ETH price (959ms)
-      ✓ withdrawETHGainToTrove(): Small liquidated coll/debt, large deposits and ETH price (784ms)
+      ✓ withdrawETHGainToTrove(): Large liquidated coll/debt, deposits and REEF price (959ms)
+      ✓ withdrawETHGainToTrove(): Small liquidated coll/debt, large deposits and REEF price (784ms)
 
   Contract: StabilityPool
     Stability Pool Mechanisms
@@ -897,8 +897,8 @@ alice deposit: 0
       ✓ provideToSP(), multiple deposits: updates user's deposit and snapshots (2543ms)
       ✓ provideToSP(): reverts if user tries to provide more than their MoUSD balance (1030ms)
       ✓ provideToSP(): reverts if user tries to provide 2^256-1 MoUSD, which exceeds their balance (508ms)
-      ✓ provideToSP(): reverts if cannot receive ETH Gain (1073ms)
-      ✓ provideToSP(): doesn't impact other users' deposits or ETH gains (1906ms)
+      ✓ provideToSP(): reverts if cannot receive REEF Gain (1073ms)
+      ✓ provideToSP(): doesn't impact other users' deposits or REEF gains (1906ms)
       ✓ provideToSP(): doesn't impact system debt, collateral or TCR (2287ms)
       ✓ provideToSP(): doesn't impact any troves, including the caller's trove (1810ms)
       ✓ provideToSP(): doesn't protect the depositor's trove from liquidation (1082ms)
@@ -911,8 +911,8 @@ alice deposit: 0
       ✓ provideToSP(), new eligible deposit: tagged front end receives MSIC rewards (1605ms)
       ✓ provideToSP(), new eligible deposit: tagged front end's stake increases (848ms)
       ✓ provideToSP(), new eligible deposit: tagged front end's snapshots update (1913ms)
-      ✓ provideToSP(), new deposit: depositor does not receive ETH gains (957ms)
-      ✓ provideToSP(), new deposit after past full withdrawal: depositor does not receive ETH gains (1928ms)
+      ✓ provideToSP(), new deposit: depositor does not receive REEF gains (957ms)
+      ✓ provideToSP(), new deposit after past full withdrawal: depositor does not receive REEF gains (1928ms)
       ✓ provideToSP(), topup: triggers MSIC reward event - increases the sum G (1007ms)
       ✓ provideToSP(), topup from different front end: doesn't change the front end tag (1511ms)
       ✓ provideToSP(), topup: depositor receives MSIC rewards (1487ms)
@@ -924,24 +924,24 @@ alice deposit: 0
       ✓ provideToSP(): reverts if provided tag is not a registered front end (587ms)
       ✓ withdrawFromSP(): reverts when user has no active deposit (597ms)
       ✓ withdrawFromSP(): reverts when amount > 0 and system has an undercollateralized trove (453ms)
-      ✓ withdrawFromSP(): partial retrieval - retrieves correct MoUSD amount and the entire ETH Gain, and updates deposit (1102ms)
+      ✓ withdrawFromSP(): partial retrieval - retrieves correct MoUSD amount and the entire REEF Gain, and updates deposit (1102ms)
       ✓ withdrawFromSP(): partial retrieval - leaves the correct amount of MoUSD in the Stability Pool (1128ms)
       ✓ withdrawFromSP(): full retrieval - leaves the correct amount of MoUSD in the Stability Pool (1091ms)
-      ✓ withdrawFromSP(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero ETH (1494ms)
-      ✓ withdrawFromSP(): it correctly updates the user's MoUSD and ETH snapshots of entitled reward per unit staked (1049ms)
-      ✓ withdrawFromSP(): decreases StabilityPool ETH (3952ms)
+      ✓ withdrawFromSP(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF (1494ms)
+      ✓ withdrawFromSP(): it correctly updates the user's MoUSD and REEF snapshots of entitled reward per unit staked (1049ms)
+      ✓ withdrawFromSP(): decreases StabilityPool REEF (3952ms)
       ✓ withdrawFromSP(): All depositors are able to withdraw from the SP to their account (2393ms)
       ✓ withdrawFromSP(): increases depositor's MoUSD token balance by the expected amount (2098ms)
-      ✓ withdrawFromSP(): doesn't impact other users Stability deposits or ETH gains (4954ms)
+      ✓ withdrawFromSP(): doesn't impact other users Stability deposits or REEF gains (4954ms)
       ✓ withdrawFromSP(): doesn't impact system debt, collateral or TCR  (1500ms)
       ✓ withdrawFromSP(): doesn't impact any troves, including the caller's trove (1085ms)
       ✓ withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove (933ms)
       ✓ withdrawFromSP(): withdrawing 0 MoUSD doesn't alter the caller's deposit or the total MoUSD in the Stability Pool (993ms)
-      ✓ withdrawFromSP(): withdrawing 0 ETH Gain does not alter the caller's ETH balance, their trove collateral, or the ETH  in the Stability Pool (1139ms)
+      ✓ withdrawFromSP(): withdrawing 0 REEF Gain does not alter the caller's REEF balance, their trove collateral, or the REEF  in the Stability Pool (1139ms)
       ✓ withdrawFromSP(): Request to withdraw > caller's deposit only withdraws the caller's compounded deposit (1260ms)
       ✓ withdrawFromSP(): Request to withdraw 2^256-1 MoUSD only withdraws the caller's compounded deposit (1229ms)
-      ✓ withdrawFromSP(): caller can withdraw full deposit and ETH gain during Recovery Mode (4371ms)
-      ✓ getDepositorETHGain(): depositor does not earn further ETH gains from liquidations while their compounded deposit == 0:  (1831ms)
+      ✓ withdrawFromSP(): caller can withdraw full deposit and REEF gain during Recovery Mode (4371ms)
+      ✓ getDepositorETHGain(): depositor does not earn further REEF gains from liquidations while their compounded deposit == 0:  (1831ms)
       ✓ withdrawFromSP(): triggers MSIC reward event - increases the sum G (982ms)
       ✓ withdrawFromSP(), partial withdrawal: doesn't change the front end tag (1421ms)
       ✓ withdrawFromSP(), partial withdrawal: depositor receives MSIC rewards (1155ms)
@@ -953,13 +953,13 @@ alice deposit: 0
       ✓ withdrawFromSP(), full withdrawal that reduces front end stake to 0: zero’s the front end’s snapshots (1248ms)
       ✓ withdrawFromSP(), reverts when initial deposit value is 0 (1037ms)
       ✓ withdrawETHGainToTrove(): reverts when user has no active deposit (1043ms)
-      ✓ withdrawETHGainToTrove(): Applies MoUSDLoss to user's deposit, and redirects ETH reward to user's Trove (932ms)
+      ✓ withdrawETHGainToTrove(): Applies MoUSDLoss to user's deposit, and redirects REEF reward to user's Trove (932ms)
       ✓ withdrawETHGainToTrove(): reverts if it would leave trove with ICR < MCR (3920ms)
-      ✓ withdrawETHGainToTrove(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero ETH (976ms)
-      ✓ withdrawETHGainToTrove(): decreases StabilityPool ETH and increases activePool ETH (976ms)
-      ✓ withdrawETHGainToTrove(): All depositors are able to withdraw their ETH gain from the SP to their Trove (5974ms)
-      ✓ withdrawETHGainToTrove(): All depositors withdraw, each withdraw their correct ETH gain (2591ms)
-      ✓ withdrawETHGainToTrove(): caller can withdraw full deposit and ETH gain to their trove during Recovery Mode (1629ms)
+      ✓ withdrawETHGainToTrove(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF (976ms)
+      ✓ withdrawETHGainToTrove(): decreases StabilityPool REEF and increases activePool REEF (976ms)
+      ✓ withdrawETHGainToTrove(): All depositors are able to withdraw their REEF gain from the SP to their Trove (5974ms)
+      ✓ withdrawETHGainToTrove(): All depositors withdraw, each withdraw their correct REEF gain (2591ms)
+      ✓ withdrawETHGainToTrove(): caller can withdraw full deposit and REEF gain to their trove during Recovery Mode (1629ms)
       ✓ withdrawETHGainToTrove(): reverts if user has no trove (967ms)
       ✓ withdrawETHGainToTrove(): triggers MSIC reward event - increases the sum G (1298ms)
       ✓ withdrawETHGainToTrove(), partial withdrawal: doesn't change the front end tag (4778ms)
@@ -967,7 +967,7 @@ alice deposit: 0
       ✓ withdrawETHGainToTrove(), eligible deposit: tagged front end receives MSIC rewards (1701ms)
       ✓ withdrawETHGainToTrove(), eligible deposit: tagged front end's stake decreases (5345ms)
       ✓ withdrawETHGainToTrove(), eligible deposit: tagged front end's snapshots update (1984ms)
-      ✓ withdrawETHGainToTrove(): reverts when depositor has no ETH gain (1172ms)
+      ✓ withdrawETHGainToTrove(): reverts when depositor has no REEF gain (1172ms)
       ✓ registerFrontEnd(): registers the front end and chosen kickback rate (173ms)
       ✓ registerFrontEnd(): reverts if the front end is already registered (196ms)
       ✓ registerFrontEnd(): reverts if the kickback rate >1 (57ms)
@@ -977,7 +977,7 @@ alice deposit: 0
 totalStakesSnapshot after L1: 200000002000000000000000000000
 totalCollateralSnapshot after L1: 399000002000000000000000000000
 Snapshots ratio after L1: 501253135332064484
-B pending ETH reward after L1: 39799999602000003960000000000
+B pending REEF reward after L1: 39799999602000003960000000000
 B stake after L1: 40000000000000000000000000000
 B stake after A1: 39999999999999999989974957243
 Snapshots ratio after A1: 501253135332064484
@@ -1016,7 +1016,7 @@ B stake after A11: 39999999999999999998008332745
   Contract: TroveManager - Redistribution reward calculations
     ✓ redistribution: A, B Open. B Liquidated. C, D Open. D Liquidated. Distributes correct rewards (1514ms)
     ✓ redistribution: A, B, C Open. C Liquidated. D, E, F Open. F Liquidated. Distributes correct rewards (1537ms)
-    ✓ redistribution: Sequence of alternate opening/liquidation: final surviving trove has ETH from all previously liquidated troves (1667ms)
+    ✓ redistribution: Sequence of alternate opening/liquidation: final surviving trove has REEF from all previously liquidated troves (1667ms)
     ✓ redistribution: A,B,C,D,E open. Liq(A). B adds coll. Liq(C). B and D have correct coll and debt (1915ms)
     ✓ redistribution: A,B,C,D open. Liq(A). B adds coll. Liq(C). B and D have correct coll and debt (1962ms)
     ✓ redistribution: A,B,C Open. Liq(C). B adds coll. Liq(A). B acquires all coll and debt (1102ms)
@@ -1054,7 +1054,7 @@ B stake after A11: 39999999999999999998008332745
     ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: Trove remains in TroveOwners array (1134ms)
     ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: nothing happens (1146ms)
     ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: updates system shapshots (1284ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: causes correct Pool offset and ETH gain, and doesn't redistribute to active troves (1266ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: causes correct Pool offset and REEF gain, and doesn't redistribute to active troves (1266ms)
     ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: ICR of non liquidated trove does not change (2161ms)
     ✓ liquidate() with ICR > 110%, and StabilityPool MoUSD < liquidated debt: total liquidated coll and debt is correct (1912ms)
     ✓ liquidate(): Doesn't liquidate undercollateralized trove if it is the only trove in the system (652ms)
@@ -1064,7 +1064,7 @@ B stake after A11: 39999999999999999998008332745
     ✓ liquidate(): reverts if trove is non-existent (815ms)
     ✓ liquidate(): reverts if trove has been closed (1044ms)
     ✓ liquidate(): liquidates based on entire/collateral debt (including pending rewards), not raw collateral/debt (1878ms)
-    ✓ liquidate(): does not affect the SP deposit or ETH gain when called on an SP depositor's address that has no trove (708ms)
+    ✓ liquidate(): does not affect the SP deposit or REEF gain when called on an SP depositor's address that has no trove (708ms)
     ✓ liquidate(): does not alter the liquidated user's token balance (1312ms)
     ✓ liquidate(), with 110% < ICR < TCR, can claim collateral, re-open, be reedemed and claim again (2055ms)
     ✓ liquidate(), with 110% < ICR < TCR, can claim collateral, after another claim from a redemption (2300ms)
@@ -1080,8 +1080,8 @@ B stake after A11: 39999999999999999998008332745
     ✓ liquidateTroves(): emits liquidation event with correct values when all troves have ICR > 110% and Stability Pool covers a subset of troves (1300ms)
     ✓ liquidateTroves():  emits liquidation event with correct values when all troves have ICR > 110% and Stability Pool covers a subset of troves, including a partial (1362ms)
     ✓ liquidateTroves(): does not affect the liquidated user's token balances (4805ms)
-    ✓ liquidateTroves(): Liquidating troves at 100 < ICR < 110 with SP deposits correctly impacts their SP deposit and ETH gain (1556ms)
-    ✓ liquidateTroves(): Liquidating troves at ICR <=100% with SP deposits does not alter their deposit or ETH gain (1391ms)
+    ✓ liquidateTroves(): Liquidating troves at 100 < ICR < 110 with SP deposits correctly impacts their SP deposit and REEF gain (1556ms)
+    ✓ liquidateTroves(): Liquidating troves at ICR <=100% with SP deposits does not alter their deposit or REEF gain (1391ms)
     ✓ liquidateTroves() with a non fullfilled liquidation: non liquidated trove remains active (1140ms)
     ✓ liquidateTroves() with a non fullfilled liquidation: non liquidated trove remains in TroveOwners Array (1378ms)
 gasUsed:  609826
@@ -1112,8 +1112,8 @@ gasUsed:  636956
 
   Contract: TroveManager
     ✓ liquidate(): closes a Trove that has ICR < MCR (573ms)
-    ✓ liquidate(): decreases ActivePool ETH and MoUSDDebt by correct amounts (567ms)
-    ✓ liquidate(): increases DefaultPool ETH and MoUSD debt by correct amounts (553ms)
+    ✓ liquidate(): decreases ActivePool REEF and MoUSDDebt by correct amounts (567ms)
+    ✓ liquidate(): increases DefaultPool REEF and MoUSD debt by correct amounts (553ms)
     ✓ liquidate(): removes the Trove's stake from the total stakes (608ms)
     ✓ liquidate(): Removes the correct trove from the TroveOwners array, and moves the last array element to the new empty slot (1276ms)
     ✓ liquidate(): updates the snapshots of total stakes and total collateral (422ms)
@@ -1125,9 +1125,9 @@ gasUsed:  636956
     ✓ liquidate(): Given the same price and no other trove changes, complete Pool offsets restore the TCR to its value prior to the defaulters opening troves (2590ms)
     ✓ liquidate(): Pool offsets increase the TCR (6140ms)
     ✓ liquidate(): a pure redistribution reduces the TCR only as a result of compensation (2570ms)
-    ✓ liquidate(): does not affect the SP deposit or ETH gain when called on an SP depositor's address that has no trove (964ms)
-    ✓ liquidate(): does not liquidate a SP depositor's trove with ICR > 110%, and does not affect their SP deposit or ETH gain (892ms)
-    ✓ liquidate(): liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and ETH gain (1141ms)
+    ✓ liquidate(): does not affect the SP deposit or REEF gain when called on an SP depositor's address that has no trove (964ms)
+    ✓ liquidate(): does not liquidate a SP depositor's trove with ICR > 110%, and does not affect their SP deposit or REEF gain (892ms)
+    ✓ liquidate(): liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and REEF gain (1141ms)
     ✓ liquidate(): does not alter the liquidated user's token balance (1104ms)
     ✓ liquidate(): liquidates based on entire/collateral debt (including pending rewards), not raw collateral/debt (1573ms)
     ✓ liquidate(): when SP > 0, triggers MSIC reward event - increases the sum G (1081ms)
@@ -1142,7 +1142,7 @@ gasUsed:  636956
     ✓ liquidateTroves(): does not affect the liquidated user's token balances (999ms)
     ✓ liquidateTroves(): A liquidation sequence containing Pool offsets increases the TCR (6204ms)
     ✓ liquidateTroves(): A liquidation sequence of pure redistributions decreases the TCR, due to gas compensation, but up to 0.5% (1929ms)
-    ✓ liquidateTroves(): Liquidating troves with SP deposits correctly impacts their SP deposit and ETH gain (1214ms)
+    ✓ liquidateTroves(): Liquidating troves with SP deposits correctly impacts their SP deposit and REEF gain (1214ms)
     ✓ liquidateTroves(): when SP > 0, triggers MSIC reward event - increases the sum G (5057ms)
     ✓ liquidateTroves(): when SP is empty, doesn't update G (1722ms)
     ✓ batchLiquidateTroves(): liquidates a Trove that a) was skipped in a previous liquidation and b) has pending rewards (1912ms)
@@ -1174,32 +1174,32 @@ gasUsed:  636956
     ✓ redeemCollateral(): reverts if max fee < 0.5% (2011ms)
     ✓ redeemCollateral(): reverts if fee exceeds max fee percentage (2899ms)
     ✓ redeemCollateral(): succeeds if fee is less than max fee percentage (3127ms)
-    ✓ redeemCollateral(): doesn't affect the Stability Pool deposits or ETH gain of redeemed-from troves (2311ms)
+    ✓ redeemCollateral(): doesn't affect the Stability Pool deposits or REEF gain of redeemed-from troves (2311ms)
     ✓ redeemCollateral(): caller can redeem their entire MoUSDToken balance (1086ms)
     ✓ redeemCollateral(): reverts when requested redemption amount exceeds caller's MoUSD token balance (1320ms)
-    ✓ redeemCollateral(): value of issued ETH == face value of redeemed MoUSD (assuming 1 MoUSD has value of $1) (1353ms)
+    ✓ redeemCollateral(): value of issued REEF == face value of redeemed MoUSD (assuming 1 MoUSD has value of $1) (1353ms)
     ✓ redeemCollateral(): reverts if there is zero outstanding system debt (66ms)
     ✓ redeemCollateral(): reverts if caller's tries to redeem more than the outstanding system debt (367ms)
     ✓ redeemCollateral(): a redemption made when base rate is zero increases the base rate (1187ms)
     ✓ redeemCollateral(): a redemption made when base rate is non-zero increases the base rate, for negligible time passed (1987ms)
     ✓ redeemCollateral(): lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation [ @skip-on-coverage ] (2515ms)
     ✓ redeemCollateral(): a redemption made at zero base rate send a non-zero ETHFee to MSIC staking contract (5136ms)
-    ✓ redeemCollateral(): a redemption made at zero base increases the ETH-fees-per-MSIC-staked in MSIC Staking contract (1207ms)
+    ✓ redeemCollateral(): a redemption made at zero base increases the REEF-fees-per-MSIC-staked in MSIC Staking contract (1207ms)
     ✓ redeemCollateral(): a redemption made at a non-zero base rate send a non-zero ETHFee to MSIC staking contract (1730ms)
-    ✓ redeemCollateral(): a redemption made at a non-zero base rate increases ETH-per-MSIC-staked in the staking contract (5971ms)
-    ✓ redeemCollateral(): a redemption sends the ETH remainder (ETHDrawn - ETHFee) to the redeemer (1113ms)
+    ✓ redeemCollateral(): a redemption made at a non-zero base rate increases REEF-per-MSIC-staked in the staking contract (5971ms)
+    ✓ redeemCollateral(): a redemption sends the REEF remainder (ETHDrawn - ETHFee) to the redeemer (1113ms)
     ✓ redeemCollateral(): a full redemption (leaving trove with 0 debt), closes the trove (1553ms)
     ✓ redeemCollateral(): emits correct debt and coll values in each redeemed trove's TroveUpdated event (1416ms)
-    ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's ETH surplus (collateral - ETH drawn) available for the trove owner to claim (5373ms)
-    ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's ETH surplus (collateral - ETH drawn) available for the trove owner after re-opening trove (2154ms)
+    ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner to claim (5373ms)
+    ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner after re-opening trove (2154ms)
     ✓ redeemCollateral(): reverts if fee eats up all returned collateral (1412ms)
     ✓ getPendingMoUSDDebtReward(): Returns 0 if there is no pending MoUSDDebt reward (618ms)
-    ✓ getPendingETHReward(): Returns 0 if there is no pending ETH reward (620ms)
+    ✓ getPendingETHReward(): Returns 0 if there is no pending REEF reward (620ms)
     ✓ computeICR(): Returns 0 if trove's coll is worth 0
-    ✓ computeICR(): Returns 2^256-1 for ETH:USD = 100, coll = 1 ETH, debt = 100 MoUSD
-    ✓ computeICR(): returns correct ICR for ETH:USD = 100, coll = 200 ETH, debt = 30 MoUSD
-    ✓ computeICR(): returns correct ICR for ETH:USD = 250, coll = 1350 ETH, debt = 127 MoUSD
-    ✓ computeICR(): returns correct ICR for ETH:USD = 100, coll = 1 ETH, debt = 54321 MoUSD
+    ✓ computeICR(): Returns 2^256-1 for REEF:USD = 100, coll = 1 REEF, debt = 100 MoUSD
+    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 200 REEF, debt = 30 MoUSD
+    ✓ computeICR(): returns correct ICR for REEF:USD = 250, coll = 1350 REEF, debt = 127 MoUSD
+    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 1 REEF, debt = 54321 MoUSD
     ✓ computeICR(): Returns 2^256-1 if trove has non-zero coll and zero debt
     ✓ checkRecoveryMode(): Returns true when TCR < 150% (351ms)
     ✓ checkRecoveryMode(): Returns false when TCR == 150% (366ms)

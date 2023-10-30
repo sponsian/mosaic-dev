@@ -143,7 +143,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const B_pendingMSICGain = await stabilityPool.getDepositorMSICGain(B)
       assert.equal(B_pendingMSICGain, '0')
 
-      // Check depositor B has a pending ETH gain
+      // Check depositor B has a pending REEF gain
       const B_pendingETHGain = await stabilityPool.getDepositorETHGain(B)
       assert.isTrue(B_pendingETHGain.gt(toBN('0')))
     })
@@ -159,7 +159,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       // defaulter opens trove
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
-      // ETH drops
+      // REEF drops
       await priceFeed.setPrice(dec(100, 18))
 
       await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider)
@@ -198,7 +198,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(1, 22), A, A, { from: A, value: dec(100, 'ether') })
@@ -273,7 +273,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -367,7 +367,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -499,7 +499,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const allDepositors = [A, B, C, D, E, F, G, H]
@@ -704,22 +704,22 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
     /* Serial scale changes
 
     A make deposit 10k MoUSD
-    1 month passes. L1 decreases P: P = 1e-5 P. L1:   9999.9 MoUSD, 100 ETH
+    1 month passes. L1 decreases P: P = 1e-5 P. L1:   9999.9 MoUSD, 100 REEF
     B makes deposit 9999.9
-    1 month passes. L2 decreases P: P =  1e-5 P. L2:  9999.9 MoUSD, 100 ETH
+    1 month passes. L2 decreases P: P =  1e-5 P. L2:  9999.9 MoUSD, 100 REEF
     C makes deposit  9999.9
-    1 month passes. L3 decreases P: P = 1e-5 P. L3:  9999.9 MoUSD, 100 ETH
+    1 month passes. L3 decreases P: P = 1e-5 P. L3:  9999.9 MoUSD, 100 REEF
     D makes deposit  9999.9
-    1 month passes. L4 decreases P: P = 1e-5 P. L4:  9999.9 MoUSD, 100 ETH
+    1 month passes. L4 decreases P: P = 1e-5 P. L4:  9999.9 MoUSD, 100 REEF
     E makes deposit  9999.9
-    1 month passes. L5 decreases P: P = 1e-5 P. L5:  9999.9 MoUSD, 100 ETH
+    1 month passes. L5 decreases P: P = 1e-5 P. L5:  9999.9 MoUSD, 100 REEF
     =========
     F makes deposit 100
-    1 month passes. L6 empties the Pool. L6:  10000 MoUSD, 100 ETH
+    1 month passes. L6 empties the Pool. L6:  10000 MoUSD, 100 REEF
 
     expect A, B, C, D each withdraw ~1 month's worth of MSIC */
     it("withdrawFromSP(): Several deposits of 100 MoUSD span one scale factor change. Depositors withdraw correct MSIC gains", async () => {
-      // Whale opens Trove with 100 ETH
+      // Whale opens Trove with 100 REEF
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(100, 'ether') })
 
       const fiveDefaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4, defaulter_5]
@@ -891,7 +891,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(100, 'ether') })
@@ -1033,7 +1033,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalMSICIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -1397,13 +1397,13 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
     F1 kickbackRate: 80%
 
     A, B make deposit 5000 MoUSD via F1
-    1 month passes. L1 depletes P: P = 1e-5*P L1:  9999.9 MoUSD, 1 ETH.  scale = 0
+    1 month passes. L1 depletes P: P = 1e-5*P L1:  9999.9 MoUSD, 1 REEF.  scale = 0
     C makes deposit 10000  via F1
-    1 month passes. L2 depletes P: P = 1e-5*P L2:  9999.9 MoUSD, 1 ETH  scale = 1
+    1 month passes. L2 depletes P: P = 1e-5*P L2:  9999.9 MoUSD, 1 REEF  scale = 1
     D makes deposit 10000 via F1
-    1 month passes. L3 depletes P: P = 1e-5*P L3:  9999.9 MoUSD, 1 ETH scale = 1
+    1 month passes. L3 depletes P: P = 1e-5*P L3:  9999.9 MoUSD, 1 REEF scale = 1
     E makes deposit 10000 via F1
-    1 month passes. L3 depletes P: P = 1e-5*P L4:  9999.9 MoUSD, 1 ETH scale = 2
+    1 month passes. L3 depletes P: P = 1e-5*P L4:  9999.9 MoUSD, 1 REEF scale = 2
     A, B, C, D, E withdraw
 
     =========
@@ -1413,7 +1413,7 @@ contract('StabilityPool - MSIC Rewards', async accounts => {
       const kickbackRate = toBN(dec(80, 16)) // F1 kicks 80% back to depositor
       await stabilityPool.registerFrontEnd(kickbackRate, { from: frontEnd_1 })
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k REEF
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const _4_Defaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4]

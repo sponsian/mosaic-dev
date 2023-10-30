@@ -30,7 +30,7 @@ The constructor for this class is marked as internal. Third-party code should no
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
 |  [adjustTrove(params, maxBorrowingRateOrOptionalParams, overrides)](./lib-ethers.ethersmosaic.adjusttrove.md) |  | Adjust existing Trove by changing its collateral, debt, or both. |
-|  [approveUniTokens(allowance, overrides)](./lib-ethers.ethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap ETH/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
+|  [approveUniTokens(allowance, overrides)](./lib-ethers.ethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
 |  [borrowMoUSD(amount, maxBorrowingRate, overrides)](./lib-ethers.ethersmosaic.borrowmsic.md) |  | Adjust existing Trove by borrowing more MoUSD. |
 |  [claimCollateralSurplus(overrides)](./lib-ethers.ethersmosaic.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove(overrides)](./lib-ethers.ethersmosaic.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
@@ -42,7 +42,7 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [getFees(overrides)](./lib-ethers.ethersmosaic.getfees.md) |  | Get a calculator for current fees. |
 |  [getFrontendStatus(address, overrides)](./lib-ethers.ethersmosaic.getfrontendstatus.md) |  | Check whether an address is registered as a Mosaic frontend, and what its kickback rate is. |
 |  [getLiquidityMiningMSICReward(address, overrides)](./lib-ethers.ethersmosaic.getliquidityminingmsicreward.md) |  | Get the amount of MSIC earned by an address through mining liquidity. |
-|  [getLiquidityMiningStake(address, overrides)](./lib-ethers.ethersmosaic.getliquidityminingstake.md) |  | Get the amount of Uniswap ETH/MoUSD LP tokens currently staked by an address in liquidity mining. |
+|  [getLiquidityMiningStake(address, overrides)](./lib-ethers.ethersmosaic.getliquidityminingstake.md) |  | Get the amount of Uniswap REEF/MoUSD LP tokens currently staked by an address in liquidity mining. |
 |  [getMSICBalance(address, overrides)](./lib-ethers.ethersmosaic.getmsicbalance.md) |  | Get the amount of MSIC held by an address. |
 |  [getMSICStake(address, overrides)](./lib-ethers.ethersmosaic.getmsicstake.md) |  | Get the current state of an MSIC Stake. |
 |  [getMoUSDBalance(address, overrides)](./lib-ethers.ethersmosaic.getmsicbalance.md) |  | Get the amount of MoUSD held by an address. |
@@ -55,12 +55,12 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [getTotal(overrides)](./lib-ethers.ethersmosaic.gettotal.md) |  | Get the total amount of collateral and debt in the Mosaic system. |
 |  [getTotalRedistributed(overrides)](./lib-ethers.ethersmosaic.gettotalredistributed.md) |  | Get the total collateral and debt per stake that has been liquidated through redistribution. |
 |  [getTotalStakedMSIC(overrides)](./lib-ethers.ethersmosaic.gettotalstakedmsic.md) |  | Get the total amount of MSIC currently staked. |
-|  [getTotalStakedUniTokens(overrides)](./lib-ethers.ethersmosaic.gettotalstakedunitokens.md) |  | Get the total amount of Uniswap ETH/MoUSD LP tokens currently staked in liquidity mining. |
+|  [getTotalStakedUniTokens(overrides)](./lib-ethers.ethersmosaic.gettotalstakedunitokens.md) |  | Get the total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. |
 |  [getTrove(address, overrides)](./lib-ethers.ethersmosaic.gettrove.md) |  | Get the current state of a Trove. |
 |  [getTroveBeforeRedistribution(address, overrides)](./lib-ethers.ethersmosaic.gettrovebeforeredistribution.md) |  | Get a Trove in its state after the last direct modification. |
 |  [getTroves(params, overrides)](./lib-ethers.ethersmosaic.gettroves_1.md) |  | Get a slice from the list of Troves. |
-|  [getUniTokenAllowance(address, overrides)](./lib-ethers.ethersmosaic.getunitokenallowance.md) |  | Get the liquidity mining contract's allowance of a holder's Uniswap ETH/MoUSD LP tokens. |
-|  [getUniTokenBalance(address, overrides)](./lib-ethers.ethersmosaic.getunitokenbalance.md) |  | Get the amount of Uniswap ETH/MoUSD LP tokens held by an address. |
+|  [getUniTokenAllowance(address, overrides)](./lib-ethers.ethersmosaic.getunitokenallowance.md) |  | Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens. |
+|  [getUniTokenBalance(address, overrides)](./lib-ethers.ethersmosaic.getunitokenbalance.md) |  | Get the amount of Uniswap REEF/MoUSD LP tokens held by an address. |
 |  [hasStore()](./lib-ethers.ethersmosaic.hasstore.md) |  | Check whether this <code>EthersMosaic</code> is an [EthersMosaicWithStore](./lib-ethers.ethersmosaicwithstore.md)<!-- -->. |
 |  [hasStore(store)](./lib-ethers.ethersmosaic.hasstore_1.md) |  | Check whether this <code>EthersMosaic</code> is an [EthersMosaicWithStore](./lib-ethers.ethersmosaicwithstore.md)<!-- -->&lt;[BlockPolledMosaicStore](./lib-ethers.blockpolledmosaicstore.md)<!-- -->&gt;<!-- -->. |
 |  [liquidate(address, overrides)](./lib-ethers.ethersmosaic.liquidate.md) |  | Liquidate one or more undercollateralized Troves. |
@@ -72,10 +72,10 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [sendMSIC(toAddress, amount, overrides)](./lib-ethers.ethersmosaic.sendmsic.md) |  | Send MSIC tokens to an address. |
 |  [sendMoUSD(toAddress, amount, overrides)](./lib-ethers.ethersmosaic.sendmsic.md) |  | Send MoUSD tokens to an address. |
 |  [stakeMSIC(amount, overrides)](./lib-ethers.ethersmosaic.stakemsic.md) |  | Stake MSIC to start earning fee revenue or increase existing stake. |
-|  [stakeUniTokens(amount, overrides)](./lib-ethers.ethersmosaic.stakeunitokens.md) |  | Stake Uniswap ETH/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
+|  [stakeUniTokens(amount, overrides)](./lib-ethers.ethersmosaic.stakeunitokens.md) |  | Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
 |  [transferCollateralGainToTrove(overrides)](./lib-ethers.ethersmosaic.transfercollateralgaintotrove.md) |  | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
 |  [unstakeMSIC(amount, overrides)](./lib-ethers.ethersmosaic.unstakemsic.md) |  | Withdraw MSIC from staking. |
-|  [unstakeUniTokens(amount, overrides)](./lib-ethers.ethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap ETH/MoUSD LP tokens from liquidity mining. |
+|  [unstakeUniTokens(amount, overrides)](./lib-ethers.ethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining. |
 |  [withdrawCollateral(amount, overrides)](./lib-ethers.ethersmosaic.withdrawcollateral.md) |  | Adjust existing Trove by withdrawing some of its collateral. |
 |  [withdrawGainsFromStabilityPool(overrides)](./lib-ethers.ethersmosaic.withdrawgainsfromstabilitypool.md) |  | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [MSIC reward](./lib-base.stabilitydeposit.msicreward.md) from Stability Deposit. |
 |  [withdrawGainsFromStaking(overrides)](./lib-ethers.ethersmosaic.withdrawgainsfromstaking.md) |  | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |

@@ -4,7 +4,7 @@
 
 ## ReadableEthersMosaic.getUniTokenBalance() method
 
-Get the amount of Uniswap ETH/MoUSD LP tokens held by an address.
+Get the amount of Uniswap REEF/MoUSD LP tokens held by an address.
 
 <b>Signature:</b>
 

@@ -756,10 +756,10 @@ class TestHelper {
       let isDebtIncrease = MoUSDChangeBN.gt(zero)
       MoUSDChangeBN = MoUSDChangeBN.abs() 
 
-      // Add ETH to trove
+      // Add REEF to trove
       if (ETHChangeBN.gt(zero)) {
         tx = await contracts.borrowerOperations.adjustTrove(this._100pct, 0, MoUSDChangeBN, isDebtIncrease, upperHint, lowerHint, { from: account, value: ETHChangeBN })
-      // Withdraw ETH from trove
+      // Withdraw REEF from trove
       } else if (ETHChangeBN.lt(zero)) {
         ETHChangeBN = ETHChangeBN.neg()
         tx = await contracts.borrowerOperations.adjustTrove(this._100pct, ETHChangeBN, MoUSDChangeBN, isDebtIncrease, upperHint, lowerHint, { from: account })
@@ -788,17 +788,17 @@ class TestHelper {
       let isDebtIncrease = MoUSDChangeBN.gt(zero)
       MoUSDChangeBN = MoUSDChangeBN.abs() 
 
-      // Add ETH to trove
+      // Add REEF to trove
       if (ETHChangeBN.gt(zero)) {
         tx = await contracts.borrowerOperations.adjustTrove(this._100pct, 0, MoUSDChangeBN, isDebtIncrease, upperHint, lowerHint, { from: account, value: ETHChangeBN })
-      // Withdraw ETH from trove
+      // Withdraw REEF from trove
       } else if (ETHChangeBN.lt(zero)) {
         ETHChangeBN = ETHChangeBN.neg()
         tx = await contracts.borrowerOperations.adjustTrove(this._100pct, ETHChangeBN, MoUSDChangeBN, isDebtIncrease, lowerHint,  upperHint,{ from: account })
       }
 
       const gas = this.gasUsed(tx)
-      // console.log(`ETH change: ${ETHChangeBN},  MoUSDChange: ${MoUSDChangeBN}, gas: ${gas} `)
+      // console.log(`REEF change: ${ETHChangeBN},  MoUSDChange: ${MoUSDChangeBN}, gas: ${gas} `)
 
       gasCostList.push(gas)
     }

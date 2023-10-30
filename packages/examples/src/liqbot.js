@@ -113,7 +113,7 @@ async function tryToLiquidate(mosaic) {
       .add(msicGasCompensation);
 
     success(
-      `Received ${bold(`${collateralGasCompensation.toString(4)} ETH`)} + ` +
+      `Received ${bold(`${collateralGasCompensation.toString(4)} REEF`)} + ` +
         `${bold(`${msicGasCompensation.toString(2)} MoUSD`)} compensation (` +
         (totalCompensation.gte(gasCost)
           ? `${green(`$${totalCompensation.sub(gasCost).toString(2)}`)} profit`

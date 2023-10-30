@@ -178,7 +178,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
         decimalify(trove.coll),
         decimalify(trove.debt),
         decimalify(trove.stake),
-        new Trove(decimalify(snapshot.ETH), decimalify(snapshot.MoUSDDebt))
+        new Trove(decimalify(snapshot.REEF), decimalify(snapshot.MoUSDDebt))
       );
     } else {
       return new TroveWithPendingRedistribution(address, userTroveStatusFrom(trove.status));

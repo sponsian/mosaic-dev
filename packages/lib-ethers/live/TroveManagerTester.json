@@ -1672,7 +1672,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "ETH",
+          "name": "REEF",
           "type": "uint256"
         },
         {

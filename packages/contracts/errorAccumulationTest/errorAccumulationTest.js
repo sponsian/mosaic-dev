@@ -65,20 +65,20 @@ contract('TroveManager', async accounts => {
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH()
     const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+    console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
   })
 
   /* ABDK64, no error correction:
-    ETH left in Default Pool is: 34
+    REEF left in Default Pool is: 34
     MoUSDDebt left in Default Pool is: 98
 
     DeciMath, no error correction:
-    ETH left in Default Pool is: 7
+    REEF left in Default Pool is: 7
     MoUSDDebt left in Default Pool is: 37
 
     Pure division, no correction for rewards:
-    ETH left in Default Pool is: 52
+    REEF left in Default Pool is: 52
     MoUSDDebt left in Default Pool is: 96
   */
 
@@ -100,19 +100,19 @@ contract('TroveManager', async accounts => {
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH()
     const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+    console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
   })
 
   /* ABDK64, no error correction:
-    ETH left in Default Pool is: 908
+    REEF left in Default Pool is: 908
     MoUSDDebt left in Default Pool is: 108
 
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction for rewards:
-    ETH left in Default Pool is: 167
+    REEF left in Default Pool is: 167
     MoUSDDebt left in Default Pool is: 653
   */
 
@@ -133,19 +133,19 @@ contract('TroveManager', async accounts => {
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH()
     const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+    console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
   })
   
   /* ABDK64, no error correction:
-    ETH left in Default Pool is: 64
+    REEF left in Default Pool is: 64
     MoUSDDebt left in Default Pool is: 75 
     
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction:
-    ETH left in Default Pool is: 64
+    REEF left in Default Pool is: 64
     MoUSDDebt left in Default Pool is: 75
   */
 
@@ -166,19 +166,19 @@ contract('TroveManager', async accounts => {
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH()
     const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+    console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
   })
   
   /* ABDK64, no error correction:
-    ETH left in Default Pool is: 100
+    REEF left in Default Pool is: 100
     MoUSDDebt left in Default Pool is: 180 
     
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction:
-    ETH left in Default Pool is: 100
+    REEF left in Default Pool is: 100
     MoUSDDebt left in Default Pool is: 180
   */
 
@@ -199,20 +199,20 @@ contract('TroveManager', async accounts => {
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH()
     const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+    console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}:`)
   })
 
   /*
     ABDK64, no error correction:
-    ETH left in Default Pool is: 1000
+    REEF left in Default Pool is: 1000
     MoUSDDebt left in Default Pool is: 180: 
     
     DeciMath, no error correction:
     -- overflow
 
     Pure division, no correction:
-    ETH left in Default Pool is: 1000
+    REEF left in Default Pool is: 1000
     MoUSDDebt left in Default Pool is: 180:
   */
 
@@ -249,20 +249,20 @@ contract('TroveManager', async accounts => {
       totalMoUSDDebtPoolDifference.add(activePoolMoUSDDebt.sub(defaultPoolMoUSDDebt))
     }
     
-    console.log(`Accumulated ETH difference between Default and Active Pools is: ${totalETHPoolDifference}`)
+    console.log(`Accumulated REEF difference between Default and Active Pools is: ${totalETHPoolDifference}`)
     console.log(`Accumulated MoUSDDebt difference between Active and Default Pools is: ${totalMoUSDDebtPoolDifference}`)
   })
   
   /* ABDK64, no error correction
-    Accumulated ETH difference between Default and Active Pools is: 0
+    Accumulated REEF difference between Default and Active Pools is: 0
     Accumulated MoUSDDebt difference between Active and Default Pools is: 0
     
     DeciMath, no error correction:
-    Accumulated ETH difference between Default and Active Pools is: 0
+    Accumulated REEF difference between Default and Active Pools is: 0
     Accumulated MoUSDDebt difference between Active and Default Pools is: 0
     
     Pure division with correction:
-    Accumulated ETH difference between Default and Active Pools is: 0
+    Accumulated REEF difference between Default and Active Pools is: 0
     Accumulated MoUSDDebt difference between Active and Default Pools is: 0
   */
 
@@ -294,24 +294,24 @@ contract('TroveManager', async accounts => {
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 700
+    REEF difference between total pending rewards and DefaultPool: 700
     MoUSDDebt difference between total pending rewards and DefaultPool: 800
 
     ABDK64 WITH correction:
-    ETH difference between total pending rewards and DefaultPool: 300
+    REEF difference between total pending rewards and DefaultPool: 300
     MoUSDDebt difference between total pending rewards and DefaultPool: 400
     
     DeciMath, no error correction:
-    ETH difference between total pending rewards and DefaultPool: -100
+    REEF difference between total pending rewards and DefaultPool: -100
     MoUSDDebt difference between total pending rewards and DefaultPool: -200
 
     Pure division with correction: 
-    ETH difference between total pending rewards and DefaultPool: 0
+    REEF difference between total pending rewards and DefaultPool: 0
     MoUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
@@ -343,28 +343,28 @@ contract('TroveManager', async accounts => {
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
   
   /* ABDK64, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 51000
+    REEF difference between total pending rewards and DefaultPool: 51000
     MoUSDDebt difference between total pending rewards and DefaultPool: 55000
     
     ABDK64 WITH correction:
-    ETH difference between total pending rewards and DefaultPool: 31000
+    REEF difference between total pending rewards and DefaultPool: 31000
     MoUSDDebt difference between total pending rewards and DefaultPool: 31000
 
     DeciMath, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 2000
+    REEF difference between total pending rewards and DefaultPool: 2000
     MoUSDDebt difference between total pending rewards and DefaultPool: -2000
     
     Pure division with correction:
-    ETH difference between total pending rewards and DefaultPool: 0
+    REEF difference between total pending rewards and DefaultPool: 0
     MoUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
- it("11 accounts with random ETH and proportional MoUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+ it("11 accounts with random REEF and proportional MoUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(100, 'ether') })
 
   await th.openTrove_allAccounts_randomETH_ProportionalMoUSD(1, 2, accounts.slice(0, 11), contracts, 180)
@@ -392,28 +392,28 @@ contract('TroveManager', async accounts => {
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 4500
+    REEF difference between total pending rewards and DefaultPool: 4500
     MoUSDDebt difference between total pending rewards and DefaultPool: 8000
 
     ABDK64 WITH correction:
-    ETH difference between total pending rewards and DefaultPool: 300
+    REEF difference between total pending rewards and DefaultPool: 300
     MoUSDDebt difference between total pending rewards and DefaultPool: 300
       
     DeciMath, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 0
+    REEF difference between total pending rewards and DefaultPool: 0
     MoUSDDebt difference between total pending rewards and DefaultPool: -200
 
     Pure division with correction:
-    ETH difference between total pending rewards and DefaultPool: 100
+    REEF difference between total pending rewards and DefaultPool: 100
     MoUSDDebt difference between total pending rewards and DefaultPool: 100
   */
 
-  it("101 accounts with random ETH and proportional MoUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it("101 accounts with random REEF and proportional MoUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
     await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1000, 'ether') })
 
     await th.openTrove_allAccounts_randomETH_ProportionalMoUSD(1, 2, accounts.slice(0, 101), contracts, 180)
@@ -442,24 +442,24 @@ contract('TroveManager', async accounts => {
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    ETH difference between total pending rewards and DefaultPool: 53900
+    REEF difference between total pending rewards and DefaultPool: 53900
     MoUSDDebt difference between total pending rewards and DefaultPool: 61000
 
     ABDK64 WITH correction:
-    ETH difference between total pending rewards and DefaultPool: 31300
+    REEF difference between total pending rewards and DefaultPool: 31300
     MoUSDDebt difference between total pending rewards and DefaultPool: 30000
     
     DeciMath, no error correction:
-    ETH difference between total pending rewards and DefaultPool: -4300
+    REEF difference between total pending rewards and DefaultPool: -4300
     MoUSDDebt difference between total pending rewards and DefaultPool: -8000
   
     Pure division with correction:
-    ETH difference between total pending rewards and DefaultPool: 400
+    REEF difference between total pending rewards and DefaultPool: 400
     MoUSDDebt difference between total pending rewards and DefaultPool: 1000
   */
 
@@ -496,20 +496,20 @@ contract('TroveManager', async accounts => {
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards_Distribution)
 
-    console.log(`ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending distribution rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction
-    ETH difference between total pending distribution rewards and DefaultPool: 550
+    REEF difference between total pending distribution rewards and DefaultPool: 550
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: 600
     
     DeciMath, no error correction:
-    ETH difference between total pending distribution rewards and DefaultPool: 150
+    REEF difference between total pending distribution rewards and DefaultPool: 150
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: -200
     
     Pure division with error correction:
-    ETH difference between total pending distribution rewards and DefaultPool: 50
+    REEF difference between total pending distribution rewards and DefaultPool: 50
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: 0
   */
 
@@ -544,20 +544,20 @@ contract('TroveManager', async accounts => {
      const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution)
      const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards_Distribution)
  
-     console.log(`ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
+     console.log(`REEF difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
      console.log(`MoUSDDebt difference between total pending distribution rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
    })
 
   /* ABDK64, no error correction
-    ETH difference between total pending distribution rewards and DefaultPool: 7600 
+    REEF difference between total pending distribution rewards and DefaultPool: 7600 
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: 8900
     
     DeciMath, no error correction:
-    ETH difference between total pending distribution rewards and DefaultPool: -700
+    REEF difference between total pending distribution rewards and DefaultPool: -700
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: 200
     
     Pure division with error correction:
-    ETH difference between total pending distribution rewards and DefaultPool: 0
+    REEF difference between total pending distribution rewards and DefaultPool: 0
     MoUSDDebt difference between total pending distribution rewards and DefaultPool: 0
   */
 
@@ -595,7 +595,7 @@ contract('TroveManager', async accounts => {
     const SP_MoUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_MoUSD)
 
      // check Stability Pool
-    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
+    console.log(`Surplus REEF left in in Stability Pool is ${SP_ETH}`)
     console.log(`MoUSD insufficiency in Stability Pool is ${SP_MoUSD_Insufficiency}`)
    })
 
@@ -603,16 +603,16 @@ contract('TroveManager', async accounts => {
       Sometimes subtraction overflows on last withdrawal from SP - error leaves insufficient MoUSD in Pool.
       Noticed when reward shares are recurring fractions.
 
-      Error in ETH gain accumulates in the Pool.
-      Surplus ETH left in in Stability Pool is 530
+      Error in REEF gain accumulates in the Pool.
+      Surplus REEF left in in Stability Pool is 530
       MoUSD insufficiency in Stability Pool is 530
       
       DeciMath, no error correction:
-      Surplus ETH left in in Stability Pool is 0
+      Surplus REEF left in in Stability Pool is 0
       MoUSD insufficiency in Stability Pool is 0
 
       Pure division with error correction:
-      Surplus ETH left in in Stability Pool is 0
+      Surplus REEF left in in Stability Pool is 0
       MoUSD insufficiency in Stability Pool is 0
     */
 
@@ -648,20 +648,20 @@ contract('TroveManager', async accounts => {
     const SP_MoUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_MoUSD)
 
      // check Stability Pool
-    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
+    console.log(`Surplus REEF left in in Stability Pool is ${SP_ETH}`)
     console.log(`MoUSD insufficiency in Stability Pool is ${SP_MoUSD_Insufficiency}`)
    })
 
    /* ABDK64, no error correction
-    Surplus ETH left in in Stability Pool is 5300
+    Surplus REEF left in in Stability Pool is 5300
     MoUSD insufficiency in Stability Pool is 5300
       
     DeciMath, no error correction:
-    Surplus ETH left in in Stability Pool is 0
+    Surplus REEF left in in Stability Pool is 0
     MoUSD insufficiency in Stability Pool is 0
 
     Pure division with error correction:
-    Surplus ETH left in in Stability Pool is 0
+    Surplus REEF left in in Stability Pool is 0
     MoUSD insufficiency in Stability Pool is 0
    */
 
@@ -701,7 +701,7 @@ contract('TroveManager', async accounts => {
     const SP_MoUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_MoUSD)
 
      // check Stability Pool
-    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
+    console.log(`Surplus REEF left in in Stability Pool is ${SP_ETH}`)
     console.log(`MoUSD insufficiency in Stability Pool is ${SP_MoUSD_Insufficiency}`)
    })
 
@@ -709,19 +709,19 @@ contract('TroveManager', async accounts => {
       Sometimes subtraction overflows on last withdrawal from SP - error leaves insufficient MoUSD in Pool.
       Noticed when reward shares are recurring fractions.
 
-      Error in ETH gain accumulates in the Pool.
-      Surplus ETH left in in Stability Pool is 84
+      Error in REEF gain accumulates in the Pool.
+      Surplus REEF left in in Stability Pool is 84
       MoUSD insufficiency in Stability Pool is 442
 
       DeciMath, no error correction:
       -- Subtraction Overflow
 
       Pure division with no error correction:
-      Surplus ETH left in in Stability Pool is 366
+      Surplus REEF left in in Stability Pool is 366
       MoUSD insufficiency in Stability Pool is 67
 
       Pure division with error correction:
-      Surplus ETH left in in Stability Pool is 446
+      Surplus REEF left in in Stability Pool is 446
       MoUSD insufficiency in Stability Pool is 507
     */
 
@@ -761,24 +761,24 @@ contract('TroveManager', async accounts => {
     const SP_MoUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_MoUSD)
 
      // check Stability Pool
-    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
+    console.log(`Surplus REEF left in in Stability Pool is ${SP_ETH}`)
     console.log(`MoUSD insufficiency in Stability Pool is ${SP_MoUSD_Insufficiency}`)
    })
 
    /* ABDK64, no error correction
-    Surplus ETH left in in Stability Pool is 3321
+    Surplus REEF left in in Stability Pool is 3321
     MoUSD insufficiency in Stability Pool is 1112
 
     DeciMath, no error correction:
-    Surplus ETH left in in Stability Pool is 1373
+    Surplus REEF left in in Stability Pool is 1373
     MoUSD insufficiency in Stability Pool is -13
 
     Pure division with no error correction:
-    Surplus ETH left in in Stability Pool is 4087
+    Surplus REEF left in in Stability Pool is 4087
     MoUSD insufficiency in Stability Pool is 1960
 
     Pure division with error correction:
-    Surplus ETH left in in Stability Pool is 3072
+    Surplus REEF left in in Stability Pool is 3072
     MoUSD insufficiency in Stability Pool is 452
   */ 
 
@@ -818,21 +818,21 @@ contract('TroveManager', async accounts => {
   const SP_MoUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_MoUSD)
 
    // check Stability Pool
-  console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
+  console.log(`Surplus REEF left in in Stability Pool is ${SP_ETH}`)
   console.log(`MoUSD insufficiency in Stability Pool is ${SP_MoUSD_Insufficiency}`)
  })
 
   /* ABDK64, no error correction:
     DeciMath, no error correction:
-    Surplus ETH left in in Stability Pool is 2691
+    Surplus REEF left in in Stability Pool is 2691
     MoUSD insufficiency in Stability Pool is -8445
 
     Pure division, no correction:
-    Surplus ETH left in in Stability Pool is 18708
+    Surplus REEF left in in Stability Pool is 18708
     MoUSD insufficiency in Stability Pool is 25427
 
     Pure division with error correction:
-    Surplus ETH left in in Stability Pool is 1573
+    Surplus REEF left in in Stability Pool is 1573
     MoUSD insufficiency in Stability Pool is 6037
   */ 
 
@@ -1028,20 +1028,20 @@ it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 
   // check DefaultPool
   const ETH_DefaultPool = await defaultPool.getETH()
   const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-  console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+  console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
   console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
 })
 
 /* DeciMath:
-  ETH left in Default Pool is: 563902502
+  REEF left in Default Pool is: 563902502
   MoUSDDebt left in Default Pool is: 308731912
 
   Pure division, correction:
-  ETH left in Default Pool is: 1136050360
+  REEF left in Default Pool is: 1136050360
   MoUSDDebt left in Default Pool is: 997601870
 
   Pure division, no correction:
-  ETH left in Default Pool is: 810899932
+  REEF left in Default Pool is: 810899932
   MoUSDDebt left in Default Pool is: 535042995
 */
 
@@ -1065,23 +1065,23 @@ it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 50
   // check DefaultPool
   const ETH_DefaultPool = await defaultPool.getETH()
   const MoUSDDebt_DefaultPool = await defaultPool.getMoUSDDebt()
-  console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
+  console.log(`REEF left in Default Pool is: ${ETH_DefaultPool}`)
   console.log(`MoUSDDebt left in Default Pool is: ${MoUSDDebt_DefaultPool}`)
 })
 
  /*
   Pure division, no correction:
-  ETH left in Default Pool is: 8356761440
+  REEF left in Default Pool is: 8356761440
   MoUSDDebt left in Default Pool is: 14696382412
 
   Pure division, correction:
-  ETH left in Default Pool is: 9281255535
+  REEF left in Default Pool is: 9281255535
   MoUSDDebt left in Default Pool is: 5854012464
   */
 
 // --- Liquidations, large coll and debt ---
 
-it("11 accounts with random ETH and proportional MoUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+it("11 accounts with random REEF and proportional MoUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 27) })
 
   // Troves open with 100-200 million ether and proportional MoUSD Debt
@@ -1110,21 +1110,21 @@ it("11 accounts with random ETH and proportional MoUSD (180:1). 10 liquidations.
   const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
   const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-  console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+  console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
   console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
 })
  
 /* 
   Pure division, no error correction:
-  ETH difference between total pending rewards and DefaultPool: 9000000000
+  REEF difference between total pending rewards and DefaultPool: 9000000000
   MoUSDDebt difference between total pending rewards and DefaultPool: 12000000000
 
   Pure division with correction:
-  ETH difference between total pending rewards and DefaultPool: 1000000000
+  REEF difference between total pending rewards and DefaultPool: 1000000000
   MoUSDDebt difference between total pending rewards and DefaultPool: 1000000000
   */
 
-  it("101 accounts with random ETH and proportional MoUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it("101 accounts with random REEF and proportional MoUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
     await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 28) })
 
     // Troves open with 100-200 million ether and proportional MoUSD Debt
@@ -1155,16 +1155,16 @@ it("11 accounts with random ETH and proportional MoUSD (180:1). 10 liquidations.
     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const MoUSDDebtRewardDifference = defaultPoolMoUSDDebt.sub(totalMoUSDRewards)
 
-    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
+    console.log(`REEF difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`MoUSDDebt difference between total pending rewards and DefaultPool: ${MoUSDDebtRewardDifference} `)
   })
   /*
     Pure division, no correction:
-    ETH difference between total pending rewards and DefaultPool: 910000000000
+    REEF difference between total pending rewards and DefaultPool: 910000000000
     MoUSDDebt difference between total pending rewards and DefaultPool: 870000000000
 
     Pure division with correction:
-    ETH difference between total pending rewards and DefaultPool: 10000000000
+    REEF difference between total pending rewards and DefaultPool: 10000000000
     MoUSDDebt difference between total pending rewards and DefaultPool: 10000000000
   */
 })
@@ -1186,13 +1186,13 @@ it("11 accounts with random ETH and proportional MoUSD (180:1). 10 liquidations.
 
   ABDK64:
 
-  1) Reward applications accumulate ETH and MoUSDDebt error in DefaultPool
+  1) Reward applications accumulate REEF and MoUSDDebt error in DefaultPool
 
-  2) Liquidations accumulate ETH and MoUSDDebt error in DefaultPool
+  2) Liquidations accumulate REEF and MoUSDDebt error in DefaultPool
 
   3) Liquidations with partial offset send slightly too little to StabilityPool, and redistribute slightly too much
   
-  4) StabilityPool Withdrawals accumulate ETH error in the StabilityPool
+  4) StabilityPool Withdrawals accumulate REEF error in the StabilityPool
 
   5) StabilityPool Withdrawals can accumulate MoUSDLoss in the StabilityPool (i.e. they distribute too much MoUSD), and can block
   the final deposit withdrawal

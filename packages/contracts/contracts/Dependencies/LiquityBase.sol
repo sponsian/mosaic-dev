@@ -52,7 +52,7 @@ contract MosaicBase is BaseMath, IMosaicBase {
         return _debt.sub(MoUSD_GAS_COMPENSATION);
     }
 
-    // Return the amount of ETH to be drawn from a trove's collateral and sent as gas compensation.
+    // Return the amount of REEF to be drawn from a trove's collateral and sent as gas compensation.
     function _getCollGasCompensation(uint _entireColl) internal pure returns (uint) {
         return _entireColl / PERCENT_DIVISOR;
     }

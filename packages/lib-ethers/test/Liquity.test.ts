@@ -44,8 +44,8 @@ chai.use(chaiSpies);
 
 const STARTING_BALANCE = Decimal.from(100);
 
-// Extra ETH sent to users to be spent on gas
-const GAS_BUDGET = Decimal.from(0.1); // ETH
+// Extra REEF sent to users to be spent on gas
+const GAS_BUDGET = Decimal.from(0.1); // REEF
 
 const getGasCost = (tx: EthersTransactionReceipt) => tx.gasUsed.mul(tx.effectiveGasPrice);
 

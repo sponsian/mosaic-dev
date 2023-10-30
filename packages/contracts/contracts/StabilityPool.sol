@@ -23,7 +23,7 @@ import "./Dependencies/console.sol";
  * MoUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of MoUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a MoUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an ETH gain, as the ETH collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an REEF gain, as the REEF collateral of the liquidated trove is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -35,25 +35,25 @@ import "./Dependencies/console.sol";
  *
  * --- IMPLEMENTATION ---
  *
- * We use a highly scalable method of tracking deposits and ETH gains that has O(1) complexity.
+ * We use a highly scalable method of tracking deposits and REEF gains that has O(1) complexity.
  *
- * When a liquidation occurs, rather than updating each depositor's deposit and ETH gain, we simply update two state variables:
+ * When a liquidation occurs, rather than updating each depositor's deposit and REEF gain, we simply update two state variables:
  * a product P, and a sum S.
  *
  * A mathematical manipulation allows us to factor out the initial deposit, and accurately track all depositors' compounded deposits
- * and accumulated ETH gains over time, as liquidations occur, using just these two variables P and S. When depositors join the
+ * and accumulated REEF gains over time, as liquidations occur, using just these two variables P and S. When depositors join the
  * Stability Pool, they get a snapshot of the latest P and S: P_t and S_t, respectively.
  *
- * The formula for a depositor's accumulated ETH gain is derived here:
+ * The formula for a depositor's accumulated REEF gain is derived here:
  * https://github.com/mosaic/dev/blob/main/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  * For a given deposit d_t, the ratio P/P_t tells us the factor by which a deposit has decreased since it joined the Stability Pool,
- * and the term d_t * (S - S_t)/P_t gives us the deposit's total accumulated ETH gain.
+ * and the term d_t * (S - S_t)/P_t gives us the deposit's total accumulated REEF gain.
  *
- * Each liquidation updates the product P and sum S. After a series of liquidations, a compounded deposit and corresponding ETH gain
+ * Each liquidation updates the product P and sum S. After a series of liquidations, a compounded deposit and corresponding REEF gain
  * can be calculated using the initial deposit, the depositor’s snapshots of P and S, and the latest values of P and S.
  *
- * Any time a depositor updates their deposit (withdrawal, top-up) their accumulated ETH gain is paid out, their new deposit is recorded
+ * Any time a depositor updates their deposit (withdrawal, top-up) their accumulated REEF gain is paid out, their new deposit is recorded
  * (based on their latest compounded deposit and modified by the withdrawal/top-up), and they receive new snapshots of the latest P and S.
  * Essentially, they make a fresh deposit that overwrites the old one.
  *
@@ -92,13 +92,13 @@ import "./Dependencies/console.sol";
  * as 0, since it is now less than 1e-9'th of its initial value (e.g. a deposit of 1 billion MoUSD has depleted to < 1 MoUSD).
  *
  *
- *  --- TRACKING DEPOSITOR'S ETH GAIN OVER SCALE CHANGES AND EPOCHS ---
+ *  --- TRACKING DEPOSITOR'S REEF GAIN OVER SCALE CHANGES AND EPOCHS ---
  *
  * In the current epoch, the latest value of S is stored upon each scale change, and the mapping (scale -> S) is stored for each epoch.
  *
- * This allows us to calculate a deposit's accumulated ETH gain, during the epoch in which the deposit was non-zero and earned ETH.
+ * This allows us to calculate a deposit's accumulated REEF gain, during the epoch in which the deposit was non-zero and earned REEF.
  *
- * We calculate the depositor's accumulated ETH gain for the scale at which they made the deposit, using the ETH gain formula:
+ * We calculate the depositor's accumulated REEF gain for the scale at which they made the deposit, using the REEF gain formula:
  * e_1 = d_t * (S - S_t) / P_t
  *
  * and also for scale after, taking care to divide the latter by a factor of 1e9:
@@ -118,14 +118,14 @@ import "./Dependencies/console.sol";
  *  |---+---------|-------------|-----...
  *         i            i+1
  *
- * The sum of (e_1 + e_2) captures the depositor's total accumulated ETH gain, handling the case where their
+ * The sum of (e_1 + e_2) captures the depositor's total accumulated REEF gain, handling the case where their
  * deposit spanned one scale change. We only care about gains across one scale change, since the compounded
  * deposit is defined as being 0 once it has spanned more than one scale change.
  *
  *
  * --- UPDATING P WHEN A LIQUIDATION OCCURS ---
  *
- * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
+ * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / REEF gain derivations:
  * https://github.com/mosaic/mosaic/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  *
@@ -161,7 +161,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     ICommunityIssuance public communityIssuance;
 
-    uint256 internal ETH;  // deposited ether tracker
+    uint256 internal REEF;  // deposited ether tracker
 
     // Tracker for MoUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
     uint256 internal totalMoUSDDeposits;
@@ -209,7 +209,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     // With each offset that fully empties the Pool, the epoch is incremented by 1
     uint128 public currentEpoch;
 
-    /* ETH Gain sum 'S': During its lifetime, each deposit d_t earns an ETH gain of ( d_t * [S - S_t] )/P_t, where S_t
+    /* REEF Gain sum 'S': During its lifetime, each deposit d_t earns an REEF gain of ( d_t * [S - S_t] )/P_t, where S_t
     * is the depositor's snapshot of S taken at the time t when the deposit was made.
     *
     * The 'S' sums are stored in a nested mapping (epoch => scale => sum):
@@ -312,7 +312,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     // --- Getters for public variables. Required by IPool interface ---
 
     function getETH() external view override returns (uint) {
-        return ETH;
+        return REEF;
     }
 
     function getTotalMoUSDDeposits() external view override returns (uint) {
@@ -325,7 +325,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     *
     * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
     * - Tags the deposit with the provided front end tag param, if it's a new deposit
-    * - Sends depositor's accumulated gains (MSIC, ETH) to depositor
+    * - Sends depositor's accumulated gains (MSIC, REEF) to depositor
     * - Sends the tagged front end's accumulated MSIC gains to the tagged front end
     * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
     */
@@ -370,7 +370,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     *
     * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
     * - Removes the deposit's front end tag if it is a full withdrawal
-    * - Sends all depositor's accumulated gains (MSIC, ETH) to depositor
+    * - Sends all depositor's accumulated gains (MSIC, REEF) to depositor
     * - Sends the tagged front end's accumulated MSIC gains to the tagged front end
     * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
     *
@@ -417,7 +417,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     * - Triggers a MSIC issuance, based on time passed since the last issuance. The MSIC issuance is shared between *all* depositors and front ends
     * - Sends all depositor's MSIC gain to  depositor
     * - Sends all tagged front end's MSIC gain to the tagged front end
-    * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+    * - Transfers the depositor's entire REEF gain from the Stability Pool to the caller's trove
     * - Leaves their compounded deposit in the Stability Pool
     * - Updates snapshots for deposit and tagged front end stake */
     function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external override {
@@ -447,14 +447,14 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         _updateDepositAndSnapshots(msg.sender, compoundedMoUSDDeposit);
 
-        /* Emit events before transferring ETH gain to Trove.
-         This lets the event log make more sense (i.e. so it appears that first the ETH gain is withdrawn
+        /* Emit events before transferring REEF gain to Trove.
+         This lets the event log make more sense (i.e. so it appears that first the REEF gain is withdrawn
         and then it is deposited into the Trove, not the other way around). */
         emit ETHGainWithdrawn(msg.sender, depositorETHGain, MoUSDLoss);
         emit UserDepositChanged(msg.sender, compoundedMoUSDDeposit);
 
-        ETH = ETH.sub(depositorETHGain);
-        emit StabilityPoolETHBalanceUpdated(ETH);
+        REEF = REEF.sub(depositorETHGain);
+        emit StabilityPoolETHBalanceUpdated(REEF);
         emit EtherSent(msg.sender, depositorETHGain);
 
         borrowerOperations.moveETHGainToTrove{ value: depositorETHGain }(msg.sender, _upperHint, _lowerHint);
@@ -509,7 +509,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     /*
     * Cancels out the specified debt against the MoUSD contained in the Stability Pool (as far as possible)
-    * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
+    * and transfers the Trove's REEF collateral from ActivePool to StabilityPool.
     * Only called by liquidation functions in the TroveManager.
     */
     function offset(uint _debtToOffset, uint _collToAdd) external override {
@@ -538,7 +538,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         returns (uint ETHGainPerUnitStaked, uint MoUSDLossPerUnitStaked)
     {
         /*
-        * Compute the MoUSD and ETH rewards. Uses a "feedback" error correction, to keep
+        * Compute the MoUSD and REEF rewards. Uses a "feedback" error correction, to keep
         * the cumulative error in the P and S state variables low:
         *
         * 1) Form numerators which compensate for the floor division errors that occurred the last time this 
@@ -588,10 +588,10 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         /*
         * Calculate the new S first, before we update P.
-        * The ETH gain for any given depositor from a liquidation depends on the value of their deposit
+        * The REEF gain for any given depositor from a liquidation depends on the value of their deposit
         * (and the value of totalDeposits) prior to the Stability being depleted by the debt in the liquidation.
         *
-        * Since S corresponds to ETH gain, and P to deposit loss, we update S first.
+        * Since S corresponds to REEF gain, and P to deposit loss, we update S first.
         */
         uint marginalETHGain = _ETHGainPerUnitStaked.mul(currentP);
         uint newS = currentS.add(marginalETHGain);
@@ -642,7 +642,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     // --- Reward calculator functions for depositor and front end ---
 
-    /* Calculates the ETH gain earned by the deposit since its last snapshots were taken.
+    /* Calculates the REEF gain earned by the deposit since its last snapshots were taken.
     * Given by the formula:  E = d0 * (S - S(0))/P(0)
     * where S(0) and P(0) are the depositor's snapshots of the sum S and product P, respectively.
     * d0 is the last recorded deposit value.
@@ -660,8 +660,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     function _getETHGainFromSnapshots(uint initialDeposit, Snapshots memory snapshots) internal view returns (uint) {
         /*
-        * Grab the sum 'S' from the epoch at which the stake was made. The ETH gain may span up to one scale change.
-        * If it does, the second portion of the ETH gain is scaled by 1e9.
+        * Grab the sum 'S' from the epoch at which the stake was made. The REEF gain may span up to one scale change.
+        * If it does, the second portion of the REEF gain is scaled by 1e9.
         * If the gain spans no scale change, the second portion will be 0.
         */
         uint128 epochSnapshot = snapshots.epoch;
@@ -819,7 +819,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         return compoundedStake;
     }
 
-    // --- Sender functions for MoUSD deposit, ETH gains and MSIC gains ---
+    // --- Sender functions for MoUSD deposit, REEF gains and MSIC gains ---
 
     // Transfer the MoUSD tokens from the user to the Stability Pool's address, and update its recorded MoUSD
     function _sendMoUSDtoStabilityPool(address _address, uint _amount) internal {
@@ -831,13 +831,13 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     function _sendETHGainToDepositor(uint _amount) internal {
         if (_amount == 0) {return;}
-        uint newETH = ETH.sub(_amount);
-        ETH = newETH;
+        uint newETH = REEF.sub(_amount);
+        REEF = newETH;
         emit StabilityPoolETHBalanceUpdated(newETH);
         emit EtherSent(msg.sender, _amount);
 
         (bool success, ) = msg.sender.call{ value: _amount }("");
-        require(success, "StabilityPool: sending ETH failed");
+        require(success, "StabilityPool: sending REEF failed");
     }
 
     // Send MoUSD to user and decrease MoUSD in Pool
@@ -972,7 +972,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     function _requireUserHasETHGain(address _depositor) internal view {
         uint ETHGain = getDepositorETHGain(_depositor);
-        require(ETHGain > 0, "StabilityPool: caller must have non-zero ETH Gain");
+        require(ETHGain > 0, "StabilityPool: caller must have non-zero REEF Gain");
     }
 
     function _requireFrontEndNotRegistered(address _address) internal view {
@@ -992,7 +992,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-        StabilityPoolETHBalanceUpdated(ETH);
+        REEF = REEF.add(msg.value);
+        StabilityPoolETHBalanceUpdated(REEF);
     }
 }

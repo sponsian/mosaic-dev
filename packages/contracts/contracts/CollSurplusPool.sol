@@ -19,7 +19,7 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
     address public activePoolAddress;
 
     // deposited ether tracker
-    uint256 internal ETH;
+    uint256 internal REEF;
     // Collateral surplus claimable by trove owners
     mapping (address => uint) internal balances;
 
@@ -58,10 +58,10 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         _renounceOwnership();
     }
 
-    /* Returns the ETH state variable at ActivePool address.
+    /* Returns the REEF state variable at ActivePool address.
        Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
     function getETH() external view override returns (uint) {
-        return ETH;
+        return REEF;
     }
 
     function getCollateral(address _account) external view override returns (uint) {
@@ -87,11 +87,11 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        ETH = ETH.sub(claimableColl);
+        REEF = REEF.sub(claimableColl);
         emit EtherSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
-        require(success, "CollSurplusPool: sending ETH failed");
+        require(success, "CollSurplusPool: sending REEF failed");
     }
 
     // --- 'require' functions ---
@@ -118,6 +118,6 @@ contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
+        REEF = REEF.add(msg.value);
     }
 }

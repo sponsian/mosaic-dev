@@ -24,7 +24,7 @@ export declare class PopulatableEthersMosaic implements PopulatableMosaic<Ethers
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
 |  [adjustTrove(params, maxBorrowingRateOrOptionalParams, overrides)](./lib-ethers.populatableethersmosaic.adjusttrove.md) |  | Adjust existing Trove by changing its collateral, debt, or both. |
-|  [approveUniTokens(allowance, overrides)](./lib-ethers.populatableethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap ETH/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
+|  [approveUniTokens(allowance, overrides)](./lib-ethers.populatableethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
 |  [borrowMoUSD(amount, maxBorrowingRate, overrides)](./lib-ethers.populatableethersmosaic.borrowmsic.md) |  | Adjust existing Trove by borrowing more MoUSD. |
 |  [claimCollateralSurplus(overrides)](./lib-ethers.populatableethersmosaic.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove(overrides)](./lib-ethers.populatableethersmosaic.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
@@ -40,10 +40,10 @@ export declare class PopulatableEthersMosaic implements PopulatableMosaic<Ethers
 |  [sendMSIC(toAddress, amount, overrides)](./lib-ethers.populatableethersmosaic.sendmsic.md) |  | Send MSIC tokens to an address. |
 |  [sendMoUSD(toAddress, amount, overrides)](./lib-ethers.populatableethersmosaic.sendmsic.md) |  | Send MoUSD tokens to an address. |
 |  [stakeMSIC(amount, overrides)](./lib-ethers.populatableethersmosaic.stakemsic.md) |  | Stake MSIC to start earning fee revenue or increase existing stake. |
-|  [stakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.stakeunitokens.md) |  | Stake Uniswap ETH/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
+|  [stakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.stakeunitokens.md) |  | Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
 |  [transferCollateralGainToTrove(overrides)](./lib-ethers.populatableethersmosaic.transfercollateralgaintotrove.md) |  | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
 |  [unstakeMSIC(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakemsic.md) |  | Withdraw MSIC from staking. |
-|  [unstakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap ETH/MoUSD LP tokens from liquidity mining. |
+|  [unstakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining. |
 |  [withdrawCollateral(amount, overrides)](./lib-ethers.populatableethersmosaic.withdrawcollateral.md) |  | Adjust existing Trove by withdrawing some of its collateral. |
 |  [withdrawGainsFromStabilityPool(overrides)](./lib-ethers.populatableethersmosaic.withdrawgainsfromstabilitypool.md) |  | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [MSIC reward](./lib-base.stabilitydeposit.msicreward.md) from Stability Deposit. |
 |  [withdrawGainsFromStaking(overrides)](./lib-ethers.populatableethersmosaic.withdrawgainsfromstaking.md) |  | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |

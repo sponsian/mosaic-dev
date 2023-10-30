@@ -3,7 +3,7 @@ deployer address: 0xF8e5C47a6866e97F5D561982Ff80D39c436E573E
 deployerETHBalance before: 18189725977000000000
 Uniswp addr: 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f
 Uniswap Factory number of pairs: 31974
-deployer's ETH balance before deployments: 18189725977000000000
+deployer's REEF balance before deployments: 18189725977000000000
 Using previously deployed priceFeed contract at address 0x891d882fDACd2cB8DAeA5289f6019676E797EE5F
 Using previously deployed sortedTroves contract at address 0xb8493cD0E7135462502DF048deeFc9b650fa789F
 Using previously deployed troveManager contract at address 0x111Bf64dA957C55601C6D0f9DB2Eb1aef4dDEE23

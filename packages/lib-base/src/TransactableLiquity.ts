@@ -459,7 +459,7 @@ export interface TransactableMosaic {
   withdrawGainsFromStaking(): Promise<void>;
 
   /**
-   * Allow the liquidity mining contract to use Uniswap ETH/MoUSD LP tokens for
+   * Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for
    * {@link @mosaic/lib-base#TransactableMosaic.stakeUniTokens | staking}.
    *
    * @param allowance - Maximum amount of LP tokens that will be transferrable to liquidity mining
@@ -475,7 +475,7 @@ export interface TransactableMosaic {
   approveUniTokens(allowance?: Decimalish): Promise<void>;
 
   /**
-   * Stake Uniswap ETH/MoUSD LP tokens to participate in liquidity mining and earn MSIC.
+   * Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC.
    *
    * @param amount - Amount of LP tokens to add to new or existing stake.
    *
@@ -485,7 +485,7 @@ export interface TransactableMosaic {
   stakeUniTokens(amount: Decimalish): Promise<void>;
 
   /**
-   * Withdraw Uniswap ETH/MoUSD LP tokens from liquidity mining.
+   * Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining.
    *
    * @param amount - Amount of LP tokens to withdraw.
    *

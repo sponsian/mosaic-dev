@@ -14,7 +14,7 @@ export const StabilityActionDescription: React.FC<StabilityActionDescriptionProp
   originalDeposit,
   change
 }) => {
-  const collateralGain = originalDeposit.collateralGain.nonZero?.prettify(4).concat(" ETH");
+  const collateralGain = originalDeposit.collateralGain.nonZero?.prettify(4).concat(" REEF");
   const msicReward = originalDeposit.msicReward.nonZero?.prettify().concat(" ", GT);
 
   return (

@@ -95,10 +95,10 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
                 if (netMoUSDDebt > MIN_NET_DEBT) {
                     uint maxRedeemableMoUSD = MosaicMath._min(remainingMoUSD, netMoUSDDebt.sub(MIN_NET_DEBT));
 
-                    uint ETH = troveManager.getTroveColl(currentTroveuser)
+                    uint REEF = troveManager.getTroveColl(currentTroveuser)
                         .add(troveManager.getPendingETHReward(currentTroveuser));
 
-                    uint newColl = ETH.sub(maxRedeemableMoUSD.mul(DECIMAL_PRECISION).div(_price));
+                    uint newColl = REEF.sub(maxRedeemableMoUSD.mul(DECIMAL_PRECISION).div(_price));
                     uint newDebt = netMoUSDDebt.sub(maxRedeemableMoUSD);
 
                     uint compositeDebt = _getCompositeDebt(newDebt);

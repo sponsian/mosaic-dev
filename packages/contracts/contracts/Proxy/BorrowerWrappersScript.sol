@@ -90,7 +90,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint msicBalanceAfter = msicToken.balanceOf(address(this));
         uint claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
 
-        // Add claimed ETH to trove, get more MoUSD and stake it into the Stability Pool
+        // Add claimed REEF to trove, get more MoUSD and stake it into the Stability Pool
         if (claimedCollateral > 0) {
             _requireUserHasTrove(address(this));
             uint MoUSDAmount = _getNetMoUSDAmount(claimedCollateral);

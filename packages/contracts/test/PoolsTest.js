@@ -25,7 +25,7 @@ contract('StabilityPool', async accounts => {
     await stabilityPool.setAddresses(dumbContractAddress, dumbContractAddress, mockActivePoolAddress, dumbContractAddress, dumbContractAddress, dumbContractAddress, dumbContractAddress)
   })
 
-  it('getETH(): gets the recorded ETH balance', async () => {
+  it('getETH(): gets the recorded REEF balance', async () => {
     const recordedETHBalance = await stabilityPool.getETH()
     assert.equal(recordedETHBalance, 0)
   })
@@ -48,7 +48,7 @@ contract('ActivePool', async accounts => {
     await activePool.setAddresses(mockBorrowerOperations.address, dumbContractAddress, dumbContractAddress, dumbContractAddress)
   })
 
-  it('getETH(): gets the recorded ETH balance', async () => {
+  it('getETH(): gets the recorded REEF balance', async () => {
     const recordedETHBalance = await activePool.getETH()
     assert.equal(recordedETHBalance, 0)
   })
@@ -89,7 +89,7 @@ contract('ActivePool', async accounts => {
   })
 
   // send raw ether
-  it('sendETH(): decreases the recorded ETH balance by the correct amount', async () => {
+  it('sendETH(): decreases the recorded REEF balance by the correct amount', async () => {
     // setup: give pool 2 ether
     const activePool_initialBalance = web3.utils.toBN(await web3.eth.getBalance(activePool.address))
     assert.equal(activePool_initialBalance, 0)
@@ -174,7 +174,7 @@ contract('DefaultPool', async accounts => {
   })
 
   // send raw ether
-  it('sendETHToActivePool(): decreases the recorded ETH balance by the correct amount', async () => {
+  it('sendETHToActivePool(): decreases the recorded REEF balance by the correct amount', async () => {
     // setup: give pool 2 ether
     const defaultPool_initialBalance = web3.utils.toBN(await web3.eth.getBalance(defaultPool.address))
     assert.equal(defaultPool_initialBalance, 0)

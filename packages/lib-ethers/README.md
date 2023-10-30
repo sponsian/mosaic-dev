@@ -22,7 +22,7 @@ async function example() {
   const mosaic = await EthersMosaic.connect(wallet);
 
   const { newTrove } = await mosaic.openTrove({
-    depositCollateral: 5, // ETH
+    depositCollateral: 5, // REEF
     borrowMoUSD: 2000
   });
 

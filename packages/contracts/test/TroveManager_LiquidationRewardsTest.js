@@ -106,13 +106,13 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
       .toString()
 
     /* Expected collateral:
-    A: Alice receives 0.995 ETH from L1, and ~3/5*0.995 ETH from L2.
-    expect aliceColl = 2 + 0.995 + 2.995/4.995 * 0.995 = 3.5916 ETH
+    A: Alice receives 0.995 REEF from L1, and ~3/5*0.995 REEF from L2.
+    expect aliceColl = 2 + 0.995 + 2.995/4.995 * 0.995 = 3.5916 REEF
 
-    C: Carol receives ~2/5 ETH from L2
-    expect carolColl = 2 + 2/4.995 * 0.995 = 2.398 ETH
+    C: Carol receives ~2/5 REEF from L2
+    expect carolColl = 2 + 2/4.995 * 0.995 = 2.398 REEF
 
-    Total coll = 4 + 2 * 0.995 ETH
+    Total coll = 4 + 2 * 0.995 REEF
     */
     const A_collAfterL1 = A_coll.add(th.applyLiquidationFee(B_coll))
     assert.isAtMost(th.getDifference(alice_Coll, A_collAfterL1.add(A_collAfterL1.mul(th.applyLiquidationFee(D_coll)).div(A_collAfterL1.add(C_coll)))), 1000)
@@ -177,15 +177,15 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
       .toString()
 
     /* Expected collateral:
-    A and B receives 1/2 ETH * 0.995 from L1.
+    A and B receives 1/2 REEF * 0.995 from L1.
     total Coll: 3
 
-    A, B, receive (2.4975)/8.995 * 0.995 ETH from L2.
+    A, B, receive (2.4975)/8.995 * 0.995 REEF from L2.
     
-    D, E receive 2/8.995 * 0.995 ETH from L2.
+    D, E receive 2/8.995 * 0.995 REEF from L2.
 
-    expect A, B coll  = 2 +  0.4975 + 0.2763  =  ETH
-    expect D, E coll  = 2 + 0.2212  =  ETH
+    expect A, B coll  = 2 +  0.4975 + 0.2763  =  REEF
+    expect D, E coll  = 2 + 0.2212  =  REEF
 
     Total coll = 8 (non-liquidated) + 2 * 0.995 (liquidated and redistributed)
     */
@@ -209,7 +209,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   })
   ////
 
-  it("redistribution: Sequence of alternate opening/liquidation: final surviving trove has ETH from all previously liquidated troves", async () => {
+  it("redistribution: Sequence of alternate opening/liquidation: final surviving trove has REEF from all previously liquidated troves", async () => {
     // A, B  open troves
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: alice } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: bob } })
@@ -296,7 +296,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
 
     /* Expected collateral:
      A-E should have been liquidated
-     trove F should have acquired all ETH in the system: 1 ETH initial coll, and 0.995^5+0.995^4+0.995^3+0.995^2+0.995 from rewards = 5.925 ETH
+     trove F should have acquired all REEF in the system: 1 REEF initial coll, and 0.995^5+0.995^4+0.995^3+0.995^2+0.995 from rewards = 5.925 REEF
     */
     assert.isAtMost(th.getDifference(alice_Coll, '0'), 1000)
     assert.isAtMost(th.getDifference(bob_Coll, '0'), 1000)
@@ -359,7 +359,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(getDifference(D_entireColl_1, D_collAfterL1), 1e8)
     assert.isAtMost(getDifference(E_entireColl_1, E_collAfterL1), 1e8)
 
-    // Bob adds 1 ETH to his trove
+    // Bob adds 1 REEF to his trove
     const addedColl1 = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(B, B, { from: B, value: addedColl1 })
 
@@ -382,7 +382,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(getDifference(D_entireColl_2, D_collAfterL2), 1e8)
     assert.isAtMost(getDifference(E_entireColl_2, E_collAfterL2), 1e8)
 
-    // Bob adds 1 ETH to his trove
+    // Bob adds 1 REEF to his trove
     const addedColl2 = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(B, B, { from: B, value: addedColl2 })
 
@@ -436,7 +436,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     const A_collRedistribution = A_entireColl_0.mul(toBN(995)).div(toBN(1000)) // remove the gas comp
 
     // console.log(`A_collRedistribution: ${A_collRedistribution}`)
-    // Check accumulated ETH gain for each trove
+    // Check accumulated REEF gain for each trove
     const B_ETHGain_1 = await troveManager.getPendingETHReward(B)
     const C_ETHGain_1 = await troveManager.getPendingETHReward(C)
     const D_ETHGain_1 = await troveManager.getPendingETHReward(D)
@@ -453,7 +453,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(getDifference(D_expectedPendingETH_1, D_ETHGain_1), 1e8)
     assert.isAtMost(getDifference(E_expectedPendingETH_1, E_ETHGain_1), 1e8)
 
-    // // Bob adds 1 ETH to his trove
+    // // Bob adds 1 REEF to his trove
     await borrowerOperations.addColl(B, B, { from: B, value: dec(1, 'ether') })
 
     // Check entireColl for each trove
@@ -477,10 +477,10 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     const D_ETHGain_2 = await troveManager.getPendingETHReward(D)
     const E_ETHGain_2 = await troveManager.getPendingETHReward(E)
 
-    // Since B topped up, he has no previous pending ETH gain
+    // Since B topped up, he has no previous pending REEF gain
     const B_expectedPendingETH_2 = C_collRedistribution.mul(B_entireColl_1).div(denominatorColl_2)
 
-    // D & E's accumulated pending ETH gain includes their previous gain
+    // D & E's accumulated pending REEF gain includes their previous gain
     const D_expectedPendingETH_2 = C_collRedistribution.mul(D_entireColl_1).div(denominatorColl_2)
       .add(D_expectedPendingETH_1)
 
@@ -491,7 +491,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(getDifference(D_expectedPendingETH_2, D_ETHGain_2), 1e8)
     assert.isAtMost(getDifference(E_expectedPendingETH_2, E_ETHGain_2), 1e8)
 
-    // // Bob adds 1 ETH to his trove
+    // // Bob adds 1 REEF to his trove
     await borrowerOperations.addColl(B, B, { from: B, value: dec(1, 'ether') })
 
     // Check entireColl for each trove
@@ -513,10 +513,10 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     const B_ETHGain_3 = await troveManager.getPendingETHReward(B)
     const D_ETHGain_3 = await troveManager.getPendingETHReward(D)
 
-    // Since B topped up, he has no previous pending ETH gain
+    // Since B topped up, he has no previous pending REEF gain
     const B_expectedPendingETH_3 = E_collRedistribution.mul(B_entireColl_2).div(denominatorColl_3)
 
-    // D'S accumulated pending ETH gain includes their previous gain
+    // D'S accumulated pending REEF gain includes their previous gain
     const D_expectedPendingETH_3 = E_collRedistribution.mul(D_entireColl_2).div(denominatorColl_3)
       .add(D_expectedPendingETH_2)
 
@@ -541,7 +541,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    //Bob adds ETH to his trove
+    //Bob adds REEF to his trove
     const addedColl = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(bob, bob, { from: bob, value: addedColl })
 
@@ -591,7 +591,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    //Bob adds ETH to his trove
+    //Bob adds REEF to his trove
     const addedColl = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(bob, bob, { from: bob, value: addedColl })
 
@@ -607,20 +607,20 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isFalse(await sortedTroves.contains(dennis))
 
     /* Bob rewards:
-     L1: 1/2*0.995 ETH, 55 MoUSD
-     L2: (2.4975/3.995)*0.995 = 0.622 ETH , 110*(2.4975/3.995)= 68.77 MoUSDDebt
+     L1: 1/2*0.995 REEF, 55 MoUSD
+     L2: (2.4975/3.995)*0.995 = 0.622 REEF , 110*(2.4975/3.995)= 68.77 MoUSDDebt
 
-    coll: 3.1195 ETH
+    coll: 3.1195 REEF
     debt: 233.77 MoUSDDebt
 
      Alice rewards:
-    L1 1/2*0.995 ETH, 55 MoUSD
-    L2 (1.4975/3.995)*0.995 = 0.3730 ETH, 110*(1.4975/3.995) = 41.23 MoUSDDebt
+    L1 1/2*0.995 REEF, 55 MoUSD
+    L2 (1.4975/3.995)*0.995 = 0.3730 REEF, 110*(1.4975/3.995) = 41.23 MoUSDDebt
 
-    coll: 1.8705 ETH
+    coll: 1.8705 REEF
     debt: 146.23 MoUSDDebt
 
-    totalColl: 4.99 ETH
+    totalColl: 4.99 REEF
     totalDebt 380 MoUSD (includes 50 each for gas compensation)
     */
     const bob_Coll = ((await troveManager.Troves(bob))[1]
@@ -679,12 +679,12 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    // Expected rewards:  alice: 1 ETH, bob: 1 ETH, carol: 998 ETH
+    // Expected rewards:  alice: 1 REEF, bob: 1 REEF, carol: 998 REEF
     const alice_ETHReward_1 = await troveManager.getPendingETHReward(alice)
     const bob_ETHReward_1 = await troveManager.getPendingETHReward(bob)
     const carol_ETHReward_1 = await troveManager.getPendingETHReward(carol)
 
-    //Expect 1000 + 1000*0.995 ETH in system now
+    //Expect 1000 + 1000*0.995 REEF in system now
     const entireSystemColl_1 = (await activePool.getETH()).add(await defaultPool.getETH()).toString()
     assert.equal(entireSystemColl_1, A_coll.add(B_coll).add(C_coll).add(th.applyLiquidationFee(D_coll)))
 
@@ -693,15 +693,15 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     th.assertIsApproximatelyEqual(bob_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(B_coll).div(totalColl))
     th.assertIsApproximatelyEqual(carol_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(C_coll).div(totalColl))
 
-    //Carol adds 1 ETH to her trove, brings it to 1992.01 total coll
+    //Carol adds 1 REEF to her trove, brings it to 1992.01 total coll
     const C_addedColl = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(carol, carol, { from: carol, value: dec(1, 'ether') })
 
-    //Expect 1996 ETH in system now
+    //Expect 1996 REEF in system now
     const entireSystemColl_2 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_2, totalColl.add(th.applyLiquidationFee(D_coll)).add(C_addedColl))
 
-    // E opens with another 1996 ETH
+    // E opens with another 1996 REEF
     const { collateral: E_coll } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: erin, value: entireSystemColl_2 } })
 
     // Price drops to 100 $/E
@@ -712,18 +712,18 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txE.receipt.status)
     assert.isFalse(await sortedTroves.contains(erin))
 
-    /* Expected ETH rewards: 
-     Carol = 1992.01/1996 * 1996*0.995 = 1982.05 ETH
-     Alice = 1.995/1996 * 1996*0.995 = 1.985025 ETH
-     Bob = 1.995/1996 * 1996*0.995 = 1.985025 ETH
+    /* Expected REEF rewards: 
+     Carol = 1992.01/1996 * 1996*0.995 = 1982.05 REEF
+     Alice = 1.995/1996 * 1996*0.995 = 1.985025 REEF
+     Bob = 1.995/1996 * 1996*0.995 = 1.985025 REEF
 
     therefore, expected total collateral:
 
     Carol = 1991.01 + 1991.01 = 3974.06
-    Alice = 1.995 + 1.985025 = 3.980025 ETH
-    Bob = 1.995 + 1.985025 = 3.980025 ETH
+    Alice = 1.995 + 1.985025 = 3.980025 REEF
+    Bob = 1.995 + 1.985025 = 3.980025 REEF
 
-    total = 3982.02 ETH
+    total = 3982.02 REEF
     */
 
     const alice_Coll = ((await troveManager.Troves(alice))[1]
@@ -750,7 +750,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(bob_Coll, expected_B_coll), 1000)
     assert.isAtMost(th.getDifference(carol_Coll, expected_C_coll), 1000)
 
-    //Expect 3982.02 ETH in system now
+    //Expect 3982.02 REEF in system now
     const entireSystemColl_3 = (await activePool.getETH()).add(await defaultPool.getETH()).toString()
     th.assertIsApproximatelyEqual(entireSystemColl_3, totalCollAfterL1.add(th.applyLiquidationFee(E_coll)))
 
@@ -777,12 +777,12 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    // Expected rewards:  alice: 1 ETH, bob: 1 ETH, carol: 998 ETH (*0.995)
+    // Expected rewards:  alice: 1 REEF, bob: 1 REEF, carol: 998 REEF (*0.995)
     const alice_ETHReward_1 = await troveManager.getPendingETHReward(alice)
     const bob_ETHReward_1 = await troveManager.getPendingETHReward(bob)
     const carol_ETHReward_1 = await troveManager.getPendingETHReward(carol)
 
-    //Expect 1995 ETH in system now
+    //Expect 1995 REEF in system now
     const entireSystemColl_1 = (await activePool.getETH()).add(await defaultPool.getETH()).toString()
     assert.equal(entireSystemColl_1, A_coll.add(B_coll).add(C_coll).add(th.applyLiquidationFee(D_coll)))
 
@@ -791,7 +791,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     th.assertIsApproximatelyEqual(bob_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(B_coll).div(totalColl))
     th.assertIsApproximatelyEqual(carol_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(C_coll).div(totalColl))
 
-    /* Alice, Bob, Carol each adds 1 ETH to their troves, 
+    /* Alice, Bob, Carol each adds 1 REEF to their troves, 
     bringing them to 2.995, 2.995, 1992.01 total coll each. */
 
     const addedColl = toBN(dec(1, 'ether'))
@@ -799,11 +799,11 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     await borrowerOperations.addColl(bob, bob, { from: bob, value: addedColl })
     await borrowerOperations.addColl(carol, carol, { from: carol, value: addedColl })
 
-    //Expect 1998 ETH in system now
+    //Expect 1998 REEF in system now
     const entireSystemColl_2 = (await activePool.getETH()).add(await defaultPool.getETH()).toString()
     th.assertIsApproximatelyEqual(entireSystemColl_2, totalColl.add(th.applyLiquidationFee(D_coll)).add(addedColl.mul(toBN(3))))
 
-    // E opens with another 1998 ETH
+    // E opens with another 1998 REEF
     const { collateral: E_coll } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: erin, value: entireSystemColl_2 } })
 
     // Price drops to 100 $/E
@@ -814,18 +814,18 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txE.receipt.status)
     assert.isFalse(await sortedTroves.contains(erin))
 
-    /* Expected ETH rewards: 
-     Carol = 1992.01/1998 * 1998*0.995 = 1982.04995 ETH
-     Alice = 2.995/1998 * 1998*0.995 = 2.980025 ETH
-     Bob = 2.995/1998 * 1998*0.995 = 2.980025 ETH
+    /* Expected REEF rewards: 
+     Carol = 1992.01/1998 * 1998*0.995 = 1982.04995 REEF
+     Alice = 2.995/1998 * 1998*0.995 = 2.980025 REEF
+     Bob = 2.995/1998 * 1998*0.995 = 2.980025 REEF
 
     therefore, expected total collateral:
 
     Carol = 1992.01 + 1982.04995 = 3974.05995
-    Alice = 2.995 + 2.980025 = 5.975025 ETH
-    Bob = 2.995 + 2.980025 = 5.975025 ETH
+    Alice = 2.995 + 2.980025 = 5.975025 REEF
+    Bob = 2.995 + 2.980025 = 5.975025 REEF
 
-    total = 3986.01 ETH
+    total = 3986.01 REEF
     */
 
     const alice_Coll = ((await troveManager.Troves(alice))[1]
@@ -852,7 +852,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(bob_Coll, expected_B_coll), 1000)
     assert.isAtMost(th.getDifference(carol_Coll, expected_C_coll), 1000)
 
-    //Expect 3986.01 ETH in system now
+    //Expect 3986.01 REEF in system now
     const entireSystemColl_3 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_3, totalCollAfterL1.add(th.applyLiquidationFee(E_coll)))
 
@@ -879,7 +879,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    //Bob withdraws 0.5 ETH from his trove
+    //Bob withdraws 0.5 REEF from his trove
     const withdrawnColl = toBN(dec(500, 'finney'))
     await borrowerOperations.withdrawColl(withdrawnColl, bob, bob, { from: bob })
 
@@ -933,7 +933,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    //Bob  withdraws 0.5 ETH from his trove
+    //Bob  withdraws 0.5 REEF from his trove
     const withdrawnColl = toBN(dec(500, 'finney'))
     await borrowerOperations.withdrawColl(withdrawnColl, bob, bob, { from: bob })
 
@@ -949,20 +949,20 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isFalse(await sortedTroves.contains(dennis))
 
     /* Bob rewards:
-     L1: 0.4975 ETH, 55 MoUSD
-     L2: (0.9975/2.495)*0.995 = 0.3978 ETH , 110*(0.9975/2.495)= 43.98 MoUSDDebt
+     L1: 0.4975 REEF, 55 MoUSD
+     L2: (0.9975/2.495)*0.995 = 0.3978 REEF , 110*(0.9975/2.495)= 43.98 MoUSDDebt
 
-    coll: (1 + 0.4975 - 0.5 + 0.3968) = 1.3953 ETH
+    coll: (1 + 0.4975 - 0.5 + 0.3968) = 1.3953 REEF
     debt: (110 + 55 + 43.98 = 208.98 MoUSDDebt 
 
      Alice rewards:
     L1 0.4975, 55 MoUSD
-    L2 (1.4975/2.495)*0.995 = 0.5972 ETH, 110*(1.4975/2.495) = 66.022 MoUSDDebt
+    L2 (1.4975/2.495)*0.995 = 0.5972 REEF, 110*(1.4975/2.495) = 66.022 MoUSDDebt
 
-    coll: (1 + 0.4975 + 0.5972) = 2.0947 ETH
+    coll: (1 + 0.4975 + 0.5972) = 2.0947 REEF
     debt: (50 + 55 + 66.022) = 171.022 MoUSD Debt
 
-    totalColl: 3.49 ETH
+    totalColl: 3.49 REEF
     totalDebt 380 MoUSD (Includes 50 in each trove for gas compensation)
     */
     const bob_Coll = ((await troveManager.Troves(bob))[1]
@@ -1026,12 +1026,12 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    // Expected rewards:  alice: 1 ETH, bob: 1 ETH, carol: 998 ETH (*0.995)
+    // Expected rewards:  alice: 1 REEF, bob: 1 REEF, carol: 998 REEF (*0.995)
     const alice_ETHReward_1 = await troveManager.getPendingETHReward(alice)
     const bob_ETHReward_1 = await troveManager.getPendingETHReward(bob)
     const carol_ETHReward_1 = await troveManager.getPendingETHReward(carol)
 
-    //Expect 1995 ETH in system now
+    //Expect 1995 REEF in system now
     const entireSystemColl_1 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_1, A_coll.add(B_coll).add(C_coll).add(th.applyLiquidationFee(D_coll)))
 
@@ -1040,15 +1040,15 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     th.assertIsApproximatelyEqual(bob_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(B_coll).div(totalColl))
     th.assertIsApproximatelyEqual(carol_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(C_coll).div(totalColl))
 
-    //Carol wthdraws 1 ETH from her trove, brings it to 1990.01 total coll
+    //Carol wthdraws 1 REEF from her trove, brings it to 1990.01 total coll
     const C_withdrawnColl = toBN(dec(1, 'ether'))
     await borrowerOperations.withdrawColl(C_withdrawnColl, carol, carol, { from: carol })
 
-    //Expect 1994 ETH in system now
+    //Expect 1994 REEF in system now
     const entireSystemColl_2 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_2, totalColl.add(th.applyLiquidationFee(D_coll)).sub(C_withdrawnColl))
 
-    // E opens with another 1994 ETH
+    // E opens with another 1994 REEF
     const { collateral: E_coll } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: erin, value: entireSystemColl_2 } })
 
     // Price drops to 100 $/E
@@ -1059,18 +1059,18 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txE.receipt.status)
     assert.isFalse(await sortedTroves.contains(erin))
 
-    /* Expected ETH rewards: 
-     Carol = 1990.01/1994 * 1994*0.995 = 1980.05995 ETH
-     Alice = 1.995/1994 * 1994*0.995 = 1.985025 ETH
-     Bob = 1.995/1994 * 1994*0.995 = 1.985025 ETH
+    /* Expected REEF rewards: 
+     Carol = 1990.01/1994 * 1994*0.995 = 1980.05995 REEF
+     Alice = 1.995/1994 * 1994*0.995 = 1.985025 REEF
+     Bob = 1.995/1994 * 1994*0.995 = 1.985025 REEF
 
     therefore, expected total collateral:
 
     Carol = 1990.01 + 1980.05995 = 3970.06995
-    Alice = 1.995 + 1.985025 = 3.980025 ETH
-    Bob = 1.995 + 1.985025 = 3.980025 ETH
+    Alice = 1.995 + 1.985025 = 3.980025 REEF
+    Bob = 1.995 + 1.985025 = 3.980025 REEF
 
-    total = 3978.03 ETH
+    total = 3978.03 REEF
     */
 
     const alice_Coll = ((await troveManager.Troves(alice))[1]
@@ -1097,7 +1097,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(bob_Coll, expected_B_coll), 1000)
     assert.isAtMost(th.getDifference(carol_Coll, expected_C_coll), 1000)
 
-    //Expect 3978.03 ETH in system now
+    //Expect 3978.03 REEF in system now
     const entireSystemColl_3 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_3, totalCollAfterL1.add(th.applyLiquidationFee(E_coll)))
 
@@ -1124,12 +1124,12 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price bounces back to 200 $/E
     await priceFeed.setPrice(dec(200, 18))
 
-    // Expected rewards:  alice: 1 ETH, bob: 1 ETH, carol: 998 ETH (*0.995)
+    // Expected rewards:  alice: 1 REEF, bob: 1 REEF, carol: 998 REEF (*0.995)
     const alice_ETHReward_1 = await troveManager.getPendingETHReward(alice)
     const bob_ETHReward_1 = await troveManager.getPendingETHReward(bob)
     const carol_ETHReward_1 = await troveManager.getPendingETHReward(carol)
 
-    //Expect 1995 ETH in system now
+    //Expect 1995 REEF in system now
     const entireSystemColl_1 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_1, A_coll.add(B_coll).add(C_coll).add(th.applyLiquidationFee(D_coll)))
 
@@ -1138,7 +1138,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     th.assertIsApproximatelyEqual(bob_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(B_coll).div(totalColl))
     th.assertIsApproximatelyEqual(carol_ETHReward_1.toString(), th.applyLiquidationFee(D_coll).mul(C_coll).div(totalColl))
 
-    /* Alice, Bob, Carol each withdraw 0.5 ETH to their troves, 
+    /* Alice, Bob, Carol each withdraw 0.5 REEF to their troves, 
     bringing them to 1.495, 1.495, 1990.51 total coll each. */
     const withdrawnColl = toBN(dec(500, 'finney'))
     await borrowerOperations.withdrawColl(withdrawnColl, alice, alice, { from: alice })
@@ -1162,11 +1162,11 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(bob_Coll_1, B_coll.add(th.applyLiquidationFee(D_coll).mul(B_coll).div(totalColl_1)).sub(withdrawnColl)), 1000)
     assert.isAtMost(th.getDifference(carol_Coll_1, C_coll.add(th.applyLiquidationFee(D_coll).mul(C_coll).div(totalColl_1)).sub(withdrawnColl)), 1000)
 
-    //Expect 1993.5 ETH in system now
+    //Expect 1993.5 REEF in system now
     const entireSystemColl_2 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_2, totalColl.add(th.applyLiquidationFee(D_coll)).sub(withdrawnColl.mul(toBN(3))))
 
-    // E opens with another 1993.5 ETH
+    // E opens with another 1993.5 REEF
     const { collateral: E_coll } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: erin, value: entireSystemColl_2 } })
 
     // Price drops to 100 $/E
@@ -1177,18 +1177,18 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txE.receipt.status)
     assert.isFalse(await sortedTroves.contains(erin))
 
-    /* Expected ETH rewards: 
-     Carol = 1990.51/1993.5 * 1993.5*0.995 = 1980.55745 ETH
-     Alice = 1.495/1993.5 * 1993.5*0.995 = 1.487525 ETH
-     Bob = 1.495/1993.5 * 1993.5*0.995 = 1.487525 ETH
+    /* Expected REEF rewards: 
+     Carol = 1990.51/1993.5 * 1993.5*0.995 = 1980.55745 REEF
+     Alice = 1.495/1993.5 * 1993.5*0.995 = 1.487525 REEF
+     Bob = 1.495/1993.5 * 1993.5*0.995 = 1.487525 REEF
 
     therefore, expected total collateral:
 
     Carol = 1990.51 + 1980.55745 = 3971.06745
-    Alice = 1.495 + 1.487525 = 2.982525 ETH
-    Bob = 1.495 + 1.487525 = 2.982525 ETH
+    Alice = 1.495 + 1.487525 = 2.982525 REEF
+    Bob = 1.495 + 1.487525 = 2.982525 REEF
 
-    total = 3977.0325 ETH
+    total = 3977.0325 REEF
     */
 
     const alice_Coll_2 = ((await troveManager.Troves(alice))[1]
@@ -1215,7 +1215,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(bob_Coll_2, expected_B_coll), 1000)
     assert.isAtMost(th.getDifference(carol_Coll_2, expected_C_coll), 1000)
 
-    //Expect 3977.0325 ETH in system now
+    //Expect 3977.0325 REEF in system now
     const entireSystemColl_3 = (await activePool.getETH()).add(await defaultPool.getETH())
     th.assertIsApproximatelyEqual(entireSystemColl_3, totalCollAfterL1.add(th.applyLiquidationFee(E_coll)))
 
@@ -1256,11 +1256,11 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // D opens trove
     const { collateral: D_coll, totalDebt: D_totalDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraMoUSDAmount: dec(110, 18), extraParams: { from: dennis } })
 
-    //Bob adds 1 ETH to his trove
+    //Bob adds 1 REEF to his trove
     const B_addedColl = toBN(dec(1, 'ether'))
     await borrowerOperations.addColl(bob, bob, { from: bob, value: B_addedColl })
 
-    //Carol  withdraws 1 ETH from her trove
+    //Carol  withdraws 1 REEF from her trove
     const C_withdrawnColl = toBN(dec(1, 'ether'))
     await borrowerOperations.withdrawColl(C_withdrawnColl, carol, carol, { from: carol })
 
@@ -1327,7 +1327,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(dennis_rawColl, D_collAfterL2), 1000000)
     assert.isAtMost(th.getDifference(erin_rawColl, E_coll), 1000)
 
-    // Check pending ETH rewards of C, D, E
+    // Check pending REEF rewards of C, D, E
     assert.isAtMost(th.getDifference(carol_pendingETHReward, C_collAfterL3.sub(C_collAfterL1)), 1000000)
     assert.isAtMost(th.getDifference(dennis_pendingETHReward, D_collAfterL3.sub(D_collAfterL2)), 1000000)
     assert.isAtMost(th.getDifference(erin_pendingETHReward, E_collAfterL3.sub(E_coll)), 1000000)
@@ -1355,9 +1355,9 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   // https://docs.google.com/spreadsheets/d/1F5p3nZy749K5jwO-bwJeTsRoY7ewMfWIQ3QHtokxqzo/edit?usp=sharing
   it("redistribution, all operations: A,B,C open. Liq(A). D opens. B adds, C withdraws. Liq(B). E & F open. D adds. Liq(F). Varying coll. Distributes correct rewards", async () => {
     /* A, B, C open troves.
-    A: 450 ETH
-    B: 8901 ETH
-    C: 23.902 ETH
+    A: 450 REEF
+    B: 8901 REEF
+    C: 23.902 REEF
     */
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(90000, 16)), extraParams: { from: alice, value: toBN('450000000000000000000') } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(1800000, 16)), extraParams: { from: bob, value: toBN('8901000000000000000000') } })
@@ -1385,14 +1385,14 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     // Price rises 
     await priceFeed.setPrice(dec(1, 27))
 
-    // D opens trove: 0.035 ETH
+    // D opens trove: 0.035 REEF
     const { collateral: D_coll, totalDebt: D_totalDebt } = await openTrove({ extraMoUSDAmount: dec(100, 18), extraParams: { from: dennis, value: toBN(dec(35, 15)) } })
 
-    // Bob adds 11.33909 ETH to his trove
+    // Bob adds 11.33909 REEF to his trove
     const B_addedColl = toBN('11339090000000000000')
     await borrowerOperations.addColl(bob, bob, { from: bob, value: B_addedColl })
 
-    // Carol withdraws 15 ETH from her trove
+    // Carol withdraws 15 REEF from her trove
     const C_withdrawnColl = toBN(dec(15, 'ether'))
     await borrowerOperations.withdrawColl(C_withdrawnColl, carol, carol, { from: carol })
 
@@ -1424,8 +1424,8 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     await priceFeed.setPrice(dec(1, 27))
 
     /* E and F open troves.
-    E: 10000 ETH
-    F: 0.0007 ETH
+    E: 10000 REEF
+    F: 0.0007 REEF
     */
     const { collateral: E_coll, totalDebt: E_totalDebt } = await openTrove({ extraMoUSDAmount: dec(100, 18), extraParams: { from: erin, value: toBN(dec(1, 22)) } })
     const { collateral: F_coll, totalDebt: F_totalDebt } = await openTrove({ extraMoUSDAmount: dec(100, 18), extraParams: { from: freddy, value: toBN('700000000000000') } })
@@ -1466,7 +1466,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isAtMost(th.getDifference(dennis_rawColl, D_collAfterL2), 1000000)
     assert.isAtMost(th.getDifference(erin_rawColl, E_coll), 1000)
 
-    // Check pending ETH rewards of C, D, E
+    // Check pending REEF rewards of C, D, E
     assert.isAtMost(th.getDifference(carol_pendingETHReward, C_collAfterL3.sub(C_collAfterL1)), 1000000)
     assert.isAtMost(th.getDifference(dennis_pendingETHReward, D_collAfterL3.sub(D_collAfterL2)), 1000000)
     assert.isAtMost(th.getDifference(erin_pendingETHReward, E_collAfterL3.sub(E_coll)), 1000000)

@@ -13,7 +13,7 @@ export const BORROW_FEE: Lexicon = {
 export const TVL: Lexicon = {
   term: "TVL",
   description:
-    "The Total Value Locked (TVL) is the total value of Ether locked as collateral in the system, given in ETH and USD."
+    "The Total Value Locked (TVL) is the total value of Ether locked as collateral in the system, given in REEF and USD."
 };
 
 export const STAKED_MSIC: Lexicon = {
@@ -24,7 +24,7 @@ export const STAKED_MSIC: Lexicon = {
 export const TCR: Lexicon = {
   term: "Total Collateral Ratio",
   description:
-    "The ratio of the Dollar value of the entire system collateral at the current ETH:USD price, to the entire system debt."
+    "The ratio of the Dollar value of the entire system collateral at the current REEF:USD price, to the entire system debt."
 };
 
 export const RECOVERY_MODE: Lexicon = {
@@ -45,8 +45,8 @@ export const KICKBACK_RATE: Lexicon = {
     "A rate between 0 and 100% set by the Frontend Operator that determines the fraction of MSIC that will be paid out as a kickback to the Stability Providers using the frontend."
 };
 
-export const ETH: Lexicon = {
-  term: "ETH"
+export const REEF: Lexicon = {
+  term: "REEF"
 };
 
 export const MoUSD: Lexicon = {

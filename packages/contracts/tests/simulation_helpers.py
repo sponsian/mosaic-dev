@@ -303,30 +303,30 @@ for i in range(1, period1):
     random.seed(2019375+10000*i)
     shock_ether = random.normalvariate(0, sd_ether)
     price_ether.append(price_ether[i-1] * (1 + shock_ether) * (1 + drift_ether1))
-print(" - ETH period 1 -")
-print(f"Min ETH price: {min(price_ether[1:period1])}")
-print(f"Max ETH price: {max(price_ether[1:period1])}")
+print(" - REEF period 1 -")
+print(f"Min REEF price: {min(price_ether[1:period1])}")
+print(f"Max REEF price: {max(price_ether[1:period1])}")
 for i in range(period1, period2):
     random.seed(2019375+10000*i)
     shock_ether = random.normalvariate(0, sd_ether)
     price_ether.append(price_ether[i-1] * (1 + shock_ether) * (1 + drift_ether2))
-print(" - ETH period 2 -")
-print(f"Min ETH price: {min(price_ether[period1:period2])}")
-print(f"Max ETH price: {max(price_ether[period1:period2])}")
+print(" - REEF period 2 -")
+print(f"Min REEF price: {min(price_ether[period1:period2])}")
+print(f"Max REEF price: {max(price_ether[period1:period2])}")
 for i in range(period2, period3):
     random.seed(2019375+10000*i)
     shock_ether = random.normalvariate(0, sd_ether)
     price_ether.append(price_ether[i-1] * (1 + shock_ether) * (1 + drift_ether3))
-print(" - ETH period 3 -")
-print(f"Min ETH price: {min(price_ether[period2:period3])}")
-print(f"Max ETH price: {max(price_ether[period2:period3])}")
+print(" - REEF period 3 -")
+print(f"Min REEF price: {min(price_ether[period2:period3])}")
+print(f"Max REEF price: {max(price_ether[period2:period3])}")
 for i in range(period3, period4):
     random.seed(2019375+10000*i)
     shock_ether = random.normalvariate(0, sd_ether)
     price_ether.append(price_ether[i-1] * (1 + shock_ether) * (1 + drift_ether4))
-print(" - ETH period 4 -")
-print(f"Min ETH price: {min(price_ether[period3:period4])}")
-print(f"Max ETH price: {max(price_ether[period3:period4])}")
+print(" - REEF period 4 -")
+print(f"Min REEF price: {min(price_ether[period3:period4])}")
+print(f"Max REEF price: {max(price_ether[period3:period4])}")
 
 """Natural Rate"""
 
@@ -635,7 +635,7 @@ def adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price
                 coll_added = floatToWei(coll_added_float)
                 contracts.borrowerOperations.addColl(hints[0], hints[1], { 'from': account, 'value': coll_added })
             elif check > 2 and not is_recovery_mode(contracts, price_ether_current):
-                # withdraw ETH
+                # withdraw REEF
                 coll_withdrawn = floatToWei(coll - coll_new)
                 if isNewTCRAboveCCR(contracts, coll_withdrawn, False, 0, False, floatToWei(price_ether_current)):
                     contracts.borrowerOperations.withdrawColl(coll_withdrawn, hints[0], hints[1], { 'from': account })
