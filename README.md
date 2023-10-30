@@ -400,21 +400,21 @@ Along with `StabilityPool.sol`, these contracts hold Ether and/or tokens for the
 
 ### PriceFeed and Oracle
 
-Mosaic functions that require the most current REEF:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the Chainlink REEF:USD reference contract as its primary and Tellor's REEF:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
+Mosaic functions that require the most current REEF:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the Chainlink REEF:USD reference contract as its primary and Witnet's REEF:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
 
-The fallback logic distinguishes 3 different failure modes for Chainlink and 2 failure modes for Tellor:
+The fallback logic distinguishes 3 different failure modes for Chainlink and 2 failure modes for Witnet:
 
 - `Frozen` (for both oracles): last price update more than 4 hours ago
-- `Broken` (for both oracles): response call reverted, invalid timeStamp that is either 0 or in the future, or reported price is non-positive (Chainlink) or zero (Tellor). Chainlink is considered broken if either the response for the latest round _or_ the response for the round before the latest fails one of these conditions.
+- `Broken` (for both oracles): response call reverted, invalid timeStamp that is either 0 or in the future, or reported price is non-positive (Chainlink) or zero (Witnet). Chainlink is considered broken if either the response for the latest round _or_ the response for the round before the latest fails one of these conditions.
 - `PriceChangeAboveMax` (Chainlink only): higher than 50% deviation between two consecutive price updates
 
 There is also a return condition `bothOraclesLiveAndUnbrokenAndSimilarPrice` which is a function returning true if both oracles are live and not broken, and the percentual difference between the two reported prices is below 5%.
 
 The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Mosaic functions which require a current REEF:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
 
-### Tellor price data lag
+### Witnet price data lag
 
-Mosaic sees a Tellor REEF-USD price that is at least 15 minutes old. This is because Tellor operates via proof-of-stake, and some dispute period is needed in which fake prices can be disputed. When a Tellor price is disputed, it is removed from the list of prices that Mosaic sees. This dispute period ensures that, given at least one responsive disputer who disputes fake REEF prices, Mosaic will never consume fake price data from Tellor.
+Mosaic sees a Witnet REEF-USD price that is at least 15 minutes old. This is because Witnet operates via proof-of-stake, and some dispute period is needed in which fake prices can be disputed. When a Witnet price is disputed, it is removed from the list of prices that Mosaic sees. This dispute period ensures that, given at least one responsive disputer who disputes fake REEF prices, Mosaic will never consume fake price data from Witnet.
 
 The choice of 15 minutes for the dispute period was based on careful analysis of the impact of a delayed REEF price on a Mosaic system. We used historical REEF price data and looked at the impact of different delay lengths. 15 minutes was chosen as a sweet spot that gives plenty of time for disputers to respond to fake prices, while keeping any adverse impacts on Mosaic to a minimum.
 
@@ -435,28 +435,12 @@ The mainnet PriceFeed is tested in `test/PriceFeedTest.js`, using a mock Chainli
 
 ### PriceFeed limitations and known issues
 
-The purpose of the PriceFeed is to be at least as good as an immutable PriceFeed that relies purely on Chainlink, while also having some resilience in case of Chainlink failure / timeout, and chance of recovery.
+The purpose of the PriceFeed is to be at least as good as an immutable PriceFeed that relies purely on Witnet, while also having some resilience in case of Witnet failure / timeout, and chance of recovery.
 
-The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from Tellor, and if possible, for returning to Chainlink if/when it recovers.
-
-The PriceFeed logic is complex, and although we would prefer simplicity, it does allow the system a chance of switching to an accurate price source in case of a Chainlink failure or timeout, and also the possibility of returning to an honest Chainlink price after it has failed and recovered.
-
-We believe the benefit of the fallback logic is worth the complexity, given that our system is entirely immutable - if we had no fallback logic and Chainlink were to be hacked or permanently fail, Mosaic would become permanently unusable anyway.
+The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from Witnet
 
 
-
-**Chainlink Decimals**: the `PriceFeed` checks for and uses the latest `decimals` value reported by the Chainlink aggregator in order to calculate the Chainlink price at 18-digit precision, as needed by Mosaic.  `PriceFeed` does not assume a value for decimals and can handle the case where Chainlink change their decimal value. 
-
-However, the check `chainlinkIsBroken` uses both the current response from the latest round and the response previous round. Since `decimals` is not attached to round data, Mosaic has no way of knowing whether decimals has changed between the current round and the previous round, so we assume it is the same. Mosaic assumes the current return value of decimals() applies to both current round `i` and previous round `i-1`. 
-
-This means that a decimal change that coincides with a Mosaic price fetch could cause Mosaic to assert that the Chainlink price has deviated too much, and fall back to Tellor. There is nothing we can do about this. We hope/expect Chainlink to never change their `decimals()` return value (currently 8), and if a hack/technical error causes Chainlink's decimals to change, Mosaic may fall back to Tellor.
-
-To summarize the Chainlink decimals issue: 
-- Mosaic can handle the case where Chainlink decimals changes across _two consecutive rounds `i` and `i-1` which are not used in the same Mosaic price fetch_
-- If Mosaic fetches the price at round `i`, it will not know if Chainlink decimals changed across round `i-1` to round `i`, and the consequent price scaling distortion may cause Mosaic to fall back to Tellor
-- Mosaic will always calculate the correct current price at 18-digit precision assuming the current return value of `decimals()` is correct (i.e. is the value used by the nodes).
-
-**Tellor Decimals**: Tellor uses 6 decimal precision for their ETHUSD price as determined by a social consensus of Tellor miners/data providers, and shown on Tellor's price feed page. Their decimals value is not offered in their on-chain contracts.  We rely on the continued social consensus around 6 decimals for their ETHUSD price feed. Tellor have informed us that if there was demand for an ETHUSD price at different precision, they would simply create a new `requestId`, and make no attempt to alter the social consensus around the precision of the current ETHUSD `requestId` (1) used by Mosaic.
+**Witnet Decimals**: Witnet uses 6 decimal precision for their ETHUSD price as determined by a social consensus of Witnet miners/data providers, and shown on Witnet's price feed page. Their decimals value is not offered in their on-chain contracts.  We rely on the continued social consensus around 6 decimals for their ETHUSD price feed. Witnet have informed us that if there was demand for an ETHUSD price at different precision, they would simply create a new `requestId`, and make no attempt to alter the social consensus around the precision of the current ETHUSD `requestId` (1) used by Mosaic.
 
 
 ### Keeping a sorted list of Troves ordered by ICR
