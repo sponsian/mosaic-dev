@@ -11,15 +11,15 @@ import {
   Decimal,
   Decimalish,
   LiquidationDetails,
-  LiquityReceipt,
-  LUSD_MINIMUM_DEBT,
-  LUSD_MINIMUM_NET_DEBT,
+  MosaicReceipt,
+  MoUSD_MINIMUM_DEBT,
+  MoUSD_MINIMUM_NET_DEBT,
   MinedReceipt,
-  PopulatableLiquity,
-  PopulatedLiquityTransaction,
+  PopulatableMosaic,
+  PopulatedMosaicTransaction,
   PopulatedRedemption,
   RedemptionDetails,
-  SentLiquityTransaction,
+  SentMosaicTransaction,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
   Trove,
@@ -34,7 +34,7 @@ import {
   _normalizeTroveCreation,
   _pendingReceipt,
   _successfulReceipt
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import {
   EthersPopulatedTransaction,
@@ -44,16 +44,16 @@ import {
 } from "./types";
 
 import {
-  EthersLiquityConnection,
+  EthersMosaicConnection,
   _getContracts,
   _requireAddress,
   _requireSigner
-} from "./EthersLiquityConnection";
+} from "./EthersMosaicConnection";
 
 import { decimalify, promiseAllValues } from "./_utils";
 import { _priceFeedIsTestnet, _uniTokenIsMock } from "./contracts";
 import { logsToString } from "./parseLogs";
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
+import { ReadableEthersMosaic } from "./ReadableEthersMosaic";
 
 const bigNumberMax = (a: BigNumber, b?: BigNumber) => (b?.gt(a) ? b : a);
 
@@ -80,7 +80,7 @@ const addGasForBaseRateUpdate = (maxMinutesSinceLastUpdate = 10) => (gas: BigNum
 // 80K should be enough for 3 steps, plus some extra to be safe.
 const addGasForPotentialListTraversal = (gas: BigNumber) => gas.add(80000);
 
-const addGasForLQTYIssuance = (gas: BigNumber) => gas.add(50000);
+const addGasForMSICIssuance = (gas: BigNumber) => gas.add(50000);
 
 const addGasForUnipoolRewardUpdate = (gas: BigNumber) => gas.add(20000);
 
@@ -191,23 +191,23 @@ export class EthersTransactionCancelledError extends Error {
  * A transaction that has already been sent.
  *
  * @remarks
- * Returned by {@link SendableEthersLiquity} functions.
+ * Returned by {@link SendableEthersMosaic} functions.
  *
  * @public
  */
-export class SentEthersLiquityTransaction<T = unknown>
+export class SentEthersMosaicTransaction<T = unknown>
   implements
-    SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
+    SentMosaicTransaction<EthersTransactionResponse, MosaicReceipt<EthersTransactionReceipt, T>> {
   /** Ethers' representation of a sent transaction. */
   readonly rawSentTransaction: EthersTransactionResponse;
 
-  private readonly _connection: EthersLiquityConnection;
+  private readonly _connection: EthersMosaicConnection;
   private readonly _parse: (rawReceipt: EthersTransactionReceipt) => T;
 
   /** @internal */
   constructor(
     rawSentTransaction: EthersTransactionResponse,
-    connection: EthersLiquityConnection,
+    connection: EthersMosaicConnection,
     parse: (rawReceipt: EthersTransactionReceipt) => T
   ) {
     this.rawSentTransaction = rawSentTransaction;
@@ -247,13 +247,13 @@ export class SentEthersLiquityTransaction<T = unknown>
     }
   }
 
-  /** {@inheritDoc @liquity/lib-base#SentLiquityTransaction.getReceipt} */
-  async getReceipt(): Promise<LiquityReceipt<EthersTransactionReceipt, T>> {
+  /** {@inheritDoc @mosaic/lib-base#SentMosaicTransaction.getReceipt} */
+  async getReceipt(): Promise<MosaicReceipt<EthersTransactionReceipt, T>> {
     return this._receiptFrom(await this._waitForRawReceipt(0));
   }
 
   /**
-   * {@inheritDoc @liquity/lib-base#SentLiquityTransaction.waitForReceipt}
+   * {@inheritDoc @mosaic/lib-base#SentMosaicTransaction.waitForReceipt}
    *
    * @throws
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
@@ -267,13 +267,13 @@ export class SentEthersLiquityTransaction<T = unknown>
 }
 
 /**
- * Optional parameters of a transaction that borrows LUSD.
+ * Optional parameters of a transaction that borrows MoUSD.
  *
  * @public
  */
 export interface BorrowingOperationOptionalParams {
   /**
-   * Maximum acceptable {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}
+   * Maximum acceptable {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate}
    * (default: current borrowing rate plus 0.5%).
    */
   maxBorrowingRate?: Decimalish;
@@ -282,7 +282,7 @@ export interface BorrowingOperationOptionalParams {
    * Control the amount of extra gas included attached to the transaction.
    *
    * @remarks
-   * Transactions that borrow LUSD must pay a variable borrowing fee, which is added to the Trove's
+   * Transactions that borrow MoUSD must pay a variable borrowing fee, which is added to the Trove's
    * debt. This fee increases whenever a redemption occurs, and otherwise decays exponentially.
    * Due to this decay, a Trove's collateral ratio can end up being higher than initially calculated
    * if the transaction is pending for a long time. When this happens, the backend has to iterate
@@ -339,13 +339,13 @@ const normalizeBorrowingOperationOptionalParams = (
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Returned by {@link PopulatableEthersLiquity} functions.
+ * Returned by {@link PopulatableEthersMosaic} functions.
  *
  * @public
  */
-export class PopulatedEthersLiquityTransaction<T = unknown>
+export class PopulatedEthersMosaicTransaction<T = unknown>
   implements
-    PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
+    PopulatedMosaicTransaction<EthersPopulatedTransaction, SentEthersMosaicTransaction<T>> {
   /** Unsigned transaction object populated by Ethers. */
   readonly rawPopulatedTransaction: EthersPopulatedTransaction;
 
@@ -355,23 +355,23 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
    * @remarks
    * Gas estimation is based on blockchain state at the latest block. However, most transactions
    * stay in pending state for several blocks before being included in a block. This may increase
-   * the actual gas requirements of certain Liquity transactions by the time they are eventually
-   * mined, therefore the Liquity SDK increases these transactions' `gasLimit` by default (unless
+   * the actual gas requirements of certain Mosaic transactions by the time they are eventually
+   * mined, therefore the Mosaic SDK increases these transactions' `gasLimit` by default (unless
    * `gasLimit` is {@link EthersTransactionOverrides | overridden}).
    *
    * Note: even though the SDK includes gas headroom for many transaction types, currently this
-   * property is only implemented for {@link PopulatableEthersLiquity.openTrove | openTrove()},
-   * {@link PopulatableEthersLiquity.adjustTrove | adjustTrove()} and its aliases.
+   * property is only implemented for {@link PopulatableEthersMosaic.openTrove | openTrove()},
+   * {@link PopulatableEthersMosaic.adjustTrove | adjustTrove()} and its aliases.
    */
   readonly gasHeadroom?: number;
 
-  private readonly _connection: EthersLiquityConnection;
+  private readonly _connection: EthersMosaicConnection;
   private readonly _parse: (rawReceipt: EthersTransactionReceipt) => T;
 
   /** @internal */
   constructor(
     rawPopulatedTransaction: EthersPopulatedTransaction,
-    connection: EthersLiquityConnection,
+    connection: EthersMosaicConnection,
     parse: (rawReceipt: EthersTransactionReceipt) => T,
     gasHeadroom?: number
   ) {
@@ -384,9 +384,9 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
     }
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatedLiquityTransaction.send} */
-  async send(): Promise<SentEthersLiquityTransaction<T>> {
-    return new SentEthersLiquityTransaction(
+  /** {@inheritDoc @mosaic/lib-base#PopulatedMosaicTransaction.send} */
+  async send(): Promise<SentEthersMosaicTransaction<T>> {
+    return new SentEthersMosaicTransaction(
       await _requireSigner(this._connection).sendTransaction(this.rawPopulatedTransaction),
       this._connection,
       this._parse
@@ -395,25 +395,25 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
 }
 
 /**
- * {@inheritDoc @liquity/lib-base#PopulatedRedemption}
+ * {@inheritDoc @mosaic/lib-base#PopulatedRedemption}
  *
  * @public
  */
 export class PopulatedEthersRedemption
-  extends PopulatedEthersLiquityTransaction<RedemptionDetails>
+  extends PopulatedEthersMosaicTransaction<RedemptionDetails>
   implements
     PopulatedRedemption<
       EthersPopulatedTransaction,
       EthersTransactionResponse,
       EthersTransactionReceipt
     > {
-  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.attemptedLUSDAmount} */
-  readonly attemptedLUSDAmount: Decimal;
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.attemptedMoUSDAmount} */
+  readonly attemptedMoUSDAmount: Decimal;
 
-  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.redeemableLUSDAmount} */
-  readonly redeemableLUSDAmount: Decimal;
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.redeemableMoUSDAmount} */
+  readonly redeemableMoUSDAmount: Decimal;
 
-  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.isTruncated} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.isTruncated} */
   readonly isTruncated: boolean;
 
   private readonly _increaseAmountByMinimumNetDebt?: (
@@ -423,9 +423,9 @@ export class PopulatedEthersRedemption
   /** @internal */
   constructor(
     rawPopulatedTransaction: EthersPopulatedTransaction,
-    connection: EthersLiquityConnection,
-    attemptedLUSDAmount: Decimal,
-    redeemableLUSDAmount: Decimal,
+    connection: EthersMosaicConnection,
+    attemptedMoUSDAmount: Decimal,
+    redeemableMoUSDAmount: Decimal,
     increaseAmountByMinimumNetDebt?: (
       maxRedemptionRate?: Decimalish
     ) => Promise<PopulatedEthersRedemption>
@@ -439,21 +439,21 @@ export class PopulatedEthersRedemption
       ({ logs }) =>
         troveManager
           .extractEvents(logs, "Redemption")
-          .map(({ args: { _ETHSent, _ETHFee, _actualLUSDAmount, _attemptedLUSDAmount } }) => ({
-            attemptedLUSDAmount: decimalify(_attemptedLUSDAmount),
-            actualLUSDAmount: decimalify(_actualLUSDAmount),
+          .map(({ args: { _ETHSent, _ETHFee, _actualMoUSDAmount, _attemptedMoUSDAmount } }) => ({
+            attemptedMoUSDAmount: decimalify(_attemptedMoUSDAmount),
+            actualMoUSDAmount: decimalify(_actualMoUSDAmount),
             collateralTaken: decimalify(_ETHSent),
             fee: decimalify(_ETHFee)
           }))[0]
     );
 
-    this.attemptedLUSDAmount = attemptedLUSDAmount;
-    this.redeemableLUSDAmount = redeemableLUSDAmount;
-    this.isTruncated = redeemableLUSDAmount.lt(attemptedLUSDAmount);
+    this.attemptedMoUSDAmount = attemptedMoUSDAmount;
+    this.redeemableMoUSDAmount = redeemableMoUSDAmount;
+    this.isTruncated = redeemableMoUSDAmount.lt(attemptedMoUSDAmount);
     this._increaseAmountByMinimumNetDebt = increaseAmountByMinimumNetDebt;
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
   increaseAmountByMinimumNetDebt(
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedEthersRedemption> {
@@ -476,27 +476,27 @@ export interface _TroveChangeWithFees<T> {
 }
 
 /**
- * Ethers-based implementation of {@link @liquity/lib-base#PopulatableLiquity}.
+ * Ethers-based implementation of {@link @mosaic/lib-base#PopulatableMosaic}.
  *
  * @public
  */
-export class PopulatableEthersLiquity
+export class PopulatableEthersMosaic
   implements
-    PopulatableLiquity<
+    PopulatableMosaic<
       EthersTransactionReceipt,
       EthersTransactionResponse,
       EthersPopulatedTransaction
     > {
-  private readonly _readable: ReadableEthersLiquity;
+  private readonly _readable: ReadableEthersMosaic;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersMosaic) {
     this._readable = readable;
   }
 
   private _wrapSimpleTransaction(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<void> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersMosaicTransaction<void> {
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
       noDetails
@@ -507,10 +507,10 @@ export class PopulatableEthersLiquity
     params: T,
     rawPopulatedTransaction: EthersPopulatedTransaction,
     gasHeadroom?: number
-  ): PopulatedEthersLiquityTransaction<_TroveChangeWithFees<T>> {
+  ): PopulatedEthersMosaicTransaction<_TroveChangeWithFees<T>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -520,8 +520,8 @@ export class PopulatableEthersLiquity
           .map(({ args: { _coll, _debt } }) => new Trove(decimalify(_coll), decimalify(_debt)));
 
         const [fee] = borrowerOperations
-          .extractEvents(logs, "LUSDBorrowingFeePaid")
-          .map(({ args: { _LUSDFee } }) => decimalify(_LUSDFee));
+          .extractEvents(logs, "MoUSDBorrowingFeePaid")
+          .map(({ args: { _MoUSDFee } }) => decimalify(_MoUSDFee));
 
         return {
           params,
@@ -536,15 +536,15 @@ export class PopulatableEthersLiquity
 
   private async _wrapTroveClosure(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
-    const { activePool, lusdToken } = _getContracts(this._readable.connection);
+  ): Promise<PopulatedEthersMosaicTransaction<TroveClosureDetails>> {
+    const { activePool, msicToken } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
       ({ logs, from: userAddress }) => {
-        const [repayLUSD] = lusdToken
+        const [repayMoUSD] = msicToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === userAddress && to === AddressZero)
           .map(({ args: { value } }) => decimalify(value));
@@ -555,7 +555,7 @@ export class PopulatableEthersLiquity
           .map(({ args: { _amount } }) => decimalify(_amount));
 
         return {
-          params: repayLUSD.nonZero ? { withdrawCollateral, repayLUSD } : { withdrawCollateral }
+          params: repayMoUSD.nonZero ? { withdrawCollateral, repayMoUSD } : { withdrawCollateral }
         };
       }
     );
@@ -563,10 +563,10 @@ export class PopulatableEthersLiquity
 
   private _wrapLiquidation(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<LiquidationDetails> {
+  ): PopulatedEthersMosaicTransaction<LiquidationDetails> {
     const { troveManager } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -579,10 +579,10 @@ export class PopulatableEthersLiquity
           .extractEvents(logs, "Liquidation")
           .map(
             ({
-              args: { _LUSDGasCompensation, _collGasCompensation, _liquidatedColl, _liquidatedDebt }
+              args: { _MoUSDGasCompensation, _collGasCompensation, _liquidatedColl, _liquidatedDebt }
             }) => ({
               collateralGasCompensation: decimalify(_collGasCompensation),
-              lusdGasCompensation: decimalify(_LUSDGasCompensation),
+              msicGasCompensation: decimalify(_MoUSDGasCompensation),
               totalLiquidated: new Trove(decimalify(_liquidatedColl), decimalify(_liquidatedDebt))
             })
           );
@@ -600,30 +600,30 @@ export class PopulatableEthersLiquity
   ): StabilityPoolGainsWithdrawalDetails {
     const { stabilityPool } = _getContracts(this._readable.connection);
 
-    const [newLUSDDeposit] = stabilityPool
+    const [newMoUSDDeposit] = stabilityPool
       .extractEvents(logs, "UserDepositChanged")
       .map(({ args: { _newDeposit } }) => decimalify(_newDeposit));
 
-    const [[collateralGain, lusdLoss]] = stabilityPool
+    const [[collateralGain, msicLoss]] = stabilityPool
       .extractEvents(logs, "ETHGainWithdrawn")
-      .map(({ args: { _ETH, _LUSDLoss } }) => [decimalify(_ETH), decimalify(_LUSDLoss)]);
+      .map(({ args: { _ETH, _MoUSDLoss } }) => [decimalify(_ETH), decimalify(_MoUSDLoss)]);
 
-    const [lqtyReward] = stabilityPool
-      .extractEvents(logs, "LQTYPaidToDepositor")
-      .map(({ args: { _LQTY } }) => decimalify(_LQTY));
+    const [msicReward] = stabilityPool
+      .extractEvents(logs, "MSICPaidToDepositor")
+      .map(({ args: { _MSIC } }) => decimalify(_MSIC));
 
     return {
-      lusdLoss,
-      newLUSDDeposit,
+      msicLoss,
+      newMoUSDDeposit,
       collateralGain,
-      lqtyReward
+      msicReward
     };
   }
 
   private _wrapStabilityPoolGainsWithdrawal(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersMosaicTransaction<StabilityPoolGainsWithdrawalDetails> {
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
       ({ logs }) => this._extractStabilityPoolGainsWithdrawalDetails(logs)
@@ -631,10 +631,10 @@ export class PopulatableEthersLiquity
   }
 
   private _wrapStabilityDepositTopup(
-    change: { depositLUSD: Decimal },
+    change: { depositMoUSD: Decimal },
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails> {
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -647,24 +647,24 @@ export class PopulatableEthersLiquity
 
   private async _wrapStabilityDepositWithdrawal(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
-    const { stabilityPool, lusdToken } = _getContracts(this._readable.connection);
+  ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
+    const { stabilityPool, msicToken } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
       ({ logs, from: userAddress }) => {
         const gainsWithdrawalDetails = this._extractStabilityPoolGainsWithdrawalDetails(logs);
 
-        const [withdrawLUSD] = lusdToken
+        const [withdrawMoUSD] = msicToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === stabilityPool.address && to === userAddress)
           .map(({ args: { value } }) => decimalify(value));
 
         return {
           ...gainsWithdrawalDetails,
-          change: { withdrawLUSD, withdrawAllLUSD: gainsWithdrawalDetails.newLUSDDeposit.isZero }
+          change: { withdrawMoUSD, withdrawAllMoUSD: gainsWithdrawalDetails.newMoUSDDeposit.isZero }
         };
       }
     );
@@ -672,10 +672,10 @@ export class PopulatableEthersLiquity
 
   private _wrapCollateralGainTransfer(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<CollateralGainTransferDetails> {
+  ): PopulatedEthersMosaicTransaction<CollateralGainTransferDetails> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -756,7 +756,7 @@ export class PopulatableEthersLiquity
     }
 
     // Don't use `address(0)` as hint as it can result in huge gas cost.
-    // (See https://github.com/liquity/dev/issues/600).
+    // (See https://github.com/mosaic/dev/issues/600).
     if (prev === AddressZero) {
       prev = next;
     } else if (next === AddressZero) {
@@ -791,7 +791,7 @@ export class PopulatableEthersLiquity
     const {
       firstRedemptionHint,
       partialRedemptionHintNICR,
-      truncatedLUSDamount
+      truncatedMoUSDamount
     } = await hintHelpers.getRedemptionHints(amount.hex, price.hex, _redeemMaxIterations);
 
     const [
@@ -805,7 +805,7 @@ export class PopulatableEthersLiquity
         );
 
     return [
-      decimalify(truncatedLUSDamount),
+      decimalify(truncatedMoUSDamount),
       firstRedemptionHint,
       partialRedemptionUpperHint,
       partialRedemptionLowerHint,
@@ -813,17 +813,17 @@ export class PopulatableEthersLiquity
     ];
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.openTrove} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.openTrove} */
   async openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRateOrOptionalParams?: Decimalish | BorrowingOperationOptionalParams,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<TroveCreationDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalizedParams = _normalizeTroveCreation(params);
-    const { depositCollateral, borrowLUSD } = normalizedParams;
+    const { depositCollateral, borrowMoUSD } = normalizedParams;
 
     const [fees, blockTimestamp, total, price] = await Promise.all([
       this._readable._getFeesFactory(),
@@ -849,9 +849,9 @@ export class PopulatableEthersLiquity
       currentBorrowingRate
     );
 
-    const txParams = (borrowLUSD: Decimal): Parameters<typeof borrowerOperations.openTrove> => [
+    const txParams = (borrowMoUSD: Decimal): Parameters<typeof borrowerOperations.openTrove> => [
       maxBorrowingRate.hex,
-      borrowLUSD.hex,
+      borrowMoUSD.hex,
       ...hints,
       { value: depositCollateral.hex, ...overrides }
     ];
@@ -861,21 +861,21 @@ export class PopulatableEthersLiquity
     if (overrides?.gasLimit === undefined) {
       const decayedBorrowingRate = decayBorrowingRate(60 * borrowingFeeDecayToleranceMinutes);
       const decayedTrove = Trove.create(normalizedParams, decayedBorrowingRate);
-      const { borrowLUSD: borrowLUSDSimulatingDecay } = Trove.recreate(
+      const { borrowMoUSD: borrowMoUSDSimulatingDecay } = Trove.recreate(
         decayedTrove,
         currentBorrowingRate
       );
 
-      if (decayedTrove.debt.lt(LUSD_MINIMUM_DEBT)) {
+      if (decayedTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
         throw new Error(
-          `Trove's debt might fall below ${LUSD_MINIMUM_DEBT} ` +
+          `Trove's debt might fall below ${MoUSD_MINIMUM_DEBT} ` +
             `within ${borrowingFeeDecayToleranceMinutes} minutes`
         );
       }
 
       const [gasNow, gasLater] = await Promise.all([
-        borrowerOperations.estimateGas.openTrove(...txParams(borrowLUSD)),
-        borrowerOperations.estimateGas.openTrove(...txParams(borrowLUSDSimulatingDecay))
+        borrowerOperations.estimateGas.openTrove(...txParams(borrowMoUSD)),
+        borrowerOperations.estimateGas.openTrove(...txParams(borrowMoUSDSimulatingDecay))
       ]);
 
       const gasLimit = addGasForBaseRateUpdate(borrowingFeeDecayToleranceMinutes)(
@@ -888,15 +888,15 @@ export class PopulatableEthersLiquity
 
     return this._wrapTroveChangeWithFees(
       normalizedParams,
-      await borrowerOperations.populateTransaction.openTrove(...txParams(borrowLUSD)),
+      await borrowerOperations.populateTransaction.openTrove(...txParams(borrowMoUSD)),
       gasHeadroom
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.closeTrove} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.closeTrove} */
   async closeTrove(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<TroveClosureDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
@@ -905,54 +905,54 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.depositCollateral} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositCollateral} */
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ depositCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawCollateral} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.borrowLUSD} */
-  borrowLUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.borrowMoUSD} */
+  borrowMoUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ borrowLUSD: amount }, maxBorrowingRate, overrides);
+  ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
+    return this.adjustTrove({ borrowMoUSD: amount }, maxBorrowingRate, overrides);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.repayLUSD} */
-  repayLUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.repayMoUSD} */
+  repayMoUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ repayLUSD: amount }, undefined, overrides);
+  ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
+    return this.adjustTrove({ repayMoUSD: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.adjustTrove} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.adjustTrove} */
   async adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRateOrOptionalParams?: Decimalish | BorrowingOperationOptionalParams,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalizedParams = _normalizeTroveAdjustment(params);
-    const { depositCollateral, withdrawCollateral, borrowLUSD, repayLUSD } = normalizedParams;
+    const { depositCollateral, withdrawCollateral, borrowMoUSD, repayMoUSD } = normalizedParams;
 
     const [trove, feeVars] = await Promise.all([
       this._readable.getTrove(overrides.from),
-      borrowLUSD &&
+      borrowMoUSD &&
         promiseAllValues({
           fees: this._readable._getFeesFactory(),
           blockTimestamp: this._readable._getBlockTimestamp(),
@@ -981,11 +981,11 @@ export class PopulatableEthersLiquity
       currentBorrowingRate
     );
 
-    const txParams = (borrowLUSD?: Decimal): Parameters<typeof borrowerOperations.adjustTrove> => [
+    const txParams = (borrowMoUSD?: Decimal): Parameters<typeof borrowerOperations.adjustTrove> => [
       maxBorrowingRate.hex,
       (withdrawCollateral ?? Decimal.ZERO).hex,
-      (borrowLUSD ?? repayLUSD ?? Decimal.ZERO).hex,
-      !!borrowLUSD,
+      (borrowMoUSD ?? repayMoUSD ?? Decimal.ZERO).hex,
+      !!borrowMoUSD,
       ...hints,
       { value: depositCollateral?.hex, ...overrides }
     ];
@@ -995,27 +995,27 @@ export class PopulatableEthersLiquity
     if (overrides.gasLimit === undefined) {
       const decayedBorrowingRate = decayBorrowingRate(60 * borrowingFeeDecayToleranceMinutes);
       const decayedTrove = trove.adjust(normalizedParams, decayedBorrowingRate);
-      const { borrowLUSD: borrowLUSDSimulatingDecay } = trove.adjustTo(
+      const { borrowMoUSD: borrowMoUSDSimulatingDecay } = trove.adjustTo(
         decayedTrove,
         currentBorrowingRate
       );
 
-      if (decayedTrove.debt.lt(LUSD_MINIMUM_DEBT)) {
+      if (decayedTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
         throw new Error(
-          `Trove's debt might fall below ${LUSD_MINIMUM_DEBT} ` +
+          `Trove's debt might fall below ${MoUSD_MINIMUM_DEBT} ` +
             `within ${borrowingFeeDecayToleranceMinutes} minutes`
         );
       }
 
       const [gasNow, gasLater] = await Promise.all([
-        borrowerOperations.estimateGas.adjustTrove(...txParams(borrowLUSD)),
-        borrowLUSD &&
-          borrowerOperations.estimateGas.adjustTrove(...txParams(borrowLUSDSimulatingDecay))
+        borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMoUSD)),
+        borrowMoUSD &&
+          borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMoUSDSimulatingDecay))
       ]);
 
       let gasLimit = bigNumberMax(addGasForPotentialListTraversal(gasNow), gasLater);
 
-      if (borrowLUSD) {
+      if (borrowMoUSD) {
         gasLimit = addGasForBaseRateUpdate(borrowingFeeDecayToleranceMinutes)(gasLimit);
       }
 
@@ -1025,15 +1025,15 @@ export class PopulatableEthersLiquity
 
     return this._wrapTroveChangeWithFees(
       normalizedParams,
-      await borrowerOperations.populateTransaction.adjustTrove(...txParams(borrowLUSD)),
+      await borrowerOperations.populateTransaction.adjustTrove(...txParams(borrowMoUSD)),
       gasHeadroom
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.claimCollateralSurplus} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.claimCollateralSurplus} */
   async claimCollateralSurplus(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
@@ -1046,12 +1046,12 @@ export class PopulatableEthersLiquity
   async setPrice(
     price: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { priceFeed } = _getContracts(this._readable.connection);
 
     if (!_priceFeedIsTestnet(priceFeed)) {
-      throw new Error("setPrice() unavailable on this deployment of Liquity");
+      throw new Error("setPrice() unavailable on this deployment of Mosaic");
     }
 
     return this._wrapSimpleTransaction(
@@ -1059,11 +1059,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.liquidate} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.liquidate} */
   async liquidate(
     address: string | string[],
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<LiquidationDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { troveManager } = _getContracts(this._readable.connection);
 
@@ -1071,92 +1071,92 @@ export class PopulatableEthersLiquity
       return this._wrapLiquidation(
         await troveManager.estimateAndPopulate.batchLiquidateTroves(
           overrides,
-          addGasForLQTYIssuance,
+          addGasForMSICIssuance,
           address
         )
       );
     } else {
       return this._wrapLiquidation(
-        await troveManager.estimateAndPopulate.liquidate(overrides, addGasForLQTYIssuance, address)
+        await troveManager.estimateAndPopulate.liquidate(overrides, addGasForMSICIssuance, address)
       );
     }
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.liquidateUpTo} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.liquidateUpTo} */
   async liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<LiquidationDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { troveManager } = _getContracts(this._readable.connection);
 
     return this._wrapLiquidation(
       await troveManager.estimateAndPopulate.liquidateTroves(
         overrides,
-        addGasForLQTYIssuance,
+        addGasForMSICIssuance,
         maximumNumberOfTrovesToLiquidate
       )
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.depositLUSDInStabilityPool} */
-  async depositLUSDInStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositMoUSDInStabilityPool} */
+  async depositMoUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
-    const depositLUSD = Decimal.from(amount);
+    const depositMoUSD = Decimal.from(amount);
 
     return this._wrapStabilityDepositTopup(
-      { depositLUSD },
+      { depositMoUSD },
       await stabilityPool.estimateAndPopulate.provideToSP(
         overrides,
-        addGasForLQTYIssuance,
-        depositLUSD.hex,
+        addGasForMSICIssuance,
+        depositMoUSD.hex,
         frontendTag ?? this._readable.connection.frontendTag ?? AddressZero
       )
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawLUSDFromStabilityPool} */
-  async withdrawLUSDFromStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMoUSDFromStabilityPool} */
+  async withdrawMoUSDFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
     return this._wrapStabilityDepositWithdrawal(
       await stabilityPool.estimateAndPopulate.withdrawFromSP(
         overrides,
-        addGasForLQTYIssuance,
+        addGasForMSICIssuance,
         Decimal.from(amount).hex
       )
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawGainsFromStabilityPool} */
   async withdrawGainsFromStabilityPool(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<StabilityPoolGainsWithdrawalDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
     return this._wrapStabilityPoolGainsWithdrawal(
       await stabilityPool.estimateAndPopulate.withdrawFromSP(
         overrides,
-        addGasForLQTYIssuance,
+        addGasForMSICIssuance,
         Decimal.ZERO.hex
       )
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.transferCollateralGainToTrove} */
   async transferCollateralGainToTrove(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<CollateralGainTransferDetails>> {
+  ): Promise<PopulatedEthersMosaicTransaction<CollateralGainTransferDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
@@ -1170,23 +1170,23 @@ export class PopulatableEthersLiquity
     return this._wrapCollateralGainTransfer(
       await stabilityPool.estimateAndPopulate.withdrawETHGainToTrove(
         overrides,
-        compose(addGasForPotentialListTraversal, addGasForLQTYIssuance),
+        compose(addGasForPotentialListTraversal, addGasForMSICIssuance),
         ...(await this._findHints(finalTrove, overrides.from))
       )
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.sendLUSD} */
-  async sendLUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMoUSD} */
+  async sendMoUSD(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
-    const { lusdToken } = _getContracts(this._readable.connection);
+    const { msicToken } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
-      await lusdToken.estimateAndPopulate.transfer(
+      await msicToken.estimateAndPopulate.transfer(
         overrides,
         id,
         toAddress,
@@ -1195,17 +1195,17 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.sendLQTY} */
-  async sendLQTY(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMSIC} */
+  async sendMSIC(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
-    const { lqtyToken } = _getContracts(this._readable.connection);
+    const { msicToken } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
-      await lqtyToken.estimateAndPopulate.transfer(
+      await msicToken.estimateAndPopulate.transfer(
         overrides,
         id,
         toAddress,
@@ -1214,15 +1214,15 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.redeemLUSD} */
-  async redeemLUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.redeemMoUSD} */
+  async redeemMoUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersRedemption> {
     const preparedOverrides = this._prepareOverrides(overrides);
     const { troveManager } = _getContracts(this._readable.connection);
-    const attemptedLUSDAmount = Decimal.from(amount);
+    const attemptedMoUSDAmount = Decimal.from(amount);
 
     const [
       fees,
@@ -1231,12 +1231,12 @@ export class PopulatableEthersLiquity
     ] = await Promise.all([
       this._readable.getFees(),
       this._readable.getTotal(),
-      this._findRedemptionHints(attemptedLUSDAmount)
+      this._findRedemptionHints(attemptedMoUSDAmount)
     ]);
 
     if (truncatedAmount.isZero) {
       throw new Error(
-        `redeemLUSD: amount too low to redeem (try at least ${LUSD_MINIMUM_NET_DEBT})`
+        `redeemMoUSD: amount too low to redeem (try at least ${MoUSD_MINIMUM_NET_DEBT})`
       );
     }
 
@@ -1247,9 +1247,9 @@ export class PopulatableEthersLiquity
       );
 
     const populateRedemption = async (
-      attemptedLUSDAmount: Decimal,
+      attemptedMoUSDAmount: Decimal,
       maxRedemptionRate?: Decimalish,
-      truncatedAmount: Decimal = attemptedLUSDAmount,
+      truncatedAmount: Decimal = attemptedMoUSDAmount,
       partialHints: [string, string, BigNumberish] = [AddressZero, AddressZero, 0]
     ): Promise<PopulatedEthersRedemption> => {
       const maxRedemptionRateOrDefault =
@@ -1269,60 +1269,60 @@ export class PopulatableEthersLiquity
         ),
 
         this._readable.connection,
-        attemptedLUSDAmount,
+        attemptedMoUSDAmount,
         truncatedAmount,
 
-        truncatedAmount.lt(attemptedLUSDAmount)
+        truncatedAmount.lt(attemptedMoUSDAmount)
           ? newMaxRedemptionRate =>
               populateRedemption(
-                truncatedAmount.add(LUSD_MINIMUM_NET_DEBT),
+                truncatedAmount.add(MoUSD_MINIMUM_NET_DEBT),
                 newMaxRedemptionRate ?? maxRedemptionRate
               )
           : undefined
       );
     };
 
-    return populateRedemption(attemptedLUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
+    return populateRedemption(attemptedMoUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.stakeLQTY} */
-  async stakeLQTY(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.stakeMSIC} */
+  async stakeMSIC(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
-    const { lqtyStaking } = _getContracts(this._readable.connection);
+    const { msicStaking } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
-      await lqtyStaking.estimateAndPopulate.stake(overrides, id, Decimal.from(amount).hex)
+      await msicStaking.estimateAndPopulate.stake(overrides, id, Decimal.from(amount).hex)
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.unstakeLQTY} */
-  async unstakeLQTY(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.unstakeMSIC} */
+  async unstakeMSIC(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
-    const { lqtyStaking } = _getContracts(this._readable.connection);
+    const { msicStaking } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
-      await lqtyStaking.estimateAndPopulate.unstake(overrides, id, Decimal.from(amount).hex)
+      await msicStaking.estimateAndPopulate.unstake(overrides, id, Decimal.from(amount).hex)
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawGainsFromStaking} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
-    return this.unstakeLQTY(Decimal.ZERO, overrides);
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
+    return this.unstakeMSIC(Decimal.ZERO, overrides);
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.registerFrontend} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.registerFrontend} */
   async registerFrontend(
     kickbackRate: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
@@ -1340,13 +1340,13 @@ export class PopulatableEthersLiquity
     amount: Decimalish,
     address?: string,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     address ??= _requireAddress(this._readable.connection, overrides);
     overrides = this._prepareOverrides(overrides);
     const { uniToken } = _getContracts(this._readable.connection);
 
     if (!_uniTokenIsMock(uniToken)) {
-      throw new Error("_mintUniToken() unavailable on this deployment of Liquity");
+      throw new Error("_mintUniToken() unavailable on this deployment of Mosaic");
     }
 
     return this._wrapSimpleTransaction(
@@ -1354,11 +1354,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.approveUniTokens} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.approveUniTokens} */
   async approveUniTokens(
     allowance?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { uniToken, unipool } = _getContracts(this._readable.connection);
 
@@ -1372,11 +1372,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.stakeUniTokens} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.stakeUniTokens} */
   async stakeUniTokens(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { unipool } = _getContracts(this._readable.connection);
 
@@ -1389,11 +1389,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.unstakeUniTokens} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.unstakeUniTokens} */
   async unstakeUniTokens(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { unipool } = _getContracts(this._readable.connection);
 
@@ -1406,10 +1406,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawLQTYRewardFromLiquidityMining} */
-  async withdrawLQTYRewardFromLiquidityMining(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMSICRewardFromLiquidityMining} */
+  async withdrawMSICRewardFromLiquidityMining(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { unipool } = _getContracts(this._readable.connection);
 
@@ -1418,10 +1418,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.exitLiquidityMining} */
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.exitLiquidityMining} */
   async exitLiquidityMining(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
     const { unipool } = _getContracts(this._readable.connection);
 

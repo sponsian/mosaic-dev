@@ -4,14 +4,14 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { Contract, CallOverrides, EventFilter } from "@ethersproject/contracts";
 import { AlchemyProvider } from "@ethersproject/providers";
 
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 const outputFile = "eth-usd.csv";
 
 const phase = 2;
 const answerDecimals = 8;
-const liquityDecimals = 18;
-const answerMultiplier = BigNumber.from(10).pow(liquityDecimals - answerDecimals);
+const mosaicDecimals = 18;
+const answerMultiplier = BigNumber.from(10).pow(mosaicDecimals - answerDecimals);
 const firstRound = BigNumber.from("0x10000000000000000").mul(phase);
 
 const aggregatorAddress = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";

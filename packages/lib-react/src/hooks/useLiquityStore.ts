@@ -1,15 +1,15 @@
 import { useContext } from "react";
 
-import { LiquityStore } from "@liquity/lib-base";
+import { MosaicStore } from "@mosaic/lib-base";
 
-import { LiquityStoreContext } from "../components/LiquityStoreProvider";
+import { MosaicStoreContext } from "../components/MosaicStoreProvider";
 
-export const useLiquityStore = <T>(): LiquityStore<T> => {
-  const store = useContext(LiquityStoreContext);
+export const useMosaicStore = <T>(): MosaicStore<T> => {
+  const store = useContext(MosaicStoreContext);
 
   if (!store) {
-    throw new Error("You must provide a LiquityStore via LiquityStoreProvider");
+    throw new Error("You must provide a MosaicStore via MosaicStoreProvider");
   }
 
-  return store as LiquityStore<T>;
+  return store as MosaicStore<T>;
 };

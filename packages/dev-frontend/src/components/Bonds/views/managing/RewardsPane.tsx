@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import React from "react";
 import { Flex, Button, Spinner } from "theme-ui";
 import { StaticRow, StaticAmounts } from "../../../Trove/Editor";
@@ -26,10 +26,10 @@ export const RewardsPane: React.FC = () => {
     <>
       <PendingRewards />
 
-      <StaticRow label="bLUSD LP APR">
+      <StaticRow label="bMoUSD LP APR">
         <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
           <PoolBalance symbol="%">
-            {(protocolInfo?.bLusdLpApr ?? Decimal.INFINITY).prettify(2)}
+            {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
           </PoolBalance>{" "}
         </StaticAmounts>
       </StaticRow>

@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 type CoinGeckoSimplePriceResponse<T extends string, U extends string> = {
   [P in T]: {
@@ -67,14 +67,14 @@ const fetchCoinGeckoSimplePrice = async <T extends string, U extends string>(
   return validateCoinGeckoSimplePriceResponse(coinIds, vsCurrencies, await response.json());
 };
 
-export interface LqtyPriceResponse {
-  lqtyPriceUSD: Decimal;
+export interface MsicPriceResponse {
+  msicPriceUSD: Decimal;
 }
 
-export const fetchLqtyPrice = async (): Promise<LqtyPriceResponse> => {
-  const response = await fetchCoinGeckoSimplePrice(["liquity"] as const, ["usd"] as const);
+export const fetchMsicPrice = async (): Promise<MsicPriceResponse> => {
+  const response = await fetchCoinGeckoSimplePrice(["mosaic"] as const, ["usd"] as const);
 
   return {
-    lqtyPriceUSD: Decimal.from(response.liquity.usd)
+    msicPriceUSD: Decimal.from(response.mosaic.usd)
   };
 };

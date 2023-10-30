@@ -3,17 +3,17 @@ import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export declare namespace BondNFT {
-    type LiquityDataAddressesStruct = {
+    type MosaicDataAddressesStruct = {
         troveManagerAddress: string;
-        lqtyToken: string;
-        lqtyStaking: string;
-        pickleLQTYJar: string;
-        pickleLQTYFarm: string;
+        msicToken: string;
+        msicStaking: string;
+        pickleMSICJar: string;
+        pickleMSICFarm: string;
         curveGaugeController: string;
-        curveLUSD3CRVGauge: string;
-        curveLUSDFRAXGauge: string;
+        curveMoUSD3CRVGauge: string;
+        curveMoUSDFRAXGauge: string;
     };
-    type LiquityDataAddressesStructOutput = [
+    type MosaicDataAddressesStructOutput = [
         string,
         string,
         string,
@@ -24,13 +24,13 @@ export declare namespace BondNFT {
         string
     ] & {
         troveManagerAddress: string;
-        lqtyToken: string;
-        lqtyStaking: string;
-        pickleLQTYJar: string;
-        pickleLQTYFarm: string;
+        msicToken: string;
+        msicStaking: string;
+        pickleMSICJar: string;
+        pickleMSICFarm: string;
         curveGaugeController: string;
-        curveLUSD3CRVGauge: string;
-        curveLUSDFRAXGauge: string;
+        curveMoUSD3CRVGauge: string;
+        curveMoUSDFRAXGauge: string;
     };
 }
 export interface BondNFTInterface extends utils.Interface {
@@ -41,11 +41,11 @@ export interface BondNFTInterface extends utils.Interface {
         "balanceOf(address)": FunctionFragment;
         "chickenBondManager()": FunctionFragment;
         "curveGaugeController()": FunctionFragment;
-        "curveLUSD3CRVGauge()": FunctionFragment;
-        "curveLUSDFRAXGauge()": FunctionFragment;
+        "curveMoUSD3CRVGauge()": FunctionFragment;
+        "curveMoUSDFRAXGauge()": FunctionFragment;
         "getApproved(uint256)": FunctionFragment;
         "getBondAmount(uint256)": FunctionFragment;
-        "getBondClaimedBLUSD(uint256)": FunctionFragment;
+        "getBondClaimedBMoUSD(uint256)": FunctionFragment;
         "getBondEndTime(uint256)": FunctionFragment;
         "getBondExtraData(uint256)": FunctionFragment;
         "getBondFinalDna(uint256)": FunctionFragment;
@@ -55,14 +55,14 @@ export interface BondNFTInterface extends utils.Interface {
         "getBondStartTime(uint256)": FunctionFragment;
         "getBondStatus(uint256)": FunctionFragment;
         "isApprovedForAll(address,address)": FunctionFragment;
-        "lqtyStaking()": FunctionFragment;
-        "lqtyToken()": FunctionFragment;
+        "msicStaking()": FunctionFragment;
+        "msicToken()": FunctionFragment;
         "mint(address,uint256)": FunctionFragment;
         "name()": FunctionFragment;
         "owner()": FunctionFragment;
         "ownerOf(uint256)": FunctionFragment;
-        "pickleLQTYFarm()": FunctionFragment;
-        "pickleLQTYJar()": FunctionFragment;
+        "pickleMSICFarm()": FunctionFragment;
+        "pickleMSICJar()": FunctionFragment;
         "renounceOwnership()": FunctionFragment;
         "safeTransferFrom(address,address,uint256)": FunctionFragment;
         "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
@@ -81,18 +81,18 @@ export interface BondNFTInterface extends utils.Interface {
         "transferOwnership(address)": FunctionFragment;
         "troveManager()": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "CURVE_GAUGE_SLOPES_PRECISION" | "approve" | "artwork" | "balanceOf" | "chickenBondManager" | "curveGaugeController" | "curveLUSD3CRVGauge" | "curveLUSDFRAXGauge" | "getApproved" | "getBondAmount" | "getBondClaimedBLUSD" | "getBondEndTime" | "getBondExtraData" | "getBondFinalDna" | "getBondFinalHalfDna" | "getBondInitialDna" | "getBondInitialHalfDna" | "getBondStartTime" | "getBondStatus" | "isApprovedForAll" | "lqtyStaking" | "lqtyToken" | "mint" | "name" | "owner" | "ownerOf" | "pickleLQTYFarm" | "pickleLQTYJar" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setAddresses" | "setApprovalForAll" | "setArtworkAddress" | "setFinalExtraData" | "supportsInterface" | "symbol" | "tokenByIndex" | "tokenOfOwnerByIndex" | "tokenURI" | "totalSupply" | "transferFrom" | "transferLockoutPeriodSeconds" | "transferOwnership" | "troveManager"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "CURVE_GAUGE_SLOPES_PRECISION" | "approve" | "artwork" | "balanceOf" | "chickenBondManager" | "curveGaugeController" | "curveMoUSD3CRVGauge" | "curveMoUSDFRAXGauge" | "getApproved" | "getBondAmount" | "getBondClaimedBMoUSD" | "getBondEndTime" | "getBondExtraData" | "getBondFinalDna" | "getBondFinalHalfDna" | "getBondInitialDna" | "getBondInitialHalfDna" | "getBondStartTime" | "getBondStatus" | "isApprovedForAll" | "msicStaking" | "msicToken" | "mint" | "name" | "owner" | "ownerOf" | "pickleMSICFarm" | "pickleMSICJar" | "renounceOwnership" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setAddresses" | "setApprovalForAll" | "setArtworkAddress" | "setFinalExtraData" | "supportsInterface" | "symbol" | "tokenByIndex" | "tokenOfOwnerByIndex" | "tokenURI" | "totalSupply" | "transferFrom" | "transferLockoutPeriodSeconds" | "transferOwnership" | "troveManager"): FunctionFragment;
     encodeFunctionData(functionFragment: "CURVE_GAUGE_SLOPES_PRECISION", values?: undefined): string;
     encodeFunctionData(functionFragment: "approve", values: [string, BigNumberish]): string;
     encodeFunctionData(functionFragment: "artwork", values?: undefined): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
     encodeFunctionData(functionFragment: "chickenBondManager", values?: undefined): string;
     encodeFunctionData(functionFragment: "curveGaugeController", values?: undefined): string;
-    encodeFunctionData(functionFragment: "curveLUSD3CRVGauge", values?: undefined): string;
-    encodeFunctionData(functionFragment: "curveLUSDFRAXGauge", values?: undefined): string;
+    encodeFunctionData(functionFragment: "curveMoUSD3CRVGauge", values?: undefined): string;
+    encodeFunctionData(functionFragment: "curveMoUSDFRAXGauge", values?: undefined): string;
     encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getBondAmount", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "getBondClaimedBLUSD", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "getBondClaimedBMoUSD", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getBondEndTime", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getBondExtraData", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getBondFinalDna", values: [BigNumberish]): string;
@@ -102,14 +102,14 @@ export interface BondNFTInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "getBondStartTime", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getBondStatus", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "isApprovedForAll", values: [string, string]): string;
-    encodeFunctionData(functionFragment: "lqtyStaking", values?: undefined): string;
-    encodeFunctionData(functionFragment: "lqtyToken", values?: undefined): string;
+    encodeFunctionData(functionFragment: "msicStaking", values?: undefined): string;
+    encodeFunctionData(functionFragment: "msicToken", values?: undefined): string;
     encodeFunctionData(functionFragment: "mint", values: [string, BigNumberish]): string;
     encodeFunctionData(functionFragment: "name", values?: undefined): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "pickleLQTYFarm", values?: undefined): string;
-    encodeFunctionData(functionFragment: "pickleLQTYJar", values?: undefined): string;
+    encodeFunctionData(functionFragment: "pickleMSICFarm", values?: undefined): string;
+    encodeFunctionData(functionFragment: "pickleMSICJar", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [string, string, BigNumberish]): string;
     encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [string, string, BigNumberish, BytesLike]): string;
@@ -133,11 +133,11 @@ export interface BondNFTInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "chickenBondManager", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "curveGaugeController", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "curveLUSD3CRVGauge", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "curveLUSDFRAXGauge", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "curveMoUSD3CRVGauge", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "curveMoUSDFRAXGauge", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getApproved", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getBondAmount", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "getBondClaimedBLUSD", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getBondClaimedBMoUSD", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getBondEndTime", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getBondExtraData", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getBondFinalDna", data: BytesLike): Result;
@@ -147,14 +147,14 @@ export interface BondNFTInterface extends utils.Interface {
     decodeFunctionResult(functionFragment: "getBondStartTime", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getBondStatus", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isApprovedForAll", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "lqtyStaking", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "lqtyToken", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "msicStaking", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "msicToken", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "pickleLQTYFarm", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "pickleLQTYJar", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "pickleMSICFarm", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "pickleMSICJar", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "safeTransferFrom(address,address,uint256)", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", data: BytesLike): Result;
@@ -248,14 +248,14 @@ export interface BondNFT extends BaseContract {
         balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
         chickenBondManager(overrides?: CallOverrides): Promise<[string]>;
         curveGaugeController(overrides?: CallOverrides): Promise<[string]>;
-        curveLUSD3CRVGauge(overrides?: CallOverrides): Promise<[string]>;
-        curveLUSDFRAXGauge(overrides?: CallOverrides): Promise<[string]>;
+        curveMoUSD3CRVGauge(overrides?: CallOverrides): Promise<[string]>;
+        curveMoUSDFRAXGauge(overrides?: CallOverrides): Promise<[string]>;
         getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
         getBondAmount(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber] & {
             amount: BigNumber;
         }>;
-        getBondClaimedBLUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber] & {
-            claimedBLUSD: BigNumber;
+        getBondClaimedBMoUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber] & {
+            claimedBMoUSD: BigNumber;
         }>;
         getBondEndTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber] & {
             endTime: BigNumber;
@@ -270,7 +270,7 @@ export interface BondNFT extends BaseContract {
             initialHalfDna: BigNumber;
             finalHalfDna: BigNumber;
             troveSize: number;
-            lqtyAmount: number;
+            msicAmount: number;
             curveGaugeSlopes: number;
         }>;
         getBondFinalDna(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber] & {
@@ -292,16 +292,16 @@ export interface BondNFT extends BaseContract {
             status: number;
         }>;
         isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<[boolean]>;
-        lqtyStaking(overrides?: CallOverrides): Promise<[string]>;
-        lqtyToken(overrides?: CallOverrides): Promise<[string]>;
+        msicStaking(overrides?: CallOverrides): Promise<[string]>;
+        msicToken(overrides?: CallOverrides): Promise<[string]>;
         mint(_bonder: string, _permanentSeed: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
         name(overrides?: CallOverrides): Promise<[string]>;
         owner(overrides?: CallOverrides): Promise<[string]>;
         ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-        pickleLQTYFarm(overrides?: CallOverrides): Promise<[string]>;
-        pickleLQTYJar(overrides?: CallOverrides): Promise<[string]>;
+        pickleMSICFarm(overrides?: CallOverrides): Promise<[string]>;
+        pickleMSICJar(overrides?: CallOverrides): Promise<[string]>;
         renounceOwnership(overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
@@ -346,11 +346,11 @@ export interface BondNFT extends BaseContract {
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
     chickenBondManager(overrides?: CallOverrides): Promise<string>;
     curveGaugeController(overrides?: CallOverrides): Promise<string>;
-    curveLUSD3CRVGauge(overrides?: CallOverrides): Promise<string>;
-    curveLUSDFRAXGauge(overrides?: CallOverrides): Promise<string>;
+    curveMoUSD3CRVGauge(overrides?: CallOverrides): Promise<string>;
+    curveMoUSDFRAXGauge(overrides?: CallOverrides): Promise<string>;
     getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
     getBondAmount(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-    getBondClaimedBLUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    getBondClaimedBMoUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
     getBondEndTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
     getBondExtraData(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[
         BigNumber,
@@ -362,7 +362,7 @@ export interface BondNFT extends BaseContract {
         initialHalfDna: BigNumber;
         finalHalfDna: BigNumber;
         troveSize: number;
-        lqtyAmount: number;
+        msicAmount: number;
         curveGaugeSlopes: number;
     }>;
     getBondFinalDna(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -372,16 +372,16 @@ export interface BondNFT extends BaseContract {
     getBondStartTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
     getBondStatus(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<number>;
     isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>;
-    lqtyStaking(overrides?: CallOverrides): Promise<string>;
-    lqtyToken(overrides?: CallOverrides): Promise<string>;
+    msicStaking(overrides?: CallOverrides): Promise<string>;
+    msicToken(overrides?: CallOverrides): Promise<string>;
     mint(_bonder: string, _permanentSeed: BigNumberish, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
     name(overrides?: CallOverrides): Promise<string>;
     owner(overrides?: CallOverrides): Promise<string>;
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-    pickleLQTYFarm(overrides?: CallOverrides): Promise<string>;
-    pickleLQTYJar(overrides?: CallOverrides): Promise<string>;
+    pickleMSICFarm(overrides?: CallOverrides): Promise<string>;
+    pickleMSICJar(overrides?: CallOverrides): Promise<string>;
     renounceOwnership(overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
@@ -424,11 +424,11 @@ export interface BondNFT extends BaseContract {
         balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
         chickenBondManager(overrides?: CallOverrides): Promise<string>;
         curveGaugeController(overrides?: CallOverrides): Promise<string>;
-        curveLUSD3CRVGauge(overrides?: CallOverrides): Promise<string>;
-        curveLUSDFRAXGauge(overrides?: CallOverrides): Promise<string>;
+        curveMoUSD3CRVGauge(overrides?: CallOverrides): Promise<string>;
+        curveMoUSDFRAXGauge(overrides?: CallOverrides): Promise<string>;
         getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
         getBondAmount(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-        getBondClaimedBLUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+        getBondClaimedBMoUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondEndTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondExtraData(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<[
             BigNumber,
@@ -440,7 +440,7 @@ export interface BondNFT extends BaseContract {
             initialHalfDna: BigNumber;
             finalHalfDna: BigNumber;
             troveSize: number;
-            lqtyAmount: number;
+            msicAmount: number;
             curveGaugeSlopes: number;
         }>;
         getBondFinalDna(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -450,14 +450,14 @@ export interface BondNFT extends BaseContract {
         getBondStartTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondStatus(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<number>;
         isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>;
-        lqtyStaking(overrides?: CallOverrides): Promise<string>;
-        lqtyToken(overrides?: CallOverrides): Promise<string>;
+        msicStaking(overrides?: CallOverrides): Promise<string>;
+        msicToken(overrides?: CallOverrides): Promise<string>;
         mint(_bonder: string, _permanentSeed: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber, BigNumber]>;
         name(overrides?: CallOverrides): Promise<string>;
         owner(overrides?: CallOverrides): Promise<string>;
         ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-        pickleLQTYFarm(overrides?: CallOverrides): Promise<string>;
-        pickleLQTYJar(overrides?: CallOverrides): Promise<string>;
+        pickleMSICFarm(overrides?: CallOverrides): Promise<string>;
+        pickleMSICJar(overrides?: CallOverrides): Promise<string>;
         renounceOwnership(overrides?: CallOverrides): Promise<void>;
         "safeTransferFrom(address,address,uint256)"(from: string, to: string, tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
         "safeTransferFrom(address,address,uint256,bytes)"(from: string, to: string, tokenId: BigNumberish, _data: BytesLike, overrides?: CallOverrides): Promise<void>;
@@ -495,11 +495,11 @@ export interface BondNFT extends BaseContract {
         balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
         chickenBondManager(overrides?: CallOverrides): Promise<BigNumber>;
         curveGaugeController(overrides?: CallOverrides): Promise<BigNumber>;
-        curveLUSD3CRVGauge(overrides?: CallOverrides): Promise<BigNumber>;
-        curveLUSDFRAXGauge(overrides?: CallOverrides): Promise<BigNumber>;
+        curveMoUSD3CRVGauge(overrides?: CallOverrides): Promise<BigNumber>;
+        curveMoUSDFRAXGauge(overrides?: CallOverrides): Promise<BigNumber>;
         getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondAmount(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-        getBondClaimedBLUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+        getBondClaimedBMoUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondEndTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondExtraData(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondFinalDna(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -509,16 +509,16 @@ export interface BondNFT extends BaseContract {
         getBondStartTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         getBondStatus(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
         isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<BigNumber>;
-        lqtyStaking(overrides?: CallOverrides): Promise<BigNumber>;
-        lqtyToken(overrides?: CallOverrides): Promise<BigNumber>;
+        msicStaking(overrides?: CallOverrides): Promise<BigNumber>;
+        msicToken(overrides?: CallOverrides): Promise<BigNumber>;
         mint(_bonder: string, _permanentSeed: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
         name(overrides?: CallOverrides): Promise<BigNumber>;
         owner(overrides?: CallOverrides): Promise<BigNumber>;
         ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-        pickleLQTYFarm(overrides?: CallOverrides): Promise<BigNumber>;
-        pickleLQTYJar(overrides?: CallOverrides): Promise<BigNumber>;
+        pickleMSICFarm(overrides?: CallOverrides): Promise<BigNumber>;
+        pickleMSICJar(overrides?: CallOverrides): Promise<BigNumber>;
         renounceOwnership(overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
@@ -564,11 +564,11 @@ export interface BondNFT extends BaseContract {
         balanceOf(owner: string, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         chickenBondManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         curveGaugeController(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        curveLUSD3CRVGauge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        curveLUSDFRAXGauge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        curveMoUSD3CRVGauge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        curveMoUSDFRAXGauge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getBondAmount(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        getBondClaimedBLUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        getBondClaimedBMoUSD(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getBondEndTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getBondExtraData(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getBondFinalDna(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -578,16 +578,16 @@ export interface BondNFT extends BaseContract {
         getBondStartTime(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         getBondStatus(_tokenID: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        lqtyStaking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        lqtyToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        msicStaking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        msicToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         mint(_bonder: string, _permanentSeed: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;
         name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        pickleLQTYFarm(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        pickleLQTYJar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        pickleMSICFarm(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+        pickleMSICJar(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         renounceOwnership(overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;

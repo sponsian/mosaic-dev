@@ -17,7 +17,7 @@
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         }
       ],
@@ -109,7 +109,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_LUSDAmount",
+          "name": "_MoUSDAmount",
           "type": "uint256"
         },
         {
@@ -190,7 +190,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_LUSDAmount",
+          "name": "_MoUSDAmount",
           "type": "uint256"
         },
         {
@@ -227,7 +227,7 @@
           "type": "address"
         }
       ],
-      "name": "repayLUSD",
+      "name": "repayMoUSD",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -236,7 +236,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LQTYamount",
+          "name": "_MSICamount",
           "type": "uint256"
         }
       ],
@@ -315,7 +315,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawLUSD",
+      "name": "withdrawMoUSD",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

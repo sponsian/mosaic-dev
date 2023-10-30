@@ -5,10 +5,10 @@ pragma solidity 0.6.11;
 import '../Interfaces/ITroveManager.sol';
 import '../Interfaces/ISortedTroves.sol';
 import '../Interfaces/IPriceFeed.sol';
-import '../Dependencies/LiquityMath.sol';
+import '../Dependencies/MosaicMath.sol';
 
 /* Wrapper contract - used for calculating gas of read-only and internal functions. 
-Not part of the Liquity application. */
+Not part of the Mosaic application. */
 contract FunctionCaller {
 
     ITroveManager troveManager;

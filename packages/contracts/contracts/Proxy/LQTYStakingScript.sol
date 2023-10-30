@@ -3,18 +3,18 @@
 pragma solidity 0.6.11;
 
 import "../Dependencies/CheckContract.sol";
-import "../Interfaces/ILQTYStaking.sol";
+import "../Interfaces/IMSICStaking.sol";
 
 
-contract LQTYStakingScript is CheckContract {
-    ILQTYStaking immutable LQTYStaking;
+contract MSICStakingScript is CheckContract {
+    IMSICStaking immutable MSICStaking;
 
-    constructor(address _lqtyStakingAddress) public {
-        checkContract(_lqtyStakingAddress);
-        LQTYStaking = ILQTYStaking(_lqtyStakingAddress);
+    constructor(address _msicStakingAddress) public {
+        checkContract(_msicStakingAddress);
+        MSICStaking = IMSICStaking(_msicStakingAddress);
     }
 
-    function stake(uint _LQTYamount) external {
-        LQTYStaking.stake(_LQTYamount);
+    function stake(uint _MSICamount) external {
+        MSICStaking.stake(_MSICamount);
     }
 }

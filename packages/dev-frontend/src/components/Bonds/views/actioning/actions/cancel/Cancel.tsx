@@ -22,8 +22,8 @@ export const Cancel: React.FC = () => {
     <>
       <ActionDescription>
         You will receive your bonded{" "}
-        <Text sx={{ fontWeight: "bold" }}>{bond.deposit.prettify(2)} LUSD</Text> back and forgo{" "}
-        <Text sx={{ fontWeight: "bold" }}>{bond.accrued.shorten()} bLUSD</Text>
+        <Text sx={{ fontWeight: "bold" }}>{bond.deposit.prettify(2)} MoUSD</Text> back and forgo{" "}
+        <Text sx={{ fontWeight: "bold" }}>{bond.accrued.shorten()} bMoUSD</Text>
       </ActionDescription>
 
       <Flex variant="layout.actions">

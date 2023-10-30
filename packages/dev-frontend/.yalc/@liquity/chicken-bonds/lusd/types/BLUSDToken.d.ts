@@ -2,7 +2,7 @@ import type { BaseContract, BigNumber, BigNumberish, BytesLike, CallOverrides, C
 import type { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
-export interface BLUSDTokenInterface extends utils.Interface {
+export interface BMoUSDTokenInterface extends utils.Interface {
     functions: {
         "allowance(address,address)": FunctionFragment;
         "approve(address,uint256)": FunctionFragment;
@@ -100,11 +100,11 @@ export declare type TransferEvent = TypedEvent<[
     BigNumber
 ], TransferEventObject>;
 export declare type TransferEventFilter = TypedEventFilter<TransferEvent>;
-export interface BLUSDToken extends BaseContract {
+export interface BMoUSDToken extends BaseContract {
     connect(signerOrProvider: Signer | Provider | string): this;
     attach(addressOrName: string): this;
     deployed(): Promise<this>;
-    interface: BLUSDTokenInterface;
+    interface: BMoUSDTokenInterface;
     queryFilter<TEvent extends TypedEvent>(event: TypedEventFilter<TEvent>, fromBlockOrBlockhash?: string | number | undefined, toBlock?: string | number | undefined): Promise<Array<TEvent>>;
     listeners<TEvent extends TypedEvent>(eventFilter?: TypedEventFilter<TEvent>): Array<TypedListener<TEvent>>;
     listeners(eventName?: string): Array<Listener>;
@@ -120,7 +120,7 @@ export interface BLUSDToken extends BaseContract {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
         balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-        burn(_from: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        burn(_from: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
         chickenBondManagerAddress(overrides?: CallOverrides): Promise<[string]>;
@@ -131,7 +131,7 @@ export interface BLUSDToken extends BaseContract {
         increaseAllowance(spender: string, addedValue: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
-        mint(_to: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        mint(_to: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<ContractTransaction>;
         name(overrides?: CallOverrides): Promise<[string]>;
@@ -159,7 +159,7 @@ export interface BLUSDToken extends BaseContract {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-    burn(_from: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+    burn(_from: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
     chickenBondManagerAddress(overrides?: CallOverrides): Promise<string>;
@@ -170,7 +170,7 @@ export interface BLUSDToken extends BaseContract {
     increaseAllowance(spender: string, addedValue: BigNumberish, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
-    mint(_to: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+    mint(_to: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<ContractTransaction>;
     name(overrides?: CallOverrides): Promise<string>;
@@ -196,12 +196,12 @@ export interface BLUSDToken extends BaseContract {
         allowance(owner: string, spender: string, overrides?: CallOverrides): Promise<BigNumber>;
         approve(spender: string, amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
         balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-        burn(_from: string, _bLUSDAmount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+        burn(_from: string, _bMoUSDAmount: BigNumberish, overrides?: CallOverrides): Promise<void>;
         chickenBondManagerAddress(overrides?: CallOverrides): Promise<string>;
         decimals(overrides?: CallOverrides): Promise<number>;
         decreaseAllowance(spender: string, subtractedValue: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
         increaseAllowance(spender: string, addedValue: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
-        mint(_to: string, _bLUSDAmount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+        mint(_to: string, _bMoUSDAmount: BigNumberish, overrides?: CallOverrides): Promise<void>;
         name(overrides?: CallOverrides): Promise<string>;
         owner(overrides?: CallOverrides): Promise<string>;
         renounceOwnership(overrides?: CallOverrides): Promise<void>;
@@ -226,7 +226,7 @@ export interface BLUSDToken extends BaseContract {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
         balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-        burn(_from: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        burn(_from: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
         chickenBondManagerAddress(overrides?: CallOverrides): Promise<BigNumber>;
@@ -237,7 +237,7 @@ export interface BLUSDToken extends BaseContract {
         increaseAllowance(spender: string, addedValue: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
-        mint(_to: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        mint(_to: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<BigNumber>;
         name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -266,7 +266,7 @@ export interface BLUSDToken extends BaseContract {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;
         balanceOf(account: string, overrides?: CallOverrides): Promise<PopulatedTransaction>;
-        burn(_from: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        burn(_from: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;
         chickenBondManagerAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -277,7 +277,7 @@ export interface BLUSDToken extends BaseContract {
         increaseAllowance(spender: string, addedValue: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;
-        mint(_to: string, _bLUSDAmount: BigNumberish, overrides?: Overrides & {
+        mint(_to: string, _bMoUSDAmount: BigNumberish, overrides?: Overrides & {
             from?: string | Promise<string>;
         }): Promise<PopulatedTransaction>;
         name(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -23,7 +23,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
   const lpRewardsAddress = accounts[999]
 
   let priceFeed
-  let lusdToken
+  let msicToken
   let troveManager
   let stabilityPool
   let sortedTroves
@@ -42,7 +42,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const randomDefaulterIndex = Math.floor(Math.random() * (remainingDefaulters.length))
     const randomDefaulter = remainingDefaulters[randomDefaulterIndex]
 
-    const liquidatedLUSD = (await troveManager.Troves(randomDefaulter))[0]
+    const liquidatedMoUSD = (await troveManager.Troves(randomDefaulter))[0]
     const liquidatedETH = (await troveManager.Troves(randomDefaulter))[1]
 
     const price = await priceFeed.getPrice()
@@ -50,9 +50,9 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const ICRPercent = ICR.slice(0, ICR.length - 16)
 
     console.log(`SP address: ${stabilityPool.address}`)
-    const LUSDinPoolBefore = await stabilityPool.getTotalLUSDDeposits()
+    const MoUSDinPoolBefore = await stabilityPool.getTotalMoUSDDeposits()
     const liquidatedTx = await troveManager.liquidate(randomDefaulter, { from: accounts[0] })
-    const LUSDinPoolAfter = await stabilityPool.getTotalLUSDDeposits()
+    const MoUSDinPoolAfter = await stabilityPool.getTotalMoUSDDeposits()
 
     assert.isTrue(liquidatedTx.receipt.status)
 
@@ -62,19 +62,19 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     }
     if (await troveManager.checkRecoveryMode(price)) { console.log("recovery mode: TRUE") }
 
-    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedETH} debt: ${liquidatedLUSD} SP LUSD before: ${LUSDinPoolBefore} SP LUSD after: ${LUSDinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
+    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedETH} debt: ${liquidatedMoUSD} SP MoUSD before: ${MoUSDinPoolBefore} SP MoUSD after: ${MoUSDinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
   }
 
   const performSPDeposit = async (depositorAccounts, currentDepositors, currentDepositorsDict) => {
     const randomIndex = Math.floor(Math.random() * (depositorAccounts.length))
     const randomDepositor = depositorAccounts[randomIndex]
 
-    const userBalance = (await lusdToken.balanceOf(randomDepositor))
-    const maxLUSDDeposit = userBalance.div(toBN(dec(1, 18)))
+    const userBalance = (await msicToken.balanceOf(randomDepositor))
+    const maxMoUSDDeposit = userBalance.div(toBN(dec(1, 18)))
 
-    const randomLUSDAmount = th.randAmountInWei(1, maxLUSDDeposit)
+    const randomMoUSDAmount = th.randAmountInWei(1, maxMoUSDDeposit)
 
-    const depositTx = await stabilityPool.provideToSP(randomLUSDAmount, ZERO_ADDRESS, { from: randomDepositor })
+    const depositTx = await stabilityPool.provideToSP(randomMoUSDAmount, ZERO_ADDRESS, { from: randomDepositor })
 
     assert.isTrue(depositTx.receipt.status)
 
@@ -83,7 +83,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       currentDepositors.push(randomDepositor)
     }
 
-    console.log(`SP deposit. addr: ${th.squeezeAddr(randomDepositor)} amount: ${randomLUSDAmount} tx success: ${depositTx.receipt.status} `)
+    console.log(`SP deposit. addr: ${th.squeezeAddr(randomDepositor)} amount: ${randomMoUSDAmount} tx success: ${depositTx.receipt.status} `)
   }
 
   const randomOperation = async (depositorAccounts,
@@ -148,7 +148,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const lowestTrove = await sortedTroves.getLast()
       const lastTroveDebt = (await troveManager.getEntireDebtAndColl(trove))[0]
       await borrowerOperations.adjustTrove(0, 0 , lastTroveDebt, true, whale, {from: whale})
-      await lusdToken.transfer(lowestTrove, lowestTroveDebt, {from: whale})
+      await msicToken.transfer(lowestTrove, lowestTroveDebt, {from: whale})
       await borrowerOperations.closeTrove({from: lowestTrove})
     }
 
@@ -173,18 +173,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
     for (depositor of currentDepositors) {
       const initialDeposit = (await stabilityPool.deposits(depositor))[0]
-      const finalDeposit = await stabilityPool.getCompoundedLUSDDeposit(depositor)
+      const finalDeposit = await stabilityPool.getCompoundedMoUSDDeposit(depositor)
       const ETHGain = await stabilityPool.getDepositorETHGain(depositor)
       const ETHinSP = (await stabilityPool.getETH()).toString()
-      const LUSDinSP = (await stabilityPool.getTotalLUSDDeposits()).toString()
+      const MoUSDinSP = (await stabilityPool.getTotalMoUSDDeposits()).toString()
 
       // Attempt to withdraw
       const withdrawalTx = await stabilityPool.withdrawFromSP(dec(1, 36), { from: depositor })
 
       const ETHinSPAfter = (await stabilityPool.getETH()).toString()
-      const LUSDinSPAfter = (await stabilityPool.getTotalLUSDDeposits()).toString()
-      const LUSDBalanceSPAfter = (await lusdToken.balanceOf(stabilityPool.address))
-      const depositAfter = await stabilityPool.getCompoundedLUSDDeposit(depositor)
+      const MoUSDinSPAfter = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const MoUSDBalanceSPAfter = (await msicToken.balanceOf(stabilityPool.address))
+      const depositAfter = await stabilityPool.getCompoundedMoUSDDeposit(depositor)
 
       console.log(`--Before withdrawal--
                     withdrawer addr: ${th.squeezeAddr(depositor)}
@@ -192,14 +192,14 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
                      ETH gain: ${ETHGain}
                      ETH in SP: ${ETHinSP}
                      compounded deposit: ${finalDeposit} 
-                     LUSD in SP: ${LUSDinSP}
+                     MoUSD in SP: ${MoUSDinSP}
                     
                     --After withdrawal--
                      Withdrawal tx success: ${withdrawalTx.receipt.status} 
                      Deposit after: ${depositAfter}
                      ETH remaining in SP: ${ETHinSPAfter}
-                     SP LUSD deposits tracker after: ${LUSDinSPAfter}
-                     SP LUSD balance after: ${LUSDBalanceSPAfter}
+                     SP MoUSD deposits tracker after: ${MoUSDinSPAfter}
+                     SP MoUSD balance after: ${MoUSDBalanceSPAfter}
                      `)
       // Check each deposit can be withdrawn
       assert.isTrue(withdrawalTx.receipt.status)
@@ -214,20 +214,20 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     })
 
     beforeEach(async () => {
-      contracts = await deploymentHelper.deployLiquityCore()
-      const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress)
+      contracts = await deploymentHelper.deployMosaicCore()
+      const MSICContracts = await deploymentHelper.deployMSICContracts(bountyAddress, lpRewardsAddress)
 
       stabilityPool = contracts.stabilityPool
       priceFeed = contracts.priceFeedTestnet
-      lusdToken = contracts.lusdToken
+      msicToken = contracts.msicToken
       stabilityPool = contracts.stabilityPool
       troveManager = contracts.troveManager
       borrowerOperations = contracts.borrowerOperations
       sortedTroves = contracts.sortedTroves
 
-      await deploymentHelper.connectLQTYContracts(LQTYContracts)
-      await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-      await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+      await deploymentHelper.connectMSICContracts(MSICContracts)
+      await deploymentHelper.connectCoreContracts(contracts, MSICContracts)
+      await deploymentHelper.connectMSICContractsToCore(MSICContracts, contracts)
     })
 
     // mixed deposits/liquidations
@@ -248,13 +248,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1
       const defaulterCollMax = 100000000
-      const defaulterLUSDProportionMin = 91
-      const defaulterLUSDProportionMax = 180
+      const defaulterMoUSDProportionMin = 91
+      const defaulterMoUSDProportionMax = 180
 
       const depositorCollMin = 1
       const depositorCollMax = 100000000
-      const depositorLUSDProportionMin = 100
-      const depositorLUSDProportionMax = 100
+      const depositorMoUSDProportionMin = 100
+      const depositorMoUSDProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -262,22 +262,22 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterLUSDProportionMin,
-        defaulterLUSDProportionMax,
+        defaulterMoUSDProportionMin,
+        defaulterMoUSDProportionMax,
         true)
 
-      // account set S all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(depositorCollMin,
+      // account set S all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorLUSDProportionMin,
-        depositorLUSDProportionMax,
+        depositorMoUSDProportionMin,
+        depositorMoUSDProportionMax,
         true)
 
       // price drops, all L liquidateable
@@ -294,18 +294,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
       console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
       console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -322,13 +322,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1
       const defaulterCollMax = 10
-      const defaulterLUSDProportionMin = 91
-      const defaulterLUSDProportionMax = 180
+      const defaulterMoUSDProportionMin = 91
+      const defaulterMoUSDProportionMax = 180
 
       const depositorCollMin = 1000000
       const depositorCollMax = 100000000
-      const depositorLUSDProportionMin = 100
-      const depositorLUSDProportionMax = 100
+      const depositorMoUSDProportionMin = 100
+      const depositorMoUSDProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -336,21 +336,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterLUSDProportionMin,
-        defaulterLUSDProportionMax)
+        defaulterMoUSDProportionMin,
+        defaulterMoUSDProportionMax)
 
-      // account set S all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(depositorCollMin,
+      // account set S all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorLUSDProportionMin,
-        depositorLUSDProportionMax)
+        depositorMoUSDProportionMin,
+        depositorMoUSDProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -366,18 +366,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
       console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
       console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -394,13 +394,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1000000
       const defaulterCollMax = 100000000
-      const defaulterLUSDProportionMin = 91
-      const defaulterLUSDProportionMax = 180
+      const defaulterMoUSDProportionMin = 91
+      const defaulterMoUSDProportionMax = 180
 
       const depositorCollMin = 1
       const depositorCollMax = 10
-      const depositorLUSDProportionMin = 100
-      const depositorLUSDProportionMax = 100
+      const depositorMoUSDProportionMin = 100
+      const depositorMoUSDProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -408,21 +408,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterLUSDProportionMin,
-        defaulterLUSDProportionMax)
+        defaulterMoUSDProportionMin,
+        defaulterMoUSDProportionMax)
 
-      // account set S all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(depositorCollMin,
+      // account set S all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorLUSDProportionMin,
-        depositorLUSDProportionMax)
+        depositorMoUSDProportionMin,
+        depositorMoUSDProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -438,18 +438,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
       console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
       console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -467,13 +467,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1000000
       const defaulterCollMax = 100000000
-      const defaulterLUSDProportionMin = 91
-      const defaulterLUSDProportionMax = 180
+      const defaulterMoUSDProportionMin = 91
+      const defaulterMoUSDProportionMax = 180
 
       const depositorCollMin = 1000000
       const depositorCollMax = 100000000
-      const depositorLUSDProportionMin = 100
-      const depositorLUSDProportionMax = 100
+      const depositorMoUSDProportionMin = 100
+      const depositorMoUSDProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -481,21 +481,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterLUSDProportionMin,
-        defaulterLUSDProportionMax)
+        defaulterMoUSDProportionMin,
+        defaulterMoUSDProportionMax)
 
-      // account set S all add coll and withdraw LUSD
-      await th.openTrove_allAccounts_randomETH_randomLUSD(depositorCollMin,
+      // account set S all add coll and withdraw MoUSD
+      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorLUSDProportionMin,
-        depositorLUSDProportionMax)
+        depositorMoUSDProportionMin,
+        depositorMoUSDProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -511,18 +511,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits()
+      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
       console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
       console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)

@@ -9,23 +9,23 @@ const timeValues = testHelpers.TimeValues
 const dec = th.dec
 
 
-const logLQTYBalanceAndError = (LQTYBalance_A, expectedLQTYBalance_A) => {
+const logMSICBalanceAndError = (MSICBalance_A, expectedMSICBalance_A) => {
   console.log(
-    `Expected final balance: ${expectedLQTYBalance_A}, \n
-    Actual final balance: ${LQTYBalance_A}, \n
-    Abs. error: ${expectedLQTYBalance_A.sub(LQTYBalance_A)}`
+    `Expected final balance: ${expectedMSICBalance_A}, \n
+    Actual final balance: ${MSICBalance_A}, \n
+    Abs. error: ${expectedMSICBalance_A.sub(MSICBalance_A)}`
   )
 }
 
-const repeatedlyIssueLQTY = async (stabilityPool, timeBetweenIssuances, duration) => {
+const repeatedlyIssueMSIC = async (stabilityPool, timeBetweenIssuances, duration) => {
   const startTimestamp = th.toBN(await th.getLatestBlockTimestamp(web3))
   let timePassed = 0
 
-  // while current time < 1 month from deployment, issue LQTY every minute
+  // while current time < 1 month from deployment, issue MSIC every minute
   while (timePassed < duration) {
     // console.log(`timePassed: ${timePassed}`)
     await th.fastForwardTime(timeBetweenIssuances, web3.currentProvider)
-    await stabilityPool._unprotectedTriggerLQTYIssuance()
+    await stabilityPool._unprotectedTriggerMSICIssuance()
 
     const currentTimestamp = th.toBN(await th.getLatestBlockTimestamp(web3))
     timePassed = currentTimestamp.sub(startTimestamp)
@@ -33,11 +33,11 @@ const repeatedlyIssueLQTY = async (stabilityPool, timeBetweenIssuances, duration
 }
 
 
-contract('LQTY community issuance arithmetic tests', async accounts => {
+contract('MSIC community issuance arithmetic tests', async accounts => {
   let contracts
   let borrowerOperations
   let communityIssuanceTester
-  let lqtyToken
+  let msicToken
   let stabilityPool
 
   const [owner, alice, frontEnd_1] = accounts;
@@ -49,20 +49,20 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
   })
 
   beforeEach(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
-    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
+    contracts = await deploymentHelper.deployMosaicCore()
+    const MSICContracts = await deploymentHelper.deployMSICTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
     contracts.stabilityPool = await StabilityPool.new()
-    contracts = await deploymentHelper.deployLUSDToken(contracts)
+    contracts = await deploymentHelper.deployMoUSDToken(contracts)
 
     stabilityPool = contracts.stabilityPool
     borrowerOperations = contracts.borrowerOperations
 
-    lqtyToken = LQTYContracts.lqtyToken
-    communityIssuanceTester = LQTYContracts.communityIssuance
+    msicToken = MSICContracts.msicToken
+    communityIssuanceTester = MSICContracts.communityIssuance
 
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectMSICContracts(MSICContracts)
+    await deploymentHelper.connectCoreContracts(contracts, MSICContracts)
+    await deploymentHelper.connectMSICContractsToCore(MSICContracts, contracts)
   })
 
   // Accuracy tests
@@ -70,7 +70,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
    // progress time 1 week 
     await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider)
 
-    await communityIssuanceTester.unprotectedIssueLQTY()
+    await communityIssuanceTester.unprotectedIssueMSIC()
    
     const issuanceFractionBefore = await communityIssuanceTester.getCumulativeIssuanceFraction()
     assert.isTrue(issuanceFractionBefore.gt(th.toBN('0')))
@@ -109,7 +109,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
   }
 
   it("Cumulative issuance fraction is 0.0000013 after a minute", async () => {
-    // console.log(`supply cap: ${await communityIssuanceTester.LQTYSupplyCap()}`)
+    // console.log(`supply cap: ${await communityIssuanceTester.MSICSupplyCap()}`)
 
     const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction()
     assert.equal(initialIssuanceFraction, 0)
@@ -423,32 +423,32 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
 
    // Error tolerance: 1e-3, i.e. 1/1000th of a token
 
-  it("Total LQTY tokens issued is 42.20 after a minute", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 42.20 after a minute", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MINUTE)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '42200713760820460000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '42200713760820460000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 2,531.94 after an hour", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 2,531.94 after an hour", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
 
@@ -456,24 +456,24 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '2531944322115010000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '2531944322115010000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 60,711.40 after a day", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 60,711.40 after a day", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
 
@@ -481,24 +481,24 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '60711403150133240000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '60711403150133240000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 422,568.60 after a week", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 422,568.60 after a week", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
 
@@ -506,24 +506,24 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '422568600980110200000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '422568600980110200000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 1,772,113.21 after a month", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 1,772,113.21 after a month", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
 
@@ -531,236 +531,236 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '1772113218814930000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '1772113218814930000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 5,027,363.22 after 3 months", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 5,027,363.22 after 3 months", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 3)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '5027363224065180000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '5027363224065180000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 9,264,902.04 after 6 months", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 9,264,902.04 after 6 months", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 6)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '9264902042296516000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '9264902042296516000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 16,000,000 after a year", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 16,000,000 after a year", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '16000000000000000000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '16000000000000000000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 24,000,000 after 2 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 24,000,000 after 2 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 2)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '24000000000000000000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '24000000000000000000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 28,000,000 after 3 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 28,000,000 after 3 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '28000000000000000000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '28000000000000000000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 30,000,000 after 4 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 30,000,000 after 4 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 4)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '30000000000000000000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '30000000000000000000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 31,968,750 after 10 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 31,968,750 after 10 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 10)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '31968750000000000000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '31968750000000000000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 31,999,969.48 after 20 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 31,999,969.48 after 20 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 20)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '31999969482421880000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '31999969482421880000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
-  it("Total LQTY tokens issued is 31,999,999.97 after 30 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalLQTYIssued()
+  it("Total MSIC tokens issued is 31,999,999.97 after 30 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalMSICIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
-    // Issue LQTY
-    await communityIssuanceTester.unprotectedIssueLQTY()
-    const totalLQTYIssued = await communityIssuanceTester.totalLQTYIssued()
-    const expectedTotalLQTYIssued = '31999999970197680000000000'
+    // Issue MSIC
+    await communityIssuanceTester.unprotectedIssueMSIC()
+    const totalMSICIssued = await communityIssuanceTester.totalMSICIssued()
+    const expectedTotalMSICIssued = '31999999970197680000000000'
 
-    const absError = th.toBN(expectedTotalLQTYIssued).sub(totalLQTYIssued)
+    const absError = th.toBN(expectedTotalMSICIssued).sub(totalMSICIssued)
     // console.log(
     //   `time since deployment: ${duration}, 
-    //    totalLQTYIssued: ${totalLQTYIssued},  
-    //    expectedTotalLQTYIssued: ${expectedTotalLQTYIssued},
+    //    totalMSICIssued: ${totalMSICIssued},  
+    //    expectedTotalMSICIssued: ${expectedTotalMSICIssued},
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000)
+    assert.isAtMost(th.getDifference(totalMSICIssued, expectedTotalMSICIssued), 1000000000000000)
   })
 
   /* ---  
@@ -778,21 +778,21 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
-    assert.isTrue(await stabilityPool.isEligibleForLQTY(alice))
+    assert.isTrue(await stabilityPool.isEligibleForMSIC(alice))
 
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_YEAR
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30)
 
-    await repeatedlyIssueLQTY(stabilityPool, timeBetweenIssuances, duration)
+    await repeatedlyIssueMSIC(stabilityPool, timeBetweenIssuances, duration)
 
-    // Depositor withdraws their deposit and accumulated LQTY
+    // Depositor withdraws their deposit and accumulated MSIC
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice })
 
-    const LQTYBalance_A = await lqtyToken.balanceOf(alice)
-    const expectedLQTYBalance_A = th.toBN('33333333302289200000000000')
-    const diff = expectedLQTYBalance_A.sub(LQTYBalance_A)
+    const MSICBalance_A = await msicToken.balanceOf(alice)
+    const expectedMSICBalance_A = th.toBN('33333333302289200000000000')
+    const diff = expectedMSICBalance_A.sub(MSICBalance_A)
 
-    // logLQTYBalanceAndError(LQTYBalance_A, expectedLQTYBalance_A)
+    // logMSICBalanceAndError(MSICBalance_A, expectedMSICBalance_A)
 
     // Check the actual balance differs by no more than 1e18 (i.e. 1 token) from the expected balance
     assert.isTrue(diff.lte(th.toBN(dec(1, 18))))
@@ -813,21 +813,21 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
-    assert.isTrue(await stabilityPool.isEligibleForLQTY(alice))
+    assert.isTrue(await stabilityPool.isEligibleForMSIC(alice))
 
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_DAY
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30)
 
-    await repeatedlyIssueLQTY(stabilityPool, timeBetweenIssuances, duration)
+    await repeatedlyIssueMSIC(stabilityPool, timeBetweenIssuances, duration)
 
-    // Depositor withdraws their deposit and accumulated LQTY
+    // Depositor withdraws their deposit and accumulated MSIC
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice })
 
-    const LQTYBalance_A = await lqtyToken.balanceOf(alice)
-    const expectedLQTYBalance_A = th.toBN('33333333302289200000000000')
-    const diff = expectedLQTYBalance_A.sub(LQTYBalance_A)
+    const MSICBalance_A = await msicToken.balanceOf(alice)
+    const expectedMSICBalance_A = th.toBN('33333333302289200000000000')
+    const diff = expectedMSICBalance_A.sub(MSICBalance_A)
 
-    // logLQTYBalanceAndError(LQTYBalance_A, expectedLQTYBalance_A)
+    // logMSICBalanceAndError(MSICBalance_A, expectedMSICBalance_A)
 
     // Check the actual balance differs by no more than 1e18 (i.e. 1 token) from the expected balance
     assert.isTrue(diff.lte(th.toBN(dec(1, 18))))
@@ -847,21 +847,21 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
-    assert.isTrue(await stabilityPool.isEligibleForLQTY(alice))
+    assert.isTrue(await stabilityPool.isEligibleForMSIC(alice))
 
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_MINUTE
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH)
 
-    await repeatedlyIssueLQTY(stabilityPool, timeBetweenIssuances, duration)
+    await repeatedlyIssueMSIC(stabilityPool, timeBetweenIssuances, duration)
 
-    // Depositor withdraws their deposit and accumulated LQTY
+    // Depositor withdraws their deposit and accumulated MSIC
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice })
 
-    const LQTYBalance_A = await lqtyToken.balanceOf(alice)
-    const expectedLQTYBalance_A = th.toBN('1845951269598880000000000')
-    const diff = expectedLQTYBalance_A.sub(LQTYBalance_A)
+    const MSICBalance_A = await msicToken.balanceOf(alice)
+    const expectedMSICBalance_A = th.toBN('1845951269598880000000000')
+    const diff = expectedMSICBalance_A.sub(MSICBalance_A)
 
-    // logLQTYBalanceAndError(LQTYBalance_A, expectedLQTYBalance_A)
+    // logMSICBalanceAndError(MSICBalance_A, expectedMSICBalance_A)
 
     // Check the actual balance differs by no more than 1e18 (i.e. 1 token) from the expected balance
     assert.isTrue(diff.lte(th.toBN(dec(1, 18))))
@@ -882,21 +882,21 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
-    assert.isTrue(await stabilityPool.isEligibleForLQTY(alice))
+    assert.isTrue(await stabilityPool.isEligibleForMSIC(alice))
 
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_MINUTE
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR)
 
-    await repeatedlyIssueLQTY(stabilityPool, timeBetweenIssuances, duration)
+    await repeatedlyIssueMSIC(stabilityPool, timeBetweenIssuances, duration)
 
-    // Depositor withdraws their deposit and accumulated LQTY
+    // Depositor withdraws their deposit and accumulated MSIC
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice })
 
-    const LQTYBalance_A = await lqtyToken.balanceOf(alice)
-    const expectedLQTYBalance_A = th.toBN('1845951269598880000000000')
-    const diff = expectedLQTYBalance_A.sub(LQTYBalance_A)
+    const MSICBalance_A = await msicToken.balanceOf(alice)
+    const expectedMSICBalance_A = th.toBN('1845951269598880000000000')
+    const diff = expectedMSICBalance_A.sub(MSICBalance_A)
 
-    // logLQTYBalanceAndError(LQTYBalance_A, expectedLQTYBalance_A)
+    // logMSICBalanceAndError(MSICBalance_A, expectedMSICBalance_A)
 
     // Check the actual balance differs by no more than 1e18 (i.e. 1 token) from the expected balance
     assert.isTrue(diff.lte(th.toBN(dec(1, 18))))

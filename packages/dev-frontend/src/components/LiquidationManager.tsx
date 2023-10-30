@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
 
-import { useLiquity } from "../hooks/LiquityContext";
+import { useMosaic } from "../hooks/MosaicContext";
 
 import { Icon } from "./Icon";
 import { Transaction } from "./Transaction";
 
 export const LiquidationManager: React.FC = () => {
   const {
-    liquity: { send: liquity }
-  } = useLiquity();
+    mosaic: { send: mosaic }
+  } = useMosaic();
   const [numberOfTrovesToLiquidate, setNumberOfTrovesToLiquidate] = useState("90");
 
   return (
@@ -39,7 +39,7 @@ export const LiquidationManager: React.FC = () => {
                 if (!numberOfTrovesToLiquidate) {
                   throw new Error("Invalid number");
                 }
-                return liquity.liquidateUpTo(parseInt(numberOfTrovesToLiquidate, 10), overrides);
+                return mosaic.liquidateUpTo(parseInt(numberOfTrovesToLiquidate, 10), overrides);
               }}
             >
               <Button variant="dangerIcon">

@@ -37,22 +37,22 @@ const _abi = [
                     },
                     {
                         internalType: "address",
-                        name: "lqtyToken",
+                        name: "msicToken",
                         type: "address",
                     },
                     {
                         internalType: "address",
-                        name: "lqtyStaking",
+                        name: "msicStaking",
                         type: "address",
                     },
                     {
                         internalType: "address",
-                        name: "pickleLQTYJar",
+                        name: "pickleMSICJar",
                         type: "address",
                     },
                     {
                         internalType: "address",
-                        name: "pickleLQTYFarm",
+                        name: "pickleMSICFarm",
                         type: "address",
                     },
                     {
@@ -62,17 +62,17 @@ const _abi = [
                     },
                     {
                         internalType: "address",
-                        name: "curveLUSD3CRVGauge",
+                        name: "curveMoUSD3CRVGauge",
                         type: "address",
                     },
                     {
                         internalType: "address",
-                        name: "curveLUSDFRAXGauge",
+                        name: "curveMoUSDFRAXGauge",
                         type: "address",
                     },
                 ],
-                internalType: "struct BondNFT.LiquityDataAddresses",
-                name: "_liquityDataAddresses",
+                internalType: "struct BondNFT.MosaicDataAddresses",
+                name: "_mosaicDataAddresses",
                 type: "tuple",
             },
         ],
@@ -264,7 +264,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "curveLUSD3CRVGauge",
+        name: "curveMoUSD3CRVGauge",
         outputs: [
             {
                 internalType: "address",
@@ -277,7 +277,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "curveLUSDFRAXGauge",
+        name: "curveMoUSDFRAXGauge",
         outputs: [
             {
                 internalType: "address",
@@ -334,11 +334,11 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        name: "getBondClaimedBLUSD",
+        name: "getBondClaimedBMoUSD",
         outputs: [
             {
                 internalType: "uint256",
-                name: "claimedBLUSD",
+                name: "claimedBMoUSD",
                 type: "uint256",
             },
         ],
@@ -391,7 +391,7 @@ const _abi = [
             },
             {
                 internalType: "uint32",
-                name: "lqtyAmount",
+                name: "msicAmount",
                 type: "uint32",
             },
             {
@@ -543,10 +543,10 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "lqtyStaking",
+        name: "msicStaking",
         outputs: [
             {
-                internalType: "contract ILQTYStaking",
+                internalType: "contract IMSICStaking",
                 name: "",
                 type: "address",
             },
@@ -556,7 +556,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "lqtyToken",
+        name: "msicToken",
         outputs: [
             {
                 internalType: "contract IERC20",
@@ -643,7 +643,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "pickleLQTYFarm",
+        name: "pickleMSICFarm",
         outputs: [
             {
                 internalType: "contract IERC20",
@@ -656,7 +656,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "pickleLQTYJar",
+        name: "pickleMSICJar",
         outputs: [
             {
                 internalType: "contract IPickleJar",
@@ -979,11 +979,11 @@ class BondNFT__factory extends ethers_1.ContractFactory {
             super(_abi, _bytecode, args[0]);
         }
     }
-    deploy(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _liquityDataAddresses, overrides) {
-        return super.deploy(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _liquityDataAddresses, overrides || {});
+    deploy(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _mosaicDataAddresses, overrides) {
+        return super.deploy(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _mosaicDataAddresses, overrides || {});
     }
-    getDeployTransaction(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _liquityDataAddresses, overrides) {
-        return super.getDeployTransaction(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _liquityDataAddresses, overrides || {});
+    getDeployTransaction(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _mosaicDataAddresses, overrides) {
+        return super.getDeployTransaction(name_, symbol_, _initialArtworkAddress, _transferLockoutPeriodSeconds, _mosaicDataAddresses, overrides || {});
     }
     attach(address) {
         return super.attach(address);

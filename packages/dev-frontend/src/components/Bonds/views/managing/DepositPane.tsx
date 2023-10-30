@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import React, { useEffect, useState } from "react";
 import { Flex, Button, Spinner, Checkbox, Label, Card, Text } from "theme-ui";
 import { Amount } from "../../../ActionDescription";
@@ -7,7 +7,7 @@ import { Icon } from "../../../Icon";
 import { InfoIcon } from "../../../InfoIcon";
 import { DisabledEditableRow, EditableRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { BLusdAmmTokenIndex } from "../../context/transitions";
+import { BMousdAmmTokenIndex } from "../../context/transitions";
 import { PoolDetails } from "./PoolDetails";
 import type { Address, ApprovePressedPayload } from "../../context/transitions";
 
@@ -15,51 +15,51 @@ export const DepositPane: React.FC = () => {
   const {
     dispatchEvent,
     statuses,
-    lusdBalance,
-    bLusdBalance,
-    isBLusdApprovedWithAmmZapper,
-    isLusdApprovedWithAmmZapper,
+    msicBalance,
+    bMousdBalance,
+    isBMousdApprovedWithAmmZapper,
+    isMousdApprovedWithAmmZapper,
     getExpectedLpTokens,
     addresses,
-    bLusdAmmBLusdBalance,
-    bLusdAmmLusdBalance
+    bMousdAmmBMousdBalance,
+    bMousdAmmMousdBalance
   } = useBondView();
 
   const editingState = useState<string>();
-  const [bLusdAmount, setBLusdAmount] = useState<Decimal>(Decimal.ZERO);
-  const [lusdAmount, setLusdAmount] = useState<Decimal>(Decimal.ZERO);
+  const [bMousdAmount, setBMousdAmount] = useState<Decimal>(Decimal.ZERO);
+  const [msicAmount, setMousdAmount] = useState<Decimal>(Decimal.ZERO);
   const [lpTokens, setLpTokens] = useState<Decimal>(Decimal.ZERO);
   const [shouldStakeInGauge, setShouldStakeInGauge] = useState(true);
   const [shouldDepositBalanced, setShouldDepositBalanced] = useState(true);
 
-  const coalescedBLusdBalance = bLusdBalance ?? Decimal.ZERO;
-  const coalescedLusdBalance = lusdBalance ?? Decimal.ZERO;
+  const coalescedBMousdBalance = bMousdBalance ?? Decimal.ZERO;
+  const coalescedMousdBalance = msicBalance ?? Decimal.ZERO;
 
   const isApprovePending = statuses.APPROVE_SPENDER === "PENDING";
   const isManageLiquidityPending = statuses.MANAGE_LIQUIDITY === "PENDING";
-  const isBLusdBalanceInsufficient = bLusdAmount.gt(coalescedBLusdBalance);
-  const isLusdBalanceInsufficient = lusdAmount.gt(coalescedLusdBalance);
-  const isAnyBalanceInsufficient = isBLusdBalanceInsufficient || isLusdBalanceInsufficient;
+  const isBMousdBalanceInsufficient = bMousdAmount.gt(coalescedBMousdBalance);
+  const isMousdBalanceInsufficient = msicAmount.gt(coalescedMousdBalance);
+  const isAnyBalanceInsufficient = isBMousdBalanceInsufficient || isMousdBalanceInsufficient;
 
-  const isDepositingLusd = lusdAmount.gt(0);
-  const isDepositingBLusd = bLusdAmount.gt(0);
+  const isDepositingMousd = msicAmount.gt(0);
+  const isDepositingBMousd = bMousdAmount.gt(0);
 
-  const zapperNeedsLusdApproval = isDepositingLusd && !isLusdApprovedWithAmmZapper;
-  const zapperNeedsBLusdApproval = isDepositingBLusd && !isBLusdApprovedWithAmmZapper;
-  const isApprovalNeeded = zapperNeedsLusdApproval || zapperNeedsBLusdApproval;
+  const zapperNeedsMousdApproval = isDepositingMousd && !isMousdApprovedWithAmmZapper;
+  const zapperNeedsBMousdApproval = isDepositingBMousd && !isBMousdApprovedWithAmmZapper;
+  const isApprovalNeeded = zapperNeedsMousdApproval || zapperNeedsBMousdApproval;
 
   const poolBalanceRatio =
-    bLusdAmmBLusdBalance && bLusdAmmLusdBalance
-      ? bLusdAmmLusdBalance.div(bLusdAmmBLusdBalance)
+    bMousdAmmBMousdBalance && bMousdAmmMousdBalance
+      ? bMousdAmmMousdBalance.div(bMousdAmmBMousdBalance)
       : Decimal.ONE;
 
   const handleApprovePressed = () => {
-    const tokensNeedingApproval = new Map<BLusdAmmTokenIndex, Address>();
-    if (zapperNeedsLusdApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.LUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
+    const tokensNeedingApproval = new Map<BMousdAmmTokenIndex, Address>();
+    if (zapperNeedsMousdApproval) {
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.MoUSD, addresses.BMoUSD_LP_ZAP_ADDRESS);
     }
-    if (zapperNeedsBLusdApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.BLUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
+    if (zapperNeedsBMousdApproval) {
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMoUSD, addresses.BMoUSD_LP_ZAP_ADDRESS);
     }
 
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);
@@ -68,8 +68,8 @@ export const DepositPane: React.FC = () => {
   const handleConfirmPressed = () => {
     dispatchEvent("CONFIRM_PRESSED", {
       action: "addLiquidity",
-      bLusdAmount,
-      lusdAmount,
+      bMousdAmount,
+      msicAmount,
       minLpTokens: lpTokens,
       shouldStakeInGauge
     });
@@ -85,24 +85,24 @@ export const DepositPane: React.FC = () => {
 
   const handleToggleShouldDepositBalanced = () => {
     if (!shouldDepositBalanced) {
-      setBLusdAmount(Decimal.ZERO);
-      setLusdAmount(Decimal.ZERO);
+      setBMousdAmount(Decimal.ZERO);
+      setMousdAmount(Decimal.ZERO);
     }
     setShouldDepositBalanced(toggle => !toggle);
   };
 
-  const handleSetAmount = (token: "bLUSD" | "LUSD", amount: Decimal) => {
+  const handleSetAmount = (token: "bMoUSD" | "MoUSD", amount: Decimal) => {
     if (shouldDepositBalanced) {
-      if (token === "bLUSD") setLusdAmount(poolBalanceRatio.mul(amount));
-      else if (token === "LUSD") setBLusdAmount(amount.div(poolBalanceRatio));
+      if (token === "bMoUSD") setMousdAmount(poolBalanceRatio.mul(amount));
+      else if (token === "MoUSD") setBMousdAmount(amount.div(poolBalanceRatio));
     }
 
-    if (token === "bLUSD") setBLusdAmount(amount);
-    else if (token === "LUSD") setLusdAmount(amount);
+    if (token === "bMoUSD") setBMousdAmount(amount);
+    else if (token === "MoUSD") setMousdAmount(amount);
   };
 
   useEffect(() => {
-    if (bLusdAmount.isZero && lusdAmount.isZero) {
+    if (bMousdAmount.isZero && msicAmount.isZero) {
       setLpTokens(Decimal.ZERO);
       return;
     }
@@ -111,7 +111,7 @@ export const DepositPane: React.FC = () => {
 
     const timeoutId = setTimeout(async () => {
       try {
-        const expectedLpTokens = await getExpectedLpTokens(bLusdAmount, lusdAmount);
+        const expectedLpTokens = await getExpectedLpTokens(bMousdAmount, msicAmount);
         if (cancelled) return;
         setLpTokens(expectedLpTokens);
       } catch (error) {
@@ -124,32 +124,32 @@ export const DepositPane: React.FC = () => {
       clearTimeout(timeoutId);
       cancelled = true;
     };
-  }, [bLusdAmount, lusdAmount, getExpectedLpTokens]);
+  }, [bMousdAmount, msicAmount, getExpectedLpTokens]);
 
   return (
     <>
       <EditableRow
-        label="bLUSD amount"
-        inputId="deposit-blusd"
-        amount={bLusdAmount.prettify(2)}
-        unit="bLUSD"
+        label="bMoUSD amount"
+        inputId="deposit-bmsic"
+        amount={bMousdAmount.prettify(2)}
+        unit="bMoUSD"
         editingState={editingState}
-        editedAmount={bLusdAmount.toString()}
-        setEditedAmount={amount => handleSetAmount("bLUSD", Decimal.from(amount))}
-        maxAmount={coalescedBLusdBalance.toString()}
-        maxedOut={bLusdAmount.eq(coalescedBLusdBalance)}
+        editedAmount={bMousdAmount.toString()}
+        setEditedAmount={amount => handleSetAmount("bMoUSD", Decimal.from(amount))}
+        maxAmount={coalescedBMousdBalance.toString()}
+        maxedOut={bMousdAmount.eq(coalescedBMousdBalance)}
       />
 
       <EditableRow
-        label="LUSD amount"
-        inputId="deposit-lusd"
-        amount={lusdAmount.prettify(2)}
-        unit="LUSD"
+        label="MoUSD amount"
+        inputId="deposit-msic"
+        amount={msicAmount.prettify(2)}
+        unit="MoUSD"
         editingState={editingState}
-        editedAmount={lusdAmount.toString()}
-        setEditedAmount={amount => handleSetAmount("LUSD", Decimal.from(amount))}
-        maxAmount={coalescedLusdBalance.toString()}
-        maxedOut={lusdAmount.eq(coalescedLusdBalance)}
+        editedAmount={msicAmount.toString()}
+        setEditedAmount={amount => handleSetAmount("MoUSD", Decimal.from(amount))}
+        maxAmount={coalescedMousdBalance.toString()}
+        maxedOut={msicAmount.eq(coalescedMousdBalance)}
       />
 
       <Flex sx={{ justifyContent: "center", mb: 3 }}>
@@ -171,8 +171,8 @@ export const DepositPane: React.FC = () => {
             size="xs"
             tooltip={
               <Card variant="tooltip">
-                Tick this box to deposit bLUSD and LUSD-3CRV in the pool's current liquidity ratio.
-                Current ratio = 1 bLUSD : {poolBalanceRatio.prettify(2)} LUSD.
+                Tick this box to deposit bMoUSD and MoUSD-3CRV in the pool's current liquidity ratio.
+                Current ratio = 1 bMoUSD : {poolBalanceRatio.prettify(2)} MoUSD.
               </Card>
             }
           />
@@ -188,7 +188,7 @@ export const DepositPane: React.FC = () => {
             size="xs"
             tooltip={
               <Card variant="tooltip">
-                Tick this box to have your Curve LP tokens staked in the bLUSD Curve gauge. Staked LP
+                Tick this box to have your Curve LP tokens staked in the bMoUSD Curve gauge. Staked LP
                 tokens will earn protocol fees and Curve rewards.
               </Card>
             }
@@ -201,14 +201,14 @@ export const DepositPane: React.FC = () => {
       {isAnyBalanceInsufficient && (
         <ErrorDescription>
           Deposit exceeds your balance by{" "}
-          {isBLusdBalanceInsufficient && (
+          {isBMousdBalanceInsufficient && (
             <>
-              <Amount>{bLusdAmount.sub(coalescedBLusdBalance).prettify(2)} bLUSD</Amount>
-              {isLusdBalanceInsufficient && <> and </>}
+              <Amount>{bMousdAmount.sub(coalescedBMousdBalance).prettify(2)} bMoUSD</Amount>
+              {isMousdBalanceInsufficient && <> and </>}
             </>
           )}
-          {isLusdBalanceInsufficient && (
-            <Amount>{lusdAmount.sub(coalescedLusdBalance).prettify(2)} LUSD</Amount>
+          {isMousdBalanceInsufficient && (
+            <Amount>{msicAmount.sub(coalescedMousdBalance).prettify(2)} MoUSD</Amount>
           )}
         </ErrorDescription>
       )}
@@ -227,7 +227,7 @@ export const DepositPane: React.FC = () => {
             variant="primary"
             onClick={handleConfirmPressed}
             disabled={
-              (bLusdAmount.isZero && lusdAmount.isZero) ||
+              (bMousdAmount.isZero && msicAmount.isZero) ||
               isAnyBalanceInsufficient ||
               isManageLiquidityPending
             }

@@ -2,10 +2,10 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ILQTYToken.sol";
+import "../Interfaces/IMSICToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
 import "../Dependencies/BaseMath.sol";
-import "../Dependencies/LiquityMath.sol";
+import "../Dependencies/MosaicMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
@@ -37,25 +37,25 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     uint constant public ISSUANCE_FACTOR = 999998681227695000;
 
     /* 
-    * The community LQTY supply cap is the starting balance of the Community Issuance contract.
-    * It should be minted to this contract by LQTYToken, when the token is deployed.
+    * The community MSIC supply cap is the starting balance of the Community Issuance contract.
+    * It should be minted to this contract by MSICToken, when the token is deployed.
     * 
-    * Set to 32M (slightly less than 1/3) of total LQTY supply.
+    * Set to 32M (slightly less than 1/3) of total MSIC supply.
     */
-    uint constant public LQTYSupplyCap = 32e24; // 32 million
+    uint constant public MSICSupplyCap = 32e24; // 32 million
 
-    ILQTYToken public lqtyToken;
+    IMSICToken public msicToken;
 
     address public stabilityPoolAddress;
 
-    uint public totalLQTYIssued;
+    uint public totalMSICIssued;
     uint public immutable deploymentTime;
 
     // --- Events ---
 
-    event LQTYTokenAddressSet(address _lqtyTokenAddress);
+    event MSICTokenAddressSet(address _msicTokenAddress);
     event StabilityPoolAddressSet(address _stabilityPoolAddress);
-    event TotalLQTYIssuedUpdated(uint _totalLQTYIssued);
+    event TotalMSICIssuedUpdated(uint _totalMSICIssued);
 
     // --- Functions ---
 
@@ -65,37 +65,37 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
 
     function setAddresses
     (
-        address _lqtyTokenAddress, 
+        address _msicTokenAddress, 
         address _stabilityPoolAddress
     ) 
         external 
         onlyOwner 
         override 
     {
-        checkContract(_lqtyTokenAddress);
+        checkContract(_msicTokenAddress);
         checkContract(_stabilityPoolAddress);
 
-        lqtyToken = ILQTYToken(_lqtyTokenAddress);
+        msicToken = IMSICToken(_msicTokenAddress);
         stabilityPoolAddress = _stabilityPoolAddress;
 
-        // When LQTYToken deployed, it should have transferred CommunityIssuance's LQTY entitlement
-        uint LQTYBalance = lqtyToken.balanceOf(address(this));
-        assert(LQTYBalance >= LQTYSupplyCap);
+        // When MSICToken deployed, it should have transferred CommunityIssuance's MSIC entitlement
+        uint MSICBalance = msicToken.balanceOf(address(this));
+        assert(MSICBalance >= MSICSupplyCap);
 
-        emit LQTYTokenAddressSet(_lqtyTokenAddress);
+        emit MSICTokenAddressSet(_msicTokenAddress);
         emit StabilityPoolAddressSet(_stabilityPoolAddress);
 
         _renounceOwnership();
     }
 
-    function issueLQTY() external override returns (uint) {
+    function issueMSIC() external override returns (uint) {
         _requireCallerIsStabilityPool();
 
-        uint latestTotalLQTYIssued = LQTYSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalLQTYIssued.sub(totalLQTYIssued);
+        uint latestTotalMSICIssued = MSICSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
+        uint issuance = latestTotalMSICIssued.sub(totalMSICIssued);
 
-        totalLQTYIssued = latestTotalLQTYIssued;
-        emit TotalLQTYIssuedUpdated(latestTotalLQTYIssued);
+        totalMSICIssued = latestTotalMSICIssued;
+        emit TotalMSICIssuedUpdated(latestTotalMSICIssued);
         
         return issuance;
     }
@@ -103,13 +103,13 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     /* Gets 1-f^t    where: f < 1
 
     f: issuance factor that determines the shape of the curve
-    t:  time passed since last LQTY issuance event  */
+    t:  time passed since last MSIC issuance event  */
     function _getCumulativeIssuanceFraction() internal view returns (uint) {
         // Get the time passed since deployment
         uint timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
 
         // f^t
-        uint power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
+        uint power = MosaicMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
 
         //  (1 - f^t)
         uint cumulativeIssuanceFraction = (uint(DECIMAL_PRECISION).sub(power));
@@ -118,10 +118,10 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
         return cumulativeIssuanceFraction;
     }
 
-    function sendLQTY(address _account, uint _LQTYamount) external override {
+    function sendMSIC(address _account, uint _MSICamount) external override {
         _requireCallerIsStabilityPool();
 
-        lqtyToken.transfer(_account, _LQTYamount);
+        msicToken.transfer(_account, _MSICamount);
     }
 
     // --- 'require' functions ---

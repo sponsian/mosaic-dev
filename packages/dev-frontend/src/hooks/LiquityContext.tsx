@@ -4,31 +4,31 @@ import { FallbackProvider } from "@ethersproject/providers";
 import { useProvider, useSigner, useAccount, useChainId } from "wagmi";
 
 import {
-  BlockPolledLiquityStore,
-  EthersLiquity,
-  EthersLiquityWithStore,
+  BlockPolledMosaicStore,
+  EthersMosaic,
+  EthersMosaicWithStore,
   _connectByChainId
-} from "@liquity/lib-ethers";
+} from "@mosaic/lib-ethers";
 
-import { LiquityFrontendConfig, getConfig } from "../config";
+import { MosaicFrontendConfig, getConfig } from "../config";
 import { BatchedProvider } from "../providers/BatchingProvider";
 
-type LiquityContextValue = {
-  config: LiquityFrontendConfig;
+type MosaicContextValue = {
+  config: MosaicFrontendConfig;
   account: string;
   provider: Provider;
-  liquity: EthersLiquityWithStore<BlockPolledLiquityStore>;
+  mosaic: EthersMosaicWithStore<BlockPolledMosaicStore>;
 };
 
-const LiquityContext = createContext<LiquityContextValue | undefined>(undefined);
+const MosaicContext = createContext<MosaicContextValue | undefined>(undefined);
 
-type LiquityProviderProps = {
+type MosaicProviderProps = {
   loader?: React.ReactNode;
   unsupportedNetworkFallback?: React.ReactNode;
   unsupportedMainnetFallback?: React.ReactNode;
 };
 
-export const LiquityProvider: React.FC<LiquityProviderProps> = ({
+export const MosaicProvider: React.FC<MosaicProviderProps> = ({
   children,
   loader,
   unsupportedNetworkFallback,
@@ -38,7 +38,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
   const signer = useSigner();
   const account = useAccount();
   const chainId = useChainId();
-  const [config, setConfig] = useState<LiquityFrontendConfig>();
+  const [config, setConfig] = useState<MosaicFrontendConfig>();
 
   const connection = useMemo(() => {
     if (config && provider && signer.data && account.address) {
@@ -73,24 +73,24 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
     return <>{unsupportedNetworkFallback}</>;
   }
 
-  const liquity = EthersLiquity._from(connection);
-  liquity.store.logging = true;
+  const mosaic = EthersMosaic._from(connection);
+  mosaic.store.logging = true;
 
   return (
-    <LiquityContext.Provider
-      value={{ config, account: account.address, provider: connection.provider, liquity }}
+    <MosaicContext.Provider
+      value={{ config, account: account.address, provider: connection.provider, mosaic }}
     >
       {children}
-    </LiquityContext.Provider>
+    </MosaicContext.Provider>
   );
 };
 
-export const useLiquity = () => {
-  const liquityContext = useContext(LiquityContext);
+export const useMosaic = () => {
+  const mosaicContext = useContext(MosaicContext);
 
-  if (!liquityContext) {
-    throw new Error("You must provide a LiquityContext via LiquityProvider");
+  if (!mosaicContext) {
+    throw new Error("You must provide a MosaicContext via MosaicProvider");
   }
 
-  return liquityContext;
+  return mosaicContext;
 };

@@ -1,20 +1,20 @@
 import { Decimal } from "./Decimal";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
+import { MSICStake } from "./MSICStake";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
-import { FrontendStatus, ReadableLiquity, TroveListingParams } from "./ReadableLiquity";
+import { FrontendStatus, ReadableMosaic, TroveListingParams } from "./ReadableMosaic";
 
 /** @internal */
-export type _ReadableLiquityWithExtraParamsBase<T extends unknown[]> = {
-  [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...params: infer A) => infer R
+export type _ReadableMosaicWithExtraParamsBase<T extends unknown[]> = {
+  [P in keyof ReadableMosaic]: ReadableMosaic[P] extends (...params: infer A) => infer R
     ? (...params: [...originalParams: A, ...extraParams: T]) => R
     : never;
 };
 
 /** @internal */
-export type _LiquityReadCacheBase<T extends unknown[]> = {
-  [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...args: infer A) => Promise<infer R>
+export type _MosaicReadCacheBase<T extends unknown[]> = {
+  [P in keyof ReadableMosaic]: ReadableMosaic[P] extends (...args: infer A) => Promise<infer R>
     ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined
     : never;
 };
@@ -22,8 +22,8 @@ export type _LiquityReadCacheBase<T extends unknown[]> = {
 // Overloads get lost in the mapping, so we need to define them again...
 
 /** @internal */
-export interface _ReadableLiquityWithExtraParams<T extends unknown[]>
-  extends _ReadableLiquityWithExtraParamsBase<T> {
+export interface _ReadableMosaicWithExtraParams<T extends unknown[]>
+  extends _ReadableMosaicWithExtraParamsBase<T> {
   getTroves(
     params: TroveListingParams & { beforeRedistribution: true },
     ...extraParams: T
@@ -33,7 +33,7 @@ export interface _ReadableLiquityWithExtraParams<T extends unknown[]>
 }
 
 /** @internal */
-export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCacheBase<T> {
+export interface _MosaicReadCache<T extends unknown[]> extends _MosaicReadCacheBase<T> {
   getTroves(
     params: TroveListingParams & { beforeRedistribution: true },
     ...extraParams: T
@@ -43,12 +43,12 @@ export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCach
 }
 
 /** @internal */
-export class _CachedReadableLiquity<T extends unknown[]>
-  implements _ReadableLiquityWithExtraParams<T> {
-  private _readable: _ReadableLiquityWithExtraParams<T>;
-  private _cache: _LiquityReadCache<T>;
+export class _CachedReadableMosaic<T extends unknown[]>
+  implements _ReadableMosaicWithExtraParams<T> {
+  private _readable: _ReadableMosaicWithExtraParams<T>;
+  private _cache: _MosaicReadCache<T>;
 
-  constructor(readable: _ReadableLiquityWithExtraParams<T>, cache: _LiquityReadCache<T>) {
+  constructor(readable: _ReadableMosaicWithExtraParams<T>, cache: _MosaicReadCache<T>) {
     this._readable = readable;
     this._cache = cache;
   }
@@ -101,31 +101,31 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getRemainingStabilityPoolLQTYReward(...extraParams: T): Promise<Decimal> {
+  async getRemainingStabilityPoolMSICReward(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getRemainingStabilityPoolLQTYReward(...extraParams) ??
-      this._readable.getRemainingStabilityPoolLQTYReward(...extraParams)
+      this._cache.getRemainingStabilityPoolMSICReward(...extraParams) ??
+      this._readable.getRemainingStabilityPoolMSICReward(...extraParams)
     );
   }
 
-  async getLUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
+  async getMoUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLUSDInStabilityPool(...extraParams) ??
-      this._readable.getLUSDInStabilityPool(...extraParams)
+      this._cache.getMoUSDInStabilityPool(...extraParams) ??
+      this._readable.getMoUSDInStabilityPool(...extraParams)
     );
   }
 
-  async getLUSDBalance(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getMoUSDBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLUSDBalance(address, ...extraParams) ??
-      this._readable.getLUSDBalance(address, ...extraParams)
+      this._cache.getMoUSDBalance(address, ...extraParams) ??
+      this._readable.getMoUSDBalance(address, ...extraParams)
     );
   }
 
-  async getLQTYBalance(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getMSICBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLQTYBalance(address, ...extraParams) ??
-      this._readable.getLQTYBalance(address, ...extraParams)
+      this._cache.getMSICBalance(address, ...extraParams) ??
+      this._readable.getMSICBalance(address, ...extraParams)
     );
   }
 
@@ -143,10 +143,10 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getRemainingLiquidityMiningLQTYReward(...extraParams: T): Promise<Decimal> {
+  async getRemainingLiquidityMiningMSICReward(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getRemainingLiquidityMiningLQTYReward(...extraParams) ??
-      this._readable.getRemainingLiquidityMiningLQTYReward(...extraParams)
+      this._cache.getRemainingLiquidityMiningMSICReward(...extraParams) ??
+      this._readable.getRemainingLiquidityMiningMSICReward(...extraParams)
     );
   }
 
@@ -164,10 +164,10 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getLiquidityMiningLQTYReward(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getLiquidityMiningMSICReward(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLiquidityMiningLQTYReward(address, ...extraParams) ??
-      this._readable.getLiquidityMiningLQTYReward(address, ...extraParams)
+      this._cache.getLiquidityMiningMSICReward(address, ...extraParams) ??
+      this._readable.getLiquidityMiningMSICReward(address, ...extraParams)
     );
   }
 
@@ -205,17 +205,17 @@ export class _CachedReadableLiquity<T extends unknown[]>
     return this._cache.getFees(...extraParams) ?? this._readable.getFees(...extraParams);
   }
 
-  async getLQTYStake(address?: string, ...extraParams: T): Promise<LQTYStake> {
+  async getMSICStake(address?: string, ...extraParams: T): Promise<MSICStake> {
     return (
-      this._cache.getLQTYStake(address, ...extraParams) ??
-      this._readable.getLQTYStake(address, ...extraParams)
+      this._cache.getMSICStake(address, ...extraParams) ??
+      this._readable.getMSICStake(address, ...extraParams)
     );
   }
 
-  async getTotalStakedLQTY(...extraParams: T): Promise<Decimal> {
+  async getTotalStakedMSIC(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getTotalStakedLQTY(...extraParams) ??
-      this._readable.getTotalStakedLQTY(...extraParams)
+      this._cache.getTotalStakedMSIC(...extraParams) ??
+      this._readable.getTotalStakedMSIC(...extraParams)
     );
   }
 

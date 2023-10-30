@@ -1,19 +1,19 @@
-import { LiquityStore } from "@liquity/lib-base";
+import { MosaicStore } from "@mosaic/lib-base";
 import React, { createContext, useEffect, useState } from "react";
 
-export const LiquityStoreContext = createContext<LiquityStore | undefined>(undefined);
+export const MosaicStoreContext = createContext<MosaicStore | undefined>(undefined);
 
-type LiquityStoreProviderProps = {
-  store: LiquityStore;
+type MosaicStoreProviderProps = {
+  store: MosaicStore;
   loader?: React.ReactNode;
 };
 
-export const LiquityStoreProvider: React.FC<LiquityStoreProviderProps> = ({
+export const MosaicStoreProvider: React.FC<MosaicStoreProviderProps> = ({
   store,
   loader,
   children
 }) => {
-  const [loadedStore, setLoadedStore] = useState<LiquityStore>();
+  const [loadedStore, setLoadedStore] = useState<MosaicStore>();
 
   useEffect(() => {
     store.onLoaded = () => setLoadedStore(store);
@@ -30,5 +30,5 @@ export const LiquityStoreProvider: React.FC<LiquityStoreProviderProps> = ({
     return <>{loader}</>;
   }
 
-  return <LiquityStoreContext.Provider value={loadedStore}>{children}</LiquityStoreContext.Provider>;
+  return <MosaicStoreContext.Provider value={loadedStore}>{children}</MosaicStoreContext.Provider>;
 };

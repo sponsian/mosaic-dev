@@ -8,12 +8,12 @@ import type {
   BondTransactionStatuses,
   ProtocolInfo,
   OptimisticBond,
-  BLusdAmmTokenIndex,
+  BMousdAmmTokenIndex,
   Addresses,
-  BLusdLpRewards
+  BMousdLpRewards
 } from "./transitions";
 import { PENDING_STATUS, CANCELLED_STATUS, CLAIMED_STATUS } from "../lexicon";
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 export type BondViewContextType = {
   view: BondView;
@@ -24,39 +24,39 @@ export type BondViewContextType = {
   bonds?: Bond[];
   selectedBond?: Bond;
   optimisticBond?: OptimisticBond;
-  bLusdBalance?: Decimal;
-  lusdBalance?: Decimal;
+  bMousdBalance?: Decimal;
+  msicBalance?: Decimal;
   lpTokenBalance?: Decimal;
   stakedLpTokenBalance?: Decimal;
   lpTokenSupply?: Decimal;
-  bLusdAmmBLusdBalance?: Decimal;
-  bLusdAmmLusdBalance?: Decimal;
+  bMousdAmmBMousdBalance?: Decimal;
+  bMousdAmmMousdBalance?: Decimal;
   statuses: BondTransactionStatuses;
   isInfiniteBondApproved: boolean;
   isSynchronizing: boolean;
-  getLusdFromFaucet: () => Promise<void>;
+  getMousdFromFaucet: () => Promise<void>;
   simulatedProtocolInfo?: ProtocolInfo;
   setSimulatedMarketPrice: (marketPrice: Decimal) => void;
   resetSimulatedMarketPrice: () => void;
   hasFoundContracts: boolean;
-  isBLusdApprovedWithBlusdAmm: boolean;
-  isLusdApprovedWithBlusdAmm: boolean;
-  isLusdApprovedWithAmmZapper: boolean;
-  isBLusdApprovedWithAmmZapper: boolean;
-  isBLusdLpApprovedWithAmmZapper: boolean;
-  isBLusdLpApprovedWithGauge: boolean;
-  inputToken: BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.LUSD;
-  isInputTokenApprovedWithBLusdAmm: boolean;
-  getExpectedSwapOutput: (inputToken: BLusdAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
-  getExpectedLpTokens: (bLusdAmount: Decimal, lusdAmount: Decimal) => Promise<Decimal>;
+  isBMousdApprovedWithBmsicAmm: boolean;
+  isMousdApprovedWithBmsicAmm: boolean;
+  isMousdApprovedWithAmmZapper: boolean;
+  isBMousdApprovedWithAmmZapper: boolean;
+  isBMousdLpApprovedWithAmmZapper: boolean;
+  isBMousdLpApprovedWithGauge: boolean;
+  inputToken: BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD;
+  isInputTokenApprovedWithBMousdAmm: boolean;
+  getExpectedSwapOutput: (inputToken: BMousdAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
+  getExpectedLpTokens: (bMousdAmount: Decimal, msicAmount: Decimal) => Promise<Decimal>;
   getExpectedWithdrawal: (
     burnLp: Decimal,
-    output: BLusdAmmTokenIndex | "both"
-  ) => Promise<Map<BLusdAmmTokenIndex, Decimal>>;
+    output: BMousdAmmTokenIndex | "both"
+  ) => Promise<Map<BMousdAmmTokenIndex, Decimal>>;
   isBootstrapPeriodActive?: boolean;
   hasLoaded: boolean;
   addresses: Addresses;
-  lpRewards: BLusdLpRewards | undefined;
+  lpRewards: BMousdLpRewards | undefined;
 };
 
 export const BondViewContext = createContext<BondViewContextType | null>(null);

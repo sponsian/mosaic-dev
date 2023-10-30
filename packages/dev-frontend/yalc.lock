@@ -1,7 +1,7 @@
 {
   "version": "v1",
   "packages": {
-    "@liquity/chicken-bonds": {
+    "@mosaic/chicken-bonds": {
       "signature": "007bbe44375983ab942770ca53a2039e"
     }
   }

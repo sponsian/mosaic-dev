@@ -1,7 +1,7 @@
 import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 import devOrNull from "../deployments/dev.json";
 import goerli from "../deployments/goerli.json";
@@ -16,17 +16,17 @@ import { EthersProvider, EthersSigner } from "./types";
 
 import {
   _connectToContracts,
-  _LiquityContractAddresses,
-  _LiquityContracts,
-  _LiquityDeploymentJSON
+  _MosaicContractAddresses,
+  _MosaicContracts,
+  _MosaicDeploymentJSON
 } from "./contracts";
 
 import { _connectToMulticall, _Multicall } from "./_Multicall";
 
-const dev = devOrNull as _LiquityDeploymentJSON | null;
+const dev = devOrNull as _MosaicDeploymentJSON | null;
 
 const deployments: {
-  [chainId: number]: _LiquityDeploymentJSON | undefined;
+  [chainId: number]: _MosaicDeploymentJSON | undefined;
 } = {
   [mainnet.chainId]: mainnet,
   [ropsten.chainId]: ropsten,
@@ -43,16 +43,16 @@ declare const brand: unique symbol;
 const branded = <T>(t: Omit<T, typeof brand>): T => t as T;
 
 /**
- * Information about a connection to the Liquity protocol.
+ * Information about a connection to the Mosaic protocol.
  *
  * @remarks
  * Provided for debugging / informational purposes.
  *
- * Exposed through {@link ReadableEthersLiquity.connection} and {@link EthersLiquity.connection}.
+ * Exposed through {@link ReadableEthersMosaic.connection} and {@link EthersMosaic.connection}.
  *
  * @public
  */
-export interface EthersLiquityConnection extends EthersLiquityConnectionOptionalParams {
+export interface EthersMosaicConnection extends EthersMosaicConnectionOptionalParams {
   /** Ethers `Provider` used for connecting to the network. */
   readonly provider: EthersProvider;
 
@@ -62,25 +62,25 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
   /** Chain ID of the connected network. */
   readonly chainId: number;
 
-  /** Version of the Liquity contracts (Git commit hash). */
+  /** Version of the Mosaic contracts (Git commit hash). */
   readonly version: string;
 
-  /** Date when the Liquity contracts were deployed. */
+  /** Date when the Mosaic contracts were deployed. */
   readonly deploymentDate: Date;
 
-  /** Number of block in which the first Liquity contract was deployed. */
+  /** Number of block in which the first Mosaic contract was deployed. */
   readonly startBlock: number;
 
   /** Time period (in seconds) after `deploymentDate` during which redemptions are disabled. */
   readonly bootstrapPeriod: number;
 
-  /** Total amount of LQTY allocated for rewarding stability depositors. */
-  readonly totalStabilityPoolLQTYReward: Decimal;
+  /** Total amount of MSIC allocated for rewarding stability depositors. */
+  readonly totalStabilityPoolMSICReward: Decimal;
 
-  /** Amount of LQTY collectively rewarded to stakers of the liquidity mining pool per second. */
-  readonly liquidityMiningLQTYRewardRate: Decimal;
+  /** Amount of MSIC collectively rewarded to stakers of the liquidity mining pool per second. */
+  readonly liquidityMiningMSICRewardRate: Decimal;
 
-  /** A mapping of Liquity contracts' names to their addresses. */
+  /** A mapping of Mosaic contracts' names to their addresses. */
   readonly addresses: Record<string, string>;
 
   /** @internal */
@@ -94,25 +94,25 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
 }
 
 /** @internal */
-export interface _InternalEthersLiquityConnection extends EthersLiquityConnection {
-  readonly addresses: _LiquityContractAddresses;
-  readonly _contracts: _LiquityContracts;
+export interface _InternalEthersMosaicConnection extends EthersMosaicConnection {
+  readonly addresses: _MosaicContractAddresses;
+  readonly _contracts: _MosaicContracts;
   readonly _multicall?: _Multicall;
 }
 
 const connectionFrom = (
   provider: EthersProvider,
   signer: EthersSigner | undefined,
-  _contracts: _LiquityContracts,
+  _contracts: _MosaicContracts,
   _multicall: _Multicall | undefined,
   {
     deploymentDate,
-    totalStabilityPoolLQTYReward,
-    liquidityMiningLQTYRewardRate,
+    totalStabilityPoolMSICReward,
+    liquidityMiningMSICRewardRate,
     ...deployment
-  }: _LiquityDeploymentJSON,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): _InternalEthersLiquityConnection => {
+  }: _MosaicDeploymentJSON,
+  optionalParams?: EthersMosaicConnectionOptionalParams
+): _InternalEthersMosaicConnection => {
   if (
     optionalParams &&
     optionalParams.useStore !== undefined &&
@@ -127,25 +127,25 @@ const connectionFrom = (
     _contracts,
     _multicall,
     deploymentDate: new Date(deploymentDate),
-    totalStabilityPoolLQTYReward: Decimal.from(totalStabilityPoolLQTYReward),
-    liquidityMiningLQTYRewardRate: Decimal.from(liquidityMiningLQTYRewardRate),
+    totalStabilityPoolMSICReward: Decimal.from(totalStabilityPoolMSICReward),
+    liquidityMiningMSICRewardRate: Decimal.from(liquidityMiningMSICRewardRate),
     ...deployment,
     ...optionalParams
   });
 };
 
 /** @internal */
-export const _getContracts = (connection: EthersLiquityConnection): _LiquityContracts =>
-  (connection as _InternalEthersLiquityConnection)._contracts;
+export const _getContracts = (connection: EthersMosaicConnection): _MosaicContracts =>
+  (connection as _InternalEthersMosaicConnection)._contracts;
 
-const getMulticall = (connection: EthersLiquityConnection): _Multicall | undefined =>
-  (connection as _InternalEthersLiquityConnection)._multicall;
+const getMulticall = (connection: EthersMosaicConnection): _Multicall | undefined =>
+  (connection as _InternalEthersMosaicConnection)._multicall;
 
 const getTimestampFromBlock = ({ timestamp }: Block) => timestamp;
 
 /** @internal */
 export const _getBlockTimestamp = (
-  connection: EthersLiquityConnection,
+  connection: EthersMosaicConnection,
   blockTag: BlockTag = "latest"
 ): Promise<number> =>
   // Get the timestamp via a contract call whenever possible, to make it batchable with other calls
@@ -153,36 +153,36 @@ export const _getBlockTimestamp = (
   _getProvider(connection).getBlock(blockTag).then(getTimestampFromBlock);
 
 /** @internal */
-export const _requireSigner = (connection: EthersLiquityConnection): EthersSigner =>
+export const _requireSigner = (connection: EthersMosaicConnection): EthersSigner =>
   connection.signer ?? panic(new Error("Must be connected through a Signer"));
 
 /** @internal */
-export const _getProvider = (connection: EthersLiquityConnection): EthersProvider =>
+export const _getProvider = (connection: EthersMosaicConnection): EthersProvider =>
   connection.provider;
 
 // TODO parameterize error message?
 /** @internal */
 export const _requireAddress = (
-  connection: EthersLiquityConnection,
+  connection: EthersMosaicConnection,
   overrides?: { from?: string }
 ): string =>
   overrides?.from ?? connection.userAddress ?? panic(new Error("A user address is required"));
 
 /** @internal */
-export const _requireFrontendAddress = (connection: EthersLiquityConnection): string =>
+export const _requireFrontendAddress = (connection: EthersMosaicConnection): string =>
   connection.frontendTag ?? panic(new Error("A frontend address is required"));
 
 /** @internal */
 export const _usingStore = (
-  connection: EthersLiquityConnection
-): connection is EthersLiquityConnection & { useStore: EthersLiquityStoreOption } =>
+  connection: EthersMosaicConnection
+): connection is EthersMosaicConnection & { useStore: EthersMosaicStoreOption } =>
   connection.useStore !== undefined;
 
 /**
- * Thrown when trying to connect to a network where Liquity is not deployed.
+ * Thrown when trying to connect to a network where Mosaic is not deployed.
  *
  * @remarks
- * Thrown by {@link ReadableEthersLiquity.(connect:2)} and {@link EthersLiquity.(connect:2)}.
+ * Thrown by {@link ReadableEthersMosaic.(connect:2)} and {@link EthersMosaic.(connect:2)}.
  *
  * @public
  */
@@ -212,10 +212,10 @@ const getProviderAndSigner = (
 
 /** @internal */
 export const _connectToDeployment = (
-  deployment: _LiquityDeploymentJSON,
+  deployment: _MosaicDeploymentJSON,
   signerOrProvider: EthersSigner | EthersProvider,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection =>
+  optionalParams?: EthersMosaicConnectionOptionalParams
+): EthersMosaicConnection =>
   connectionFrom(
     ...getProviderAndSigner(signerOrProvider),
     _connectToContracts(signerOrProvider, deployment),
@@ -226,31 +226,31 @@ export const _connectToDeployment = (
 
 /**
  * Possible values for the optional
- * {@link EthersLiquityConnectionOptionalParams.useStore | useStore}
+ * {@link EthersMosaicConnectionOptionalParams.useStore | useStore}
  * connection parameter.
  *
  * @remarks
  * Currently, the only supported value is `"blockPolled"`, in which case a
- * {@link BlockPolledLiquityStore} will be created.
+ * {@link BlockPolledMosaicStore} will be created.
  *
  * @public
  */
-export type EthersLiquityStoreOption = "blockPolled";
+export type EthersMosaicStoreOption = "blockPolled";
 
 const validStoreOptions = ["blockPolled"];
 
 /**
- * Optional parameters of {@link ReadableEthersLiquity.(connect:2)} and
- * {@link EthersLiquity.(connect:2)}.
+ * Optional parameters of {@link ReadableEthersMosaic.(connect:2)} and
+ * {@link EthersMosaic.(connect:2)}.
  *
  * @public
  */
-export interface EthersLiquityConnectionOptionalParams {
+export interface EthersMosaicConnectionOptionalParams {
   /**
-   * Address whose Trove, Stability Deposit, LQTY Stake and balances will be read by default.
+   * Address whose Trove, Stability Deposit, MSIC Stake and balances will be read by default.
    *
    * @remarks
-   * For example {@link EthersLiquity.getTrove | getTrove(address?)} will return the Trove owned by
+   * For example {@link EthersMosaic.getTrove | getTrove(address?)} will return the Trove owned by
    * `userAddress` when the `address` parameter is omitted.
    *
    * Should be omitted when connecting through a {@link EthersSigner | Signer}. Instead `userAddress`
@@ -259,30 +259,30 @@ export interface EthersLiquityConnectionOptionalParams {
   readonly userAddress?: string;
 
   /**
-   * Address that will receive LQTY rewards from newly created Stability Deposits by default.
+   * Address that will receive MSIC rewards from newly created Stability Deposits by default.
    *
    * @remarks
    * For example
-   * {@link EthersLiquity.depositLUSDInStabilityPool | depositLUSDInStabilityPool(amount, frontendTag?)}
+   * {@link EthersMosaic.depositMoUSDInStabilityPool | depositMoUSDInStabilityPool(amount, frontendTag?)}
    * will tag newly made Stability Deposits with this address when its `frontendTag` parameter is
    * omitted.
    */
   readonly frontendTag?: string;
 
   /**
-   * Create a {@link @liquity/lib-base#LiquityStore} and expose it as the `store` property.
+   * Create a {@link @mosaic/lib-base#MosaicStore} and expose it as the `store` property.
    *
    * @remarks
-   * When set to one of the available {@link EthersLiquityStoreOption | options},
-   * {@link ReadableEthersLiquity.(connect:2) | ReadableEthersLiquity.connect()} will return a
-   * {@link ReadableEthersLiquityWithStore}, while
-   * {@link EthersLiquity.(connect:2) | EthersLiquity.connect()} will return an
-   * {@link EthersLiquityWithStore}.
+   * When set to one of the available {@link EthersMosaicStoreOption | options},
+   * {@link ReadableEthersMosaic.(connect:2) | ReadableEthersMosaic.connect()} will return a
+   * {@link ReadableEthersMosaicWithStore}, while
+   * {@link EthersMosaic.(connect:2) | EthersMosaic.connect()} will return an
+   * {@link EthersMosaicWithStore}.
    *
    * Note that the store won't start monitoring the blockchain until its
-   * {@link @liquity/lib-base#LiquityStore.start | start()} function is called.
+   * {@link @mosaic/lib-base#MosaicStore.start | start()} function is called.
    */
-  readonly useStore?: EthersLiquityStoreOption;
+  readonly useStore?: EthersMosaicStoreOption;
 }
 
 /** @internal */
@@ -290,25 +290,25 @@ export function _connectByChainId<T>(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams: EthersLiquityConnectionOptionalParams & { useStore: T }
-): EthersLiquityConnection & { useStore: T };
+  optionalParams: EthersMosaicConnectionOptionalParams & { useStore: T }
+): EthersMosaicConnection & { useStore: T };
 
 /** @internal */
 export function _connectByChainId(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection;
+  optionalParams?: EthersMosaicConnectionOptionalParams
+): EthersMosaicConnection;
 
 /** @internal */
 export function _connectByChainId(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection {
-  const deployment: _LiquityDeploymentJSON =
+  optionalParams?: EthersMosaicConnectionOptionalParams
+): EthersMosaicConnection {
+  const deployment: _MosaicDeploymentJSON =
     deployments[chainId] ?? panic(new UnsupportedNetworkError(chainId));
 
   return connectionFrom(
@@ -324,8 +324,8 @@ export function _connectByChainId(
 /** @internal */
 export const _connect = async (
   signerOrProvider: EthersSigner | EthersProvider,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): Promise<EthersLiquityConnection> => {
+  optionalParams?: EthersMosaicConnectionOptionalParams
+): Promise<EthersMosaicConnection> => {
   const [provider, signer] = getProviderAndSigner(signerOrProvider);
 
   if (signer) {

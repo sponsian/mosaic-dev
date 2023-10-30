@@ -4,10 +4,10 @@ import type { BondNFT, BondNFTInterface } from "../BondNFT";
 declare type BondNFTConstructorParams = [signer?: Signer] | ConstructorParameters<typeof ContractFactory>;
 export declare class BondNFT__factory extends ContractFactory {
     constructor(...args: BondNFTConstructorParams);
-    deploy(name_: string, symbol_: string, _initialArtworkAddress: string, _transferLockoutPeriodSeconds: BigNumberish, _liquityDataAddresses: BondNFT.LiquityDataAddressesStruct, overrides?: Overrides & {
+    deploy(name_: string, symbol_: string, _initialArtworkAddress: string, _transferLockoutPeriodSeconds: BigNumberish, _mosaicDataAddresses: BondNFT.MosaicDataAddressesStruct, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): Promise<BondNFT>;
-    getDeployTransaction(name_: string, symbol_: string, _initialArtworkAddress: string, _transferLockoutPeriodSeconds: BigNumberish, _liquityDataAddresses: BondNFT.LiquityDataAddressesStruct, overrides?: Overrides & {
+    getDeployTransaction(name_: string, symbol_: string, _initialArtworkAddress: string, _transferLockoutPeriodSeconds: BigNumberish, _mosaicDataAddresses: BondNFT.MosaicDataAddressesStruct, overrides?: Overrides & {
         from?: string | Promise<string>;
     }): TransactionRequest;
     attach(address: string): BondNFT;

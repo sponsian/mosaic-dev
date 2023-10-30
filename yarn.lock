@@ -1709,16 +1709,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@liquity/chicken-bonds@file:.yalc/@liquity/chicken-bonds::locator=%40liquity%2Fdev-frontend%40workspace%3Apackages%2Fdev-frontend":
+"@mosaic/chicken-bonds@file:.yalc/@mosaic/chicken-bonds::locator=%40mosaic%2Fdev-frontend%40workspace%3Apackages%2Fdev-frontend":
   version: 0.0.1
-  resolution: "@liquity/chicken-bonds@file:.yalc/@liquity/chicken-bonds#.yalc/@liquity/chicken-bonds::hash=f4a3c3&locator=%40liquity%2Fdev-frontend%40workspace%3Apackages%2Fdev-frontend"
+  resolution: "@mosaic/chicken-bonds@file:.yalc/@mosaic/chicken-bonds#.yalc/@mosaic/chicken-bonds::hash=f4a3c3&locator=%40mosaic%2Fdev-frontend%40workspace%3Apackages%2Fdev-frontend"
   checksum: c16397fed7724fd7ab81ca45b8531dc73437d494543e36b4c290fb1f10acc0b9ef541cad8b7a60789c02f4639a25bb951451b1eb6ca2ed5403fca6f79dd7f13b
   languageName: node
   linkType: hard
 
-"@liquity/contracts@workspace:packages/contracts":
+"@mosaic/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
-  resolution: "@liquity/contracts@workspace:packages/contracts"
+  resolution: "@mosaic/contracts@workspace:packages/contracts"
   dependencies:
     "@nomiclabs/hardhat-ethers": ^2.0.2
     "@nomiclabs/hardhat-etherscan": ^2.1.2
@@ -1741,9 +1741,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@liquity/dev-frontend@workspace:packages/dev-frontend":
+"@mosaic/dev-frontend@workspace:packages/dev-frontend":
   version: 0.0.0-use.local
-  resolution: "@liquity/dev-frontend@workspace:packages/dev-frontend"
+  resolution: "@mosaic/dev-frontend@workspace:packages/dev-frontend"
   dependencies:
     "@esbuild-plugins/node-modules-polyfill": ^0.2.2
     "@ethersproject/abi": 5.7.0
@@ -1752,7 +1752,7 @@ __metadata:
     "@fortawesome/free-regular-svg-icons": 5.15.2
     "@fortawesome/free-solid-svg-icons": 5.15.2
     "@fortawesome/react-fontawesome": 0.1.14
-    "@liquity/chicken-bonds": "file:.yalc/@liquity/chicken-bonds"
+    "@mosaic/chicken-bonds": "file:.yalc/@mosaic/chicken-bonds"
     "@metamask/eth-sig-util": 5.0.1
     "@testing-library/dom": 7.30.0
     "@testing-library/jest-dom": 5.11.9
@@ -1798,18 +1798,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@liquity/examples@workspace:packages/examples":
+"@mosaic/examples@workspace:packages/examples":
   version: 0.0.0-use.local
-  resolution: "@liquity/examples@workspace:packages/examples"
+  resolution: "@mosaic/examples@workspace:packages/examples"
   dependencies:
     chalk: ^4.1.0
     ethers: ^5.4.3
   languageName: unknown
   linkType: soft
 
-"@liquity/fuzzer@workspace:packages/fuzzer":
+"@mosaic/fuzzer@workspace:packages/fuzzer":
   version: 0.0.0-use.local
-  resolution: "@liquity/fuzzer@workspace:packages/fuzzer"
+  resolution: "@mosaic/fuzzer@workspace:packages/fuzzer"
   dependencies:
     "@types/yargs": ^16.0.0
     colors: ^1.4.0
@@ -1821,9 +1821,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@liquity/lib-base@workspace:packages/lib-base":
+"@mosaic/lib-base@workspace:packages/lib-base":
   version: 0.0.0-use.local
-  resolution: "@liquity/lib-base@workspace:packages/lib-base"
+  resolution: "@mosaic/lib-base@workspace:packages/lib-base"
   dependencies:
     "@ethersproject/bignumber": 5.7.0
     "@microsoft/api-extractor": 7.13.2
@@ -1840,9 +1840,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@liquity/lib-ethers@workspace:packages/lib-ethers":
+"@mosaic/lib-ethers@workspace:packages/lib-ethers":
   version: 0.0.0-use.local
-  resolution: "@liquity/lib-ethers@workspace:packages/lib-ethers"
+  resolution: "@mosaic/lib-ethers@workspace:packages/lib-ethers"
   dependencies:
     "@microsoft/api-extractor": 7.13.2
     "@nomiclabs/hardhat-ethers": ^2.0.2
@@ -1871,14 +1871,14 @@ __metadata:
     typescript: 4.1.5
     ws: 7.4.6
   peerDependencies:
-    "@liquity/lib-base": ^3.0.0
+    "@mosaic/lib-base": ^3.0.0
     ethers: ^5.3.0
   languageName: unknown
   linkType: soft
 
-"@liquity/lib-react@workspace:packages/lib-react":
+"@mosaic/lib-react@workspace:packages/lib-react":
   version: 0.0.0-use.local
-  resolution: "@liquity/lib-react@workspace:packages/lib-react"
+  resolution: "@mosaic/lib-react@workspace:packages/lib-react"
   dependencies:
     "@ethersproject/bignumber": 5.7.0
     "@types/react": 17.0.3
@@ -1891,14 +1891,14 @@ __metadata:
     react: 17.0.2
     typescript: 4.1.5
   peerDependencies:
-    "@liquity/lib-base": ^3.0.0
+    "@mosaic/lib-base": ^3.0.0
     react: ^16.13.1
   languageName: unknown
   linkType: soft
 
-"@liquity/lib-subgraph@workspace:packages/lib-subgraph":
+"@mosaic/lib-subgraph@workspace:packages/lib-subgraph":
   version: 0.0.0-use.local
-  resolution: "@liquity/lib-subgraph@workspace:packages/lib-subgraph"
+  resolution: "@mosaic/lib-subgraph@workspace:packages/lib-subgraph"
   dependencies:
     "@apollo/client": ^3.3.12
     "@ethersproject/address": ^5.4.0
@@ -1909,13 +1909,13 @@ __metadata:
     rimraf: ^3.0.2
     typescript: ~4.1.0
   peerDependencies:
-    "@liquity/lib-base": ^3.0.0
+    "@mosaic/lib-base": ^3.0.0
   languageName: unknown
   linkType: soft
 
-"@liquity/providers@workspace:packages/providers":
+"@mosaic/providers@workspace:packages/providers":
   version: 0.0.0-use.local
-  resolution: "@liquity/providers@workspace:packages/providers"
+  resolution: "@mosaic/providers@workspace:packages/providers"
   dependencies:
     ethers: ^5.4.3
     ts-node: ^9.1.1
@@ -1925,9 +1925,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@liquity/subgraph@workspace:packages/subgraph":
+"@mosaic/subgraph@workspace:packages/subgraph":
   version: 0.0.0-use.local
-  resolution: "@liquity/subgraph@workspace:packages/subgraph"
+  resolution: "@mosaic/subgraph@workspace:packages/subgraph"
   dependencies:
     "@graphprotocol/graph-cli": ^0.20.1
     "@graphprotocol/graph-ts": ^0.20.1
@@ -14515,9 +14515,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"liquity@workspace:.":
+"mosaic@workspace:.":
   version: 0.0.0-use.local
-  resolution: "liquity@workspace:."
+  resolution: "mosaic@workspace:."
   dependencies:
     "@commitlint/cli": ^12.0.1
     "@commitlint/config-conventional": ^12.0.1

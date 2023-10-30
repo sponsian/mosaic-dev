@@ -1,19 +1,19 @@
 {
-  "name": "@liquity/providers",
+  "name": "@mosaic/providers",
   "version": "0.0.0-semantic-release",
-  "description": "Custom Ethers Providers used by Liquity Dev UI",
+  "description": "Custom Ethers Providers used by Mosaic Dev UI",
   "keywords": [
-    "Liquity",
+    "Mosaic",
     "protocol",
     "DeFi",
     "Ethereum"
   ],
-  "homepage": "https://github.com/liquity/liquity#readme",
+  "homepage": "https://github.com/mosaic/mosaic#readme",
   "license": "MIT",
-  "author": "Daniel Simon <dani@liquity.org>",
+  "author": "Daniel Simon <dani@mosaic.org>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/liquity/dev",
+  "repository": "https://github.com/mosaic/dev",
   "scripts": {
     "prepare": "tsc --project tsconfig.dist.json"
   },

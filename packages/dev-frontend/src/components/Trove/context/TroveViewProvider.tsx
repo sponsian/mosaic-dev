@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useLiquitySelector } from "@liquity/lib-react";
-import { LiquityStoreState, UserTroveStatus } from "@liquity/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState, UserTroveStatus } from "@mosaic/lib-base";
 import { TroveViewContext } from "./TroveViewContext";
 import type { TroveView, TroveEvent } from "./types";
 
@@ -75,11 +75,11 @@ const getInitialView = (troveStatus: UserTroveStatus): TroveView => {
   return "NONE";
 };
 
-const select = ({ trove: { status } }: LiquityStoreState) => status;
+const select = ({ trove: { status } }: MosaicStoreState) => status;
 
 export const TroveViewProvider: React.FC = props => {
   const { children } = props;
-  const troveStatus = useLiquitySelector(select);
+  const troveStatus = useMosaicSelector(select);
 
   const [view, setView] = useState<TroveView>(getInitialView(troveStatus));
   const viewRef = useRef<TroveView>(view);

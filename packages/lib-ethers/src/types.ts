@@ -5,7 +5,7 @@ import { BlockTag, TransactionResponse, TransactionReceipt } from "@ethersprojec
 import { PopulatedTransaction } from "@ethersproject/contracts";
 
 /**
- * Optional parameters taken by {@link EthersLiquity} transaction functions.
+ * Optional parameters taken by {@link EthersMosaic} transaction functions.
  *
  * @public
  */
@@ -17,7 +17,7 @@ export interface EthersTransactionOverrides {
 }
 
 /**
- * Optional parameters taken by {@link ReadableEthersLiquity} functions.
+ * Optional parameters taken by {@link ReadableEthersMosaic} functions.
  *
  * @public
  */

@@ -1,8 +1,8 @@
 import { Button } from "theme-ui";
 
-import { Decimal, TroveChange } from "@liquity/lib-base";
+import { Decimal, TroveChange } from "@mosaic/lib-base";
 
-import { useLiquity } from "../../hooks/LiquityContext";
+import { useMosaic } from "../../hooks/MosaicContext";
 import { useTransactionFunction } from "../Transaction";
 
 type TroveActionProps = {
@@ -19,18 +19,18 @@ export const TroveAction: React.FC<TroveActionProps> = ({
   maxBorrowingRate,
   borrowingFeeDecayToleranceMinutes
 }) => {
-  const { liquity } = useLiquity();
+  const { mosaic } = useMosaic();
 
   const [sendTransaction] = useTransactionFunction(
     transactionId,
     change.type === "creation"
-      ? liquity.send.openTrove.bind(liquity.send, change.params, {
+      ? mosaic.send.openTrove.bind(mosaic.send, change.params, {
           maxBorrowingRate,
           borrowingFeeDecayToleranceMinutes
         })
       : change.type === "closure"
-      ? liquity.send.closeTrove.bind(liquity.send)
-      : liquity.send.adjustTrove.bind(liquity.send, change.params, {
+      ? mosaic.send.closeTrove.bind(mosaic.send)
+      : mosaic.send.adjustTrove.bind(mosaic.send, change.params, {
           maxBorrowingRate,
           borrowingFeeDecayToleranceMinutes
         })

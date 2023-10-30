@@ -8,7 +8,7 @@ import fetch from "node-fetch";
 import { configure } from "@testing-library/dom";
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 
-// Loading the Liquity store takes longer without Multicall
+// Loading the Mosaic store takes longer without Multicall
 configure({ asyncUtilTimeout: 5000 });
 
 const ethereum = new DisposableWalletProvider(

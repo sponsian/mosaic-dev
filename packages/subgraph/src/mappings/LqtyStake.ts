@@ -1,11 +1,11 @@
-import { StakeChanged, StakingGainsWithdrawn } from "../../generated/LQTYStaking/LQTYStaking";
+import { StakeChanged, StakingGainsWithdrawn } from "../../generated/MSICStaking/MSICStaking";
 
-import { updateStake, withdrawStakeGains } from "../entities/LqtyStake";
+import { updateStake, withdrawStakeGains } from "../entities/MsicStake";
 
 export function handleStakeChanged(event: StakeChanged): void {
   updateStake(event, event.params.staker, event.params.newStake);
 }
 
 export function handleStakeGainsWithdrawn(event: StakingGainsWithdrawn): void {
-  withdrawStakeGains(event, event.params.staker, event.params.LUSDGain, event.params.ETHGain);
+  withdrawStakeGains(event, event.params.staker, event.params.MoUSDGain, event.params.ETHGain);
 }

@@ -14,11 +14,11 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: EPERM: operation not permitted, unlink 'C:\Users\Rick\Desktop\Liquity2\liquity\node_modules\bufferutil\prebuilds\win32-x64\node.napi.node'
+  Error: EPERM: operation not permitted, unlink 'C:\Users\Rick\Desktop\Mosaic2\mosaic\node_modules\bufferutil\prebuilds\win32-x64\node.napi.node'
 
 npm manifest: 
   {
-    "name": "@liquity/contracts",
+    "name": "@mosaic/contracts",
     "version": "1.0.0",
     "private": true,
     "description": "",

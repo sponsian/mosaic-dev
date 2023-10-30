@@ -8,7 +8,7 @@ const moneyVals = testHelpers.MoneyValues
 let latestRandomSeed = 31337
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
-const LUSDToken = artifacts.require("LUSDToken")
+const MoUSDToken = artifacts.require("MoUSDToken")
 
 contract('HintHelpers', async accounts => {
  
@@ -28,19 +28,19 @@ contract('HintHelpers', async accounts => {
 
   const getNetBorrowingAmount = async (debtWithFee) => th.getNetBorrowingAmount(contracts, debtWithFee)
 
-  /* Open a Trove for each account. LUSD debt is 200 LUSD each, with collateral beginning at
+  /* Open a Trove for each account. MoUSD debt is 200 MoUSD each, with collateral beginning at
   1.5 ether, and rising by 0.01 ether per Trove.  Hence, the ICR of account (i + 1) is always 1% greater than the ICR of account i. 
  */
 
- // Open Troves in parallel, then withdraw LUSD in parallel
+ // Open Troves in parallel, then withdraw MoUSD in parallel
  const makeTrovesInParallel = async (accounts, n) => {
   activeAccounts = accounts.slice(0,n)
   // console.log(`number of accounts used is: ${activeAccounts.length}`)
   // console.time("makeTrovesInParallel")
   const openTrovepromises = activeAccounts.map((account, index) => openTrove(account, index))
   await Promise.all(openTrovepromises)
-  const withdrawLUSDpromises = activeAccounts.map(account => withdrawLUSDfromTrove(account))
-  await Promise.all(withdrawLUSDpromises)
+  const withdrawMoUSDpromises = activeAccounts.map(account => withdrawMoUSDfromTrove(account))
+  await Promise.all(withdrawMoUSDpromises)
   // console.timeEnd("makeTrovesInParallel")
  }
 
@@ -50,11 +50,11 @@ contract('HintHelpers', async accounts => {
    await borrowerOperations.openTrove(th._100pct, 0, account, account, { from: account, value: coll })
  }
 
- const withdrawLUSDfromTrove = async (account) => {
-  await borrowerOperations.withdrawLUSD(th._100pct, '100000000000000000000', account, account, { from: account })
+ const withdrawMoUSDfromTrove = async (account) => {
+  await borrowerOperations.withdrawMoUSD(th._100pct, '100000000000000000000', account, account, { from: account })
  }
 
- // Sequentially add coll and withdraw LUSD, 1 account at a time
+ // Sequentially add coll and withdraw MoUSD, 1 account at a time
   const makeTrovesInSequence = async (accounts, n) => {
     activeAccounts = accounts.slice(0,n)
     // console.log(`number of accounts used is: ${activeAccounts.length}`)
@@ -64,7 +64,7 @@ contract('HintHelpers', async accounts => {
     // console.time('makeTrovesInSequence')
     for (const account of activeAccounts) {
       const ICR_BN = toBN(ICR.toString().concat('0'.repeat(16)))
-      await th.openTrove(contracts, { extraLUSDAmount: toBN(dec(10000, 18)), ICR: ICR_BN, extraParams: { from: account } })
+      await th.openTrove(contracts, { extraMoUSDAmount: toBN(dec(10000, 18)), ICR: ICR_BN, extraParams: { from: account } })
 
       ICR += 1
     }
@@ -72,14 +72,14 @@ contract('HintHelpers', async accounts => {
   }
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
+    contracts = await deploymentHelper.deployMosaicCore()
     contracts.troveManager = await TroveManagerTester.new()
-    contracts.lusdToken = await LUSDToken.new(
+    contracts.msicToken = await MoUSDToken.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     )
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+    const MSICContracts = await deploymentHelper.deployMSICContracts(bountyAddress, lpRewardsAddress, multisig)
 
     sortedTroves = contracts.sortedTroves
     troveManager = contracts.troveManager
@@ -87,9 +87,9 @@ contract('HintHelpers', async accounts => {
     hintHelpers = contracts.hintHelpers
     priceFeed = contracts.priceFeedTestnet
   
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectCoreContracts(contracts, MSICContracts)
+    await deploymentHelper.connectMSICContracts(MSICContracts)
+    await deploymentHelper.connectMSICContractsToCore(MSICContracts, contracts)
 
     numAccounts = 10
 

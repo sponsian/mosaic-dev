@@ -7,33 +7,33 @@ import "../Dependencies/SafeMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/console.sol";
-import "../Interfaces/ILQTYToken.sol";
-import "../Interfaces/ILQTYStaking.sol";
-import "../Dependencies/LiquityMath.sol";
-import "../Interfaces/ILUSDToken.sol";
+import "../Interfaces/IMSICToken.sol";
+import "../Interfaces/IMSICStaking.sol";
+import "../Dependencies/MosaicMath.sol";
+import "../Interfaces/IMoUSDToken.sol";
 
-contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
+contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     using SafeMath for uint;
 
     // --- Data ---
-    string constant public NAME = "LQTYStaking";
+    string constant public NAME = "MSICStaking";
 
     mapping( address => uint) public stakes;
-    uint public totalLQTYStaked;
+    uint public totalMSICStaked;
 
-    uint public F_ETH;  // Running sum of ETH fees per-LQTY-staked
-    uint public F_LUSD; // Running sum of LQTY fees per-LQTY-staked
+    uint public F_ETH;  // Running sum of ETH fees per-MSIC-staked
+    uint public F_MoUSD; // Running sum of MSIC fees per-MSIC-staked
 
-    // User snapshots of F_ETH and F_LUSD, taken at the point at which their latest deposit was made
+    // User snapshots of F_ETH and F_MoUSD, taken at the point at which their latest deposit was made
     mapping (address => Snapshot) public snapshots; 
 
     struct Snapshot {
         uint F_ETH_Snapshot;
-        uint F_LUSD_Snapshot;
+        uint F_MoUSD_Snapshot;
     }
     
-    ILQTYToken public lqtyToken;
-    ILUSDToken public lusdToken;
+    IMSICToken public msicToken;
+    IMoUSDToken public msicToken;
 
     address public troveManagerAddress;
     address public borrowerOperationsAddress;
@@ -41,26 +41,26 @@ contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
 
     // --- Events ---
 
-    event LQTYTokenAddressSet(address _lqtyTokenAddress);
-    event LUSDTokenAddressSet(address _lusdTokenAddress);
+    event MSICTokenAddressSet(address _msicTokenAddress);
+    event MoUSDTokenAddressSet(address _msicTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint LUSDGain, uint ETHGain);
+    event StakingGainsWithdrawn(address indexed staker, uint MoUSDGain, uint ETHGain);
     event F_ETHUpdated(uint _F_ETH);
-    event F_LUSDUpdated(uint _F_LUSD);
-    event TotalLQTYStakedUpdated(uint _totalLQTYStaked);
+    event F_MoUSDUpdated(uint _F_MoUSD);
+    event TotalMSICStakedUpdated(uint _totalMSICStaked);
     event EtherSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_LUSD);
+    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MoUSD);
 
     // --- Functions ---
 
     function setAddresses
     (
-        address _lqtyTokenAddress,
-        address _lusdTokenAddress,
+        address _msicTokenAddress,
+        address _msicTokenAddress,
         address _troveManagerAddress, 
         address _borrowerOperationsAddress,
         address _activePoolAddress
@@ -69,20 +69,20 @@ contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
         onlyOwner 
         override 
     {
-        checkContract(_lqtyTokenAddress);
-        checkContract(_lusdTokenAddress);
+        checkContract(_msicTokenAddress);
+        checkContract(_msicTokenAddress);
         checkContract(_troveManagerAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_activePoolAddress);
 
-        lqtyToken = ILQTYToken(_lqtyTokenAddress);
-        lusdToken = ILUSDToken(_lusdTokenAddress);
+        msicToken = IMSICToken(_msicTokenAddress);
+        msicToken = IMoUSDToken(_msicTokenAddress);
         troveManagerAddress = _troveManagerAddress;
         borrowerOperationsAddress = _borrowerOperationsAddress;
         activePoolAddress = _activePoolAddress;
 
-        emit LQTYTokenAddressSet(_lqtyTokenAddress);
-        emit LQTYTokenAddressSet(_lusdTokenAddress);
+        emit MSICTokenAddressSet(_msicTokenAddress);
+        emit MSICTokenAddressSet(_msicTokenAddress);
         emit TroveManagerAddressSet(_troveManagerAddress);
         emit BorrowerOperationsAddressSet(_borrowerOperationsAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
@@ -90,97 +90,97 @@ contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
         _renounceOwnership();
     }
 
-    // If caller has a pre-existing stake, send any accumulated ETH and LUSD gains to them. 
-    function stake(uint _LQTYamount) external override {
-        _requireNonZeroAmount(_LQTYamount);
+    // If caller has a pre-existing stake, send any accumulated ETH and MoUSD gains to them. 
+    function stake(uint _MSICamount) external override {
+        _requireNonZeroAmount(_MSICamount);
 
         uint currentStake = stakes[msg.sender];
 
         uint ETHGain;
-        uint LUSDGain;
-        // Grab any accumulated ETH and LUSD gains from the current stake
+        uint MoUSDGain;
+        // Grab any accumulated ETH and MoUSD gains from the current stake
         if (currentStake != 0) {
             ETHGain = _getPendingETHGain(msg.sender);
-            LUSDGain = _getPendingLUSDGain(msg.sender);
+            MoUSDGain = _getPendingMoUSDGain(msg.sender);
         }
     
        _updateUserSnapshots(msg.sender);
 
-        uint newStake = currentStake.add(_LQTYamount);
+        uint newStake = currentStake.add(_MSICamount);
 
-        // Increase user’s stake and total LQTY staked
+        // Increase user’s stake and total MSIC staked
         stakes[msg.sender] = newStake;
-        totalLQTYStaked = totalLQTYStaked.add(_LQTYamount);
-        emit TotalLQTYStakedUpdated(totalLQTYStaked);
+        totalMSICStaked = totalMSICStaked.add(_MSICamount);
+        emit TotalMSICStakedUpdated(totalMSICStaked);
 
-        // Transfer LQTY from caller to this contract
-        lqtyToken.sendToLQTYStaking(msg.sender, _LQTYamount);
+        // Transfer MSIC from caller to this contract
+        msicToken.sendToMSICStaking(msg.sender, _MSICamount);
 
         emit StakeChanged(msg.sender, newStake);
-        emit StakingGainsWithdrawn(msg.sender, LUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
 
-         // Send accumulated LUSD and ETH gains to the caller
+         // Send accumulated MoUSD and ETH gains to the caller
         if (currentStake != 0) {
-            lusdToken.transfer(msg.sender, LUSDGain);
+            msicToken.transfer(msg.sender, MoUSDGain);
             _sendETHGainToUser(ETHGain);
         }
     }
 
-    // Unstake the LQTY and send the it back to the caller, along with their accumulated LUSD & ETH gains. 
+    // Unstake the MSIC and send the it back to the caller, along with their accumulated MoUSD & ETH gains. 
     // If requested amount > stake, send their entire stake.
-    function unstake(uint _LQTYamount) external override {
+    function unstake(uint _MSICamount) external override {
         uint currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
-        // Grab any accumulated ETH and LUSD gains from the current stake
+        // Grab any accumulated ETH and MoUSD gains from the current stake
         uint ETHGain = _getPendingETHGain(msg.sender);
-        uint LUSDGain = _getPendingLUSDGain(msg.sender);
+        uint MoUSDGain = _getPendingMoUSDGain(msg.sender);
         
         _updateUserSnapshots(msg.sender);
 
-        if (_LQTYamount > 0) {
-            uint LQTYToWithdraw = LiquityMath._min(_LQTYamount, currentStake);
+        if (_MSICamount > 0) {
+            uint MSICToWithdraw = MosaicMath._min(_MSICamount, currentStake);
 
-            uint newStake = currentStake.sub(LQTYToWithdraw);
+            uint newStake = currentStake.sub(MSICToWithdraw);
 
-            // Decrease user's stake and total LQTY staked
+            // Decrease user's stake and total MSIC staked
             stakes[msg.sender] = newStake;
-            totalLQTYStaked = totalLQTYStaked.sub(LQTYToWithdraw);
-            emit TotalLQTYStakedUpdated(totalLQTYStaked);
+            totalMSICStaked = totalMSICStaked.sub(MSICToWithdraw);
+            emit TotalMSICStakedUpdated(totalMSICStaked);
 
-            // Transfer unstaked LQTY to user
-            lqtyToken.transfer(msg.sender, LQTYToWithdraw);
+            // Transfer unstaked MSIC to user
+            msicToken.transfer(msg.sender, MSICToWithdraw);
 
             emit StakeChanged(msg.sender, newStake);
         }
 
-        emit StakingGainsWithdrawn(msg.sender, LUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
 
-        // Send accumulated LUSD and ETH gains to the caller
-        lusdToken.transfer(msg.sender, LUSDGain);
+        // Send accumulated MoUSD and ETH gains to the caller
+        msicToken.transfer(msg.sender, MoUSDGain);
         _sendETHGainToUser(ETHGain);
     }
 
-    // --- Reward-per-unit-staked increase functions. Called by Liquity core contracts ---
+    // --- Reward-per-unit-staked increase functions. Called by Mosaic core contracts ---
 
     function increaseF_ETH(uint _ETHFee) external override {
         _requireCallerIsTroveManager();
-        uint ETHFeePerLQTYStaked;
+        uint ETHFeePerMSICStaked;
      
-        if (totalLQTYStaked > 0) {ETHFeePerLQTYStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalLQTYStaked);}
+        if (totalMSICStaked > 0) {ETHFeePerMSICStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
 
-        F_ETH = F_ETH.add(ETHFeePerLQTYStaked); 
+        F_ETH = F_ETH.add(ETHFeePerMSICStaked); 
         emit F_ETHUpdated(F_ETH);
     }
 
-    function increaseF_LUSD(uint _LUSDFee) external override {
+    function increaseF_MoUSD(uint _MoUSDFee) external override {
         _requireCallerIsBorrowerOperations();
-        uint LUSDFeePerLQTYStaked;
+        uint MoUSDFeePerMSICStaked;
         
-        if (totalLQTYStaked > 0) {LUSDFeePerLQTYStaked = _LUSDFee.mul(DECIMAL_PRECISION).div(totalLQTYStaked);}
+        if (totalMSICStaked > 0) {MoUSDFeePerMSICStaked = _MoUSDFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
         
-        F_LUSD = F_LUSD.add(LUSDFeePerLQTYStaked);
-        emit F_LUSDUpdated(F_LUSD);
+        F_MoUSD = F_MoUSD.add(MoUSDFeePerMSICStaked);
+        emit F_MoUSDUpdated(F_MoUSD);
     }
 
     // --- Pending reward functions ---
@@ -195,50 +195,50 @@ contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
         return ETHGain;
     }
 
-    function getPendingLUSDGain(address _user) external view override returns (uint) {
-        return _getPendingLUSDGain(_user);
+    function getPendingMoUSDGain(address _user) external view override returns (uint) {
+        return _getPendingMoUSDGain(_user);
     }
 
-    function _getPendingLUSDGain(address _user) internal view returns (uint) {
-        uint F_LUSD_Snapshot = snapshots[_user].F_LUSD_Snapshot;
-        uint LUSDGain = stakes[_user].mul(F_LUSD.sub(F_LUSD_Snapshot)).div(DECIMAL_PRECISION);
-        return LUSDGain;
+    function _getPendingMoUSDGain(address _user) internal view returns (uint) {
+        uint F_MoUSD_Snapshot = snapshots[_user].F_MoUSD_Snapshot;
+        uint MoUSDGain = stakes[_user].mul(F_MoUSD.sub(F_MoUSD_Snapshot)).div(DECIMAL_PRECISION);
+        return MoUSDGain;
     }
 
     // --- Internal helper functions ---
 
     function _updateUserSnapshots(address _user) internal {
         snapshots[_user].F_ETH_Snapshot = F_ETH;
-        snapshots[_user].F_LUSD_Snapshot = F_LUSD;
-        emit StakerSnapshotsUpdated(_user, F_ETH, F_LUSD);
+        snapshots[_user].F_MoUSD_Snapshot = F_MoUSD;
+        emit StakerSnapshotsUpdated(_user, F_ETH, F_MoUSD);
     }
 
     function _sendETHGainToUser(uint ETHGain) internal {
         emit EtherSent(msg.sender, ETHGain);
         (bool success, ) = msg.sender.call{value: ETHGain}("");
-        require(success, "LQTYStaking: Failed to send accumulated ETHGain");
+        require(success, "MSICStaking: Failed to send accumulated ETHGain");
     }
 
     // --- 'require' functions ---
 
     function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == troveManagerAddress, "LQTYStaking: caller is not TroveM");
+        require(msg.sender == troveManagerAddress, "MSICStaking: caller is not TroveM");
     }
 
     function _requireCallerIsBorrowerOperations() internal view {
-        require(msg.sender == borrowerOperationsAddress, "LQTYStaking: caller is not BorrowerOps");
+        require(msg.sender == borrowerOperationsAddress, "MSICStaking: caller is not BorrowerOps");
     }
 
      function _requireCallerIsActivePool() internal view {
-        require(msg.sender == activePoolAddress, "LQTYStaking: caller is not ActivePool");
+        require(msg.sender == activePoolAddress, "MSICStaking: caller is not ActivePool");
     }
 
     function _requireUserHasStake(uint currentStake) internal pure {  
-        require(currentStake > 0, 'LQTYStaking: User must have a non-zero stake');  
+        require(currentStake > 0, 'MSICStaking: User must have a non-zero stake');  
     }
 
     function _requireNonZeroAmount(uint _amount) internal pure {
-        require(_amount > 0, 'LQTYStaking: Amount must be non-zero');
+        require(_amount > 0, 'MSICStaking: Amount must be non-zero');
     }
 
     receive() external payable {

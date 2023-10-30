@@ -2681,7 +2681,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@liquity/chicken-bonds@file:packages/dev-frontend/.yalc/@liquity/chicken-bonds":
+"@mosaic/chicken-bonds@file:packages/dev-frontend/.yalc/@mosaic/chicken-bonds":
   version "0.0.1"
 
 "@mdx-js/react@^1.6.22":

@@ -3,10 +3,10 @@ import { Flex, Container } from "theme-ui";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, Difference, Trove } from "@liquity/lib-base";
-import { LiquityStoreProvider } from "@liquity/lib-react";
+import { Decimal, Difference, Trove } from "@mosaic/lib-base";
+import { MosaicStoreProvider } from "@mosaic/lib-react";
 
-import { useLiquity } from "./hooks/LiquityContext";
+import { useMosaic } from "./hooks/MosaicContext";
 import { TransactionMonitor } from "./components/Transaction";
 import { UserAccount } from "./components/UserAccount";
 import { SystemStatsPopup } from "./components/SystemStatsPopup";
@@ -22,17 +22,17 @@ import { StakingViewProvider } from "./components/Staking/context/StakingViewPro
 import "tippy.js/dist/tippy.css"; // Tooltip default style
 import { BondsProvider } from "./components/Bonds/context/BondsProvider";
 
-type LiquityFrontendProps = {
+type MosaicFrontendProps = {
   loader?: React.ReactNode;
 };
-export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
-  const { account, provider, liquity } = useLiquity();
+export const MosaicFrontend: React.FC<MosaicFrontendProps> = ({ loader }) => {
+  const { account, provider, mosaic } = useMosaic();
 
   // For console tinkering ;-)
   Object.assign(window, {
     account,
     provider,
-    liquity,
+    mosaic,
     Trove,
     Decimal,
     Difference,
@@ -40,7 +40,7 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
   });
 
   return (
-    <LiquityStoreProvider {...{ loader }} store={liquity.store}>
+    <MosaicStoreProvider {...{ loader }} store={mosaic.store}>
       <Router>
         <TroveViewProvider>
           <StabilityViewProvider>
@@ -80,6 +80,6 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
         </TroveViewProvider>
       </Router>
       <TransactionMonitor />
-    </LiquityStoreProvider>
+    </MosaicStoreProvider>
   );
 };

@@ -1,11 +1,11 @@
 import React from "react";
 import { Text, Flex, Box, Heading, Button } from "theme-ui";
 
-import { Decimal, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { COIN, GT } from "../strings";
-import { useLiquity } from "../hooks/LiquityContext";
+import { useMosaic } from "../hooks/MosaicContext";
 import { shortenAddress } from "../utils/shortenAddress";
 
 import { Icon } from "./Icon";
@@ -13,19 +13,19 @@ import { useBondView } from "./Bonds/context/BondViewContext";
 import { useBondAddresses } from "./Bonds/context/BondAddressesContext";
 import { ConnectKitButton } from "connectkit";
 
-const select = ({ accountBalance, lusdBalance, lqtyBalance }: LiquityStoreState) => ({
+const select = ({ accountBalance, msicBalance, msicBalance }: MosaicStoreState) => ({
   accountBalance,
-  lusdBalance,
-  lqtyBalance
+  msicBalance,
+  msicBalance
 });
 
 export const UserAccount: React.FC = () => {
-  const { account } = useLiquity();
-  const { accountBalance, lusdBalance: realLusdBalance, lqtyBalance } = useLiquitySelector(select);
-  const { bLusdBalance, lusdBalance: customLusdBalance } = useBondView();
-  const { LUSD_OVERRIDE_ADDRESS } = useBondAddresses();
+  const { account } = useMosaic();
+  const { accountBalance, msicBalance: realMousdBalance, msicBalance } = useMosaicSelector(select);
+  const { bMousdBalance, msicBalance: customMousdBalance } = useBondView();
+  const { MoUSD_OVERRIDE_ADDRESS } = useBondAddresses();
 
-  const lusdBalance = LUSD_OVERRIDE_ADDRESS === null ? realLusdBalance : customLusdBalance;
+  const msicBalance = MoUSD_OVERRIDE_ADDRESS === null ? realMousdBalance : customMousdBalance;
 
   return (
     <Flex>
@@ -54,9 +54,9 @@ export const UserAccount: React.FC = () => {
 
         {([
           ["ETH", accountBalance],
-          [COIN, Decimal.from(lusdBalance || 0)],
-          [GT, Decimal.from(lqtyBalance)],
-          ["bLUSD", Decimal.from(bLusdBalance || 0)]
+          [COIN, Decimal.from(msicBalance || 0)],
+          [GT, Decimal.from(msicBalance)],
+          ["bMoUSD", Decimal.from(bMousdBalance || 0)]
         ] as const).map(([currency, balance], i) => (
           <Flex key={i} sx={{ ml: 3, flexDirection: "column" }}>
             <Heading sx={{ fontSize: 1 }}>{currency}</Heading>

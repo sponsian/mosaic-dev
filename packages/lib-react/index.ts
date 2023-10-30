@@ -1,5 +1,5 @@
-export * from "./src/components/LiquityStoreProvider";
+export * from "./src/components/MosaicStoreProvider";
 
-export * from "./src/hooks/useLiquityStore";
-export * from "./src/hooks/useLiquityReducer";
-export * from "./src/hooks/useLiquitySelector";
+export * from "./src/hooks/useMosaicStore";
+export * from "./src/hooks/useMosaicReducer";
+export * from "./src/hooks/useMosaicSelector";

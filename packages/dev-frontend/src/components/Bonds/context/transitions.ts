@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 type Idle = "IDLE";
 type Creating = "CREATING";
@@ -90,10 +90,10 @@ export const transitions: BondEventTransitions = {
   }
 };
 
-export enum BLusdAmmTokenIndex {
-  BLUSD,
-  LUSD,
-  BLUSD_LUSD_LP
+export enum BMousdAmmTokenIndex {
+  BMoUSD,
+  MoUSD,
+  BMoUSD_MoUSD_LP
 }
 
 export type CreateBondPayload = { deposit: Decimal };
@@ -101,7 +101,7 @@ export type CreateBondPayload = { deposit: Decimal };
 export type SelectBondPayload = { bondId: string };
 
 export type SwapPressedPayload = {
-  inputToken: BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.LUSD;
+  inputToken: BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD;
 };
 
 export type SwapPayload = {
@@ -112,24 +112,24 @@ export type SwapPayload = {
 export type Address = string | null;
 
 export type Addresses = {
-  BLUSD_AMM_ADDRESS: Address;
-  BLUSD_AMM_STAKING_ADDRESS: Address;
-  BLUSD_TOKEN_ADDRESS: Address;
+  BMoUSD_AMM_ADDRESS: Address;
+  BMoUSD_AMM_STAKING_ADDRESS: Address;
+  BMoUSD_TOKEN_ADDRESS: Address;
   BOND_NFT_ADDRESS: Address;
   CHICKEN_BOND_MANAGER_ADDRESS: Address;
-  LUSD_OVERRIDE_ADDRESS: Address;
-  BLUSD_LP_ZAP_ADDRESS: Address;
+  MoUSD_OVERRIDE_ADDRESS: Address;
+  BMoUSD_LP_ZAP_ADDRESS: Address;
 };
 
 // This payload is only dispatched by "Manage liquidity"
 export type ApprovePressedPayload = {
-  tokensNeedingApproval: Map<BLusdAmmTokenIndex, Address>;
+  tokensNeedingApproval: Map<BMousdAmmTokenIndex, Address>;
 };
 
 export type AddLiquidityPayload = {
   action: "addLiquidity";
-  bLusdAmount: Decimal;
-  lusdAmount: Decimal;
+  bMousdAmount: Decimal;
+  msicAmount: Decimal;
   minLpTokens: Decimal;
   shouldStakeInGauge: boolean;
 };
@@ -137,14 +137,14 @@ export type AddLiquidityPayload = {
 export type RemoveLiquidityPayload = {
   action: "removeLiquidity";
   burnLpTokens: Decimal;
-  minBLusdAmount: Decimal;
-  minLusdAmount: Decimal;
+  minBMousdAmount: Decimal;
+  minMousdAmount: Decimal;
 };
 
 export type RemoveLiquidityOneCoinPayload = {
   action: "removeLiquidityOneCoin";
   burnLpTokens: Decimal;
-  output: BLusdAmmTokenIndex;
+  output: BMousdAmmTokenIndex;
   minAmount: Decimal;
 };
 
@@ -221,7 +221,7 @@ export type Stats = {
 
 export type ProtocolInfo = {
   treasury: Treasury;
-  bLusdSupply: Decimal;
+  bMousdSupply: Decimal;
   marketPrice: Decimal;
   fairPrice: { lower: Decimal; upper: Decimal };
   floorPrice: Decimal;
@@ -235,8 +235,8 @@ export type ProtocolInfo = {
   breakEvenPeriodInDays: Decimal;
   rebondPeriodInDays: Decimal;
   yieldAmplification?: Decimal;
-  bLusdApr?: Decimal;
-  bLusdLpApr?: Decimal;
+  bMousdApr?: Decimal;
+  bMousdLpApr?: Decimal;
   controllerTargetAge: Decimal;
   averageBondAge: Decimal;
   floorPriceWithoutPendingHarvests: Decimal;
@@ -259,4 +259,4 @@ export type BondTransactionStatuses = Record<BondTransaction, TransactionStatus>
 
 export type Maybe<T> = T | undefined;
 
-export type BLusdLpRewards = Array<{ name: string; address: string; amount: Decimal }>;
+export type BMousdLpRewards = Array<{ name: string; address: string; amount: Decimal }>;

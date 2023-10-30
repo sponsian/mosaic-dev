@@ -87,11 +87,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         }
       ],
-      "name": "LQTYStakingAddressChanged",
+      "name": "MSICStakingAddressChanged",
       "type": "event"
     },
     {
@@ -100,11 +100,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_msicTokenAddress",
           "type": "address"
         }
       ],
-      "name": "LQTYTokenAddressChanged",
+      "name": "MSICTokenAddressChanged",
       "type": "event"
     },
     {
@@ -119,7 +119,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_L_LUSDDebt",
+          "name": "_L_MoUSDDebt",
           "type": "uint256"
         }
       ],
@@ -132,11 +132,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newLUSDTokenAddress",
+          "name": "_newMoUSDTokenAddress",
           "type": "address"
         }
       ],
-      "name": "LUSDTokenAddressChanged",
+      "name": "MoUSDTokenAddressChanged",
       "type": "event"
     },
     {
@@ -176,7 +176,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_LUSDGasCompensation",
+          "name": "_MoUSDGasCompensation",
           "type": "uint256"
         }
       ],
@@ -202,13 +202,13 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_attemptedLUSDAmount",
+          "name": "_attemptedMoUSDAmount",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_actualLUSDAmount",
+          "name": "_actualMoUSDAmount",
           "type": "uint256"
         },
         {
@@ -347,7 +347,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_L_LUSDDebt",
+          "name": "_L_MoUSDDebt",
           "type": "uint256"
         }
       ],
@@ -527,7 +527,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "LUSDDebt",
+          "name": "MoUSDDebt",
           "type": "uint256"
         }
       ],
@@ -546,7 +546,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LUSDDebt",
+          "name": "_MoUSDDebt",
           "type": "uint256"
         }
       ],
@@ -633,7 +633,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "pendingLUSDDebtReward",
+          "name": "pendingMoUSDDebtReward",
           "type": "uint256"
         },
         {
@@ -691,7 +691,7 @@
           "type": "address"
         }
       ],
-      "name": "getPendingLUSDDebtReward",
+      "name": "getPendingMoUSDDebtReward",
       "outputs": [
         {
           "internalType": "uint256",
@@ -969,10 +969,10 @@
     },
     {
       "inputs": [],
-      "name": "lqtyStaking",
+      "name": "msicStaking",
       "outputs": [
         {
-          "internalType": "contract ILQTYStaking",
+          "internalType": "contract IMSICStaking",
           "name": "",
           "type": "address"
         }
@@ -982,10 +982,10 @@
     },
     {
       "inputs": [],
-      "name": "lqtyToken",
+      "name": "msicToken",
       "outputs": [
         {
-          "internalType": "contract ILQTYToken",
+          "internalType": "contract IMSICToken",
           "name": "",
           "type": "address"
         }
@@ -995,10 +995,10 @@
     },
     {
       "inputs": [],
-      "name": "lusdToken",
+      "name": "msicToken",
       "outputs": [
         {
-          "internalType": "contract ILUSDToken",
+          "internalType": "contract IMoUSDToken",
           "name": "",
           "type": "address"
         }
@@ -1023,7 +1023,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LUSDAmount",
+          "name": "_MoUSDAmount",
           "type": "uint256"
         },
         {
@@ -1114,7 +1114,7 @@
         },
         {
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_msicTokenAddress",
           "type": "address"
         },
         {
@@ -1124,12 +1124,12 @@
         },
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_msicTokenAddress",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         }
       ],

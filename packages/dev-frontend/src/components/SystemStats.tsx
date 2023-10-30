@@ -1,35 +1,35 @@
 import React from "react";
 import { Card, Heading, Link, Box, Text } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
-import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, Percent, MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
-import { useLiquity } from "../hooks/LiquityContext";
+import { useMosaic } from "../hooks/MosaicContext";
 import { Statistic } from "./Statistic";
 import * as l from "../lexicon";
 
-const selectBalances = ({ accountBalance, lusdBalance, lqtyBalance }: LiquityStoreState) => ({
+const selectBalances = ({ accountBalance, msicBalance, msicBalance }: MosaicStoreState) => ({
   accountBalance,
-  lusdBalance,
-  lqtyBalance
+  msicBalance,
+  msicBalance
 });
 
 const Balances: React.FC = () => {
-  const { accountBalance, lusdBalance, lqtyBalance } = useLiquitySelector(selectBalances);
+  const { accountBalance, msicBalance, msicBalance } = useMosaicSelector(selectBalances);
 
   return (
     <Box sx={{ mb: 3 }}>
       <Heading>My Account Balances</Heading>
       <Statistic lexicon={l.ETH}>{accountBalance.prettify(4)}</Statistic>
-      <Statistic lexicon={l.LUSD}>{lusdBalance.prettify()}</Statistic>
-      <Statistic lexicon={l.LQTY}>{lqtyBalance.prettify()}</Statistic>
+      <Statistic lexicon={l.MoUSD}>{msicBalance.prettify()}</Statistic>
+      <Statistic lexicon={l.MSIC}>{msicBalance.prettify()}</Statistic>
     </Box>
   );
 };
 
 const GitHubCommit: React.FC<{ children?: string }> = ({ children }) =>
   children?.match(/[0-9a-f]{40}/) ? (
-    <Link href={`https://github.com/liquity/dev/commit/${children}`}>{children.substr(0, 7)}</Link>
+    <Link href={`https://github.com/mosaic/dev/commit/${children}`}>{children.substr(0, 7)}</Link>
   ) : (
     <>unknown</>
   );
@@ -43,41 +43,41 @@ const select = ({
   numberOfTroves,
   price,
   total,
-  lusdInStabilityPool,
+  msicInStabilityPool,
   borrowingRate,
   redemptionRate,
-  totalStakedLQTY,
+  totalStakedMSIC,
   frontend
-}: LiquityStoreState) => ({
+}: MosaicStoreState) => ({
   numberOfTroves,
   price,
   total,
-  lusdInStabilityPool,
+  msicInStabilityPool,
   borrowingRate,
   redemptionRate,
-  totalStakedLQTY,
+  totalStakedMSIC,
   kickbackRate: frontend.status === "registered" ? frontend.kickbackRate : null
 });
 
 export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", showBalances }) => {
   const {
-    liquity: {
+    mosaic: {
       connection: { version: contractsVersion, deploymentDate, frontendTag }
     }
-  } = useLiquity();
+  } = useMosaic();
 
   const {
     numberOfTroves,
     price,
-    lusdInStabilityPool,
+    msicInStabilityPool,
     total,
     borrowingRate,
-    totalStakedLQTY,
+    totalStakedMSIC,
     kickbackRate
-  } = useLiquitySelector(select);
+  } = useMosaicSelector(select);
 
-  const lusdInStabilityPoolPct =
-    total.debt.nonZero && new Percent(lusdInStabilityPool.div(total.debt));
+  const msicInStabilityPoolPct =
+    total.debt.nonZero && new Percent(msicInStabilityPool.div(total.debt));
   const totalCollateralRatioPct = new Percent(total.collateralRatio(price));
   const borrowingFeePct = new Percent(borrowingRate);
   const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
@@ -86,7 +86,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     <Card {...{ variant }}>
       {showBalances && <Balances />}
 
-      <Heading>Liquity statistics</Heading>
+      <Heading>Mosaic statistics</Heading>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
         Protocol
@@ -101,14 +101,14 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
         </Text>
       </Statistic>
       <Statistic lexicon={l.TROVES}>{Decimal.from(numberOfTroves).prettify(0)}</Statistic>
-      <Statistic lexicon={l.LUSD_SUPPLY}>{total.debt.shorten()}</Statistic>
-      {lusdInStabilityPoolPct && (
-        <Statistic lexicon={l.STABILITY_POOL_LUSD}>
-          {lusdInStabilityPool.shorten()}
-          <Text sx={{ fontSize: 1 }}>&nbsp;({lusdInStabilityPoolPct.toString(1)})</Text>
+      <Statistic lexicon={l.MoUSD_SUPPLY}>{total.debt.shorten()}</Statistic>
+      {msicInStabilityPoolPct && (
+        <Statistic lexicon={l.STABILITY_POOL_MoUSD}>
+          {msicInStabilityPool.shorten()}
+          <Text sx={{ fontSize: 1 }}>&nbsp;({msicInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}
-      <Statistic lexicon={l.STAKED_LQTY}>{totalStakedLQTY.shorten()}</Statistic>
+      <Statistic lexicon={l.STAKED_MSIC}>{totalStakedMSIC.shorten()}</Statistic>
       <Statistic lexicon={l.TCR}>{totalCollateralRatioPct.prettify()}</Statistic>
       <Statistic lexicon={l.RECOVERY_MODE}>
         {total.collateralRatioIsBelowCritical(price) ? <Box color="danger">Yes</Box> : "No"}

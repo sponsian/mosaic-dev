@@ -4,8 +4,8 @@ import { mainnet, goerli, localhost } from "wagmi/chains";
 import { ConnectKitProvider, getDefaultClient } from "connectkit";
 import { Flex, Heading, ThemeProvider, Paragraph, Link } from "theme-ui";
 
-// import { BatchedWebSocketAugmentedWeb3Provider } from "@liquity/providers";
-import { LiquityProvider } from "./hooks/LiquityContext";
+// import { BatchedWebSocketAugmentedWeb3Provider } from "@mosaic/providers";
+import { MosaicProvider } from "./hooks/MosaicContext";
 import { WalletConnector } from "./components/WalletConnector";
 import { TransactionProvider } from "./components/Transaction";
 import { Icon } from "./components/Icon";
@@ -13,7 +13,7 @@ import { getConfig } from "./config";
 import theme from "./theme";
 
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
-import { LiquityFrontend } from "./LiquityFrontend";
+import { MosaicFrontend } from "./MosaicFrontend";
 import { AppLoader } from "./components/AppLoader";
 import { useAsyncValue } from "./hooks/AsyncValue";
 
@@ -52,8 +52,8 @@ const UnsupportedMainnetFallback: React.FC = () => (
     <Paragraph sx={{ mb: 3 }}>Please change your network to Görli.</Paragraph>
 
     <Paragraph>
-      If you'd like to use the Liquity Protocol on mainnet, please pick a frontend{" "}
-      <Link href="https://www.liquity.org/frontend">
+      If you'd like to use the Mosaic Protocol on mainnet, please pick a frontend{" "}
+      <Link href="https://www.mosaic.org/frontend">
         here <Icon name="external-link-alt" size="xs" />
       </Link>
       .
@@ -72,7 +72,7 @@ const UnsupportedNetworkFallback: React.FC = () => (
     }}
   >
     <Heading sx={{ mb: 3 }}>
-      <Icon name="exclamation-triangle" /> Liquity is not supported on this network.
+      <Icon name="exclamation-triangle" /> Mosaic is not supported on this network.
     </Heading>
     Please switch to mainnet or Görli.
   </Flex>
@@ -88,7 +88,7 @@ const App = () => {
         <WagmiConfig
           client={createClient(
             getDefaultClient({
-              appName: "Liquity",
+              appName: "Mosaic",
               chains:
                 isDemoMode || import.meta.env.MODE === "test"
                   ? [localhost]
@@ -103,15 +103,15 @@ const App = () => {
         >
           <ConnectKitProvider options={{ hideBalance: true }}>
             <WalletConnector loader={loader}>
-              <LiquityProvider
+              <MosaicProvider
                 loader={loader}
                 unsupportedNetworkFallback={<UnsupportedNetworkFallback />}
                 unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
               >
                 <TransactionProvider>
-                  <LiquityFrontend loader={loader} />
+                  <MosaicFrontend loader={loader} />
                 </TransactionProvider>
-              </LiquityProvider>
+              </MosaicProvider>
             </WalletConnector>
           </ConnectKitProvider>
         </WagmiConfig>

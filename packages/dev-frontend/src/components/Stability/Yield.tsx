@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Card, Paragraph, Text } from "theme-ui";
-import { Decimal, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 import { InfoIcon } from "../InfoIcon";
 import { Badge } from "../Badge";
-import { fetchLqtyPrice } from "./context/fetchLqtyPrice";
+import { fetchMsicPrice } from "./context/fetchMsicPrice";
 
-const selector = ({ lusdInStabilityPool, remainingStabilityPoolLQTYReward }: LiquityStoreState) => ({
-  lusdInStabilityPool,
-  remainingStabilityPoolLQTYReward
+const selector = ({ msicInStabilityPool, remainingStabilityPoolMSICReward }: MosaicStoreState) => ({
+  msicInStabilityPool,
+  remainingStabilityPoolMSICReward
 });
 
 const yearlyIssuanceFraction = 0.5;
@@ -16,50 +16,50 @@ const dailyIssuanceFraction = Decimal.from(1 - yearlyIssuanceFraction ** (1 / 36
 const dailyIssuancePercentage = dailyIssuanceFraction.mul(100);
 
 export const Yield: React.FC = () => {
-  const { lusdInStabilityPool, remainingStabilityPoolLQTYReward } = useLiquitySelector(selector);
+  const { msicInStabilityPool, remainingStabilityPoolMSICReward } = useMosaicSelector(selector);
 
-  const [lqtyPrice, setLqtyPrice] = useState<Decimal | undefined>(undefined);
-  const hasZeroValue = remainingStabilityPoolLQTYReward.isZero || lusdInStabilityPool.isZero;
+  const [msicPrice, setMsicPrice] = useState<Decimal | undefined>(undefined);
+  const hasZeroValue = remainingStabilityPoolMSICReward.isZero || msicInStabilityPool.isZero;
 
   useEffect(() => {
     (async () => {
       try {
-        const { lqtyPriceUSD } = await fetchLqtyPrice();
-        setLqtyPrice(lqtyPriceUSD);
+        const { msicPriceUSD } = await fetchMsicPrice();
+        setMsicPrice(msicPriceUSD);
       } catch (error) {
         console.error(error);
       }
     })();
   }, []);
 
-  if (hasZeroValue || lqtyPrice === undefined) return null;
+  if (hasZeroValue || msicPrice === undefined) return null;
 
-  const lqtyIssuanceOneDay = remainingStabilityPoolLQTYReward.mul(dailyIssuanceFraction);
-  const lqtyIssuanceOneDayInUSD = lqtyIssuanceOneDay.mul(lqtyPrice);
-  const aprPercentage = lqtyIssuanceOneDayInUSD.mulDiv(365 * 100, lusdInStabilityPool);
-  const remainingLqtyInUSD = remainingStabilityPoolLQTYReward.mul(lqtyPrice);
+  const msicIssuanceOneDay = remainingStabilityPoolMSICReward.mul(dailyIssuanceFraction);
+  const msicIssuanceOneDayInUSD = msicIssuanceOneDay.mul(msicPrice);
+  const aprPercentage = msicIssuanceOneDayInUSD.mulDiv(365 * 100, msicInStabilityPool);
+  const remainingMsicInUSD = remainingStabilityPoolMSICReward.mul(msicPrice);
 
   if (aprPercentage.isZero) return null;
 
   return (
     <Badge>
-      <Text>LQTY APR {aprPercentage.toString(2)}%</Text>
+      <Text>MSIC APR {aprPercentage.toString(2)}%</Text>
       <InfoIcon
         tooltip={
           <Card variant="tooltip" sx={{ width: ["220px", "518px"] }}>
             <Paragraph>
-              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the LQTY return on the LUSD
+              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the MSIC return on the MoUSD
               deposited to the Stability Pool over the next year, not including your ETH gains from
               liquidations.
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace", mt: 2 }}>
-              ($LQTY_REWARDS * DAILY_ISSUANCE% / DEPOSITED_LUSD) * 365 * 100 ={" "}
+              ($MSIC_REWARDS * DAILY_ISSUANCE% / DEPOSITED_MoUSD) * 365 * 100 ={" "}
               <Text sx={{ fontWeight: "bold" }}> APR</Text>
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace" }}>
               ($
-              {remainingLqtyInUSD.shorten()} * {dailyIssuancePercentage.toString(4)}% / $
-              {lusdInStabilityPool.shorten()}) * 365 * 100 =
+              {remainingMsicInUSD.shorten()} * {dailyIssuancePercentage.toString(4)}% / $
+              {msicInStabilityPool.shorten()}) * 365 * 100 =
               <Text sx={{ fontWeight: "bold" }}> {aprPercentage.toString(2)}%</Text>
             </Paragraph>
           </Card>

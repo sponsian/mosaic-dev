@@ -1,13 +1,13 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "LQTYStakingScript",
-  "sourceName": "contracts/Proxy/LQTYStakingScript.sol",
+  "contractName": "MSICStakingScript",
+  "sourceName": "contracts/Proxy/MSICStakingScript.sol",
   "abi": [
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         }
       ],
@@ -18,7 +18,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LQTYamount",
+          "name": "_MSICamount",
           "type": "uint256"
         }
       ],

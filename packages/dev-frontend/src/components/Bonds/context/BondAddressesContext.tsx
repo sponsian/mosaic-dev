@@ -1,18 +1,18 @@
 import { useChainId } from "wagmi";
 import React, { useContext, createContext } from "react";
 
-import mainnet from "@liquity/chicken-bonds/lusd/addresses/mainnet.json";
-import goerli from "@liquity/chicken-bonds/lusd/addresses/goerli.json";
+import mainnet from "@mosaic/chicken-bonds/msic/addresses/mainnet.json";
+import goerli from "@mosaic/chicken-bonds/msic/addresses/goerli.json";
 import { Addresses } from "./transitions";
 
 const nullAddresses: Addresses = {
-  BLUSD_AMM_ADDRESS: null,
-  BLUSD_AMM_STAKING_ADDRESS: null,
-  BLUSD_TOKEN_ADDRESS: null,
+  BMoUSD_AMM_ADDRESS: null,
+  BMoUSD_AMM_STAKING_ADDRESS: null,
+  BMoUSD_TOKEN_ADDRESS: null,
   BOND_NFT_ADDRESS: null,
   CHICKEN_BOND_MANAGER_ADDRESS: null,
-  LUSD_OVERRIDE_ADDRESS: null,
-  BLUSD_LP_ZAP_ADDRESS: null
+  MoUSD_OVERRIDE_ADDRESS: null,
+  BMoUSD_LP_ZAP_ADDRESS: null
 };
 
 export const chainIdAddressesMap: Partial<Record<number, Addresses>> = {

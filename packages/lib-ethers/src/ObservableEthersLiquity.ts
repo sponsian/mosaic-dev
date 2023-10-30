@@ -3,14 +3,14 @@ import { Event } from "@ethersproject/contracts";
 
 import {
   Decimal,
-  ObservableLiquity,
+  ObservableMosaic,
   StabilityDeposit,
   Trove,
   TroveWithPendingRedistribution
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
-import { _getContracts, _requireAddress } from "./EthersLiquityConnection";
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
+import { _getContracts, _requireAddress } from "./EthersMosaicConnection";
+import { ReadableEthersMosaic } from "./ReadableEthersMosaic";
 
 const debouncingDelayMs = 50;
 
@@ -37,10 +37,10 @@ const debounce = (listener: (latestBlock: number) => void) => {
 };
 
 /** @alpha */
-export class ObservableEthersLiquity implements ObservableLiquity {
-  private readonly _readable: ReadableEthersLiquity;
+export class ObservableEthersMosaic implements ObservableMosaic {
+  private readonly _readable: ReadableEthersMosaic;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersMosaic) {
     this._readable = readable;
   }
 
@@ -164,46 +164,46 @@ export class ObservableEthersLiquity implements ObservableLiquity {
     };
   }
 
-  watchLUSDInStabilityPool(
-    onLUSDInStabilityPoolChanged: (lusdInStabilityPool: Decimal) => void
+  watchMoUSDInStabilityPool(
+    onMoUSDInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
   ): () => void {
-    const { lusdToken, stabilityPool } = _getContracts(this._readable.connection);
-    const { Transfer } = lusdToken.filters;
+    const { msicToken, stabilityPool } = _getContracts(this._readable.connection);
+    const { Transfer } = msicToken.filters;
 
-    const transferLUSDFromStabilityPool = Transfer(stabilityPool.address);
-    const transferLUSDToStabilityPool = Transfer(null, stabilityPool.address);
+    const transferMoUSDFromStabilityPool = Transfer(stabilityPool.address);
+    const transferMoUSDToStabilityPool = Transfer(null, stabilityPool.address);
 
-    const stabilityPoolLUSDFilters = [transferLUSDFromStabilityPool, transferLUSDToStabilityPool];
+    const stabilityPoolMoUSDFilters = [transferMoUSDFromStabilityPool, transferMoUSDToStabilityPool];
 
-    const stabilityPoolLUSDListener = debounce((blockTag: number) => {
-      this._readable.getLUSDInStabilityPool({ blockTag }).then(onLUSDInStabilityPoolChanged);
+    const stabilityPoolMoUSDListener = debounce((blockTag: number) => {
+      this._readable.getMoUSDInStabilityPool({ blockTag }).then(onMoUSDInStabilityPoolChanged);
     });
 
-    stabilityPoolLUSDFilters.forEach(filter => lusdToken.on(filter, stabilityPoolLUSDListener));
+    stabilityPoolMoUSDFilters.forEach(filter => msicToken.on(filter, stabilityPoolMoUSDListener));
 
     return () =>
-      stabilityPoolLUSDFilters.forEach(filter =>
-        lusdToken.removeListener(filter, stabilityPoolLUSDListener)
+      stabilityPoolMoUSDFilters.forEach(filter =>
+        msicToken.removeListener(filter, stabilityPoolMoUSDListener)
       );
   }
 
-  watchLUSDBalance(onLUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
+  watchMoUSDBalance(onMoUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
     address ??= _requireAddress(this._readable.connection);
 
-    const { lusdToken } = _getContracts(this._readable.connection);
-    const { Transfer } = lusdToken.filters;
-    const transferLUSDFromUser = Transfer(address);
-    const transferLUSDToUser = Transfer(null, address);
+    const { msicToken } = _getContracts(this._readable.connection);
+    const { Transfer } = msicToken.filters;
+    const transferMoUSDFromUser = Transfer(address);
+    const transferMoUSDToUser = Transfer(null, address);
 
-    const lusdTransferFilters = [transferLUSDFromUser, transferLUSDToUser];
+    const msicTransferFilters = [transferMoUSDFromUser, transferMoUSDToUser];
 
-    const lusdTransferListener = debounce((blockTag: number) => {
-      this._readable.getLUSDBalance(address, { blockTag }).then(onLUSDBalanceChanged);
+    const msicTransferListener = debounce((blockTag: number) => {
+      this._readable.getMoUSDBalance(address, { blockTag }).then(onMoUSDBalanceChanged);
     });
 
-    lusdTransferFilters.forEach(filter => lusdToken.on(filter, lusdTransferListener));
+    msicTransferFilters.forEach(filter => msicToken.on(filter, msicTransferListener));
 
     return () =>
-      lusdTransferFilters.forEach(filter => lusdToken.removeListener(filter, lusdTransferListener));
+      msicTransferFilters.forEach(filter => msicToken.removeListener(filter, msicTransferListener));
   }
 }

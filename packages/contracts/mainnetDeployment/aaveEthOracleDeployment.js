@@ -21,10 +21,10 @@ async function main() {
   const deployerWalletAddress = deployerWallet.address;
   console.log('Deployer: ', deployerWalletAddress);
 
-  const LUSDUsdToLUSDEthEthersFactory = await ethers.getContractFactory("LUSDUsdToLUSDEth", deployerWallet)
-  const lusdUsdToLUSDEth = await LUSDUsdToLUSDEthEthersFactory.deploy()
-  console.log(`LUSDUsdToLUSDEth address: ${lusdUsdToLUSDEth.address}`)
-  console.log(`LUSDUsdToLUSDEth price:   ${await lusdUsdToLUSDEth.latestAnswer()}`)
+  const MoUSDUsdToMoUSDEthEthersFactory = await ethers.getContractFactory("MoUSDUsdToMoUSDEth", deployerWallet)
+  const msicUsdToMoUSDEth = await MoUSDUsdToMoUSDEthEthersFactory.deploy()
+  console.log(`MoUSDUsdToMoUSDEth address: ${msicUsdToMoUSDEth.address}`)
+  console.log(`MoUSDUsdToMoUSDEth price:   ${await msicUsdToMoUSDEth.latestAnswer()}`)
 
 }
 

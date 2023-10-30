@@ -1,6 +1,6 @@
 import { Decimal, Decimalish } from "./Decimal";
 import { TroveAdjustmentParams, TroveCreationParams } from "./Trove";
-import { LiquityReceipt, SendableLiquity, SentLiquityTransaction } from "./SendableLiquity";
+import { MosaicReceipt, SendableMosaic, SentMosaicTransaction } from "./SendableMosaic";
 
 import {
   CollateralGainTransferDetails,
@@ -11,19 +11,19 @@ import {
   TroveAdjustmentDetails,
   TroveClosureDetails,
   TroveCreationDetails
-} from "./TransactableLiquity";
+} from "./TransactableMosaic";
 
 /**
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#PopulatedEthersLiquityTransaction}.
+ * Implemented by {@link @mosaic/lib-ethers#PopulatedEthersMosaicTransaction}.
  *
  * @public
  */
-export interface PopulatedLiquityTransaction<
+export interface PopulatedMosaicTransaction<
   P = unknown,
-  T extends SentLiquityTransaction = SentLiquityTransaction
+  T extends SentMosaicTransaction = SentMosaicTransaction
 > {
   /** Implementation-specific populated transaction object. */
   readonly rawPopulatedTransaction: P;
@@ -31,7 +31,7 @@ export interface PopulatedLiquityTransaction<
   /**
    * Send the transaction.
    *
-   * @returns An object that implements {@link @liquity/lib-base#SentLiquityTransaction}.
+   * @returns An object that implements {@link @mosaic/lib-base#SentMosaicTransaction}.
    */
   send(): Promise<T>;
 }
@@ -40,33 +40,33 @@ export interface PopulatedLiquityTransaction<
  * A redemption transaction that has been prepared for sending.
  *
  * @remarks
- * The Liquity protocol fulfills redemptions by repaying the debt of Troves in ascending order of
+ * The Mosaic protocol fulfills redemptions by repaying the debt of Troves in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
- * {@link @liquity/lib-base#LUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
- * some LUSD amounts are not possible to redeem exactly.
+ * {@link @mosaic/lib-base#MoUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
+ * some MoUSD amounts are not possible to redeem exactly.
  *
- * When {@link @liquity/lib-base#PopulatableLiquity.redeemLUSD | redeemLUSD()} is called with an
- * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableLUSDAmount`
+ * When {@link @mosaic/lib-base#PopulatableMosaic.redeemMoUSD | redeemMoUSD()} is called with an
+ * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMoUSDAmount`
  * property). When this happens, the redeemer can either redeem the truncated amount by sending the
  * transaction unchanged, or prepare a new transaction by
- * {@link @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
+ * {@link @mosaic/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
  * to the next lowest possible value, which is the sum of the truncated amount and
- * {@link @liquity/lib-base#LUSD_MINIMUM_NET_DEBT}.
+ * {@link @mosaic/lib-base#MoUSD_MINIMUM_NET_DEBT}.
  *
  * @public
  */
 export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
-  extends PopulatedLiquityTransaction<
+  extends PopulatedMosaicTransaction<
     P,
-    SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>
+    SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>
   > {
-  /** Amount of LUSD the redeemer is trying to redeem. */
-  readonly attemptedLUSDAmount: Decimal;
+  /** Amount of MoUSD the redeemer is trying to redeem. */
+  readonly attemptedMoUSDAmount: Decimal;
 
-  /** Maximum amount of LUSD that is currently redeemable from `attemptedLUSDAmount`. */
-  readonly redeemableLUSDAmount: Decimal;
+  /** Maximum amount of MoUSD that is currently redeemable from `attemptedMoUSDAmount`. */
+  readonly redeemableMoUSDAmount: Decimal;
 
-  /** Whether `redeemableLUSDAmount` is less than `attemptedLUSDAmount`. */
+  /** Whether `redeemableMoUSDAmount` is less than `attemptedMoUSDAmount`. */
   readonly isTruncated: boolean;
 
   /**
@@ -74,7 +74,7 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
    * value.
    *
    * @param maxRedemptionRate - Maximum acceptable
-   *                            {@link @liquity/lib-base#Fees.redemptionRate | redemption rate} to
+   *                            {@link @mosaic/lib-base#Fees.redemptionRate | redemption rate} to
    *                            use in the new transaction.
    *
    * @remarks
@@ -90,216 +90,216 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
 /** @internal */
 export type _PopulatableFrom<T, P> = {
   [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U>
-    ? U extends SentLiquityTransaction
-      ? (...args: A) => Promise<PopulatedLiquityTransaction<P, U>>
+    ? U extends SentMosaicTransaction
+      ? (...args: A) => Promise<PopulatedMosaicTransaction<P, U>>
       : never
     : never;
 };
 
 /**
- * Prepare Liquity transactions for sending.
+ * Prepare Mosaic transactions for sending.
  *
  * @remarks
- * The functions return an object implementing {@link PopulatedLiquityTransaction}, which can be
- * used to send the transaction and get a {@link SentLiquityTransaction}.
+ * The functions return an object implementing {@link PopulatedMosaicTransaction}, which can be
+ * used to send the transaction and get a {@link SentMosaicTransaction}.
  *
- * Implemented by {@link @liquity/lib-ethers#PopulatableEthersLiquity}.
+ * Implemented by {@link @mosaic/lib-ethers#PopulatableEthersMosaic}.
  *
  * @public
  */
-export interface PopulatableLiquity<R = unknown, S = unknown, P = unknown>
-  extends _PopulatableFrom<SendableLiquity<R, S>, P> {
+export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
+  extends _PopulatableFrom<SendableMosaic<R, S>, P> {
   // Methods re-declared for documentation purposes
 
-  /** {@inheritDoc TransactableLiquity.openTrove} */
+  /** {@inheritDoc TransactableMosaic.openTrove} */
   openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveCreationDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.closeTrove} */
+  /** {@inheritDoc TransactableMosaic.closeTrove} */
   closeTrove(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveClosureDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.adjustTrove} */
+  /** {@inheritDoc TransactableMosaic.adjustTrove} */
   adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.depositCollateral} */
+  /** {@inheritDoc TransactableMosaic.depositCollateral} */
   depositCollateral(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawCollateral} */
+  /** {@inheritDoc TransactableMosaic.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.borrowLUSD} */
-  borrowLUSD(
+  /** {@inheritDoc TransactableMosaic.borrowMoUSD} */
+  borrowMoUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.repayLUSD} */
-  repayLUSD(
+  /** {@inheritDoc TransactableMosaic.repayMoUSD} */
+  repayMoUSD(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
   /** @internal */
   setPrice(
     price: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.liquidate} */
+  /** {@inheritDoc TransactableMosaic.liquidate} */
   liquidate(
     address: string | string[]
   ): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.liquidateUpTo} */
+  /** {@inheritDoc TransactableMosaic.liquidateUpTo} */
   liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number
   ): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.depositLUSDInStabilityPool} */
-  depositLUSDInStabilityPool(
+  /** {@inheritDoc TransactableMosaic.depositMoUSDInStabilityPool} */
+  depositMoUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawLUSDFromStabilityPool} */
-  withdrawLUSDFromStabilityPool(
+  /** {@inheritDoc TransactableMosaic.withdrawMoUSDFromStabilityPool} */
+  withdrawMoUSDFromStabilityPool(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc TransactableMosaic.withdrawGainsFromStabilityPool} */
   withdrawGainsFromStabilityPool(): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc TransactableMosaic.transferCollateralGainToTrove} */
   transferCollateralGainToTrove(): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedMosaicTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>
+      SentMosaicTransaction<S, MosaicReceipt<R, CollateralGainTransferDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.sendLUSD} */
-  sendLUSD(
+  /** {@inheritDoc TransactableMosaic.sendMoUSD} */
+  sendMoUSD(
     toAddress: string,
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.sendLQTY} */
-  sendLQTY(
+  /** {@inheritDoc TransactableMosaic.sendMSIC} */
+  sendMSIC(
     toAddress: string,
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.redeemLUSD} */
-  redeemLUSD(
+  /** {@inheritDoc TransactableMosaic.redeemMoUSD} */
+  redeemMoUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedRedemption<P, S, R>>;
 
-  /** {@inheritDoc TransactableLiquity.claimCollateralSurplus} */
+  /** {@inheritDoc TransactableMosaic.claimCollateralSurplus} */
   claimCollateralSurplus(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.stakeLQTY} */
-  stakeLQTY(
+  /** {@inheritDoc TransactableMosaic.stakeMSIC} */
+  stakeMSIC(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.unstakeLQTY} */
-  unstakeLQTY(
+  /** {@inheritDoc TransactableMosaic.unstakeMSIC} */
+  unstakeMSIC(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStaking} */
+  /** {@inheritDoc TransactableMosaic.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.approveUniTokens} */
+  /** {@inheritDoc TransactableMosaic.approveUniTokens} */
   approveUniTokens(
     allowance?: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.stakeUniTokens} */
+  /** {@inheritDoc TransactableMosaic.stakeUniTokens} */
   stakeUniTokens(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.unstakeUniTokens} */
+  /** {@inheritDoc TransactableMosaic.unstakeUniTokens} */
   unstakeUniTokens(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawLQTYRewardFromLiquidityMining} */
-  withdrawLQTYRewardFromLiquidityMining(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+  /** {@inheritDoc TransactableMosaic.withdrawMSICRewardFromLiquidityMining} */
+  withdrawMSICRewardFromLiquidityMining(): Promise<
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.exitLiquidityMining} */
+  /** {@inheritDoc TransactableMosaic.exitLiquidityMining} */
   exitLiquidityMining(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+    PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.registerFrontend} */
+  /** {@inheritDoc TransactableMosaic.registerFrontend} */
   registerFrontend(
     kickbackRate: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 }

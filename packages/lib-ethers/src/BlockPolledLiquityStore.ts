@@ -3,27 +3,27 @@ import { AddressZero } from "@ethersproject/constants";
 
 import {
   Decimal,
-  LiquityStoreState,
-  LiquityStoreBaseState,
+  MosaicStoreState,
+  MosaicStoreBaseState,
   TroveWithPendingRedistribution,
   StabilityDeposit,
-  LQTYStake,
-  LiquityStore,
+  MSICStake,
+  MosaicStore,
   Fees
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import { decimalify, promiseAllValues } from "./_utils";
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
-import { EthersLiquityConnection, _getProvider } from "./EthersLiquityConnection";
+import { ReadableEthersMosaic } from "./ReadableEthersMosaic";
+import { EthersMosaicConnection, _getProvider } from "./EthersMosaicConnection";
 import { EthersCallOverrides, EthersProvider } from "./types";
 
 /**
- * Extra state added to {@link @liquity/lib-base#LiquityStoreState} by
- * {@link BlockPolledLiquityStore}.
+ * Extra state added to {@link @mosaic/lib-base#MosaicStoreState} by
+ * {@link BlockPolledMosaicStore}.
  *
  * @public
  */
-export interface BlockPolledLiquityStoreExtraState {
+export interface BlockPolledMosaicStoreExtraState {
   /**
    * Number of block that the store state was fetched from.
    *
@@ -42,26 +42,26 @@ export interface BlockPolledLiquityStoreExtraState {
 }
 
 /**
- * The type of {@link BlockPolledLiquityStore}'s
- * {@link @liquity/lib-base#LiquityStore.state | state}.
+ * The type of {@link BlockPolledMosaicStore}'s
+ * {@link @mosaic/lib-base#MosaicStore.state | state}.
  *
  * @public
  */
-export type BlockPolledLiquityStoreState = LiquityStoreState<BlockPolledLiquityStoreExtraState>;
+export type BlockPolledMosaicStoreState = MosaicStoreState<BlockPolledMosaicStoreExtraState>;
 
 /**
- * Ethers-based {@link @liquity/lib-base#LiquityStore} that updates state whenever there's a new
+ * Ethers-based {@link @mosaic/lib-base#MosaicStore} that updates state whenever there's a new
  * block.
  *
  * @public
  */
-export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStoreExtraState> {
-  readonly connection: EthersLiquityConnection;
+export class BlockPolledMosaicStore extends MosaicStore<BlockPolledMosaicStoreExtraState> {
+  readonly connection: EthersMosaicConnection;
 
-  private readonly _readable: ReadableEthersLiquity;
+  private readonly _readable: ReadableEthersMosaic;
   private readonly _provider: EthersProvider;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersMosaic) {
     super();
 
     this.connection = readable.connection;
@@ -86,18 +86,18 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
 
   private async _get(
     blockTag?: number
-  ): Promise<[baseState: LiquityStoreBaseState, extraState: BlockPolledLiquityStoreExtraState]> {
+  ): Promise<[baseState: MosaicStoreBaseState, extraState: BlockPolledMosaicStoreExtraState]> {
     const { userAddress, frontendTag } = this.connection;
 
     const {
       blockTimestamp,
       _feesFactory,
-      calculateRemainingLQTY,
+      calculateRemainingMSIC,
       ...baseState
     } = await promiseAllValues({
       blockTimestamp: this._readable._getBlockTimestamp(blockTag),
       _feesFactory: this._readable._getFeesFactory({ blockTag }),
-      calculateRemainingLQTY: this._readable._getRemainingLiquidityMiningLQTYRewardCalculator({
+      calculateRemainingMSIC: this._readable._getRemainingLiquidityMiningMSICRewardCalculator({
         blockTag
       }),
 
@@ -105,11 +105,11 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       numberOfTroves: this._readable.getNumberOfTroves({ blockTag }),
       totalRedistributed: this._readable.getTotalRedistributed({ blockTag }),
       total: this._readable.getTotal({ blockTag }),
-      lusdInStabilityPool: this._readable.getLUSDInStabilityPool({ blockTag }),
-      totalStakedLQTY: this._readable.getTotalStakedLQTY({ blockTag }),
+      msicInStabilityPool: this._readable.getMoUSDInStabilityPool({ blockTag }),
+      totalStakedMSIC: this._readable.getTotalStakedMSIC({ blockTag }),
       _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
       totalStakedUniTokens: this._readable.getTotalStakedUniTokens({ blockTag }),
-      remainingStabilityPoolLQTYReward: this._readable.getRemainingStabilityPoolLQTYReward({
+      remainingStabilityPoolMSICReward: this._readable.getRemainingStabilityPoolMSICReward({
         blockTag
       }),
 
@@ -120,12 +120,12 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       ...(userAddress
         ? {
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
-            lusdBalance: this._readable.getLUSDBalance(userAddress, { blockTag }),
-            lqtyBalance: this._readable.getLQTYBalance(userAddress, { blockTag }),
+            msicBalance: this._readable.getMoUSDBalance(userAddress, { blockTag }),
+            msicBalance: this._readable.getMSICBalance(userAddress, { blockTag }),
             uniTokenBalance: this._readable.getUniTokenBalance(userAddress, { blockTag }),
             uniTokenAllowance: this._readable.getUniTokenAllowance(userAddress, { blockTag }),
             liquidityMiningStake: this._readable.getLiquidityMiningStake(userAddress, { blockTag }),
-            liquidityMiningLQTYReward: this._readable.getLiquidityMiningLQTYReward(userAddress, {
+            liquidityMiningMSICReward: this._readable.getLiquidityMiningMSICReward(userAddress, {
               blockTag
             }),
             collateralSurplusBalance: this._readable.getCollateralSurplusBalance(userAddress, {
@@ -135,17 +135,17 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
               blockTag
             }),
             stabilityDeposit: this._readable.getStabilityDeposit(userAddress, { blockTag }),
-            lqtyStake: this._readable.getLQTYStake(userAddress, { blockTag }),
+            msicStake: this._readable.getMSICStake(userAddress, { blockTag }),
             ownFrontend: this._readable.getFrontendStatus(userAddress, { blockTag })
           }
         : {
             accountBalance: Decimal.ZERO,
-            lusdBalance: Decimal.ZERO,
-            lqtyBalance: Decimal.ZERO,
+            msicBalance: Decimal.ZERO,
+            msicBalance: Decimal.ZERO,
             uniTokenBalance: Decimal.ZERO,
             uniTokenAllowance: Decimal.ZERO,
             liquidityMiningStake: Decimal.ZERO,
-            liquidityMiningLQTYReward: Decimal.ZERO,
+            liquidityMiningMSICReward: Decimal.ZERO,
             collateralSurplusBalance: Decimal.ZERO,
             troveBeforeRedistribution: new TroveWithPendingRedistribution(
               AddressZero,
@@ -158,7 +158,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
               Decimal.ZERO,
               AddressZero
             ),
-            lqtyStake: new LQTYStake(),
+            msicStake: new MSICStake(),
             ownFrontend: { status: "unregistered" as const }
           })
     });
@@ -167,7 +167,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       {
         ...baseState,
         _feesInNormalMode: _feesFactory(blockTimestamp, false),
-        remainingLiquidityMiningLQTYReward: calculateRemainingLQTY(blockTimestamp)
+        remainingLiquidityMiningMSICReward: calculateRemainingMSIC(blockTimestamp)
       },
       {
         blockTag,
@@ -224,9 +224,9 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
 
   /** @internal @override */
   protected _reduceExtra(
-    oldState: BlockPolledLiquityStoreExtraState,
-    stateUpdate: Partial<BlockPolledLiquityStoreExtraState>
-  ): BlockPolledLiquityStoreExtraState {
+    oldState: BlockPolledMosaicStoreExtraState,
+    stateUpdate: Partial<BlockPolledMosaicStoreExtraState>
+  ): BlockPolledMosaicStoreExtraState {
     return {
       blockTag: stateUpdate.blockTag ?? oldState.blockTag,
       blockTimestamp: stateUpdate.blockTimestamp ?? oldState.blockTimestamp,

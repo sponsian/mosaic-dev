@@ -1,19 +1,19 @@
 import React from "react";
 import { Flex } from "theme-ui";
 
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
-const selector = ({ remainingStabilityPoolLQTYReward }: LiquityStoreState) => ({
-  remainingStabilityPoolLQTYReward
+const selector = ({ remainingStabilityPoolMSICReward }: MosaicStoreState) => ({
+  remainingStabilityPoolMSICReward
 });
 
-export const RemainingLQTY: React.FC = () => {
-  const { remainingStabilityPoolLQTYReward } = useLiquitySelector(selector);
+export const RemainingMSIC: React.FC = () => {
+  const { remainingStabilityPoolMSICReward } = useMosaicSelector(selector);
 
   return (
     <Flex sx={{ mr: 2, fontSize: 2, fontWeight: "medium" }}>
-      {remainingStabilityPoolLQTYReward.prettify(0)} LQTY remaining
+      {remainingStabilityPoolMSICReward.prettify(0)} MSIC remaining
     </Flex>
   );
 };

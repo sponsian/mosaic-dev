@@ -10,9 +10,9 @@ const externalAddrs  = {
   WETH_ERC20: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 }
 
-const liquityAddrs = {
-  GENERAL_SAFE:"0xF06016D822943C42e3Cb7FC3a6A3B1889C1045f8", // to be passed to LQTYToken as the bounties/hackathons address
-  LQTY_SAFE:"0xb8a9faDA75c6d891fB77a7988Ff9BaD9e485Ca1C", // to be passed to LQTYToken as the LQTY multisig address
+const mosaicAddrs = {
+  GENERAL_SAFE:"0xF06016D822943C42e3Cb7FC3a6A3B1889C1045f8", // to be passed to MSICToken as the bounties/hackathons address
+  MSIC_SAFE:"0xb8a9faDA75c6d891fB77a7988Ff9BaD9e485Ca1C", // to be passed to MSICToken as the MSIC multisig address
   DEPLOYER: "0xa850535D3628CD4dFEB528dC85cfA93051Ff2984" // Mainnet REAL deployment address
 }
 
@@ -68,7 +68,7 @@ const ETHERSCAN_BASE_URL = 'https://etherscan.io/address'
 
 module.exports = {
   externalAddrs,
-  liquityAddrs,
+  mosaicAddrs,
   beneficiaries,
   OUTPUT_FILE,
   waitFunction,

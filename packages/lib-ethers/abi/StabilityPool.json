@@ -100,7 +100,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LUSDLoss",
+        "name": "_MoUSDLoss",
         "type": "uint256"
       }
     ],
@@ -264,11 +264,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LQTY",
+        "name": "_MSIC",
         "type": "uint256"
       }
     ],
-    "name": "LQTYPaidToDepositor",
+    "name": "MSICPaidToDepositor",
     "type": "event"
   },
   {
@@ -283,11 +283,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LQTY",
+        "name": "_MSIC",
         "type": "uint256"
       }
     ],
-    "name": "LQTYPaidToFrontEnd",
+    "name": "MSICPaidToFrontEnd",
     "type": "event"
   },
   {
@@ -296,11 +296,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newLUSDTokenAddress",
+        "name": "_newMoUSDTokenAddress",
         "type": "address"
       }
     ],
-    "name": "LUSDTokenAddressChanged",
+    "name": "MoUSDTokenAddressChanged",
     "type": "event"
   },
   {
@@ -422,7 +422,7 @@
         "type": "uint256"
       }
     ],
-    "name": "StabilityPoolLUSDBalanceUpdated",
+    "name": "StabilityPoolMoUSDBalanceUpdated",
     "type": "event"
   },
   {
@@ -498,7 +498,7 @@
   },
   {
     "inputs": [],
-    "name": "LUSD_GAS_COMPENSATION",
+    "name": "MoUSD_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -898,7 +898,7 @@
         "type": "address"
       }
     ],
-    "name": "getCompoundedLUSDDeposit",
+    "name": "getCompoundedMoUSDDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -936,7 +936,7 @@
         "type": "address"
       }
     ],
-    "name": "getDepositorLQTYGain",
+    "name": "getDepositorMSICGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -994,7 +994,7 @@
         "type": "address"
       }
     ],
-    "name": "getFrontEndLQTYGain",
+    "name": "getFrontEndMSICGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1007,7 +1007,7 @@
   },
   {
     "inputs": [],
-    "name": "getTotalLUSDDeposits",
+    "name": "getTotalMoUSDDeposits",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1046,7 +1046,7 @@
   },
   {
     "inputs": [],
-    "name": "lastLQTYError",
+    "name": "lastMSICError",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1059,7 +1059,7 @@
   },
   {
     "inputs": [],
-    "name": "lastLUSDLossError_Offset",
+    "name": "lastMoUSDLossError_Offset",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1072,10 +1072,10 @@
   },
   {
     "inputs": [],
-    "name": "lusdToken",
+    "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract ILUSDToken",
+        "internalType": "contract IMoUSDToken",
         "name": "",
         "type": "address"
       }
@@ -1177,7 +1177,7 @@
       },
       {
         "internalType": "address",
-        "name": "_lusdTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       },
       {

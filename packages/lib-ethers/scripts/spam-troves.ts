@@ -3,15 +3,15 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, LUSD_MINIMUM_DEBT, Trove } from "@liquity/lib-base";
-import { EthersLiquity, EthersLiquityWithStore, BlockPolledLiquityStore } from "@liquity/lib-ethers";
+import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
+import { EthersMosaic, EthersMosaicWithStore, BlockPolledMosaicStore } from "@mosaic/lib-ethers";
 
 import {
   Batched,
   BatchedProvider,
   WebSocketAugmented,
   WebSocketAugmentedProvider
-} from "@liquity/providers";
+} from "@mosaic/providers";
 
 const BatchedWebSocketAugmentedJsonRpcProvider = Batched(WebSocketAugmented(JsonRpcProvider));
 
@@ -24,7 +24,7 @@ const funderKey = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c816
 
 let provider: BatchedProvider & WebSocketAugmentedProvider & JsonRpcProvider;
 let funder: Wallet;
-let liquity: EthersLiquityWithStore<BlockPolledLiquityStore>;
+let mosaic: EthersMosaicWithStore<BlockPolledMosaicStore>;
 
 const waitForSuccess = (tx: TransactionResponse) =>
   tx.wait().then(receipt => {
@@ -37,7 +37,7 @@ const waitForSuccess = (tx: TransactionResponse) =>
 const createTrove = async (nominalCollateralRatio: Decimal) => {
   const randomWallet = Wallet.createRandom().connect(provider);
 
-  const debt = LUSD_MINIMUM_DEBT.mul(2);
+  const debt = MoUSD_MINIMUM_DEBT.mul(2);
   const collateral = debt.mul(nominalCollateralRatio);
 
   await funder
@@ -47,9 +47,9 @@ const createTrove = async (nominalCollateralRatio: Decimal) => {
     })
     .then(waitForSuccess);
 
-  await liquity.populate
+  await mosaic.populate
     .openTrove(
-      Trove.recreate(new Trove(collateral, debt), liquity.store.state.borrowingRate),
+      Trove.recreate(new Trove(collateral, debt), mosaic.store.state.borrowingRate),
       {},
       { from: randomWallet.address }
     )
@@ -61,7 +61,7 @@ const createTrove = async (nominalCollateralRatio: Decimal) => {
 const runLoop = async () => {
   for (let i = 0; i < numberOfTrovesToCreate; ++i) {
     const collateralRatio = collateralRatioStep.mul(i).add(collateralRatioStart);
-    const nominalCollateralRatio = collateralRatio.div(liquity.store.state.price);
+    const nominalCollateralRatio = collateralRatio.div(mosaic.store.state.price);
 
     await createTrove(nominalCollateralRatio);
 
@@ -83,13 +83,13 @@ const main = async () => {
     network
   );
 
-  liquity = await EthersLiquity.connect(provider, { useStore: "blockPolled" });
+  mosaic = await EthersMosaic.connect(provider, { useStore: "blockPolled" });
 
   let stopStore: () => void;
 
   return new Promise<void>(resolve => {
-    liquity.store.onLoaded = resolve;
-    stopStore = liquity.store.start();
+    mosaic.store.onLoaded = resolve;
+    stopStore = mosaic.store.start();
   })
     .then(runLoop)
     .then(() => {

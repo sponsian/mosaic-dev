@@ -4,15 +4,15 @@ import { Decimal } from "./Decimal";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
-import { FrontendStatus } from "./ReadableLiquity";
+import { MSICStake } from "./MSICStake";
+import { FrontendStatus } from "./ReadableMosaic";
 
 /**
  * State variables read from the blockchain.
  *
  * @public
  */
-export interface LiquityStoreBaseState {
+export interface MosaicStoreBaseState {
   /** Status of currently used frontend. */
   frontend: FrontendStatus;
 
@@ -25,35 +25,35 @@ export interface LiquityStoreBaseState {
   /** User's native currency balance (e.g. Ether). */
   accountBalance: Decimal;
 
-  /** User's LUSD token balance. */
-  lusdBalance: Decimal;
+  /** User's MoUSD token balance. */
+  msicBalance: Decimal;
 
-  /** User's LQTY token balance. */
-  lqtyBalance: Decimal;
+  /** User's MSIC token balance. */
+  msicBalance: Decimal;
 
-  /** User's Uniswap ETH/LUSD LP token balance. */
+  /** User's Uniswap ETH/MoUSD LP token balance. */
   uniTokenBalance: Decimal;
 
-  /** The liquidity mining contract's allowance of user's Uniswap ETH/LUSD LP tokens. */
+  /** The liquidity mining contract's allowance of user's Uniswap ETH/MoUSD LP tokens. */
   uniTokenAllowance: Decimal;
 
-  /** Remaining LQTY that will be collectively rewarded to liquidity miners. */
-  remainingLiquidityMiningLQTYReward: Decimal;
+  /** Remaining MSIC that will be collectively rewarded to liquidity miners. */
+  remainingLiquidityMiningMSICReward: Decimal;
 
-  /** Amount of Uniswap ETH/LUSD LP tokens the user has staked in liquidity mining. */
+  /** Amount of Uniswap ETH/MoUSD LP tokens the user has staked in liquidity mining. */
   liquidityMiningStake: Decimal;
 
-  /** Total amount of Uniswap ETH/LUSD LP tokens currently staked in liquidity mining. */
+  /** Total amount of Uniswap ETH/MoUSD LP tokens currently staked in liquidity mining. */
   totalStakedUniTokens: Decimal;
 
-  /** Amount of LQTY the user has earned through mining liquidity. */
-  liquidityMiningLQTYReward: Decimal;
+  /** Amount of MSIC the user has earned through mining liquidity. */
+  liquidityMiningMSICReward: Decimal;
 
   /**
    * Amount of leftover collateral available for withdrawal to the user.
    *
    * @remarks
-   * See {@link ReadableLiquity.getCollateralSurplusBalance | getCollateralSurplusBalance()} for
+   * See {@link ReadableMosaic.getCollateralSurplusBalance | getCollateralSurplusBalance()} for
    * more information.
    */
   collateralSurplusBalance: Decimal;
@@ -61,10 +61,10 @@ export interface LiquityStoreBaseState {
   /** Current price of the native currency (e.g. Ether) in USD. */
   price: Decimal;
 
-  /** Total amount of LUSD currently deposited in the Stability Pool. */
-  lusdInStabilityPool: Decimal;
+  /** Total amount of MoUSD currently deposited in the Stability Pool. */
+  msicInStabilityPool: Decimal;
 
-  /** Total collateral and debt in the Liquity system. */
+  /** Total collateral and debt in the Mosaic system. */
   total: Trove;
 
   /**
@@ -80,35 +80,35 @@ export interface LiquityStoreBaseState {
    *
    * @remarks
    * The current state of the user's Trove can be found as
-   * {@link LiquityStoreDerivedState.trove | trove}.
+   * {@link MosaicStoreDerivedState.trove | trove}.
    */
   troveBeforeRedistribution: TroveWithPendingRedistribution;
 
   /** User's stability deposit. */
   stabilityDeposit: StabilityDeposit;
 
-  /** Remaining LQTY that will be collectively rewarded to stability depositors. */
-  remainingStabilityPoolLQTYReward: Decimal;
+  /** Remaining MSIC that will be collectively rewarded to stability depositors. */
+  remainingStabilityPoolMSICReward: Decimal;
 
   /** @internal */
   _feesInNormalMode: Fees;
 
-  /** User's LQTY stake. */
-  lqtyStake: LQTYStake;
+  /** User's MSIC stake. */
+  msicStake: MSICStake;
 
-  /** Total amount of LQTY currently staked. */
-  totalStakedLQTY: Decimal;
+  /** Total amount of MSIC currently staked. */
+  totalStakedMSIC: Decimal;
 
   /** @internal */
   _riskiestTroveBeforeRedistribution: TroveWithPendingRedistribution;
 }
 
 /**
- * State variables derived from {@link LiquityStoreBaseState}.
+ * State variables derived from {@link MosaicStoreBaseState}.
  *
  * @public
  */
-export interface LiquityStoreDerivedState {
+export interface MosaicStoreDerivedState {
   /** Current state of user's Trove */
   trove: UserTrove;
 
@@ -130,7 +130,7 @@ export interface LiquityStoreDerivedState {
    * Current redemption rate.
    *
    * @remarks
-   * Note that the actual rate paid by a redemption transaction will depend on the amount of LUSD
+   * Note that the actual rate paid by a redemption transaction will depend on the amount of MoUSD
    * being redeemed.
    *
    * Use {@link Fees.redemptionRate} to calculate a precise redemption rate.
@@ -145,35 +145,35 @@ export interface LiquityStoreDerivedState {
 }
 
 /**
- * Type of {@link LiquityStore}'s {@link LiquityStore.state | state}.
+ * Type of {@link MosaicStore}'s {@link MosaicStore.state | state}.
  *
  * @remarks
- * It combines all properties of {@link LiquityStoreBaseState} and {@link LiquityStoreDerivedState}
- * with optional extra state added by the particular `LiquityStore` implementation.
+ * It combines all properties of {@link MosaicStoreBaseState} and {@link MosaicStoreDerivedState}
+ * with optional extra state added by the particular `MosaicStore` implementation.
  *
  * The type parameter `T` may be used to type the extra state.
  *
  * @public
  */
-export type LiquityStoreState<T = unknown> = LiquityStoreBaseState & LiquityStoreDerivedState & T;
+export type MosaicStoreState<T = unknown> = MosaicStoreBaseState & MosaicStoreDerivedState & T;
 
 /**
- * Parameters passed to {@link LiquityStore} listeners.
+ * Parameters passed to {@link MosaicStore} listeners.
  *
  * @remarks
- * Use the {@link LiquityStore.subscribe | subscribe()} function to register a listener.
+ * Use the {@link MosaicStore.subscribe | subscribe()} function to register a listener.
 
  * @public
  */
-export interface LiquityStoreListenerParams<T = unknown> {
+export interface MosaicStoreListenerParams<T = unknown> {
   /** The entire previous state. */
-  newState: LiquityStoreState<T>;
+  newState: MosaicStoreState<T>;
 
   /** The entire new state. */
-  oldState: LiquityStoreState<T>;
+  oldState: MosaicStoreState<T>;
 
   /** Only the state variables that have changed. */
-  stateChange: Partial<LiquityStoreState<T>>;
+  stateChange: Partial<MosaicStoreState<T>>;
 }
 
 const strictEquals = <T>(a: T, b: T) => a === b;
@@ -198,17 +198,17 @@ const difference = <T>(a: T, b: T) =>
   ) as Partial<T>;
 
 /**
- * Abstract base class of Liquity data store implementations.
+ * Abstract base class of Mosaic data store implementations.
  *
  * @remarks
- * The type parameter `T` may be used to type extra state added to {@link LiquityStoreState} by the
+ * The type parameter `T` may be used to type extra state added to {@link MosaicStoreState} by the
  * subclass.
  *
- * Implemented by {@link @liquity/lib-ethers#BlockPolledLiquityStore}.
+ * Implemented by {@link @mosaic/lib-ethers#BlockPolledMosaicStore}.
  *
  * @public
  */
-export abstract class LiquityStore<T = unknown> {
+export abstract class MosaicStore<T = unknown> {
   /** Turn console logging on/off. */
   logging = false;
 
@@ -216,30 +216,30 @@ export abstract class LiquityStore<T = unknown> {
    * Called after the state is fetched for the first time.
    *
    * @remarks
-   * See {@link LiquityStore.start | start()}.
+   * See {@link MosaicStore.start | start()}.
    */
   onLoaded?: () => void;
 
   /** @internal */
   protected _loaded = false;
 
-  private _baseState?: LiquityStoreBaseState;
-  private _derivedState?: LiquityStoreDerivedState;
+  private _baseState?: MosaicStoreBaseState;
+  private _derivedState?: MosaicStoreDerivedState;
   private _extraState?: T;
 
   private _updateTimeoutId: ReturnType<typeof setTimeout> | undefined;
-  private _listeners = new Set<(params: LiquityStoreListenerParams<T>) => void>();
+  private _listeners = new Set<(params: MosaicStoreListenerParams<T>) => void>();
 
   /**
    * The current store state.
    *
    * @remarks
    * Should not be accessed before the store is loaded. Assign a function to
-   * {@link LiquityStore.onLoaded | onLoaded} to get a callback when this happens.
+   * {@link MosaicStore.onLoaded | onLoaded} to get a callback when this happens.
    *
-   * See {@link LiquityStoreState} for the list of properties returned.
+   * See {@link MosaicStoreState} for the list of properties returned.
    */
-  get state(): LiquityStoreState<T> {
+  get state(): MosaicStoreState<T> {
     return Object.assign({}, this._baseState, this._derivedState, this._extraState);
   }
 
@@ -247,13 +247,13 @@ export abstract class LiquityStore<T = unknown> {
   protected abstract _doStart(): () => void;
 
   /**
-   * Start monitoring the blockchain for Liquity state changes.
+   * Start monitoring the blockchain for Mosaic state changes.
    *
    * @remarks
-   * The {@link LiquityStore.onLoaded | onLoaded} callback will be called after the state is fetched
+   * The {@link MosaicStore.onLoaded | onLoaded} callback will be called after the state is fetched
    * for the first time.
    *
-   * Use the {@link LiquityStore.subscribe | subscribe()} function to register listeners.
+   * Use the {@link MosaicStore.subscribe | subscribe()} function to register listeners.
    *
    * @returns Function to stop the monitoring.
    */
@@ -318,9 +318,9 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   private _reduce(
-    baseState: LiquityStoreBaseState,
-    baseStateUpdate: Partial<LiquityStoreBaseState>
-  ): LiquityStoreBaseState {
+    baseState: MosaicStoreBaseState,
+    baseStateUpdate: Partial<MosaicStoreBaseState>
+  ): MosaicStoreBaseState {
     return {
       frontend: this._updateIfChanged(
         frontendStatusEquals,
@@ -352,18 +352,18 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.accountBalance
       ),
 
-      lusdBalance: this._updateIfChanged(
+      msicBalance: this._updateIfChanged(
         eq,
-        "lusdBalance",
-        baseState.lusdBalance,
-        baseStateUpdate.lusdBalance
+        "msicBalance",
+        baseState.msicBalance,
+        baseStateUpdate.msicBalance
       ),
 
-      lqtyBalance: this._updateIfChanged(
+      msicBalance: this._updateIfChanged(
         eq,
-        "lqtyBalance",
-        baseState.lqtyBalance,
-        baseStateUpdate.lqtyBalance
+        "msicBalance",
+        baseState.msicBalance,
+        baseStateUpdate.msicBalance
       ),
 
       uniTokenBalance: this._updateIfChanged(
@@ -380,10 +380,10 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.uniTokenAllowance
       ),
 
-      remainingLiquidityMiningLQTYReward: this._silentlyUpdateIfChanged(
+      remainingLiquidityMiningMSICReward: this._silentlyUpdateIfChanged(
         eq,
-        baseState.remainingLiquidityMiningLQTYReward,
-        baseStateUpdate.remainingLiquidityMiningLQTYReward
+        baseState.remainingLiquidityMiningMSICReward,
+        baseStateUpdate.remainingLiquidityMiningMSICReward
       ),
 
       liquidityMiningStake: this._updateIfChanged(
@@ -400,10 +400,10 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.totalStakedUniTokens
       ),
 
-      liquidityMiningLQTYReward: this._silentlyUpdateIfChanged(
+      liquidityMiningMSICReward: this._silentlyUpdateIfChanged(
         eq,
-        baseState.liquidityMiningLQTYReward,
-        baseStateUpdate.liquidityMiningLQTYReward
+        baseState.liquidityMiningMSICReward,
+        baseStateUpdate.liquidityMiningMSICReward
       ),
 
       collateralSurplusBalance: this._updateIfChanged(
@@ -415,11 +415,11 @@ export abstract class LiquityStore<T = unknown> {
 
       price: this._updateIfChanged(eq, "price", baseState.price, baseStateUpdate.price),
 
-      lusdInStabilityPool: this._updateIfChanged(
+      msicInStabilityPool: this._updateIfChanged(
         eq,
-        "lusdInStabilityPool",
-        baseState.lusdInStabilityPool,
-        baseStateUpdate.lusdInStabilityPool
+        "msicInStabilityPool",
+        baseState.msicInStabilityPool,
+        baseStateUpdate.msicInStabilityPool
       ),
 
       total: this._updateIfChanged(equals, "total", baseState.total, baseStateUpdate.total),
@@ -445,10 +445,10 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.stabilityDeposit
       ),
 
-      remainingStabilityPoolLQTYReward: this._silentlyUpdateIfChanged(
+      remainingStabilityPoolMSICReward: this._silentlyUpdateIfChanged(
         eq,
-        baseState.remainingStabilityPoolLQTYReward,
-        baseStateUpdate.remainingStabilityPoolLQTYReward
+        baseState.remainingStabilityPoolMSICReward,
+        baseStateUpdate.remainingStabilityPoolMSICReward
       ),
 
       _feesInNormalMode: this._silentlyUpdateIfChanged(
@@ -457,18 +457,18 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate._feesInNormalMode
       ),
 
-      lqtyStake: this._updateIfChanged(
+      msicStake: this._updateIfChanged(
         equals,
-        "lqtyStake",
-        baseState.lqtyStake,
-        baseStateUpdate.lqtyStake
+        "msicStake",
+        baseState.msicStake,
+        baseStateUpdate.msicStake
       ),
 
-      totalStakedLQTY: this._updateIfChanged(
+      totalStakedMSIC: this._updateIfChanged(
         eq,
-        "totalStakedLQTY",
-        baseState.totalStakedLQTY,
-        baseStateUpdate.totalStakedLQTY
+        "totalStakedMSIC",
+        baseState.totalStakedMSIC,
+        baseStateUpdate.totalStakedMSIC
       ),
 
       _riskiestTroveBeforeRedistribution: this._silentlyUpdateIfChanged(
@@ -486,7 +486,7 @@ export abstract class LiquityStore<T = unknown> {
     total,
     price,
     _riskiestTroveBeforeRedistribution
-  }: LiquityStoreBaseState): LiquityStoreDerivedState {
+  }: MosaicStoreBaseState): MosaicStoreDerivedState {
     const fees = _feesInNormalMode._setRecoveryMode(total.collateralRatioIsBelowCritical(price));
 
     return {
@@ -501,9 +501,9 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   private _reduceDerived(
-    derivedState: LiquityStoreDerivedState,
-    derivedStateUpdate: LiquityStoreDerivedState
-  ): LiquityStoreDerivedState {
+    derivedState: MosaicStoreDerivedState,
+    derivedStateUpdate: MosaicStoreDerivedState
+  ): MosaicStoreDerivedState {
     return {
       fees: this._updateFees("fees", derivedState.fees, derivedStateUpdate.fees),
 
@@ -533,7 +533,7 @@ export abstract class LiquityStore<T = unknown> {
   /** @internal */
   protected abstract _reduceExtra(extraState: T, extraStateUpdate: Partial<T>): T;
 
-  private _notify(params: LiquityStoreListenerParams<T>) {
+  private _notify(params: MosaicStoreListenerParams<T>) {
     // Iterate on a copy of `_listeners`, to avoid notifying any new listeners subscribed by
     // existing listeners, as that could result in infinite loops.
     //
@@ -553,7 +553,7 @@ export abstract class LiquityStore<T = unknown> {
    * @param listener - Function that will be called whenever state changes.
    * @returns Function to unregister this listener.
    */
-  subscribe(listener: (params: LiquityStoreListenerParams<T>) => void): () => void {
+  subscribe(listener: (params: MosaicStoreListenerParams<T>) => void): () => void {
     const uniqueListener = wrap(listener);
 
     this._listeners.add(uniqueListener);
@@ -564,7 +564,7 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   /** @internal */
-  protected _load(baseState: LiquityStoreBaseState, extraState?: T): void {
+  protected _load(baseState: MosaicStoreBaseState, extraState?: T): void {
     assert(!this._loaded);
 
     this._baseState = baseState;
@@ -581,7 +581,7 @@ export abstract class LiquityStore<T = unknown> {
 
   /** @internal */
   protected _update(
-    baseStateUpdate?: Partial<LiquityStoreBaseState>,
+    baseStateUpdate?: Partial<MosaicStoreBaseState>,
     extraStateUpdate?: Partial<T>
   ): void {
     assert(this._baseState && this._derivedState);

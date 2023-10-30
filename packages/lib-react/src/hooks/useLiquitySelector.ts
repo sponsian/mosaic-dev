@@ -1,12 +1,12 @@
 import { useEffect, useReducer } from "react";
 
-import { LiquityStoreState } from "@liquity/lib-base";
+import { MosaicStoreState } from "@mosaic/lib-base";
 
 import { equals } from "../utils/equals";
-import { useLiquityStore } from "./useLiquityStore";
+import { useMosaicStore } from "./useMosaicStore";
 
-export const useLiquitySelector = <S, T>(select: (state: LiquityStoreState<T>) => S): S => {
-  const store = useLiquityStore<T>();
+export const useMosaicSelector = <S, T>(select: (state: MosaicStoreState<T>) => S): S => {
+  const store = useMosaicStore<T>();
   const [, rerender] = useReducer(() => ({}), {});
 
   useEffect(

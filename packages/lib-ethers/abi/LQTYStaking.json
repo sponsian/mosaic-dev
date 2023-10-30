@@ -63,11 +63,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_F_LUSD",
+        "name": "_F_MoUSD",
         "type": "uint256"
       }
     ],
-    "name": "F_LUSDUpdated",
+    "name": "F_MoUSDUpdated",
     "type": "event"
   },
   {
@@ -76,11 +76,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lqtyTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       }
     ],
-    "name": "LQTYTokenAddressSet",
+    "name": "MSICTokenAddressSet",
     "type": "event"
   },
   {
@@ -89,11 +89,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lusdTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       }
     ],
-    "name": "LUSDTokenAddressSet",
+    "name": "MoUSDTokenAddressSet",
     "type": "event"
   },
   {
@@ -152,7 +152,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_F_LUSD",
+        "name": "_F_MoUSD",
         "type": "uint256"
       }
     ],
@@ -171,7 +171,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "LUSDGain",
+        "name": "MoUSDGain",
         "type": "uint256"
       },
       {
@@ -190,11 +190,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_totalLQTYStaked",
+        "name": "_totalMSICStaked",
         "type": "uint256"
       }
     ],
-    "name": "TotalLQTYStakedUpdated",
+    "name": "TotalMSICStakedUpdated",
     "type": "event"
   },
   {
@@ -238,7 +238,7 @@
   },
   {
     "inputs": [],
-    "name": "F_LUSD",
+    "name": "F_MoUSD",
     "outputs": [
       {
         "internalType": "uint256",
@@ -315,7 +315,7 @@
         "type": "address"
       }
     ],
-    "name": "getPendingLUSDGain",
+    "name": "getPendingMoUSDGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -343,11 +343,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDFee",
+        "name": "_MoUSDFee",
         "type": "uint256"
       }
     ],
-    "name": "increaseF_LUSD",
+    "name": "increaseF_MoUSD",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -367,10 +367,10 @@
   },
   {
     "inputs": [],
-    "name": "lqtyToken",
+    "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract ILQTYToken",
+        "internalType": "contract IMSICToken",
         "name": "",
         "type": "address"
       }
@@ -380,10 +380,10 @@
   },
   {
     "inputs": [],
-    "name": "lusdToken",
+    "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract ILUSDToken",
+        "internalType": "contract IMoUSDToken",
         "name": "",
         "type": "address"
       }
@@ -408,12 +408,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_lqtyTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_lusdTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       },
       {
@@ -454,7 +454,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "F_LUSD_Snapshot",
+        "name": "F_MoUSD_Snapshot",
         "type": "uint256"
       }
     ],
@@ -465,7 +465,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LQTYamount",
+        "name": "_MSICamount",
         "type": "uint256"
       }
     ],
@@ -495,7 +495,7 @@
   },
   {
     "inputs": [],
-    "name": "totalLQTYStaked",
+    "name": "totalMSICStaked",
     "outputs": [
       {
         "internalType": "uint256",
@@ -523,7 +523,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LQTYamount",
+        "name": "_MSICamount",
         "type": "uint256"
       }
     ],

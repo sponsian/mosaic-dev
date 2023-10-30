@@ -1,7 +1,7 @@
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, LUSD_MINIMUM_DEBT, Trove } from "@liquity/lib-base";
-import { EthersLiquity } from "@liquity/lib-ethers";
+import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
+import { EthersMosaic } from "@mosaic/lib-ethers";
 
 import { deployer, funder, provider } from "../globals";
 
@@ -10,34 +10,34 @@ export interface WarzoneParams {
 }
 
 export const warzone = async ({ troves: numberOfTroves }: WarzoneParams) => {
-  const deployerLiquity = await EthersLiquity.connect(deployer);
+  const deployerMosaic = await EthersMosaic.connect(deployer);
 
-  const price = await deployerLiquity.getPrice();
+  const price = await deployerMosaic.getPrice();
 
   for (let i = 1; i <= numberOfTroves; ++i) {
     const user = Wallet.createRandom().connect(provider);
     const userAddress = await user.getAddress();
-    const debt = LUSD_MINIMUM_DEBT.add(99999 * Math.random());
+    const debt = MoUSD_MINIMUM_DEBT.add(99999 * Math.random());
     const collateral = debt.mulDiv(1.11 + 3 * Math.random(), price);
 
-    const liquity = await EthersLiquity.connect(user);
+    const mosaic = await EthersMosaic.connect(user);
 
     await funder.sendTransaction({
       to: userAddress,
       value: Decimal.from(collateral).hex
     });
 
-    const fees = await liquity.getFees();
+    const fees = await mosaic.getFees();
 
-    await liquity.openTrove(
+    await mosaic.openTrove(
       Trove.recreate(new Trove(collateral, debt), fees.borrowingRate()),
       { borrowingFeeDecayToleranceMinutes: 0 },
       { gasPrice: 0 }
     );
 
     if (i % 4 === 0) {
-      const lusdBalance = await liquity.getLUSDBalance();
-      await liquity.depositLUSDInStabilityPool(lusdBalance);
+      const msicBalance = await mosaic.getMoUSDBalance();
+      await mosaic.depositMoUSDInStabilityPool(msicBalance);
     }
 
     if (i % 10 === 0) {

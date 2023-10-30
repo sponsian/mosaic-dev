@@ -1,99 +1,99 @@
 import { Decimal, Decimalish } from "./Decimal";
 
 /**
- * Represents the change between two states of an LQTY Stake.
+ * Represents the change between two states of an MSIC Stake.
  *
  * @public
  */
-export type LQTYStakeChange<T> =
-  | { stakeLQTY: T; unstakeLQTY?: undefined }
-  | { stakeLQTY?: undefined; unstakeLQTY: T; unstakeAllLQTY: boolean };
+export type MSICStakeChange<T> =
+  | { stakeMSIC: T; unstakeMSIC?: undefined }
+  | { stakeMSIC?: undefined; unstakeMSIC: T; unstakeAllMSIC: boolean };
 
 /** 
- * Represents a user's LQTY stake and accrued gains.
+ * Represents a user's MSIC stake and accrued gains.
  * 
  * @remarks
- * Returned by the {@link ReadableLiquity.getLQTYStake | getLQTYStake()} function.
+ * Returned by the {@link ReadableMosaic.getMSICStake | getMSICStake()} function.
 
  * @public
  */
-export class LQTYStake {
-  /** The amount of LQTY that's staked. */
-  readonly stakedLQTY: Decimal;
+export class MSICStake {
+  /** The amount of MSIC that's staked. */
+  readonly stakedMSIC: Decimal;
 
   /** Collateral gain available to withdraw. */
   readonly collateralGain: Decimal;
 
-  /** LUSD gain available to withdraw. */
-  readonly lusdGain: Decimal;
+  /** MoUSD gain available to withdraw. */
+  readonly msicGain: Decimal;
 
   /** @internal */
-  constructor(stakedLQTY = Decimal.ZERO, collateralGain = Decimal.ZERO, lusdGain = Decimal.ZERO) {
-    this.stakedLQTY = stakedLQTY;
+  constructor(stakedMSIC = Decimal.ZERO, collateralGain = Decimal.ZERO, msicGain = Decimal.ZERO) {
+    this.stakedMSIC = stakedMSIC;
     this.collateralGain = collateralGain;
-    this.lusdGain = lusdGain;
+    this.msicGain = msicGain;
   }
 
   get isEmpty(): boolean {
-    return this.stakedLQTY.isZero && this.collateralGain.isZero && this.lusdGain.isZero;
+    return this.stakedMSIC.isZero && this.collateralGain.isZero && this.msicGain.isZero;
   }
 
   /** @internal */
   toString(): string {
     return (
-      `{ stakedLQTY: ${this.stakedLQTY}` +
+      `{ stakedMSIC: ${this.stakedMSIC}` +
       `, collateralGain: ${this.collateralGain}` +
-      `, lusdGain: ${this.lusdGain} }`
+      `, msicGain: ${this.msicGain} }`
     );
   }
 
   /**
-   * Compare to another instance of `LQTYStake`.
+   * Compare to another instance of `MSICStake`.
    */
-  equals(that: LQTYStake): boolean {
+  equals(that: MSICStake): boolean {
     return (
-      this.stakedLQTY.eq(that.stakedLQTY) &&
+      this.stakedMSIC.eq(that.stakedMSIC) &&
       this.collateralGain.eq(that.collateralGain) &&
-      this.lusdGain.eq(that.lusdGain)
+      this.msicGain.eq(that.msicGain)
     );
   }
 
   /**
-   * Calculate the difference between this `LQTYStake` and `thatStakedLQTY`.
+   * Calculate the difference between this `MSICStake` and `thatStakedMSIC`.
    *
    * @returns An object representing the change, or `undefined` if the staked amounts are equal.
    */
-  whatChanged(thatStakedLQTY: Decimalish): LQTYStakeChange<Decimal> | undefined {
-    thatStakedLQTY = Decimal.from(thatStakedLQTY);
+  whatChanged(thatStakedMSIC: Decimalish): MSICStakeChange<Decimal> | undefined {
+    thatStakedMSIC = Decimal.from(thatStakedMSIC);
 
-    if (thatStakedLQTY.lt(this.stakedLQTY)) {
+    if (thatStakedMSIC.lt(this.stakedMSIC)) {
       return {
-        unstakeLQTY: this.stakedLQTY.sub(thatStakedLQTY),
-        unstakeAllLQTY: thatStakedLQTY.isZero
+        unstakeMSIC: this.stakedMSIC.sub(thatStakedMSIC),
+        unstakeAllMSIC: thatStakedMSIC.isZero
       };
     }
 
-    if (thatStakedLQTY.gt(this.stakedLQTY)) {
-      return { stakeLQTY: thatStakedLQTY.sub(this.stakedLQTY) };
+    if (thatStakedMSIC.gt(this.stakedMSIC)) {
+      return { stakeMSIC: thatStakedMSIC.sub(this.stakedMSIC) };
     }
   }
 
   /**
-   * Apply a {@link LQTYStakeChange} to this `LQTYStake`.
+   * Apply a {@link MSICStakeChange} to this `MSICStake`.
    *
-   * @returns The new staked LQTY amount.
+   * @returns The new staked MSIC amount.
    */
-  apply(change: LQTYStakeChange<Decimalish> | undefined): Decimal {
+  apply(change: MSICStakeChange<Decimalish> | undefined): Decimal {
     if (!change) {
-      return this.stakedLQTY;
+      return this.stakedMSIC;
     }
 
-    if (change.unstakeLQTY !== undefined) {
-      return change.unstakeAllLQTY || this.stakedLQTY.lte(change.unstakeLQTY)
+    if (change.unstakeMSIC !== undefined) {
+      return change.unstakeAllMSIC || this.stakedMSIC.lte(change.unstakeMSIC)
         ? Decimal.ZERO
-        : this.stakedLQTY.sub(change.unstakeLQTY);
+        : this.stakedMSIC.sub(change.unstakeMSIC);
     } else {
-      return this.stakedLQTY.add(change.stakeLQTY);
+      return this.stakedMSIC.add(change.stakeMSIC);
     }
   }
 }

@@ -12,7 +12,7 @@ import {
  * Calculator for fees.
  *
  * @remarks
- * Returned by the {@link ReadableLiquity.getFees | getFees()} function.
+ * Returned by the {@link ReadableMosaic.getFees | getFees()} function.
  *
  * @public
  */
@@ -101,15 +101,15 @@ export class Fees {
    * By default, the fee is calculated at the time of the latest block. This can be overridden using
    * the `when` parameter.
    *
-   * To calculate the borrowing fee in LUSD, multiply the borrowed LUSD amount by the borrowing rate.
+   * To calculate the borrowing fee in MoUSD, multiply the borrowed MoUSD amount by the borrowing rate.
    *
    * @example
    * ```typescript
-   * const fees = await liquity.getFees();
+   * const fees = await mosaic.getFees();
    *
-   * const borrowedLUSDAmount = 100;
+   * const borrowedMoUSDAmount = 100;
    * const borrowingRate = fees.borrowingRate();
-   * const borrowingFeeLUSD = borrowingRate.mul(borrowedLUSDAmount);
+   * const borrowingFeeMoUSD = borrowingRate.mul(borrowedMoUSDAmount);
    * ```
    */
   borrowingRate(when?: Date): Decimal {
@@ -121,7 +121,7 @@ export class Fees {
   /**
    * Calculate the current redemption rate.
    *
-   * @param redeemedFractionOfSupply - The amount of LUSD being redeemed divided by the total supply.
+   * @param redeemedFractionOfSupply - The amount of MoUSD being redeemed divided by the total supply.
    * @param when - Optional timestamp that can be used to calculate what the redemption rate would
    *               decay to at a point of time in the future.
    *
@@ -130,21 +130,21 @@ export class Fees {
    * the `when` parameter.
 
    * Unlike the borrowing rate, the redemption rate depends on the amount being redeemed. To be more
-   * precise, it depends on the fraction of the redeemed amount compared to the total LUSD supply,
+   * precise, it depends on the fraction of the redeemed amount compared to the total MoUSD supply,
    * which must be passed as a parameter.
    *
-   * To calculate the redemption fee in LUSD, multiply the redeemed LUSD amount with the redemption
+   * To calculate the redemption fee in MoUSD, multiply the redeemed MoUSD amount with the redemption
    * rate.
    *
    * @example
    * ```typescript
-   * const fees = await liquity.getFees();
-   * const total = await liquity.getTotal();
+   * const fees = await mosaic.getFees();
+   * const total = await mosaic.getTotal();
    *
-   * const redeemedLUSDAmount = Decimal.from(100);
-   * const redeemedFractionOfSupply = redeemedLUSDAmount.div(total.debt);
+   * const redeemedMoUSDAmount = Decimal.from(100);
+   * const redeemedFractionOfSupply = redeemedMoUSDAmount.div(total.debt);
    * const redemptionRate = fees.redemptionRate(redeemedFractionOfSupply);
-   * const redemptionFeeLUSD = redemptionRate.mul(redeemedLUSDAmount);
+   * const redemptionFeeMoUSD = redemptionRate.mul(redeemedMoUSDAmount);
    * ```
    */
   redemptionRate(redeemedFractionOfSupply: Decimalish = Decimal.ZERO, when?: Date): Decimal {

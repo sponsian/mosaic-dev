@@ -2,13 +2,13 @@ const fs = require('fs')
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const MosaicMathTester = artifacts.require("./MosaicMathTester.sol")
 
 const th = testHelpers.TestHelper
 
 const timeValues = testHelpers.TimeValues
 
-/* Script that logs gas costs for Liquity math functions. */
+/* Script that logs gas costs for Mosaic math functions. */
 contract('Gas costs for math functions', async accounts => {
   
   const bountyAddress = accounts[998]
@@ -22,16 +22,16 @@ contract('Gas costs for math functions', async accounts => {
     troveManagerTester = await TroveManagerTester.new()
     TroveManagerTester.setAsDeployed(troveManagerTester)
 
-    mathTester = await LiquityMathTester.new()
-    LiquityMathTester.setAsDeployed(mathTester)
+    mathTester = await MosaicMathTester.new()
+    MosaicMathTester.setAsDeployed(mathTester)
   })
 
   beforeEach(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress)
+    contracts = await deploymentHelper.deployMosaicCore()
+    const MSICContracts = await deploymentHelper.deployMSICContracts(bountyAddress, lpRewardsAddress)
 
     priceFeed = contracts.priceFeedTestnet
-    lusdToken = contracts.lusdToken
+    msicToken = contracts.msicToken
     sortedTroves = contracts.sortedTroves
     troveManager = contracts.troveManager
     activePool = contracts.activePool
@@ -40,14 +40,14 @@ contract('Gas costs for math functions', async accounts => {
     borrowerOperations = contracts.borrowerOperations
     hintHelpers = contracts.hintHelpers
 
-    gtStaking = LQTYContracts.gtStaking
-    lqtyToken = LQTYContracts.lqtyToken
-    communityIssuance = LQTYContracts.communityIssuance
-    lockupContractFactory = LQTYContracts.lockupContractFactory
+    gtStaking = MSICContracts.gtStaking
+    msicToken = MSICContracts.msicToken
+    communityIssuance = MSICContracts.communityIssuance
+    lockupContractFactory = MSICContracts.lockupContractFactory
 
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectCoreContracts(contracts, MSICContracts)
+    await deploymentHelper.connectMSICContracts(MSICContracts)
+    await deploymentHelper.connectMSICContractsToCore(MSICContracts, contracts)
   })
 
   // performs n runs of exponentiation on a random base

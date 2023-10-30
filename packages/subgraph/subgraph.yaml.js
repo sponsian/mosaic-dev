@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 const network = process.argv[2] || "mainnet";
-const { addresses, startBlock } = require(`@liquity/lib-ethers/deployments/${network}.json`);
+const { addresses, startBlock } = require(`@mosaic/lib-ethers/deployments/${network}.json`);
 
 console.log(`Preparing subgraph manifest for network "${network}"`);
 
@@ -13,8 +13,8 @@ const yaml = (strings, ...keys) =>
 
 const manifest = yaml`
 specVersion: 0.0.2
-description: Liquity is a decentralized borrowing protocol offering interest-free liquidity against collateral in Ether.
-repository: https://github.com/liquity/dev/tree/main/packages/subgraph
+description: Mosaic is a decentralized borrowing protocol offering interest-free liquidity against collateral in Ether.
+repository: https://github.com/mosaic/dev/tree/main/packages/subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -78,8 +78,8 @@ dataSources:
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
-        - event: LUSDBorrowingFeePaid(indexed address,uint256)
-          handler: handleLUSDBorrowingFeePaid
+        - event: MoUSDBorrowingFeePaid(indexed address,uint256)
+          handler: handleMoUSDBorrowingFeePaid
   - name: PriceFeed
     kind: ethereum/contract
     network: mainnet
@@ -160,15 +160,15 @@ dataSources:
       eventHandlers:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollSurplusBalanceUpdated
-  - name: LQTYStaking
+  - name: MSICStaking
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: LQTYStaking
-      address: "${addresses.lqtyStaking}"
+      abi: MSICStaking
+      address: "${addresses.msicStaking}"
       startBlock: ${startBlock}
     mapping:
-      file: ./src/mappings/LqtyStake.ts
+      file: ./src/mappings/MsicStake.ts
       language: wasm/assemblyscript
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -176,19 +176,19 @@ dataSources:
         - Global
         - User
         - Transaction
-        - LqtyStake
-        - LqtyStakeChange
+        - MsicStake
+        - MsicStakeChange
       abis:
-        - name: LQTYStaking
-          file: ../lib-ethers/abi/LQTYStaking.json
+        - name: MSICStaking
+          file: ../lib-ethers/abi/MSICStaking.json
       eventHandlers:
         - event: StakeChanged(indexed address,uint256)
           handler: handleStakeChanged
         - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
           handler: handleStakeGainsWithdrawn
 ${[
-  ["LUSDToken", addresses.lusdToken],
-  ["LQTYToken", addresses.lqtyToken]
+  ["MoUSDToken", addresses.msicToken],
+  ["MSICToken", addresses.msicToken]
 ].map(
   ([name, address]) => yaml`
   - name: ${name}

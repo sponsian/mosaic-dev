@@ -1,13 +1,13 @@
 # Mosaic: Decentralized Borrowing Protocol
 
-![Tests](https://github.com/liquity/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.liquity.org) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/700620821198143498?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/liquity/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/liquity/dev-frontend) [![codecov](https://codecov.io/gh/liquity/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/liquity/dev)
+![Tests](https://github.com/mosaic/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.mosaic.org) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/700620821198143498?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/mosaic/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/mosaic/dev-frontend) [![codecov](https://codecov.io/gh/mosaic/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/mosaic/dev)
 
 
 Mosaic is a decentralized protocol that allows REEF holders to obtain maximum liquidity against
 their collateral without paying interest. After locking up REEF as collateral in a smart contract and
-creating an individual position called a "trove", the user can get instant liquidity by minting USDM,
+creating an individual position called a "trove", the user can get instant liquidity by minting MoUSD,
 a USD-pegged stablecoin. Each trove is required to be collateralized at a minimum of 110%. Any
-owner of USDM can redeem their stablecoins for the underlying collateral at any time. The redemption
+owner of MoUSD can redeem their stablecoins for the underlying collateral at any time. The redemption
 mechanism along with algorithmically adjusted fees guarantee a minimum stablecoin value of USD 1.
 
 An unprecedented liquidation mechanism based on incentivized stability deposits and a redistribution
@@ -22,17 +22,17 @@ multiple front ends, enhancing decentralization.
 
 Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join the discussion.
 
-## Liquity System Summary
+## Mosaic System Summary
 
 - [Disclaimer](#disclaimer)
-- [Mosaic Overview](#liquity-overview)
+- [Mosaic Overview](#mosaic-overview)
 - [Liquidation and the Stability Pool](#liquidation-and-the-stability-pool)
   - [Liquidation gas costs](#liquidation-gas-costs)
   - [Liquidation Logic](#liquidation-logic)
     - [Liquidations in Normal Mode: TCR >= 150%](#liquidations-in-normal-mode-tcr--150)
     - [Liquidations in Recovery Mode: TCR < 150%](#liquidations-in-recovery-mode-tcr--150)
 - [Gains From Liquidations](#gains-from-liquidations)
-- [USDM Token Redemption](#lusd-token-redemption)
+- [MoUSD Token Redemption](#msic-token-redemption)
   - [Partial redemption](#partial-redemption)
   - [Full redemption](#full-redemption)
   - [Redemptions create a price floor](#redemptions-create-a-price-floor)
@@ -40,13 +40,13 @@ Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join
 - [Project Structure](#project-structure)
   - [Directories](#directories)
   - [Branches](#branches)
-- [MSIC Token Architecture](#lqty-token-architecture)
-  - [MSIC Lockup contracts and token vesting](#lqty-lockup-contracts-and-token-vesting)
+- [MSIC Token Architecture](#msic-token-architecture)
+  - [MSIC Lockup contracts and token vesting](#msic-lockup-contracts-and-token-vesting)
   - [Lockup Implementation and admin transfer restriction](#lockup-implementation-and-admin-transfer-restriction)
   - [Launch sequence and vesting process](#launch-sequence-and-vesting-process)
-    - [Deploy MSIC Contracts](#deploy-lqty-contracts)
+    - [Deploy MSIC Contracts](#deploy-msic-contracts)
     - [Deploy and fund Lockup Contracts](#deploy-and-fund-lockup-contracts)
-    - [Deploy MSIC Core](#deploy-liquity-core)
+    - [Deploy MSIC Core](#deploy-mosaic-core)
     - [During one year lockup period](#during-one-year-lockup-period)
     - [Upon end of one year lockup period](#upon-end-of-one-year-lockup-period)
     - [Post-lockup period](#post-lockup-period)
@@ -59,9 +59,9 @@ Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join
   - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
   - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
   - [Keeping a sorted list of Troves ordered by ICR](#keeping-a-sorted-list-of-troves-ordered-by-icr)
-  - [Flow of REEF in Mosaic](#flow-of-ether-in-liquity)
-  - [Flow of USDM tokens in Mosaic](#flow-of-lusd-tokens-in-liquity)
-  - [Flow of MSIC Tokens in Mosaic](#flow-of-lqty-tokens-in-liquity)
+  - [Flow of REEF in Mosaic](#flow-of-ether-in-mosaic)
+  - [Flow of MoUSD tokens in Mosaic](#flow-of-msic-tokens-in-mosaic)
+  - [Flow of MSIC Tokens in Mosaic](#flow-of-msic-tokens-in-mosaic)
 - [Expected User Behaviors](#expected-user-behaviors)
 - [Contract Ownership and Function Permissions](#contract-ownership-and-function-permissions)
 - [Deployment to a Development Blockchain](#deployment-to-a-development-blockchain)
@@ -77,10 +77,10 @@ Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join
   - [TroveManager Functions - `TroveManager.sol`](#trovemanager-functions---trovemanagersol)
   - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
   - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
-  - [MSIC Staking Functions  `MSICStaking.sol`](#lqty-staking-functions--lqtystakingsol)
+  - [MSIC Staking Functions  `MSICStaking.sol`](#msic-staking-functions--msicstakingsol)
   - [Lockup Contract Factory `LockupContractFactory.sol`](#lockup-contract-factory-lockupcontractfactorysol)
   - [Lockup contract - `LockupContract.sol`](#lockup-contract---lockupcontractsol)
-  - [USDM token `USDMToken.sol` and MSIC token `MSICToken.sol`](#lusd-token-lusdtokensol-and-lqty-token-lqtytokensol)
+  - [MoUSD token `USDMToken.sol` and MSIC token `MSICToken.sol`](#msic-token-msictokensol-and-msic-token-msictokensol)
 - [Supplying Hints to Trove operations](#supplying-hints-to-trove-operations)
   - [Hints for `redeemCollateral`](#hints-for-redeemcollateral)
     - [First redemption hint](#first-redemption-hint)
@@ -96,19 +96,19 @@ Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join
   - [Stability Pool example](#stability-pool-example)
   - [Stability Pool implementation](#stability-pool-implementation)
   - [How deposits and ETH gains are tracked](#how-deposits-and-eth-gains-are-tracked)
-- [MSIC Issuance to Stability Providers](#lqty-issuance-to-stability-providers)
-  - [MSIC Issuance schedule](#lqty-issuance-schedule)
-  - [MSIC Issuance implementation](#lqty-issuance-implementation)
-  - [Handling the front end MSIC gain](#handling-the-front-end-lqty-gain)
-  - [MSIC reward events and payouts](#lqty-reward-events-and-payouts)
-- [MSIC issuance to liquity providers](#lqty-issuance-to-liquity-providers)
-- [Liquity System Fees](#liquity-system-fees)
+- [MSIC Issuance to Stability Providers](#msic-issuance-to-stability-providers)
+  - [MSIC Issuance schedule](#msic-issuance-schedule)
+  - [MSIC Issuance implementation](#msic-issuance-implementation)
+  - [Handling the front end MSIC gain](#handling-the-front-end-msic-gain)
+  - [MSIC reward events and payouts](#msic-reward-events-and-payouts)
+- [MSIC issuance to mosaic providers](#msic-issuance-to-mosaic-providers)
+- [Mosaic System Fees](#mosaic-system-fees)
   - [Redemption Fee](#redemption-fee)
   - [Issuance fee](#issuance-fee)
   - [Fee Schedule](#fee-schedule)
   - [Intuition behind fees](#intuition-behind-fees)
   - [Fee decay Implementation](#fee-decay-implementation)
-  - [Staking MSIC and earning fees](#staking-lqty-and-earning-fees)
+  - [Staking MSIC and earning fees](#staking-msic-and-earning-fees)
 - [Redistributions and Corrected Stakes](#redistributions-and-corrected-stakes)
   - [Corrected Stake Solution](#corrected-stake-solution)
 - [Math Proofs](#math-proofs)
@@ -143,19 +143,19 @@ Visit [mosaicprotocol.xyz](https://mosaicprotocol.xyz) to find out more and join
 
 ## Mosaic Overview
 
-Mosaic is a collateralized debt platform. Users can lock up REEF, and issue stablecoin tokens (USDM) to their own Reef address, and subsequently transfer those tokens to any other Reef address. The individual collateralized debt positions are called Troves.
+Mosaic is a collateralized debt platform. Users can lock up REEF, and issue stablecoin tokens (MoUSD) to their own Reef address, and subsequently transfer those tokens to any other Reef address. The individual collateralized debt positions are called Troves.
 
-The stablecoin tokens are economically geared towards maintaining value of 1 USDM = \$1 USD, due to the following properties:
+The stablecoin tokens are economically geared towards maintaining value of 1 MoUSD = \$1 USD, due to the following properties:
 
 1. The system is designed to always be over-collateralized - the dollar value of the locked Ether exceeds the dollar value of the issued stablecoins
 
-2. The stablecoins are fully redeemable - users can always swap $x worth of USDM for $x worth of REEF (minus fees), directly with the system.
+2. The stablecoins are fully redeemable - users can always swap $x worth of MoUSD for $x worth of REEF (minus fees), directly with the system.
 
-3. The system algorithmically controls the generation of USDM through a variable issuance fee.
+3. The system algorithmically controls the generation of MoUSD through a variable issuance fee.
 
-After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of REEF in a Trove can issue up to 909.09 USDM.
+After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of REEF in a Trove can issue up to 909.09 MoUSD.
 
-The tokens are freely exchangeable - anyone with an Ethereum address can send or receive USDM tokens, whether they have an open Trove or not. The tokens are burned upon repayment of a Trove's debt.
+The tokens are freely exchangeable - anyone with an Ethereum address can send or receive MoUSD tokens, whether they have an open Trove or not. The tokens are burned upon repayment of a Trove's debt.
 
 The Mosaic system regularly updates the REEF:USD price via a decentralized data feed. When a Trove falls below a minimum collateralization ratio (MCR) of 110%, it is considered under-collateralized, and is vulnerable to liquidation.
 
@@ -163,17 +163,17 @@ The Mosaic system regularly updates the REEF:USD price via a decentralized data 
 
 Mosaic utilizes a two-step liquidation mechanism in the following order of priority: 
 
-1. Offset under-collateralized Troves against the Stability Pool containing USDM tokens
+1. Offset under-collateralized Troves against the Stability Pool containing MoUSD tokens
 
 2. Redistribute under-collateralized Troves to other borrowers if the Stability Pool is emptied
 
-Mosaic primarily uses the USDM tokens in its Stability Pool to absorb the under-collateralized debt, i.e. to repay the liquidated borrower's liability.
+Mosaic primarily uses the MoUSD tokens in its Stability Pool to absorb the under-collateralized debt, i.e. to repay the liquidated borrower's liability.
 
-Any user may deposit USDM tokens to the Stability Pool. This allows them to earn the collateral from the liquidated Trove. When a liquidation occurs, the liquidated debt is cancelled with the same amount of USDM in the Pool (which is burned as a result), and the liquidated Ether is proportionally distributed to depositors.
+Any user may deposit MoUSD tokens to the Stability Pool. This allows them to earn the collateral from the liquidated Trove. When a liquidation occurs, the liquidated debt is cancelled with the same amount of MoUSD in the Pool (which is burned as a result), and the liquidated Ether is proportionally distributed to depositors.
 
 Stability Pool depositors can expect to earn net gains from liquidations, as in most cases, the value of the liquidated Ether will be greater than the value of the cancelled debt (since a liquidated Trove will likely have an ICR just slightly below 110%).
 
-If the liquidated debt is higher than the amount of USDM in the Stability Pool, the system tries to cancel as much debt as possible with the tokens in the Stability Pool, and then redistributes the remaining liquidated collateral and debt across all active Troves.
+If the liquidated debt is higher than the amount of MoUSD in the Stability Pool, the system tries to cancel as much debt as possible with the tokens in the Stability Pool, and then redistributes the remaining liquidated collateral and debt across all active Troves.
 
 Anyone may call the public `liquidateTroves()` function, which will check for under-collateralized Troves, and liquidate them. Alternatively they can call `batchLiquidateTroves()` with a custom list of trove addresses to attempt to liquidate.
 
@@ -185,46 +185,46 @@ Currently, mass liquidations performed via the above functions cost 60-65k gas p
 
 The precise behavior of liquidations depends on the ICR of the Trove being liquidated and global system conditions:  the total collateralization ratio (TCR) of the system, the size of the Stability Pool, etc.  
 
-Here is the liquidation logic for a single Trove in Normal Mode and Recovery Mode.  `SP.USDM` represents the USDM in the Stability Pool.
+Here is the liquidation logic for a single Trove in Normal Mode and Recovery Mode.  `SP.MoUSD` represents the MoUSD in the Stability Pool.
 
 #### Liquidations in Normal Mode: TCR >= 150%
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                      | Liquidation behavior                                                                                                                                                                                                                                                                                                |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR < MCR & SP.USDM >= trove.debt | USDM in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral is shared between depositors.                                                                                                                                                                       |
-| ICR < MCR & SP.USDM < trove.debt | The total StabilityPool USDM is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active Troves |
-| ICR < MCR & SP.USDM = 0          | Redistribute all debt and collateral (minus ETH gas compensation) to active Troves.                                                                                                                                                                                                                                 |
+| ICR < MCR & SP.MoUSD >= trove.debt | MoUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral is shared between depositors.                                                                                                                                                                       |
+| ICR < MCR & SP.MoUSD < trove.debt | The total StabilityPool MoUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active Troves |
+| ICR < MCR & SP.MoUSD = 0          | Redistribute all debt and collateral (minus ETH gas compensation) to active Troves.                                                                                                                                                                                                                                 |
 | ICR  >= MCR                      | Do nothing.                                                                                                                                                                                                                                                                                                         |
 #### Liquidations in Recovery Mode: TCR < 150%
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                                | Liquidation behavior                                                                                                                                                                                                                                                                                                                                                                                         |
 |------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ICR <=100%                               | Redistribute all debt and collateral (minus ETH gas compensation) to active Troves.                                                                                                                                                                                                                                                                                                                          |
-| 100% < ICR < MCR & SP.USDM > trove.debt  | USDM in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral (minus ETH gas compensation) is shared between depsitors.                                                                                                                                                                                                                                    |
-| 100% < ICR < MCR & SP.USDM < trove.debt  | The total StabilityPool USDM is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active troves                                                                                          |
-| MCR <= ICR < TCR & SP.USDM >= trove.debt  |  The Pool USDM is offset with an equal amount of debt from the Trove. A fraction of ETH collateral with dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to other active Troves. Since it's ICR was > 1.1, the Trove has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Trove is closed. |
-| MCR <= ICR < TCR & SP.USDM  < trove.debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 100% < ICR < MCR & SP.MoUSD > trove.debt  | MoUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral (minus ETH gas compensation) is shared between depsitors.                                                                                                                                                                                                                                    |
+| 100% < ICR < MCR & SP.MoUSD < trove.debt  | The total StabilityPool MoUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active troves                                                                                          |
+| MCR <= ICR < TCR & SP.MoUSD >= trove.debt  |  The Pool MoUSD is offset with an equal amount of debt from the Trove. A fraction of ETH collateral with dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to other active Troves. Since it's ICR was > 1.1, the Trove has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Trove is closed. |
+| MCR <= ICR < TCR & SP.MoUSD  < trove.debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ICR >= TCR                               | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ## Gains From Liquidations
 
 Stability Pool depositors gain Ether over time, as liquidated debt is cancelled with their deposit. When they withdraw all or part of their deposited tokens, or top up their deposit, the system sends them their accumulated ETH gains.
 
-Similarly, a Trove's accumulated gains from liquidations are automatically applied to the Trove when the owner performs any operation - e.g. adding/withdrawing collateral, or issuing/repaying USDM.
+Similarly, a Trove's accumulated gains from liquidations are automatically applied to the Trove when the owner performs any operation - e.g. adding/withdrawing collateral, or issuing/repaying MoUSD.
 
-## USDM Token Redemption
+## MoUSD Token Redemption
 
-Any USDM holder (whether or not they have an active Trove) may redeem their USDM directly with the system. Their USDM is exchanged for ETH, at face value: redeeming x USDM tokens returns \$x worth of ETH (minus a [redemption fee](#redemption-fee)).
+Any MoUSD holder (whether or not they have an active Trove) may redeem their MoUSD directly with the system. Their MoUSD is exchanged for ETH, at face value: redeeming x MoUSD tokens returns \$x worth of ETH (minus a [redemption fee](#redemption-fee)).
 
-When USDM is redeemed for ETH, the system cancels the USDM with debt from Troves, and the ETH is drawn from their collateral.
+When MoUSD is redeemed for ETH, the system cancels the MoUSD with debt from Troves, and the ETH is drawn from their collateral.
 
 In order to fulfill the redemption request, Troves are redeemed from in ascending order of their collateralization ratio.
 
 A redemption sequence of `n` steps will **fully** redeem from up to `n-1` Troves, and, and **partially** redeems from up to 1 Trove, which is always the last Trove in the redemption sequence.
 
-Redemptions are blocked when TCR < 110% (there is no need to restrict ICR < TCR). At that TCR redemptions would likely be unprofitable, as USDM is probably trading above $1 if the system has crashed that badly, but it could be a way for an attacker with a lot of USDM to lower the TCR even further.
+Redemptions are blocked when TCR < 110% (there is no need to restrict ICR < TCR). At that TCR redemptions would likely be unprofitable, as MoUSD is probably trading above $1 if the system has crashed that badly, but it could be a way for an attacker with a lot of MoUSD to lower the TCR even further.
 
-Note that redemptions are disabled during the first 14 days of operation since deployment of the Liquity protocol to protect the monetary system in its infancy.
+Note that redemptions are disabled during the first 14 days of operation since deployment of the Mosaic protocol to protect the monetary system in its infancy.
 
 ### Partial redemption
 
@@ -234,7 +234,7 @@ The partially redeemed Trove is re-inserted into the sorted list of Troves, and 
 
 ### Full redemption
 
-A Trove is defined as “fully redeemed from” when the redemption has caused (debt-200) of its debt to absorb (debt-200) USDM. Then, its 200 USDM Liquidation Reserve is cancelled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zero’d.
+A Trove is defined as “fully redeemed from” when the redemption has caused (debt-200) of its debt to absorb (debt-200) MoUSD. Then, its 200 MoUSD Liquidation Reserve is cancelled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zero’d.
 
 Before closing, we must handle the Trove’s **collateral surplus**: that is, the excess ETH collateral remaining after redemption, due to its initial over-collateralization.
 
@@ -242,40 +242,40 @@ This collateral surplus is sent to the `CollSurplusPool`, and the borrower can r
 
 ### Redemptions create a price floor
 
-Economically, the redemption mechanism creates a hard price floor for USDM, ensuring that the market price stays at or near to $1 USD. 
+Economically, the redemption mechanism creates a hard price floor for MoUSD, ensuring that the market price stays at or near to $1 USD. 
 
 ## Recovery Mode
 
 Recovery Mode kicks in when the total collateralization ratio (TCR) of the system falls below 150%.
 
-During Recovery Mode, liquidation conditions are relaxed, and the system blocks borrower transactions that would further decrease the TCR. New USDM may only be issued by adjusting existing Troves in a way that improves their ICR, or by opening a new Trove with an ICR of >=150%. In general, if an existing Trove's adjustment reduces its ICR, the transaction is only executed if the resulting TCR is above 150%
+During Recovery Mode, liquidation conditions are relaxed, and the system blocks borrower transactions that would further decrease the TCR. New MoUSD may only be issued by adjusting existing Troves in a way that improves their ICR, or by opening a new Trove with an ICR of >=150%. In general, if an existing Trove's adjustment reduces its ICR, the transaction is only executed if the resulting TCR is above 150%
 
-Recovery Mode is structured to incentivize borrowers to behave in ways that promptly raise the TCR back above 150%, and to incentivize USDM holders to replenish the Stability Pool.
+Recovery Mode is structured to incentivize borrowers to behave in ways that promptly raise the TCR back above 150%, and to incentivize MoUSD holders to replenish the Stability Pool.
 
 Economically, Recovery Mode is designed to encourage collateral top-ups and debt repayments, and also itself acts as a self-negating deterrent: the possibility of it occurring actually guides the system away from ever reaching it.
 
 ## Project Structure
 
 ### Directories
-- `papers` - Whitepaper and math papers: a proof of Liquity's trove order invariant, and a derivation of the scalable Stability Pool staking formula
-- `packages/dev-frontend/` - Liquity Developer UI: a fully functional React app used for interfacing with the smart contracts during development
-- `packages/fuzzer/` - A very simple, purpose-built tool based on Liquity middleware for randomly interacting with the system
+- `papers` - Whitepaper and math papers: a proof of Mosaic's trove order invariant, and a derivation of the scalable Stability Pool staking formula
+- `packages/dev-frontend/` - Mosaic Developer UI: a fully functional React app used for interfacing with the smart contracts during development
+- `packages/fuzzer/` - A very simple, purpose-built tool based on Mosaic middleware for randomly interacting with the system
 - `packages/lib-base/` - Common interfaces and classes shared by the other `lib-` packages
-- `packages/lib-ethers/` - [Ethers](https://github.com/ethers-io/ethers.js/)-based middleware that can read Liquity state and send transactions
-- `packages/lib-react/` - Components and hooks that React-based apps can use to view Liquity contract state
-- `packages/lib-subgraph/` - [Apollo Client](https://github.com/apollographql/apollo-client)-based middleware backed by the Liquity subgraph that can read Liquity state
+- `packages/lib-ethers/` - [Ethers](https://github.com/ethers-io/ethers.js/)-based middleware that can read Mosaic state and send transactions
+- `packages/lib-react/` - Components and hooks that React-based apps can use to view Mosaic contract state
+- `packages/lib-subgraph/` - [Apollo Client](https://github.com/apollographql/apollo-client)-based middleware backed by the Mosaic subgraph that can read Mosaic state
 - `packages/providers/` - Subclassed Ethers providers used by the frontend
-- `packages/subgraph/` - [Subgraph](https://thegraph.com) for querying Liquity state as well as historical data like transaction history
+- `packages/subgraph/` - [Subgraph](https://thegraph.com) for querying Mosaic state as well as historical data like transaction history
 - `packages/contracts/` - The backend development folder, contains the Hardhat project, contracts and tests
 - `packages/contracts/contracts/` - The core back end smart contracts written in Solidity
 - `packages/contracts/test/` - JS test suite for the system. Tests run in Mocha/Chai
 - `packages/contracts/tests/` - Python test suite for the system. Tests run in Brownie
-- `packages/contracts/gasTest/` - Non-assertive tests that return gas costs for Liquity operations under various scenarios
+- `packages/contracts/gasTest/` - Non-assertive tests that return gas costs for Mosaic operations under various scenarios
 - `packages/contracts/fuzzTests/` - Echidna tests, and naive "random operation" tests 
 - `packages/contracts/migrations/` - contains Hardhat script for deploying the smart contracts to the blockchain
 - `packages/contracts/utils/` - external Hardhat and node scripts - deployment helpers, gas calculators, etc
 
-Backend development is done in the Hardhat framework, and allows Liquity to be deployed on the Hardhat EVM network for fast compilation and test execution.
+Backend development is done in the Hardhat framework, and allows Mosaic to be deployed on the Hardhat EVM network for fast compilation and test execution.
 
 ### Branches
 
@@ -283,19 +283,19 @@ As of 18/01/2021, the current working branch is `main`. `master` is out of date.
 
 ## MSIC Token Architecture
 
-The Liquity system incorporates a secondary token, MSIC. This token entitles the holder to a share of the system revenue generated by redemption fees and  issuance fees.
+The Mosaic system incorporates a secondary token, MSIC. This token entitles the holder to a share of the system revenue generated by redemption fees and  issuance fees.
 
 To earn a share of system fees, the MSIC holder must stake their MSIC in a staking contract.
 
-Liquity also issues MSIC to Stability Providers, in a continous time-based manner.
+Mosaic also issues MSIC to Stability Providers, in a continous time-based manner.
 
 The MSIC contracts consist of:
 
-`MSICStaking.sol` - the staking contract, containing stake and unstake functionality for MSIC holders. This contract receives ETH fees from redemptions, and USDM fees from new debt issuance.
+`MSICStaking.sol` - the staking contract, containing stake and unstake functionality for MSIC holders. This contract receives ETH fees from redemptions, and MoUSD fees from new debt issuance.
 
 `CommunityIssuance.sol` - This contract handles the issuance of MSIC tokens to Stability Providers as a function of time. It is controlled by the `StabilityPool`. Upon system launch, the `CommunityIssuance` automatically receives 32 million MSIC - the “community issuance” supply. The contract steadily issues these MSIC tokens to the Stability Providers over time.
 
-`MSICToken.sol` - This is the MSIC ERC20 contract. It has a hard cap supply of 100 million, and during the first year, restricts transfers from the Liquity admin address, a regular Ethereum address controlled by the project company Liquity AG. **Note that the Liquity admin address has no extra privileges and does not retain any control over the Liquity protocol once deployed.**
+`MSICToken.sol` - This is the MSIC ERC20 contract. It has a hard cap supply of 100 million, and during the first year, restricts transfers from the Mosaic admin address, a regular Ethereum address controlled by the project company Mosaic AG. **Note that the Mosaic admin address has no extra privileges and does not retain any control over the Mosaic protocol once deployed.**
 
 ### MSIC Lockup contracts and token vesting
 
@@ -305,50 +305,50 @@ In the first year after launch:
 
 - All team members and partners are unable to access their locked up MSIC tokens
 
-- The Liquity admin address may transfer tokens **only to verified lockup contracts with an unlock date at least one year after system deployment**
+- The Mosaic admin address may transfer tokens **only to verified lockup contracts with an unlock date at least one year after system deployment**
 
 Also, separate MSIC allocations are made at deployment to an EOA that will hold an amount of MSIC for bug bounties/hackathons and to a Uniswap LP reward contract. Aside from these allocations, the only MSIC made freely available in this first year is the MSIC that is publically issued to Stability Providers via the `CommunityIssuance` contract.
 
 ### Lockup Implementation and admin transfer restriction
 
-A `LockupContractFactory` is used to deploy `LockupContracts` in the first year. During the first year, the `MSICToken` checks that any transfer from the Liquity admin address is to a valid `LockupContract` that is registered in and was deployed through the `LockupContractFactory`.
+A `LockupContractFactory` is used to deploy `LockupContracts` in the first year. During the first year, the `MSICToken` checks that any transfer from the Mosaic admin address is to a valid `LockupContract` that is registered in and was deployed through the `LockupContractFactory`.
 
 ### Launch sequence and vesting process
 
 #### Deploy MSIC Contracts
-1. Liquity admin deploys `LockupContractFactory`
-2. Liquity admin deploys `CommunityIssuance`
-3. Liquity admin deploys `MSICStaking` 
-4. Liquity admin creates a Pool in Uniswap for USDM/ETH and deploys `Unipool` (LP rewards contract), which knows the address of the Pool
-5. Liquity admin deploys `MSICToken`, which upon deployment:
+1. Mosaic admin deploys `LockupContractFactory`
+2. Mosaic admin deploys `CommunityIssuance`
+3. Mosaic admin deploys `MSICStaking` 
+4. Mosaic admin creates a Pool in Uniswap for MoUSD/ETH and deploys `Unipool` (LP rewards contract), which knows the address of the Pool
+5. Mosaic admin deploys `MSICToken`, which upon deployment:
 - Stores the `CommunityIssuance` and `LockupContractFactory` addresses
-- Mints MSIC tokens to `CommunityIssuance`, the Liquity admin address, the `Unipool` LP rewards address, and the bug bounty address
-6. Liquity admin sets `MSICToken` address in `LockupContractFactory`, `CommunityIssuance`, `MSICStaking`, and `Unipool`
+- Mints MSIC tokens to `CommunityIssuance`, the Mosaic admin address, the `Unipool` LP rewards address, and the bug bounty address
+6. Mosaic admin sets `MSICToken` address in `LockupContractFactory`, `CommunityIssuance`, `MSICStaking`, and `Unipool`
 
 #### Deploy and fund Lockup Contracts
-7. Liquity admin tells `LockupContractFactory` to deploy a `LockupContract` for each beneficiary, with an `unlockTime` set to exactly one year after system deployment
-8. Liquity admin transfers MSIC to each `LockupContract`, according to their entitlement
+7. Mosaic admin tells `LockupContractFactory` to deploy a `LockupContract` for each beneficiary, with an `unlockTime` set to exactly one year after system deployment
+8. Mosaic admin transfers MSIC to each `LockupContract`, according to their entitlement
 
-#### Deploy Liquity Core
-9. Liquity admin deploys the Liquity core system
-10. Liquity admin connects Liquity core system internally (with setters)
-11. Liquity admin connects `MSICStaking` to Liquity core contracts and `MSICToken`
-13. Liquity admin connects `CommunityIssuance` to Liquity core contracts and `MSICToken`
+#### Deploy Mosaic Core
+9. Mosaic admin deploys the Mosaic core system
+10. Mosaic admin connects Mosaic core system internally (with setters)
+11. Mosaic admin connects `MSICStaking` to Mosaic core contracts and `MSICToken`
+13. Mosaic admin connects `CommunityIssuance` to Mosaic core contracts and `MSICToken`
 
 #### During one year lockup period
-- Liquity admin periodically transfers newly vested tokens to team & partners’ `LockupContracts`, as per their vesting schedules
-- Liquity admin may only transfer MSIC to `LockupContracts`
+- Mosaic admin periodically transfers newly vested tokens to team & partners’ `LockupContracts`, as per their vesting schedules
+- Mosaic admin may only transfer MSIC to `LockupContracts`
 - Anyone may deploy new `LockupContracts` via the Factory, setting any `unlockTime` that is >= 1 year from system deployment
 
 #### Upon end of one year lockup period
 - All beneficiaries may withdraw their entire entitlements
-- Liquity admin address restriction on MSIC transfers is automatically lifted, and Liquity admin may now transfer MSIC to any address
+- Mosaic admin address restriction on MSIC transfers is automatically lifted, and Mosaic admin may now transfer MSIC to any address
 - Anyone may deploy new `LockupContracts` via the Factory, setting any `unlockTime` in the future
 
 #### Post-lockup period
-- Liquity admin periodically transfers newly vested tokens to team & partners, directly to their individual addresses, or to a fresh lockup contract if required.
+- Mosaic admin periodically transfers newly vested tokens to team & partners, directly to their individual addresses, or to a fresh lockup contract if required.
 
-_NOTE: In the final architecture, a multi-sig contract will be used to move MSIC Tokens, rather than the single Liquity admin EOA. It will be deployed at the start of the sequence, and have its address recorded in  `MSICToken` in step 4, and receive MSIC tokens. It will be used to move MSIC in step 7, and during & after the lockup period. The Liquity admin EOA will only be used for deployment of contracts in steps 1-4 and 9._
+_NOTE: In the final architecture, a multi-sig contract will be used to move MSIC Tokens, rather than the single Mosaic admin EOA. It will be deployed at the start of the sequence, and have its address recorded in  `MSICToken` in step 4, and receive MSIC tokens. It will be used to move MSIC in step 7, and during & after the lockup period. The Mosaic admin EOA will only be used for deployment of contracts in steps 1-4 and 9._
 
 _The current code does not utilize a multi-sig. It implements the launch architecture outlined above._
 
@@ -356,13 +356,13 @@ _Additionally, a LP staking contract will receive the initial LP staking reward 
 
 ## Core System Architecture
 
-The core Liquity system consists of several smart contracts, which are deployable to the Ethereum blockchain.
+The core Mosaic system consists of several smart contracts, which are deployable to the Ethereum blockchain.
 
-All application logic and data is contained in these contracts - there is no need for a separate database or back end logic running on a web server. In effect, the Ethereum network is itself the Liquity back end. As such, all balances and contract data are public.
+All application logic and data is contained in these contracts - there is no need for a separate database or back end logic running on a web server. In effect, the Ethereum network is itself the Mosaic back end. As such, all balances and contract data are public.
 
 The system has no admin key or human governance. Once deployed, it is fully automated, decentralized and no user holds any special privileges in or control over the system.
 
-The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. Together they control Trove state updates and movements of Ether and USDM tokens around the system.
+The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. Together they control Trove state updates and movements of Ether and MoUSD tokens around the system.
 
 ### Core Smart Contracts
 
@@ -370,11 +370,11 @@ The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `Sta
 
 `TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `MSICStaking` contract. Also contains the state of each Trove - i.e. a record of the Trove’s collateral and debt. TroveManager does not hold value (i.e. Ether / other tokens). TroveManager functions call in to the various Pools to tell them to move Ether/tokens between Pools, where necessary.
 
-`LiquityBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract LiquityBase, which contains global constants and some common functions.
+`MosaicBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract MosaicBase, which contains global constants and some common functions.
 
-`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits, and withdrawing compounded deposits and accumulated ETH and MSIC gains. Holds the USDM Stability Pool deposits, and the ETH gains for depositors, from liquidations.
+`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits, and withdrawing compounded deposits and accumulated ETH and MSIC gains. Holds the MoUSD Stability Pool deposits, and the ETH gains for depositors, from liquidations.
 
-`USDMToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns and transfers USDM tokens.
+`USDMToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns and transfers MoUSD tokens.
 
 `SortedTroves.sol` - a doubly linked list that stores addresses of Trove owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts Troves at the correct position, based on their ICR.
 
@@ -392,7 +392,7 @@ Along with `StabilityPool.sol`, these contracts hold Ether and/or tokens for the
 
 `CollSurplusPool.sol` - holds the ETH surplus from Troves that have been fully redeemed from as well as from Troves with an ICR > MCR that were liquidated in Recovery Mode. Sends the surplus back to the owning borrower, when told to do so by `BorrowerOperations.sol`.
 
-`GasPool.sol` - holds the total USDM liquidation reserves. USDM is moved into the `GasPool` when a Trove is opened, and moved out when a Trove is liquidated or closed.
+`GasPool.sol` - holds the total MoUSD liquidation reserves. MoUSD is moved into the `GasPool` when a Trove is opened, and moved out when a Trove is liquidated or closed.
 
 ### Contract Interfaces
 
@@ -400,7 +400,7 @@ Along with `StabilityPool.sol`, these contracts hold Ether and/or tokens for the
 
 ### PriceFeed and Oracle
 
-Liquity functions that require the most current ETH:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the Chainlink ETH:USD reference contract as its primary and Tellor's ETH:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
+Mosaic functions that require the most current ETH:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the Chainlink ETH:USD reference contract as its primary and Tellor's ETH:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
 
 The fallback logic distinguishes 3 different failure modes for Chainlink and 2 failure modes for Tellor:
 
@@ -410,13 +410,13 @@ The fallback logic distinguishes 3 different failure modes for Chainlink and 2 f
 
 There is also a return condition `bothOraclesLiveAndUnbrokenAndSimilarPrice` which is a function returning true if both oracles are live and not broken, and the percentual difference between the two reported prices is below 5%.
 
-The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Liquity functions which require a current ETH:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
+The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Mosaic functions which require a current ETH:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
 
 ### Tellor price data lag
 
-Liquity sees a Tellor ETH-USD price that is at least 15 minutes old. This is because Tellor operates via proof-of-stake, and some dispute period is needed in which fake prices can be disputed. When a Tellor price is disputed, it is removed from the list of prices that Liquity sees. This dispute period ensures that, given at least one responsive disputer who disputes fake ETH prices, Liquity will never consume fake price data from Tellor.
+Mosaic sees a Tellor ETH-USD price that is at least 15 minutes old. This is because Tellor operates via proof-of-stake, and some dispute period is needed in which fake prices can be disputed. When a Tellor price is disputed, it is removed from the list of prices that Mosaic sees. This dispute period ensures that, given at least one responsive disputer who disputes fake ETH prices, Mosaic will never consume fake price data from Tellor.
 
-The choice of 15 minutes for the dispute period was based on careful analysis of the impact of a delayed ETH price on a Liquity system. We used historical ETH price data and looked at the impact of different delay lengths. 15 minutes was chosen as a sweet spot that gives plenty of time for disputers to respond to fake prices, while keeping any adverse impacts on Liquity to a minimum.
+The choice of 15 minutes for the dispute period was based on careful analysis of the impact of a delayed ETH price on a Mosaic system. We used historical ETH price data and looked at the impact of different delay lengths. 15 minutes was chosen as a sweet spot that gives plenty of time for disputers to respond to fake prices, while keeping any adverse impacts on Mosaic to a minimum.
 
 ### PriceFeed Logic
 
@@ -441,27 +441,27 @@ The PriceFeed logic consists of automatic on-chain decision-making for obtaining
 
 The PriceFeed logic is complex, and although we would prefer simplicity, it does allow the system a chance of switching to an accurate price source in case of a Chainlink failure or timeout, and also the possibility of returning to an honest Chainlink price after it has failed and recovered.
 
-We believe the benefit of the fallback logic is worth the complexity, given that our system is entirely immutable - if we had no fallback logic and Chainlink were to be hacked or permanently fail, Liquity would become permanently unusable anyway.
+We believe the benefit of the fallback logic is worth the complexity, given that our system is entirely immutable - if we had no fallback logic and Chainlink were to be hacked or permanently fail, Mosaic would become permanently unusable anyway.
 
 
 
-**Chainlink Decimals**: the `PriceFeed` checks for and uses the latest `decimals` value reported by the Chainlink aggregator in order to calculate the Chainlink price at 18-digit precision, as needed by Liquity.  `PriceFeed` does not assume a value for decimals and can handle the case where Chainlink change their decimal value. 
+**Chainlink Decimals**: the `PriceFeed` checks for and uses the latest `decimals` value reported by the Chainlink aggregator in order to calculate the Chainlink price at 18-digit precision, as needed by Mosaic.  `PriceFeed` does not assume a value for decimals and can handle the case where Chainlink change their decimal value. 
 
-However, the check `chainlinkIsBroken` uses both the current response from the latest round and the response previous round. Since `decimals` is not attached to round data, Liquity has no way of knowing whether decimals has changed between the current round and the previous round, so we assume it is the same. Liquity assumes the current return value of decimals() applies to both current round `i` and previous round `i-1`. 
+However, the check `chainlinkIsBroken` uses both the current response from the latest round and the response previous round. Since `decimals` is not attached to round data, Mosaic has no way of knowing whether decimals has changed between the current round and the previous round, so we assume it is the same. Mosaic assumes the current return value of decimals() applies to both current round `i` and previous round `i-1`. 
 
-This means that a decimal change that coincides with a Liquity price fetch could cause Liquity to assert that the Chainlink price has deviated too much, and fall back to Tellor. There is nothing we can do about this. We hope/expect Chainlink to never change their `decimals()` return value (currently 8), and if a hack/technical error causes Chainlink's decimals to change, Liquity may fall back to Tellor.
+This means that a decimal change that coincides with a Mosaic price fetch could cause Mosaic to assert that the Chainlink price has deviated too much, and fall back to Tellor. There is nothing we can do about this. We hope/expect Chainlink to never change their `decimals()` return value (currently 8), and if a hack/technical error causes Chainlink's decimals to change, Mosaic may fall back to Tellor.
 
 To summarize the Chainlink decimals issue: 
-- Liquity can handle the case where Chainlink decimals changes across _two consecutive rounds `i` and `i-1` which are not used in the same Liquity price fetch_
-- If Liquity fetches the price at round `i`, it will not know if Chainlink decimals changed across round `i-1` to round `i`, and the consequent price scaling distortion may cause Liquity to fall back to Tellor
-- Liquity will always calculate the correct current price at 18-digit precision assuming the current return value of `decimals()` is correct (i.e. is the value used by the nodes).
+- Mosaic can handle the case where Chainlink decimals changes across _two consecutive rounds `i` and `i-1` which are not used in the same Mosaic price fetch_
+- If Mosaic fetches the price at round `i`, it will not know if Chainlink decimals changed across round `i-1` to round `i`, and the consequent price scaling distortion may cause Mosaic to fall back to Tellor
+- Mosaic will always calculate the correct current price at 18-digit precision assuming the current return value of `decimals()` is correct (i.e. is the value used by the nodes).
 
-**Tellor Decimals**: Tellor uses 6 decimal precision for their ETHUSD price as determined by a social consensus of Tellor miners/data providers, and shown on Tellor's price feed page. Their decimals value is not offered in their on-chain contracts.  We rely on the continued social consensus around 6 decimals for their ETHUSD price feed. Tellor have informed us that if there was demand for an ETHUSD price at different precision, they would simply create a new `requestId`, and make no attempt to alter the social consensus around the precision of the current ETHUSD `requestId` (1) used by Liquity.
+**Tellor Decimals**: Tellor uses 6 decimal precision for their ETHUSD price as determined by a social consensus of Tellor miners/data providers, and shown on Tellor's price feed page. Their decimals value is not offered in their on-chain contracts.  We rely on the continued social consensus around 6 decimals for their ETHUSD price feed. Tellor have informed us that if there was demand for an ETHUSD price at different precision, they would simply create a new `requestId`, and make no attempt to alter the social consensus around the precision of the current ETHUSD `requestId` (1) used by Mosaic.
 
 
 ### Keeping a sorted list of Troves ordered by ICR
 
-Liquity relies on a particular data structure: a sorted doubly-linked list of Troves that remains ordered by individual collateralization ratio (ICR), i.e. the amount of collateral (in USD) divided by the amount of debt (in USDM).
+Mosaic relies on a particular data structure: a sorted doubly-linked list of Troves that remains ordered by individual collateralization ratio (ICR), i.e. the amount of collateral (in USD) divided by the amount of debt (in MoUSD).
 
 This ordered list is critical for gas-efficient redemption sequences and for the `liquidateTroves` sequence, both of which target Troves in ascending order of ICR.
 
@@ -476,7 +476,7 @@ ICRs are computed dynamically at runtime, and not stored on the node. This is be
 
 The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active Troves (though it does decrease the ICR of each active Trove above the MCR).
 
-The fact that ordering is maintained as redistributions occur, is not immediately obvious: please see the [mathematical proof](https://github.com/liquity/dev/blob/main/papers) which shows that this holds in Liquity.
+The fact that ordering is maintained as redistributions occur, is not immediately obvious: please see the [mathematical proof](https://github.com/mosaic/dev/blob/main/papers) which shows that this holds in Mosaic.
 
 A node inserted based on current ICR will maintain the correct position, relative to its peers, as liquidation gains accumulate, as long as its raw collateral and debt have not changed.
 
@@ -484,7 +484,7 @@ Nodes also remain sorted as the ETH:USD price varies, since price fluctuations c
 
 Thus, nodes need only be re-inserted to the sorted list upon a Trove operation - when the owner adds or removes collateral or debt to their position.
 
-### Flow of Ether in Liquity
+### Flow of Ether in Mosaic
 
 ![Flow of Ether](images/ETH_flows.svg)
 
@@ -541,60 +541,60 @@ MSICStaking receives ETH coming from redemption fees.
 | stake       | staker's accumulated ETH gain from system fees | MSICStaking ->msg.sender |
 | unstake     | staker's accumulated ETH gain from system fees | MSICStaking ->msg.sender |
 
-### Flow of USDM tokens in Liquity
+### Flow of MoUSD tokens in Mosaic
 
-![Flow of USDM](images/USDM_flows.svg)
+![Flow of MoUSD](images/USDM_flows.svg)
 
-When a user issues debt from their Trove, USDM tokens are minted to their own address, and a debt is recorded on the Trove. Conversely, when they repay their Trove’s USDM debt, USDM is burned from their address, and the debt on their Trove is reduced.
+When a user issues debt from their Trove, MoUSD tokens are minted to their own address, and a debt is recorded on the Trove. Conversely, when they repay their Trove’s MoUSD debt, MoUSD is burned from their address, and the debt on their Trove is reduced.
 
-Redemptions burn USDM from the redeemer’s balance, and reduce the debt of the Trove redeemed against.
+Redemptions burn MoUSD from the redeemer’s balance, and reduce the debt of the Trove redeemed against.
 
-Liquidations that involve a Stability Pool offset burn tokens from the Stability Pool’s balance, and reduce the USDM debt of the liquidated Trove.
+Liquidations that involve a Stability Pool offset burn tokens from the Stability Pool’s balance, and reduce the MoUSD debt of the liquidated Trove.
 
-The only time USDM is transferred to/from a Liquity contract, is when a user deposits USDM to, or withdraws USDM from, the StabilityPool.
+The only time MoUSD is transferred to/from a Mosaic contract, is when a user deposits MoUSD to, or withdraws MoUSD from, the StabilityPool.
 
 **Borrower Operations**
 
-| Function                      | USDM Quantity | ERC20 Operation                      |
+| Function                      | MoUSD Quantity | ERC20 Operation                      |
 |-------------------------------|---------------|--------------------------------------|
-| openTrove                     | Drawn USDM    | USDM._mint(msg.sender, _USDMAmount)  |
-|                               | Issuance fee  | USDM._mint(MSICStaking,  USDMFee)    |
-| withdrawUSDM                  | Drawn USDM    | USDM._mint(msg.sender, _USDMAmount)  |
-|                               | Issuance fee  | USDM._mint(MSICStaking,  USDMFee)    |
-| repayUSDM                     | Repaid USDM   | USDM._burn(msg.sender, _USDMAmount)  |
-| adjustTrove: withdrawing USDM | Drawn USDM    | USDM._mint(msg.sender, _USDMAmount)  |
-|                               | Issuance fee  | USDM._mint(MSICStaking,  USDMFee)    |
-| adjustTrove: repaying USDM    | Repaid USDM   | USDM._burn(msg.sender, _USDMAmount)  |
-| closeTrove                    | Repaid USDM   | USDM._burn(msg.sender, _USDMAmount) |
+| openTrove                     | Drawn MoUSD    | MoUSD._mint(msg.sender, _USDMAmount)  |
+|                               | Issuance fee  | MoUSD._mint(MSICStaking,  USDMFee)    |
+| withdrawUSDM                  | Drawn MoUSD    | MoUSD._mint(msg.sender, _USDMAmount)  |
+|                               | Issuance fee  | MoUSD._mint(MSICStaking,  USDMFee)    |
+| repayUSDM                     | Repaid MoUSD   | MoUSD._burn(msg.sender, _USDMAmount)  |
+| adjustTrove: withdrawing MoUSD | Drawn MoUSD    | MoUSD._mint(msg.sender, _USDMAmount)  |
+|                               | Issuance fee  | MoUSD._mint(MSICStaking,  USDMFee)    |
+| adjustTrove: repaying MoUSD    | Repaid MoUSD   | MoUSD._burn(msg.sender, _USDMAmount)  |
+| closeTrove                    | Repaid MoUSD   | MoUSD._burn(msg.sender, _USDMAmount) |
 
 **Trove Manager**
 
-| Function                 | USDM Quantity            | ERC20 Operation                                  |
+| Function                 | MoUSD Quantity            | ERC20 Operation                                  |
 |--------------------------|--------------------------|--------------------------------------------------|
-| liquidate (offset)       | USDM to offset with debt | USDM._burn(stabilityPoolAddress, _debtToOffset); |
-| liquidateTroves (offset)   | USDM to offset with debt | USDM._burn(stabilityPoolAddress, _debtToOffset); |
-| batchLiquidateTroves (offset) | USDM to offset with debt | USDM._burn(stabilityPoolAddress, _debtToOffset); |
-| redeemCollateral         | USDM to redeem           | USDM._burn(msg.sender, _USDM)                    |
+| liquidate (offset)       | MoUSD to offset with debt | MoUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| liquidateTroves (offset)   | MoUSD to offset with debt | MoUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| batchLiquidateTroves (offset) | MoUSD to offset with debt | MoUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| redeemCollateral         | MoUSD to redeem           | MoUSD._burn(msg.sender, _USDM)                    |
 
 **Stability Pool**
 
-| Function       | USDM Quantity    | ERC20 Operation                                             |
+| Function       | MoUSD Quantity    | ERC20 Operation                                             |
 |----------------|------------------|-------------------------------------------------------------|
-| provideToSP    | deposit / top-up | USDM._transfer(msg.sender, stabilityPoolAddress, _amount);  |
-| withdrawFromSP | withdrawal       | USDM._transfer(stabilityPoolAddress, msg.sender, _amount);  |
+| provideToSP    | deposit / top-up | MoUSD._transfer(msg.sender, stabilityPoolAddress, _amount);  |
+| withdrawFromSP | withdrawal       | MoUSD._transfer(stabilityPoolAddress, msg.sender, _amount);  |
 
 **MSIC Staking**
 
-| Function | USDM Quantity                                   | ERC20 Operation                                           |
+| Function | MoUSD Quantity                                   | ERC20 Operation                                           |
 |----------|-------------------------------------------------|-----------------------------------------------------------|
-| stake    | staker's accumulated USDM gain from system fees | USDM._transfer(MSICStakingAddress, msg.sender, USDMGain); |
-| unstake  | staker's accumulated USDM gain from system fees | USDM._transfer(MSICStakingAddress, msg.sender, USDMGain); |
+| stake    | staker's accumulated MoUSD gain from system fees | MoUSD._transfer(MSICStakingAddress, msg.sender, USDMGain); |
+| unstake  | staker's accumulated MoUSD gain from system fees | MoUSD._transfer(MSICStakingAddress, msg.sender, USDMGain); |
 
-### Flow of MSIC Tokens in Liquity
+### Flow of MSIC Tokens in Mosaic
 
 ![Flow of MSIC](images/MSIC_flows.svg)
 
-Stability Providers and Frontend Operators receive MSIC gains according to their share of the total USDM deposits, and the MSIC community issuance schedule.  Once obtained, MSIC can be staked and unstaked with the `MSICStaking` contract.
+Stability Providers and Frontend Operators receive MSIC gains according to their share of the total MoUSD deposits, and the MSIC community issuance schedule.  Once obtained, MSIC can be staked and unstaked with the `MSICStaking` contract.
 
 **Stability Pool**
 
@@ -621,13 +621,13 @@ Generally, borrowers call functions that trigger Trove operations on their own T
 
 Anyone may call the public liquidation functions, and attempt to liquidate one or several Troves.
 
-USDM token holders may also redeem their tokens, and swap an amount of tokens 1-for-1 in value (minus fees) with Ether.
+MoUSD token holders may also redeem their tokens, and swap an amount of tokens 1-for-1 in value (minus fees) with Ether.
 
-MSIC token holders may stake their MSIC, to earn a share of the system fee revenue, in ETH and USDM.
+MSIC token holders may stake their MSIC, to earn a share of the system fee revenue, in ETH and MoUSD.
 
 ## Contract Ownership and Function Permissions
 
-All the core smart contracts inherit from the OpenZeppelin `Ownable.sol` contract template. As such all contracts have a single owning address, which is the deploying address. The contract's ownership is renounced either upon deployment, or immediately after its address setter has been called, connecting it to the rest of the core Liquity system. 
+All the core smart contracts inherit from the OpenZeppelin `Ownable.sol` contract template. As such all contracts have a single owning address, which is the deploying address. The contract's ownership is renounced either upon deployment, or immediately after its address setter has been called, connecting it to the rest of the core Mosaic system. 
 
 Several public and external functions have modifiers such as `requireCallerIsTroveManager`, `requireCallerIsActivePool`, etc - ensuring they can only be called by the respective permitted contract.
 
@@ -707,11 +707,11 @@ To check test coverage you can run:
 yarn coverage
 ```
 
-You can see the coverage status at mainnet deployment [here](https://codecov.io/gh/liquity/dev/tree/8f52f2906f99414c0b1c3a84c95c74c319b7a8c6).
+You can see the coverage status at mainnet deployment [here](https://codecov.io/gh/mosaic/dev/tree/8f52f2906f99414c0b1c3a84c95c74c319b7a8c6).
 
-![Impacted file tree graph](https://codecov.io/gh/liquity/dev/pull/707/graphs/tree.svg?width=650&height=150&src=pr&token=7AJPQ3TW0O&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=liquity)
+![Impacted file tree graph](https://codecov.io/gh/mosaic/dev/pull/707/graphs/tree.svg?width=650&height=150&src=pr&token=7AJPQ3TW0O&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=mosaic)
 
-There’s also a [pull request](https://github.com/liquity/dev/pull/515) to increase the coverage, but it hasn’t been merged yet because it modifies some smart contracts (mostly removing unnecessary checks).
+There’s also a [pull request](https://github.com/mosaic/dev/pull/515) to increase the coverage, but it hasn’t been merged yet because it modifies some smart contracts (mostly removing unnecessary checks).
 
 
 ## System Quantities - Units and Representation
@@ -746,13 +746,13 @@ All data structures with the ‘public’ visibility specifier are ‘gettable�
 
 `withdrawColl(uint _amount, address _upperHint, address _lowerHint)`: withdraws `_amount` of collateral from the caller’s Trove. Executes only if the user has an active Trove, the withdrawal would not pull the user’s Trove below the minimum collateralization ratio, and the resulting total collateralization ratio of the system is above 150%. 
 
-`function withdrawUSDM(uint _maxFeePercentage, uint _USDMAmount, address _upperHint, address _lowerHint)`: issues `_amount` of USDM from the caller’s Trove to the caller. Executes only if the Trove's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
+`function withdrawUSDM(uint _maxFeePercentage, uint _USDMAmount, address _upperHint, address _lowerHint)`: issues `_amount` of MoUSD from the caller’s Trove to the caller. Executes only if the Trove's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
 
-`repayUSDM(uint _amount, address _upperHint, address _lowerHint)`: repay `_amount` of USDM to the caller’s Trove, subject to leaving 50 debt in the Trove (which corresponds to the 50 USDM gas compensation).
+`repayUSDM(uint _amount, address _upperHint, address _lowerHint)`: repay `_amount` of MoUSD to the caller’s Trove, subject to leaving 50 debt in the Trove (which corresponds to the 50 MoUSD gas compensation).
 
 `_adjustTrove(address _borrower, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage)`: enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: if the adjustment reduces the collateralization ratio of the Trove, the function only executes if the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee. The parameter is ignored if the debt is not increased with the transaction.
 
-`closeTrove()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Trove. Requires the borrower have a USDM balance sufficient to repay their trove's debt, excluding gas compensation - i.e. `(debt - 50)` USDM.
+`closeTrove()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Trove. Requires the borrower have a MoUSD balance sufficient to repay their trove's debt, excluding gas compensation - i.e. `(debt - 50)` MoUSD.
 
 `claimCollateral(address _user)`: when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, this function allows the borrower to claim their ETH collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
 
@@ -764,9 +764,9 @@ All data structures with the ‘public’ visibility specifier are ‘gettable�
 
 `batchLiquidateTroves(address[] calldata _troveArray)`: callable by anyone, accepts a custom list of Troves addresses as an argument. Steps through the provided list and attempts to liquidate every Trove, until it reaches the end or it runs out of gas. A Trove is liquidated only if it meets the conditions for liquidation. For a batch of 10 Troves, the gas costs per liquidated Trove are roughly between 75K-83K, for a batch of 50 Troves between 54K-69K.
 
-`redeemCollateral(uint _USDMAmount, address _firstRedemptionHint, address _upperPartialRedemptionHint, address _lowerPartialRedemptionHint, uint _partialRedemptionHintNICR, uint _maxIterations, uint _maxFeePercentage)`: redeems `_USDMamount` of stablecoins for ether from the system. Decreases the caller’s USDM balance, and sends them the corresponding amount of ETH. Executes successfully if the caller has sufficient USDM to redeem. The number of Troves redeemed from is capped by `_maxIterations`. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when another redemption transaction is processed first, driving up the redemption fee.
+`redeemCollateral(uint _USDMAmount, address _firstRedemptionHint, address _upperPartialRedemptionHint, address _lowerPartialRedemptionHint, uint _partialRedemptionHintNICR, uint _maxIterations, uint _maxFeePercentage)`: redeems `_USDMamount` of stablecoins for ether from the system. Decreases the caller’s MoUSD balance, and sends them the corresponding amount of ETH. Executes successfully if the caller has sufficient MoUSD to redeem. The number of Troves redeemed from is capped by `_maxIterations`. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when another redemption transaction is processed first, driving up the redemption fee.
 
-`getCurrentICR(address _user, uint _price)`: computes the user’s individual collateralization ratio (ICR) based on their total collateral and total USDM debt. Returns 2^256 -1 if they have 0 debt.
+`getCurrentICR(address _user, uint _price)`: computes the user’s individual collateralization ratio (ICR) based on their total collateral and total MoUSD debt. Returns 2^256 -1 if they have 0 debt.
 
 `getTroveOwnersCount()`: get the number of active Troves in the system.
 
@@ -798,9 +798,9 @@ The number of Troves to consider for redemption can be capped by passing a non-z
 
 ### Stability Pool Functions - `StabilityPool.sol`
 
-`provideToSP(uint _amount, address _frontEndTag)`: allows stablecoin holders to deposit `_amount` of USDM to the Stability Pool. It sends `_amount` of USDM from their address to the Pool, and tops up their USDM deposit by `_amount` and their tagged front end’s stake by `_amount`. If the depositor already has a non-zero deposit, it sends their accumulated ETH and MSIC gains to their address, and pays out their front end’s MSIC gain to their front end.
+`provideToSP(uint _amount, address _frontEndTag)`: allows stablecoin holders to deposit `_amount` of MoUSD to the Stability Pool. It sends `_amount` of MoUSD from their address to the Pool, and tops up their MoUSD deposit by `_amount` and their tagged front end’s stake by `_amount`. If the depositor already has a non-zero deposit, it sends their accumulated ETH and MSIC gains to their address, and pays out their front end’s MSIC gain to their front end.
 
-`withdrawFromSP(uint _amount)`: allows a stablecoin holder to withdraw `_amount` of USDM from the Stability Pool, up to the value of their remaining Stability deposit. It decreases their USDM balance by `_amount` and decreases their front end’s stake by `_amount`. It sends the depositor’s accumulated ETH and MSIC gains to their address, and pays out their front end’s MSIC gain to their front end. If the user makes a partial withdrawal, their deposit remainder will earn further gains. To prevent potential loss evasion by depositors, withdrawals from the Stability Pool are suspended when there are liquidable Troves with ICR < 110% in the system.
+`withdrawFromSP(uint _amount)`: allows a stablecoin holder to withdraw `_amount` of MoUSD from the Stability Pool, up to the value of their remaining Stability deposit. It decreases their MoUSD balance by `_amount` and decreases their front end’s stake by `_amount`. It sends the depositor’s accumulated ETH and MSIC gains to their address, and pays out their front end’s MSIC gain to their front end. If the user makes a partial withdrawal, their deposit remainder will earn further gains. To prevent potential loss evasion by depositors, withdrawals from the Stability Pool are suspended when there are liquidable Troves with ICR < 110% in the system.
 
 `withdrawETHGainToTrove(address _hint)`: sends the user's entire accumulated ETH gain to the user's active Trove, and updates their Stability deposit with its accumulated loss from debt absorptions. Sends the depositor's MSIC gain to the depositor, and sends the tagged front end's MSIC gain to the front end.
 
@@ -818,9 +818,9 @@ The number of Troves to consider for redemption can be capped by passing a non-z
 
 ### MSIC Staking Functions  `MSICStaking.sol`
 
- `stake(uint _MSICamount)`: sends `_MSICAmount` from the caller to the staking contract, and increases their stake. If the caller already has a non-zero stake, it pays out their accumulated ETH and USDM gains from staking.
+ `stake(uint _MSICamount)`: sends `_MSICAmount` from the caller to the staking contract, and increases their stake. If the caller already has a non-zero stake, it pays out their accumulated ETH and MoUSD gains from staking.
 
- `unstake(uint _MSICamount)`: reduces the caller’s stake by `_MSICamount`, up to a maximum of their entire stake. It pays out their accumulated ETH and USDM gains from staking.
+ `unstake(uint _MSICamount)`: reduces the caller’s stake by `_MSICamount`, up to a maximum of their entire stake. It pays out their accumulated ETH and MoUSD gains from staking.
 
 ### Lockup Contract Factory `LockupContractFactory.sol`
 
@@ -830,7 +830,7 @@ The number of Troves to consider for redemption can be capped by passing a non-z
 
 `withdrawMSIC()`: When the current time is later than the `unlockTime` and the caller is the beneficiary, it transfers their MSIC to them.
 
-### USDM token `USDMToken.sol` and MSIC token `MSICToken.sol`
+### MoUSD token `USDMToken.sol` and MSIC token `MSICToken.sol`
 
 Standard ERC20 and EIP2612 (`permit()` ) functionality.
 
@@ -846,7 +846,7 @@ https://eips.ethereum.org/EIPS/eip-2612
 
 ## Supplying Hints to Trove operations
 
-Troves in Liquity are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in ETH) multiplied by 100e18 and divided by the amount of debt (in USDM), without taking the ETH:USD price into account. Given that all Troves are equally affected by Ether price changes, they do not need to be sorted by their real ICR.
+Troves in Mosaic are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in ETH) multiplied by 100e18 and divided by the amount of debt (in MoUSD), without taking the ETH:USD price into account. Given that all Troves are equally affected by Ether price changes, they do not need to be sorted by their real ICR.
 
 All Trove operations that change the collateralization ratio need to either insert or reinsert the Trove to the `SortedTroves` list. To reduce the computational complexity (and gas cost) of the insertion to the linked list, two ‘hints’ may be provided.
 
@@ -886,14 +886,14 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
   const toWei = web3.utils.toWei
   const toBN = web3.utils.toBN
 
-  const USDMAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 USDM
+  const USDMAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 MoUSD
   const ETHColl = toBN(toWei('5')) // borrower wants to lock 5 ETH collateral
 
   // Call deployed TroveManager contract to read the liquidation reserve and latest borrowing fee
   const liquidationReserve = await troveManager.USDM_GAS_COMPENSATION()
   const expectedFee = await troveManager.getBorrowingFeeWithDecay(USDMAmount)
   
-  // Total debt of the new trove = USDM amount drawn, plus fee, plus the liquidation reserve
+  // Total debt of the new trove = MoUSD amount drawn, plus fee, plus the liquidation reserve
   const expectedDebt = USDMAmount.add(expectedFee).add(liquidationReserve)
 
   // Get the nominal NICR of the new trove
@@ -917,7 +917,7 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
 #### Adjusting a Trove
 ```
   const collIncrease = toBN(toWei('1'))  // borrower wants to add 1 ETH
-  const USDMRepayment = toBN(toWei('230')) // borrower wants to repay 230 USDM
+  const USDMRepayment = toBN(toWei('230')) // borrower wants to repay 230 MoUSD
 
   // Get trove's current debt and coll
   const {0: debt, 1: coll} = await troveManager.getEntireDebtAndColl(borrower)
@@ -960,13 +960,13 @@ If when the transaction is confirmed the address is in fact not valid - the syst
 
 All Troves that are fully redeemed from in a redemption sequence are left with zero debt, and are closed. The remaining collateral (the difference between the orginal collateral and the amount used for the redemption) will be claimable by the owner.
 
-It’s likely that the last Trove in the redemption sequence would be partially redeemed from - i.e. only some of its debt cancelled with USDM. In this case, it should be reinserted somewhere between top and bottom of the list. The `_lowerPartialRedemptionHint` and `_upperPartialRedemptionHint` hints passed to `redeemCollateral` describe the future neighbors the expected reinsert position.
+It’s likely that the last Trove in the redemption sequence would be partially redeemed from - i.e. only some of its debt cancelled with MoUSD. In this case, it should be reinserted somewhere between top and bottom of the list. The `_lowerPartialRedemptionHint` and `_upperPartialRedemptionHint` hints passed to `redeemCollateral` describe the future neighbors the expected reinsert position.
 
 However, if between the off-chain hint computation and on-chain execution a different transaction changes the state of a Trove that would otherwise be hit by the redemption sequence, then the off-chain hint computation could end up totally inaccurate. This could lead to the whole redemption sequence reverting due to out-of-gas error.
 
 To mitigate this, another hint needs to be provided: `_partialRedemptionHintNICR`, the expected nominal ICR of the final partially-redeemed-from Trove. The on-chain redemption function checks whether, after redemption, the nominal ICR of this Trove would equal the nominal ICR hint.
 
-If not, the redemption sequence doesn’t perform the final partial redemption, and terminates early. This ensures that the transaction doesn’t revert, and most of the requested USDM redemption can be fulfilled.
+If not, the redemption sequence doesn’t perform the final partial redemption, and terminates early. This ensures that the transaction doesn’t revert, and most of the requested MoUSD redemption can be fulfilled.
 
 #### Example Redemption with hints
 ```
@@ -985,7 +985,7 @@ If not, the redemption sequence doesn’t perform the final partial redemption, 
     approxPartialRedemptionHint,
     approxPartialRedemptionHint))
 
-  /* Finally, perform the on-chain redemption, passing the truncated USDM amount, the correct hints, and the expected
+  /* Finally, perform the on-chain redemption, passing the truncated MoUSD amount, the correct hints, and the expected
   * ICR of the final partially redeemed trove in the sequence. 
   */
   await troveManager.redeemCollateral(truncatedUSDMAmount,
@@ -1000,19 +1000,19 @@ If not, the redemption sequence doesn’t perform the final partial redemption, 
 
 ## Gas compensation
 
-In Liquity, we want to maximize liquidation throughput, and ensure that undercollateralized Troves are liquidated promptly by “liquidators” - agents who may also hold Stability Pool deposits, and who expect to profit from liquidations.
+In Mosaic, we want to maximize liquidation throughput, and ensure that undercollateralized Troves are liquidated promptly by “liquidators” - agents who may also hold Stability Pool deposits, and who expect to profit from liquidations.
 
 However, gas costs in Ethereum are substantial. If the gas costs of our public liquidation functions are too high, this may discourage liquidators from calling them, and leave the system holding too many undercollateralized Troves for too long.
 
 The protocol thus directly compensates liquidators for their gas costs, to incentivize prompt liquidations in both normal and extreme periods of high gas prices. Liquidators should be confident that they will at least break even by making liquidation transactions.
 
-Gas compensation is paid in a mix of USDM and ETH. While the ETH is taken from the liquidated Trove, the USDM is provided by the borrower. When a borrower first issues debt, some USDM is reserved as a Liquidation Reserve. A liquidation transaction thus draws ETH from the trove(s) it liquidates, and sends the both the reserved USDM and the compensation in ETH to the caller, and liquidates the remainder.
+Gas compensation is paid in a mix of MoUSD and ETH. While the ETH is taken from the liquidated Trove, the MoUSD is provided by the borrower. When a borrower first issues debt, some MoUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws ETH from the trove(s) it liquidates, and sends the both the reserved MoUSD and the compensation in ETH to the caller, and liquidates the remainder.
 
-When a liquidation transaction liquidates multiple Troves, each Trove contributes USDM and ETH towards the total compensation for the transaction.
+When a liquidation transaction liquidates multiple Troves, each Trove contributes MoUSD and ETH towards the total compensation for the transaction.
 
 Gas compensation per liquidated Trove is given by the formula:
 
-Gas compensation = `200 USDM + 0.5% of trove’s collateral (ETH)`
+Gas compensation = `200 MoUSD + 0.5% of trove’s collateral (ETH)`
 
 The intentions behind this formula are:
 - To ensure that smaller Troves are liquidated promptly in normal times, at least
@@ -1020,25 +1020,25 @@ The intentions behind this formula are:
 
 ### Gas compensation schedule
 
-When a borrower opens a Trove, an additional 200 USDM debt is issued, and 200 USDM is minted and sent to a dedicated contract (`GasPool`) for gas compensation - the "gas pool".
+When a borrower opens a Trove, an additional 200 MoUSD debt is issued, and 200 MoUSD is minted and sent to a dedicated contract (`GasPool`) for gas compensation - the "gas pool".
 
-When a borrower closes their active Trove, this gas compensation is refunded: 200 USDM is burned from the gas pool's balance, and the corresponding 200 USDM debt on the Trove is cancelled.
+When a borrower closes their active Trove, this gas compensation is refunded: 200 MoUSD is burned from the gas pool's balance, and the corresponding 200 MoUSD debt on the Trove is cancelled.
 
-The purpose of the 200 USDM Liquidation Reserve is to provide a minimum level of gas compensation, regardless of the Trove's collateral size or the current ETH price.
+The purpose of the 200 MoUSD Liquidation Reserve is to provide a minimum level of gas compensation, regardless of the Trove's collateral size or the current ETH price.
 
 ### Liquidation
 
-When a Trove is liquidated, 0.5% of its collateral is sent to the liquidator, along with the 200 USDM Liquidation Reserve. Thus, a liquidator always receives `{200 USDM + 0.5% collateral}` per Trove that they liquidate. The collateral remainder of the Trove is then either offset, redistributed or a combination of both, depending on the amount of USDM in the Stability Pool.
+When a Trove is liquidated, 0.5% of its collateral is sent to the liquidator, along with the 200 MoUSD Liquidation Reserve. Thus, a liquidator always receives `{200 MoUSD + 0.5% collateral}` per Trove that they liquidate. The collateral remainder of the Trove is then either offset, redistributed or a combination of both, depending on the amount of MoUSD in the Stability Pool.
 
 ### Gas compensation and redemptions
 
 When a Trove is redeemed from, the redemption is made only against (debt - 200), not the entire debt.
 
-But if the redemption causes an amount (debt - 200) to be cancelled, the Trove is then closed: the 200 USDM Liquidation Reserve is cancelled with its remaining 200 debt. That is, the gas compensation is burned from the gas pool, and the 200 debt is zero’d. The ETH collateral surplus from the Trove remains in the system, to be later claimed by its owner.
+But if the redemption causes an amount (debt - 200) to be cancelled, the Trove is then closed: the 200 MoUSD Liquidation Reserve is cancelled with its remaining 200 debt. That is, the gas compensation is burned from the gas pool, and the 200 debt is zero’d. The ETH collateral surplus from the Trove remains in the system, to be later claimed by its owner.
 
 ### Gas compensation helper functions
 
-Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
+Gas compensation functions are found in the parent _MosaicBase.sol_ contract:
 
 `_getCollGasCompensation(uint _entireColl)` returns the amount of ETH to be drawn from a trove's collateral and sent as gas compensation. 
 
@@ -1046,15 +1046,15 @@ Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
 
 ## The Stability Pool
 
-Any USDM holder may deposit USDM to the Stability Pool. It is designed to absorb debt from liquidations, and reward depositors with the liquidated collateral, shared between depositors in proportion to their deposit size.
+Any MoUSD holder may deposit MoUSD to the Stability Pool. It is designed to absorb debt from liquidations, and reward depositors with the liquidated collateral, shared between depositors in proportion to their deposit size.
 
-Since liquidations are expected to occur at an ICR of just below 110%, and even in most extreme cases, still above 100%, a depositor can expect to receive a net gain from most liquidations. When that holds, the dollar value of the ETH gain from a liquidation exceeds the dollar value of the USDM loss (assuming the price of USDM is $1).  
+Since liquidations are expected to occur at an ICR of just below 110%, and even in most extreme cases, still above 100%, a depositor can expect to receive a net gain from most liquidations. When that holds, the dollar value of the ETH gain from a liquidation exceeds the dollar value of the MoUSD loss (assuming the price of MoUSD is $1).  
 
 We define the **collateral surplus** in a liquidation as `$(ETH) - debt`, where `$(...)` represents the dollar value.
 
-At an USDM price of $1, Troves with `ICR > 100%` have a positive collateral surplus.
+At an MoUSD price of $1, Troves with `ICR > 100%` have a positive collateral surplus.
 
-After one or more liquidations, a deposit will have absorbed USDM losses, and received ETH gains. The remaining reduced deposit is the **compounded deposit**.
+After one or more liquidations, a deposit will have absorbed MoUSD losses, and received ETH gains. The remaining reduced deposit is the **compounded deposit**.
 
 Stability Providers expect a positive ROI on their initial deposit. That is:
 
@@ -1062,17 +1062,17 @@ Stability Providers expect a positive ROI on their initial deposit. That is:
 
 ### Mixed liquidations: offset and redistribution
 
-When a liquidation hits the Stability Pool, it is known as an **offset**: the debt of the Trove is offset against the USDM in the Pool. When **x** USDM debt is offset, the debt is cancelled, and **x** USDM in the Pool is burned. When the USDM Stability Pool is greater than the debt of the Trove, all the Trove's debt is cancelled, and all its ETH is shared between depositors. This is a **pure offset**.
+When a liquidation hits the Stability Pool, it is known as an **offset**: the debt of the Trove is offset against the MoUSD in the Pool. When **x** MoUSD debt is offset, the debt is cancelled, and **x** MoUSD in the Pool is burned. When the MoUSD Stability Pool is greater than the debt of the Trove, all the Trove's debt is cancelled, and all its ETH is shared between depositors. This is a **pure offset**.
 
-It can happen that the USDM in the Stability Pool is less than the debt of a Trove. In this case, the whole Stability Pool will be used to offset a fraction of the Trove’s debt, and an equal fraction of the Trove’s ETH collateral will be assigned to Stability Providers. The remainder of the Trove’s debt and ETH gets redistributed to active Troves. This is a **mixed offset and redistribution**.
+It can happen that the MoUSD in the Stability Pool is less than the debt of a Trove. In this case, the whole Stability Pool will be used to offset a fraction of the Trove’s debt, and an equal fraction of the Trove’s ETH collateral will be assigned to Stability Providers. The remainder of the Trove’s debt and ETH gets redistributed to active Troves. This is a **mixed offset and redistribution**.
 
 Because the ETH collateral fraction matches the offset debt fraction, the effective ICR of the collateral and debt that is offset, is equal to the ICR of the Trove. So, for depositors, the ROI per liquidation depends only on the ICR of the liquidated Trove.
 
 ### Stability Pool deposit losses and ETH gains - implementation
 
-Deposit functionality is handled by `StabilityPool.sol` (`provideToSP`, `withdrawFromSP`, etc).  StabilityPool also handles the liquidation calculation, and holds the USDM and ETH balances.
+Deposit functionality is handled by `StabilityPool.sol` (`provideToSP`, `withdrawFromSP`, etc).  StabilityPool also handles the liquidation calculation, and holds the MoUSD and ETH balances.
 
-When a liquidation is offset with the Stability Pool, debt from the liquidation is cancelled with an equal amount of USDM in the pool, which is burned. 
+When a liquidation is offset with the Stability Pool, debt from the liquidation is cancelled with an equal amount of MoUSD in the pool, which is burned. 
 
 Individual deposits absorb the debt from the liquidated Trove in proportion to their deposit as a share of total deposits.
  
@@ -1086,7 +1086,7 @@ Here’s an example of the Stability Pool absorbing liquidations. The Stability 
 
 There are two Troves to be liquidated, T1 and T2:
 
-|   | Trove | Collateral (ETH) | Debt (USDM) | ICR         | $(ETH) ($) | Collateral surplus ($) |
+|   | Trove | Collateral (ETH) | Debt (MoUSD) | ICR         | $(ETH) ($) | Collateral surplus ($) |
 |---|-------|------------------|-------------|-------------|------------|------------------------|
 |   | T1    | 1.6              | 150         | 1.066666667 | 160        | 10                     |
 |   | T2    | 2.45             | 225         | 1.088888889 | 245        | 20                     |
@@ -1100,7 +1100,7 @@ Here are the deposits, before any liquidations occur:
 | C         | 300     | 0.5    |
 | Total     | 600     | 1      |
 
-Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled with 150 Pool USDM, and its 1.6 ETH is split between depositors. We see the gains earned by A, B, C, are in proportion to their share of the total USDM in the Stability Pool:
+Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled with 150 Pool MoUSD, and its 1.6 ETH is split between depositors. We see the gains earned by A, B, C, are in proportion to their share of the total MoUSD in the Stability Pool:
 
 | Deposit | Debt absorbed from T1 | Deposit after | Total ETH gained | $(deposit + ETH gain) ($) | Current ROI   |
 |---------|-----------------------|---------------|------------------|---------------------------|---------------|
@@ -1109,7 +1109,7 @@ Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled wit
 | C       | 75                    | 225           | 0.8              | 305                       | 0.01666666667 |
 | Total   | 150                   | 450           | 1.6              | 610                       | 0.01666666667 |
 
-And now the second liquidation, T2, occurs: 225 debt is cancelled with 225 Pool USDM, and 2.45 ETH is split between depositors. The accumulated ETH gain includes all ETH gain from T1 and T2.
+And now the second liquidation, T2, occurs: 225 debt is cancelled with 225 Pool MoUSD, and 2.45 ETH is split between depositors. The accumulated ETH gain includes all ETH gain from T1 and T2.
 
 | Depositor | Debt absorbed from T2 | Deposit after | Accumulated ETH | $(deposit + ETH gain) ($) | Current ROI |
 |-----------|-----------------------|---------------|-----------------|---------------------------|-------------|
@@ -1130,7 +1130,7 @@ Eventually, a deposit can be fully “used up” in absorbing debt, and reduced 
 
 A depositor obtains their compounded deposits and corresponding ETH gain in a “pull-based” manner. The system calculates the depositor’s compounded deposit and accumulated ETH gain when the depositor makes an operation that changes their ETH deposit.
 
-Depositors deposit USDM via `provideToSP`, and withdraw with `withdrawFromSP`. Their accumulated ETH gain is paid out every time they make a deposit operation - so ETH payout is triggered by both deposit withdrawals and top-ups.
+Depositors deposit MoUSD via `provideToSP`, and withdraw with `withdrawFromSP`. Their accumulated ETH gain is paid out every time they make a deposit operation - so ETH payout is triggered by both deposit withdrawals and top-ups.
 
 ### How deposits and ETH gains are tracked
 
@@ -1142,7 +1142,7 @@ A mathematical manipulation allows us to factor out the initial deposit, and acc
 
 The formula for a depositor’s accumulated ETH gain is derived here:
 
-[Scalable reward distribution for compounding, decreasing stake](https://github.com/liquity/dev/blob/main/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf)
+[Scalable reward distribution for compounding, decreasing stake](https://github.com/mosaic/dev/blob/main/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf)
 
 Each liquidation updates `P` and `S`. After a series of liquidations, a compounded deposit and corresponding ETH gain can be calculated using the initial deposit, the depositor’s snapshots, and the current values of `P` and `S`.
 
@@ -1191,13 +1191,13 @@ In a MSIC reward event, the MSIC to be issued is calculated based on time passed
 
 The MSIC produced in this issuance event is shared between depositors, in proportion to their deposit sizes.
 
-To efficiently and accurately track MSIC gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the ETH gain from liquidations.
+To efficiently and accurately track MSIC gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/mosaic/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the ETH gain from liquidations.
 
 The same product `P` is used, and a sum `G` is used to track MSIC rewards, and each deposit gets a new snapshot of `P` and `G` when it is updated.
 
 ### Handling the front end MSIC gain
 
-As mentioned in [MSIC Issuance to Stability Providers](#lqty-issuance-to-stability-providers), in a MSIC reward event generating `MSIC_d` for a deposit `d` made through a front end with kickback rate `k`, the front end receives `(1-k) * MSIC_d` and the depositor receives `k * MSIC_d`.
+As mentioned in [MSIC Issuance to Stability Providers](#msic-issuance-to-stability-providers), in a MSIC reward event generating `MSIC_d` for a deposit `d` made through a front end with kickback rate `k`, the front end receives `(1-k) * MSIC_d` and the depositor receives `k * MSIC_d`.
 
 The front end should earn a cut of MSIC gains for all deposits tagged with its front end.
 
@@ -1218,9 +1218,9 @@ When a deposit is changed (top-up, withdrawal):
 When a liquidation occurs:
 - A MSIC reward event occurs, and `G` is updated
 
-## MSIC issuance to liquity providers
+## MSIC issuance to mosaic providers
 
-On deployment a new Uniswap pool will be created for the pair USDM/ETH and a Staking rewards contract will be deployed. The contract is based on [Unipool by Synthetix](https://github.com/Synthetixio/Unipool/blob/master/contracts/Unipool.sol). More information about their liquidity rewards program can be found in the [original SIP 31](https://sips.synthetix.io/sips/sip-31) and in [their blog](https://blog.synthetix.io/new-uniswap-seth-lp-reward-system/).
+On deployment a new Uniswap pool will be created for the pair MoUSD/ETH and a Staking rewards contract will be deployed. The contract is based on [Unipool by Synthetix](https://github.com/Synthetixio/Unipool/blob/master/contracts/Unipool.sol). More information about their liquidity rewards program can be found in the [original SIP 31](https://sips.synthetix.io/sips/sip-31) and in [their blog](https://blog.synthetix.io/new-uniswap-seth-lp-reward-system/).
 
 Essentially the way it works is:
 - Liqudity providers add funds to the Uniswap pool, and get UNIv2 tokens in exchange
@@ -1233,15 +1233,15 @@ Our implementation is simpler because funds for rewards will only be added once,
 
 The amount of MSIC tokens that will be minted to rewards contract is 1.33M, and the duration of the program will be 30 days. If at some point the total amount of staked tokens is zero, the clock will be “stopped”, so the period will be extended by the time during which the staking pool is empty, in order to avoid getting MSIC tokens locked. That also means that the start time for the program will be the event that occurs first: either MSIC token contract is deployed, and therefore MSIC tokens are minted to Unipool contract, or first liquidity provider stakes UNIv2 tokens into it.
 
-## Liquity System Fees
+## Mosaic System Fees
 
-Liquity generates fee revenue from certain operations. Fees are captured by the MSIC token.
+Mosaic generates fee revenue from certain operations. Fees are captured by the MSIC token.
 
 A MSIC holder may stake their MSIC, and earn a share of all system fees, proportional to their share of the total MSIC staked.
 
-Liquity generates revenue in two ways: redemptions, and issuance of new USDM tokens.
+Mosaic generates revenue in two ways: redemptions, and issuance of new MoUSD tokens.
 
-Redemptions fees are paid in ETH. Issuance fees (when a user opens a Trove, or issues more USDM from their existing Trove) are paid in USDM.
+Redemptions fees are paid in ETH. Issuance fees (when a user opens a Trove, or issues more MoUSD from their existing Trove) are paid in MoUSD.
 
 ### Redemption Fee
 
@@ -1251,19 +1251,19 @@ In the `TroveManager`, `redeemCollateral` calculates the ETH fee and transfers i
 
 ### Issuance fee
 
-The issuance fee is charged on the USDM drawn by the user and is added to the Trove's USDM debt. It is based on the current borrowing rate.
+The issuance fee is charged on the MoUSD drawn by the user and is added to the Trove's MoUSD debt. It is based on the current borrowing rate.
 
-When new USDM are drawn via one of the `BorrowerOperations` functions `openTrove`, `withdrawUSDM` or `adjustTrove`, an extra amount `USDMFee` is minted, and an equal amount of debt is added to the user’s Trove. The `USDMFee` is transferred to the staking contract, `MSICStaking.sol`.
+When new MoUSD are drawn via one of the `BorrowerOperations` functions `openTrove`, `withdrawUSDM` or `adjustTrove`, an extra amount `USDMFee` is minted, and an equal amount of debt is added to the user’s Trove. The `USDMFee` is transferred to the staking contract, `MSICStaking.sol`.
 
 ### Fee Schedule
 
-Redemption and issuance fees are based on the `baseRate` state variable in TroveManager, which is dynamically updated. The `baseRate` increases with each redemption, and decays according to time passed since the last fee event - i.e. the last redemption or issuance of USDM.
+Redemption and issuance fees are based on the `baseRate` state variable in TroveManager, which is dynamically updated. The `baseRate` increases with each redemption, and decays according to time passed since the last fee event - i.e. the last redemption or issuance of MoUSD.
 
 The current fee schedule:
 
 Upon each redemption:
 - `baseRate` is decayed based on time passed since the last fee event
-- `baseRate` is incremented by an amount proportional to the fraction of the total USDM supply that was redeemed
+- `baseRate` is incremented by an amount proportional to the fraction of the total MoUSD supply that was redeemed
 - The redemption rate is given by `min{REDEMPTION_FEE_FLOOR + baseRate * ETHdrawn, DECIMAL_PRECISION}`
 
 Upon each debt issuance:
@@ -1284,7 +1284,7 @@ Furthermore, the fees cannot become smaller than 0.5%, which in the case of rede
 
 ### Fee decay Implementation
 
-Time is measured in units of minutes. The `baseRate` decay is based on `block.timestamp - lastFeeOpTime`. If less than a minute has passed since the last fee event, then `lastFeeOpTime` is not updated. This prevents “base rate griefing”: i.e. it prevents an attacker stopping the `baseRate` from decaying by making a series of redemptions or issuing USDM with time intervals of < 1 minute.
+Time is measured in units of minutes. The `baseRate` decay is based on `block.timestamp - lastFeeOpTime`. If less than a minute has passed since the last fee event, then `lastFeeOpTime` is not updated. This prevents “base rate griefing”: i.e. it prevents an attacker stopping the `baseRate` from decaying by making a series of redemptions or issuing MoUSD with time intervals of < 1 minute.
 
 The decay parameter is tuned such that the fee changes by a factor of 0.99 per hour, i.e. it loses 1% of its current value per hour. At that rate, after one week, the baseRate decays to 18% of its prior value. The exact decay parameter is subject to change, and will be fine-tuned via economic modelling.
 
@@ -1292,7 +1292,7 @@ The decay parameter is tuned such that the fee changes by a factor of 0.99 per h
 
 MSIC holders may `stake` and `unstake` their MSIC in the `MSICStaking.sol` contract. 
 
-When a fee event occurs, the fee in USDM or ETH is sent to the staking contract, and a reward-per-unit-staked sum (`F_ETH`, or `F_USDM`) is incremented. A MSIC stake earns a share of the fee equal to its share of the total MSIC staked, at the instant the fee occurred.
+When a fee event occurs, the fee in MoUSD or ETH is sent to the staking contract, and a reward-per-unit-staked sum (`F_ETH`, or `F_USDM`) is incremented. A MSIC stake earns a share of the fee equal to its share of the total MSIC staked, at the instant the fee occurred.
 
 This staking formula and implementation follows the basic [“Batog” pull-based reward distribution](http://batog.info/papers/scalable-reward-distribution.pdf).
 
@@ -1303,7 +1303,7 @@ When a liquidation occurs and the Stability Pool is empty or smaller than the li
 
 For two Troves A and B with collateral `A.coll > B.coll`, Trove A should earn a bigger share of the liquidated collateral and debt.
 
-In Liquity it is important that all active Troves remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Troves’ collateral, preserves the ordering of active Troves by ICR, as liquidations occur over time.  Please see the [proofs section](https://github.com/liquity/dev/tree/main/papers).
+In Mosaic it is important that all active Troves remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Troves’ collateral, preserves the ordering of active Troves by ICR, as liquidations occur over time.  Please see the [proofs section](https://github.com/mosaic/dev/tree/main/papers).
 
 However, when it comes to implementation, Ethereum gas costs make it too expensive to loop over all Troves and write new data to storage for each one. When a Trove receives redistribution rewards, the system does not update the Trove's collateral and debt properties - instead, the Trove’s rewards remain "pending" until the borrower's next operation.
 
@@ -1317,7 +1317,7 @@ Consider the case where new Trove is created after all active Troves have receiv
 
 The fresh trove would earns rewards based on its **entire** collateral, whereas old Troves would earn rewards based only on **some portion** of their collateral - since a part of their collateral is pending, and not included in the Trove’s `coll` property.
 
-This can break the ordering of Troves by ICR - see the [proofs section](https://github.com/liquity/dev/tree/main/papers).
+This can break the ordering of Troves by ICR - see the [proofs section](https://github.com/mosaic/dev/tree/main/papers).
 
 ### Corrected Stake Solution
 
@@ -1335,24 +1335,24 @@ It then earns redistribution rewards based on this corrected stake. A newly open
 
 Whenever a borrower adjusts their Trove’s collateral, their pending rewards are applied, and a fresh corrected stake is computed.
 
-To convince yourself this corrected stake preserves ordering of active Troves by ICR, please see the [proofs section](https://github.com/liquity/dev/blob/main/papers).
+To convince yourself this corrected stake preserves ordering of active Troves by ICR, please see the [proofs section](https://github.com/mosaic/dev/blob/main/papers).
 
 ## Math Proofs
 
-The Liquity implementation relies on some important system properties and mathematical derivations.
+The Mosaic implementation relies on some important system properties and mathematical derivations.
 
 In particular, we have:
 
 - Proofs that Trove ordering is maintained throughout a series of liquidations and new Trove openings
 - A derivation of a formula and implementation for a highly scalable (O(1) complexity) reward distribution in the Stability Pool, involving compounding and decreasing stakes.
 
-PDFs of these can be found in https://github.com/liquity/dev/blob/main/papers
+PDFs of these can be found in https://github.com/mosaic/dev/blob/main/papers
 
 ## Definitions
 
 _**Trove:**_ a collateralized debt position, bound to a single Ethereum address. Also referred to as a “CDP” in similar protocols.
 
-_**USDM**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any Ethereum address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 USDM is always exchangeable for $1 USD worth of ETH.
+_**MoUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any Ethereum address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 MoUSD is always exchangeable for $1 USD worth of ETH.
 
 _**Active Trove:**_ an Ethereum address owns an “active Trove” if there is a node in the `SortedTroves` list with ID equal to the address, and non-zero collateral is recorded on the Trove struct for that address.
 
@@ -1360,7 +1360,7 @@ _**Closed Trove:**_ a Trove that was once active, but now has zero debt and zero
 
 _**Active collateral:**_ the amount of ETH collateral recorded on a Trove’s struct
 
-_**Active debt:**_ the amount of USDM debt recorded on a Trove’s struct
+_**Active debt:**_ the amount of MoUSD debt recorded on a Trove’s struct
 
 _**Entire collateral:**_ the sum of a Trove’s active collateral plus its pending collateral rewards accumulated from distributions
 
@@ -1372,11 +1372,11 @@ _**Nominal collateralization ratio (nominal ICR, NICR):**_ a Trove's nominal ICR
 
 _**Total active collateral:**_ the sum of active collateral over all Troves. Equal to the ETH in the ActivePool.
 
-_**Total active debt:**_ the sum of active debt over all Troves. Equal to the USDM in the ActivePool.
+_**Total active debt:**_ the sum of active debt over all Troves. Equal to the MoUSD in the ActivePool.
 
 _**Total defaulted collateral:**_ the total ETH collateral in the DefaultPool
 
-_**Total defaulted debt:**_ the total USDM debt in the DefaultPool
+_**Total defaulted debt:**_ the total MoUSD debt in the DefaultPool
 
 _**Entire system collateral:**_ the sum of the collateral in the ActivePool and DefaultPool
 
@@ -1386,15 +1386,15 @@ _**Total collateralization ratio (TCR):**_ the ratio of the dollar value of the 
 
 _**Critical collateralization ratio (CCR):**_ 150%. When the TCR is below the CCR, the system enters Recovery Mode.
 
-_**Borrower:**_ an externally owned account or contract that locks collateral in a Trove and issues USDM tokens to their own address. They “borrow” USDM tokens against their ETH collateral.
+_**Borrower:**_ an externally owned account or contract that locks collateral in a Trove and issues MoUSD tokens to their own address. They “borrow” MoUSD tokens against their ETH collateral.
 
-_**Depositor:**_ an externally owned account or contract that has assigned USDM tokens to the Stability Pool, in order to earn returns from liquidations, and receive MSIC token issuance.
+_**Depositor:**_ an externally owned account or contract that has assigned MoUSD tokens to the Stability Pool, in order to earn returns from liquidations, and receive MSIC token issuance.
 
-_**Redemption:**_ the act of swapping USDM tokens with the system, in return for an equivalent value of ETH. Any account with a USDM token balance may redeem them, whether or not they are a borrower.
+_**Redemption:**_ the act of swapping MoUSD tokens with the system, in return for an equivalent value of ETH. Any account with a MoUSD token balance may redeem them, whether or not they are a borrower.
 
-When USDM is redeemed for ETH, the ETH is always withdrawn from the lowest collateral Troves, in ascending order of their collateralization ratio. A redeemer can not selectively target Troves with which to swap USDM for ETH.
+When MoUSD is redeemed for ETH, the ETH is always withdrawn from the lowest collateral Troves, in ascending order of their collateralization ratio. A redeemer can not selectively target Troves with which to swap MoUSD for ETH.
 
-_**Repayment:**_ when a borrower sends USDM tokens to their own Trove, reducing their debt, and increasing their collateralization ratio.
+_**Repayment:**_ when a borrower sends MoUSD tokens to their own Trove, reducing their debt, and increasing their collateralization ratio.
 
 _**Retrieval:**_ when a borrower with an active Trove withdraws some or all of their ETH collateral from their own trove, either reducing their collateralization ratio, or closing their Trove (if they have zero debt and withdraw all their ETH)
 
@@ -1402,21 +1402,21 @@ _**Liquidation:**_ the act of force-closing an undercollateralized Trove and red
 
 Liquidation functionality is permissionless and publically available - anyone may liquidate an undercollateralized Trove, or batch liquidate Troves in ascending order of collateralization ratio.
 
-_**Collateral Surplus**_: The difference between the dollar value of a Trove's ETH collateral, and the dollar value of its USDM debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
+_**Collateral Surplus**_: The difference between the dollar value of a Trove's ETH collateral, and the dollar value of its MoUSD debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
 
-_**Offset:**_ cancellation of liquidated debt with USDM in the Stability Pool, and assignment of liquidated collateral to Stability Pool depositors, in proportion to their deposit.
+_**Offset:**_ cancellation of liquidated debt with MoUSD in the Stability Pool, and assignment of liquidated collateral to Stability Pool depositors, in proportion to their deposit.
 
 _**Redistribution:**_ assignment of liquidated debt and collateral directly to active Troves, in proportion to their collateral.
 
-_**Pure offset:**_  when a Trove's debt is entirely cancelled with USDM in the Stability Pool, and all of it's liquidated ETH collateral is assigned to Stability Providers.
+_**Pure offset:**_  when a Trove's debt is entirely cancelled with MoUSD in the Stability Pool, and all of it's liquidated ETH collateral is assigned to Stability Providers.
 
-_**Mixed offset and redistribution:**_  When the Stability Pool USDM only covers a fraction of the liquidated Trove's debt.  This fraction of debt is cancelled with USDM in the Stability Pool, and an equal fraction of the Trove's collateral is assigned to depositors. The remaining collateral & debt is redistributed directly to active Troves.
+_**Mixed offset and redistribution:**_  When the Stability Pool MoUSD only covers a fraction of the liquidated Trove's debt.  This fraction of debt is cancelled with MoUSD in the Stability Pool, and an equal fraction of the Trove's collateral is assigned to depositors. The remaining collateral & debt is redistributed directly to active Troves.
 
-_**Gas compensation:**_ A refund, in USDM and ETH, automatically paid to the caller of a liquidation function, intended to at least cover the gas cost of the transaction. Designed to ensure that liquidators are not dissuaded by potentially high gas costs.
+_**Gas compensation:**_ A refund, in MoUSD and ETH, automatically paid to the caller of a liquidation function, intended to at least cover the gas cost of the transaction. Designed to ensure that liquidators are not dissuaded by potentially high gas costs.
 
 ## Development
 
-The Liquity monorepo is based on Yarn's [workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) feature. You might be able to install some of the packages individually with npm, but to make all interdependent packages see each other, you'll need to use Yarn.
+The Mosaic monorepo is based on Yarn's [workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) feature. You might be able to install some of the packages individually with npm, but to make all interdependent packages see each other, you'll need to use Yarn.
 
 In addition, some package scripts require Docker to be installed (Docker Desktop on Windows and Mac, Docker Engine on Linux).
 
@@ -1431,15 +1431,15 @@ You'll need to install the following:
 
 #### Making node-gyp work
 
-Liquity indirectly depends on some packages with native addons. To make sure these can be built, you'll have to take some additional steps. Refer to the subsection of [Installation](https://github.com/nodejs/node-gyp#installation) in node-gyp's README that corresponds to your operating system.
+Mosaic indirectly depends on some packages with native addons. To make sure these can be built, you'll have to take some additional steps. Refer to the subsection of [Installation](https://github.com/nodejs/node-gyp#installation) in node-gyp's README that corresponds to your operating system.
 
-Note: you can skip the manual installation of node-gyp itself (`npm install -g node-gyp`), but you will need to install its prerequisites to make sure Liquity can be installed.
+Note: you can skip the manual installation of node-gyp itself (`npm install -g node-gyp`), but you will need to install its prerequisites to make sure Mosaic can be installed.
 
 ### Clone & Install
 
 ```
-git clone https://github.com/liquity/dev.git liquity
-cd liquity
+git clone https://github.com/mosaic/dev.git mosaic
+cd mosaic
 yarn
 ```
 
@@ -1533,7 +1533,7 @@ This will automatically start the local blockchain, so you need to make sure tha
 yarn start-demo
 ```
 
-This spawns a modified version of dev-frontend that ignores MetaMask, and directly uses the local blockchain node. Every time the page is reloaded (at http://localhost:3000), a new random account is created with a balance of 100 ETH. Additionally, transactions are automatically signed, so you no longer need to accept wallet confirmations. This lets you play around with Liquity more freely.
+This spawns a modified version of dev-frontend that ignores MetaMask, and directly uses the local blockchain node. Every time the page is reloaded (at http://localhost:3000), a new random account is created with a balance of 100 ETH. Additionally, transactions are automatically signed, so you no longer need to accept wallet confirmations. This lets you play around with Mosaic more freely.
 
 When you no longer need the demo mode, press Ctrl+C in the terminal then run:
 
@@ -1591,7 +1591,7 @@ Your custom built frontend can be configured by putting a file named `config.jso
 
 ## Running a frontend with Docker
 
-The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/liquity/dev-frontend) available on Docker Hub.
+The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/mosaic/dev-frontend) available on Docker Hub.
 
 ### Prerequisites
 
@@ -1600,8 +1600,8 @@ You will need to have [Docker](https://docs.docker.com/get-docker/) installed.
 ### Running with `docker`
 
 ```
-docker pull liquity/dev-frontend
-docker run --name liquity -d --rm -p 3000:80 liquity/dev-frontend
+docker pull mosaic/dev-frontend
+docker run --name mosaic -d --rm -p 3000:80 mosaic/dev-frontend
 ```
 
 This will start serving your frontend using HTTP on port 3000. If everything went well, you should be able to open http://localhost:3000/ in your browser. To use a different port, just replace 3000 with your desired port number.
@@ -1609,7 +1609,7 @@ This will start serving your frontend using HTTP on port 3000. If everything wen
 To stop the service:
 
 ```
-docker kill liquity
+docker kill mosaic
 ```
 
 ### Configuring a public frontend
@@ -1631,10 +1631,10 @@ The kickback rate is the portion of MSIC you pass on to users of your frontend. 
 It is highly recommended that you do this while running a frontend locally, before you start hosting it publicly:
 
 ```
-docker run --name liquity -d --rm -p 3000:80 \
+docker run --name mosaic -d --rm -p 3000:80 \
   -e FRONTEND_TAG=0x2781fD154358b009abf6280db4Ec066FCC6cb435 \
   -e INFURA_API_KEY=158b6511a5c74d1ac028a8a2afe8f626 \
-  liquity/dev-frontend
+  mosaic/dev-frontend
 ```
 
 Remember to replace the environment variables in the above example. After executing this command, open http://localhost:3000/ in a browser with MetaMask installed, then switch MetaMask to the account whose address you specified as FRONTEND_TAG to begin setting the kickback rate.
@@ -1657,16 +1657,16 @@ A frontend doesn't require any database or server-side computation, so the easie
 To obtain the files you need to upload, you need to extract them from a frontend Docker container. If you were following the guide for setting a kickback rate and haven't stopped the container yet, then you already have one! Otherwise, you can create it with a command like this (remember to use your own `FRONTEND_TAG` and `INFURA_API_KEY`):
 
 ```
-docker run --name liquity -d --rm \
+docker run --name mosaic -d --rm \
   -e FRONTEND_TAG=0x2781fD154358b009abf6280db4Ec066FCC6cb435 \
   -e INFURA_API_KEY=158b6511a5c74d1ac028a8a2afe8f626 \
-  liquity/dev-frontend
+  mosaic/dev-frontend
 ```
 
 While the container is running, use `docker cp` to extract the frontend's files to a folder of your choosing. For example to extract them to a new folder named "devui" inside the current folder, run:
 
 ```
-docker cp liquity:/usr/share/nginx/html ./devui
+docker cp mosaic:/usr/share/nginx/html ./devui
 ```
 
 Upload the contents of this folder to your chosen hosting service (or serve them using your own infrastructure), and you're set!
@@ -1677,7 +1677,7 @@ If you have command line access to a server with Docker installed, hosting a fro
 
 The frontend Docker container simply serves files using plain HTTP, which is susceptible to man-in-the-middle attacks. Therefore it is highly recommended to wrap it in HTTPS using a reverse proxy. You can find an example docker-compose config [here](packages/dev-frontend/docker-compose-example/docker-compose.yml) that secures the frontend using [SWAG (Secure Web Application Gateway)](https://github.com/linuxserver/docker-swag) and uses [watchtower](https://github.com/containrrr/watchtower) for automatically updating the frontend image to the latest version on Docker Hub.
 
-Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/liquity.example.com).
+Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/mosaic.example.com).
 
 ## Known Issues
 
@@ -1685,7 +1685,7 @@ Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-com
 
 When liquidating a trove with `ICR > 110%`, a collateral surplus remains claimable by the borrower. This collateral surplus should be excluded from subsequent TCR calculations, but within the liquidation sequence in `batchLiquidateTroves` in Recovery Mode, it is not. This results in a slight distortion to the TCR value used at each step of the liquidation sequence going forward. This distortion only persists for the duration the `batchLiquidateTroves` function call, and the TCR is again calculated correctly after the liquidation sequence ends. In most cases there is no impact at all, and when there is, the effect tends to be minor. The issue is not present at all in Normal Mode. 
 
-There is a theoretical and extremely rare case where it incorrectly causes a loss for Stability Depositors instead of a gain. It relies on the stars aligning: the system must be in Recovery Mode, the TCR must be very close to the 150% boundary, a large trove must be liquidated, and the ETH price must drop by >10% at exactly the right moment. No profitable exploit is possible. For more details, please see [this security advisory](https://github.com/liquity/dev/security/advisories/GHSA-xh2p-7p87-fhgh).
+There is a theoretical and extremely rare case where it incorrectly causes a loss for Stability Depositors instead of a gain. It relies on the stars aligning: the system must be in Recovery Mode, the TCR must be very close to the 150% boundary, a large trove must be liquidated, and the ETH price must drop by >10% at exactly the right moment. No profitable exploit is possible. For more details, please see [this security advisory](https://github.com/mosaic/dev/security/advisories/GHSA-xh2p-7p87-fhgh).
 
 ### SortedTroves edge cases - top and bottom of the sorted list
 
@@ -1703,7 +1703,7 @@ When the trove is at one end of the `SortedTroves` list and adjusted such that i
 - Depositor sees incoming price drop tx (or just anticipates one, by reading exchange price data), that would shortly be followed by unprofitable liquidation txs
 - Depositor front-runs with `withdrawFromSP()` to evade the loss
 
-Stability Pool depositors expect to make profits from liquidations which are likely to happen at a collateral ratio slightly below 110%, but well above 100%. In rare cases (flash crashes, oracle failures), troves may be liquidated below 100% though, resulting in a net loss for stability depositors. Depositors thus have an incentive to withdraw their deposits if they anticipate liquidations below 100% (note that the exact threshold of such “unprofitable” liquidations will depend on the current Dollar price of USDM).
+Stability Pool depositors expect to make profits from liquidations which are likely to happen at a collateral ratio slightly below 110%, but well above 100%. In rare cases (flash crashes, oracle failures), troves may be liquidated below 100% though, resulting in a net loss for stability depositors. Depositors thus have an incentive to withdraw their deposits if they anticipate liquidations below 100% (note that the exact threshold of such “unprofitable” liquidations will depend on the current Dollar price of MoUSD).
 
 As long the difference between two price feed updates is <10% and price stability is maintained, loss evasion situations should be rare. The percentage changes between two consecutive prices reported by Chainlink’s ETH:USD oracle has only ever come close to 10% a handful of times in the past few years.
 
@@ -1719,7 +1719,7 @@ This solution is only partially effective since it does not prevent stability de
 - User front-runs it and immediately makes a deposit with `provideToSP()`
 - User earns a profit
 
-Front-runners could deposit funds to the Stability Pool on the fly (instead of keeping their funds in the pool) and make liquidation gains when they see a pending price update or liquidate transaction. They could even borrow the USDM using a trove as a flash loan.
+Front-runners could deposit funds to the Stability Pool on the fly (instead of keeping their funds in the pool) and make liquidation gains when they see a pending price update or liquidate transaction. They could even borrow the MoUSD using a trove as a flash loan.
 
 Such flash deposit-liquidations would actually be beneficial (in terms of TCR) to system health and prevent redistributions, since the pool can be filled on the spot to liquidate troves anytime, if only for the length of 1 transaction.
 
@@ -1731,9 +1731,9 @@ Such flash deposit-liquidations would actually be beneficial (in terms of TCR) t
 -Attacker front-runs with mass openLoan txs
 -Incoming operation becomes more costly - more traversals needed for insertion
 
-It’s theoretically possible to increase the number of the troves that need to be traversed on-chain. That is, an attacker that sees a pending borrower transaction (or redemption or liquidation transaction) could try to increase the number of traversed troves by introducing additional troves on the way. However, the number of troves that an attacker can inject before the pending transaction gets mined is limited by the amount of spendable gas. Also, the total costs of making the path longer by 1 are significantly higher (gas costs of opening a trove, plus the 0.5% borrowing fee) than the costs of one extra traversal step (simply reading from storage). The attacker also needs significant capital on-hand, since the minimum debt for a trove is 2000 USDM.
+It’s theoretically possible to increase the number of the troves that need to be traversed on-chain. That is, an attacker that sees a pending borrower transaction (or redemption or liquidation transaction) could try to increase the number of traversed troves by introducing additional troves on the way. However, the number of troves that an attacker can inject before the pending transaction gets mined is limited by the amount of spendable gas. Also, the total costs of making the path longer by 1 are significantly higher (gas costs of opening a trove, plus the 0.5% borrowing fee) than the costs of one extra traversal step (simply reading from storage). The attacker also needs significant capital on-hand, since the minimum debt for a trove is 2000 MoUSD.
 
-In case of a redemption, the “last” trove affected by the transaction may end up being only partially redeemed from, which means that its ICR will change so that it needs to be reinserted at a different place in the sorted trove list (note that this is not the case for partial liquidations in recovery mode, which preserve the ICR). A special ICR hint therefore needs to be provided by the transaction sender for that matter, which may become incorrect if another transaction changes the order before the redemption is processed. The protocol gracefully handles this by terminating the redemption sequence at the last fully redeemed trove (see [here](https://github.com/liquity/dev#hints-for-redeemcollateral)).
+In case of a redemption, the “last” trove affected by the transaction may end up being only partially redeemed from, which means that its ICR will change so that it needs to be reinserted at a different place in the sorted trove list (note that this is not the case for partial liquidations in recovery mode, which preserve the ICR). A special ICR hint therefore needs to be provided by the transaction sender for that matter, which may become incorrect if another transaction changes the order before the redemption is processed. The protocol gracefully handles this by terminating the redemption sequence at the last fully redeemed trove (see [here](https://github.com/mosaic/dev#hints-for-redeemcollateral)).
 
 An attacker trying to DoS redemptions could be bypassed by redeeming an amount that exactly corresponds to the debt of the affected trove(s).
 
@@ -1742,18 +1742,18 @@ Finally, this DoS could be avoided if the initial transaction avoids the public 
 
 ## Disclaimer
 
-The content of this readme document (“Readme”) is of purely informational nature. In particular, none of the content of the Readme shall be understood as advice provided by Liquity AG, any Liquity Project Team member or other contributor to the Readme, nor does any of these persons warrant the actuality and accuracy of the Readme.
+The content of this readme document (“Readme”) is of purely informational nature. In particular, none of the content of the Readme shall be understood as advice provided by Mosaic AG, any Mosaic Project Team member or other contributor to the Readme, nor does any of these persons warrant the actuality and accuracy of the Readme.
 
-Please read this Disclaimer carefully before accessing, interacting with, or using the Liquity Protocol software, consisting of the Liquity Protocol technology stack (in particular its smart contracts) as well as any other Liquity technology such as e.g., the launch kit for frontend operators (together the “Liquity Protocol Software”). 
+Please read this Disclaimer carefully before accessing, interacting with, or using the Mosaic Protocol software, consisting of the Mosaic Protocol technology stack (in particular its smart contracts) as well as any other Mosaic technology such as e.g., the launch kit for frontend operators (together the “Mosaic Protocol Software”). 
 
-While Liquity AG developed the Liquity Protocol Software, the Liquity Protocol Software runs in a fully decentralized and autonomous manner on the Ethereum network. Liquity AG is not involved in the operation of the Liquity Protocol Software nor has it any control over transactions made using its smart contracts. Further, Liquity AG does neither enter into any relationship with users of the Liquity Protocol Software and/or frontend operators, nor does it operate an own frontend. Any and all functionalities of the Liquity Protocol Software, including the USDM and the MSIC, are of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
+While Mosaic AG developed the Mosaic Protocol Software, the Mosaic Protocol Software runs in a fully decentralized and autonomous manner on the Ethereum network. Mosaic AG is not involved in the operation of the Mosaic Protocol Software nor has it any control over transactions made using its smart contracts. Further, Mosaic AG does neither enter into any relationship with users of the Mosaic Protocol Software and/or frontend operators, nor does it operate an own frontend. Any and all functionalities of the Mosaic Protocol Software, including the MoUSD and the MSIC, are of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
 
-LIQUITY AG IS NOT LIABLE TO ANY USER FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, IN CONNECTION WITH THE USE OR INABILITY TO USE THE LIQUITY PROTOCOL SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF ETH, USDM OR MSIC, NON-ALLOCATION OF TECHNICAL FEES TO MSIC HOLDERS, LOSS OF DATA, BUSINESS INTERRUPTION, DATA BEING RENDERED INACCURATE OR OTHER LOSSES SUSTAINED BY A USER OR THIRD PARTIES AS A RESULT OF THE LIQUITY PROTOCOL SOFTWARE AND/OR ANY ACTIVITY OF A FRONTEND OPERATOR OR A FAILURE OF THE LIQUITY PROTOCOL SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE).
+LIQUITY AG IS NOT LIABLE TO ANY USER FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, IN CONNECTION WITH THE USE OR INABILITY TO USE THE LIQUITY PROTOCOL SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF ETH, MoUSD OR MSIC, NON-ALLOCATION OF TECHNICAL FEES TO MSIC HOLDERS, LOSS OF DATA, BUSINESS INTERRUPTION, DATA BEING RENDERED INACCURATE OR OTHER LOSSES SUSTAINED BY A USER OR THIRD PARTIES AS A RESULT OF THE LIQUITY PROTOCOL SOFTWARE AND/OR ANY ACTIVITY OF A FRONTEND OPERATOR OR A FAILURE OF THE LIQUITY PROTOCOL SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE).
 
-The Liquity Protocol Software has been developed and published under the GNU GPL v3 open-source license, which forms an integral part of this disclaimer. 
+The Mosaic Protocol Software has been developed and published under the GNU GPL v3 open-source license, which forms an integral part of this disclaimer. 
 
-THE LIQUITY PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE LIQUITY PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL ETH AND/OR USDM AND/OR MSIC SENT, STAKED OR DEPOSITED TO THE LIQUITY PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
+THE LIQUITY PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE LIQUITY PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL ETH AND/OR MoUSD AND/OR MSIC SENT, STAKED OR DEPOSITED TO THE LIQUITY PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
 
 There are no official frontend operators, and the use of any frontend is made by users at their own risk. To assess the trustworthiness of a frontend operator lies in the sole responsibility of the users and must be made carefully.
 
-User is solely responsible for complying with applicable law when interacting (in particular, when using ETH, USDM, MSIC or other Token) with the Liquity Protocol Software whatsoever. 
+User is solely responsible for complying with applicable law when interacting (in particular, when using ETH, MoUSD, MSIC or other Token) with the Mosaic Protocol Software whatsoever. 

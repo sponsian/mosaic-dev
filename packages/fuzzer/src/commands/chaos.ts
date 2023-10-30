@@ -3,10 +3,10 @@ import fs from "fs";
 import {
   Decimal,
   Difference,
-  LUSD_MINIMUM_DEBT,
+  MoUSD_MINIMUM_DEBT,
   Trove,
   TroveWithPendingRedistribution
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import { Fixture } from "../fixture";
 import { deployer, funder, provider, subgraph } from "../globals";
@@ -34,7 +34,7 @@ export const chaos = async ({
 }: ChaosParams) => {
   const [frontend, ...randomUsers] = createRandomWallets(numberOfUsers + 1, provider);
 
-  const [deployerLiquity, funderLiquity, frontendLiquity, ...randomLiquities] = await connectUsers([
+  const [deployerMosaic, funderMosaic, frontendMosaic, ...randomLiquities] = await connectUsers([
     deployer,
     funder,
     frontend,
@@ -42,11 +42,11 @@ export const chaos = async ({
   ]);
 
   const fixture = await Fixture.setup(
-    deployerLiquity,
+    deployerMosaic,
     funder,
-    funderLiquity,
+    funderMosaic,
     frontend.address,
-    frontendLiquity
+    frontendMosaic
   );
 
   let previousListOfTroves: TroveWithPendingRedistribution[] | undefined = undefined;
@@ -65,50 +65,50 @@ export const chaos = async ({
 
     for (let i = 0; i < randomUsers.length; ++i) {
       const user = randomUsers[i];
-      const liquity = randomLiquities[i];
+      const mosaic = randomLiquities[i];
 
       const x = Math.random();
 
       if (x < 0.5) {
-        const trove = await liquity.getTrove();
+        const trove = await mosaic.getTrove();
 
         if (trove.isEmpty) {
-          await fixture.openRandomTrove(user.address, liquity);
+          await fixture.openRandomTrove(user.address, mosaic);
         } else {
           if (x < 0.4) {
-            await fixture.randomlyAdjustTrove(user.address, liquity, trove);
+            await fixture.randomlyAdjustTrove(user.address, mosaic, trove);
           } else {
-            await fixture.closeTrove(user.address, liquity, trove);
+            await fixture.closeTrove(user.address, mosaic, trove);
           }
         }
       } else if (x < 0.7) {
-        const deposit = await liquity.getStabilityDeposit();
+        const deposit = await mosaic.getStabilityDeposit();
 
-        if (deposit.initialLUSD.isZero || x < 0.6) {
-          await fixture.depositRandomAmountInStabilityPool(user.address, liquity);
+        if (deposit.initialMoUSD.isZero || x < 0.6) {
+          await fixture.depositRandomAmountInStabilityPool(user.address, mosaic);
         } else {
-          await fixture.withdrawRandomAmountFromStabilityPool(user.address, liquity, deposit);
+          await fixture.withdrawRandomAmountFromStabilityPool(user.address, mosaic, deposit);
         }
       } else if (x < 0.9) {
-        const stake = await liquity.getLQTYStake();
+        const stake = await mosaic.getMSICStake();
 
-        if (stake.stakedLQTY.isZero || x < 0.8) {
-          await fixture.stakeRandomAmount(user.address, liquity);
+        if (stake.stakedMSIC.isZero || x < 0.8) {
+          await fixture.stakeRandomAmount(user.address, mosaic);
         } else {
-          await fixture.unstakeRandomAmount(user.address, liquity, stake);
+          await fixture.unstakeRandomAmount(user.address, mosaic, stake);
         }
       } else {
-        await fixture.redeemRandomAmount(user.address, liquity);
+        await fixture.redeemRandomAmount(user.address, mosaic);
       }
 
-      // await fixture.sweepLUSD(liquity);
-      await fixture.sweepLQTY(liquity);
+      // await fixture.sweepMoUSD(mosaic);
+      await fixture.sweepMSIC(mosaic);
 
-      const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerLiquity);
-      const totalRedistributed = await deployerLiquity.getTotalRedistributed();
+      const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerMosaic);
+      const totalRedistributed = await deployerMosaic.getTotalRedistributed();
 
       checkTroveOrdering(listOfTroves, totalRedistributed, price, previousListOfTroves);
-      await checkPoolBalances(deployerLiquity, listOfTroves, totalRedistributed);
+      await checkPoolBalances(deployerMosaic, listOfTroves, totalRedistributed);
 
       previousListOfTroves = listOfTroves;
     }
@@ -116,7 +116,7 @@ export const chaos = async ({
     if (shouldCheckSubgraph) {
       const blockNumber = await provider.getBlockNumber();
       await subgraph.waitForBlock(blockNumber);
-      await checkSubgraph(subgraph, deployerLiquity);
+      await checkSubgraph(subgraph, deployerMosaic);
     }
   }
 
@@ -124,18 +124,18 @@ export const chaos = async ({
 };
 
 export const order = async () => {
-  const [deployerLiquity, funderLiquity] = await connectUsers([deployer, funder]);
+  const [deployerMosaic, funderMosaic] = await connectUsers([deployer, funder]);
 
-  const initialPrice = await deployerLiquity.getPrice();
-  // let initialNumberOfTroves = await funderLiquity.getNumberOfTroves();
+  const initialPrice = await deployerMosaic.getPrice();
+  // let initialNumberOfTroves = await funderMosaic.getNumberOfTroves();
 
-  let [firstTrove] = await funderLiquity.getTroves({
+  let [firstTrove] = await funderMosaic.getTroves({
     first: 1,
     sortedBy: "descendingCollateralRatio"
   });
 
   if (firstTrove.ownerAddress !== funder.address) {
-    const funderTrove = await funderLiquity.getTrove();
+    const funderTrove = await funderMosaic.getTrove();
 
     const targetCollateralRatio = Decimal.max(
       firstTrove.collateralRatio(initialPrice).add(0.00001),
@@ -144,23 +144,23 @@ export const order = async () => {
 
     if (funderTrove.isEmpty) {
       const targetTrove = new Trove(
-        LUSD_MINIMUM_DEBT.mulDiv(targetCollateralRatio, initialPrice),
-        LUSD_MINIMUM_DEBT
+        MoUSD_MINIMUM_DEBT.mulDiv(targetCollateralRatio, initialPrice),
+        MoUSD_MINIMUM_DEBT
       );
 
-      const fees = await funderLiquity.getFees();
+      const fees = await funderMosaic.getFees();
 
-      await funderLiquity.openTrove(Trove.recreate(targetTrove, fees.borrowingRate()));
+      await funderMosaic.openTrove(Trove.recreate(targetTrove, fees.borrowingRate()));
     } else {
       const targetTrove = funderTrove.setCollateral(
         funderTrove.debt.mulDiv(targetCollateralRatio, initialPrice)
       );
 
-      await funderLiquity.adjustTrove(funderTrove.adjustTo(targetTrove));
+      await funderMosaic.adjustTrove(funderTrove.adjustTo(targetTrove));
     }
   }
 
-  [firstTrove] = await funderLiquity.getTroves({
+  [firstTrove] = await funderMosaic.getTroves({
     first: 1,
     sortedBy: "descendingCollateralRatio"
   });
@@ -169,24 +169,24 @@ export const order = async () => {
     throw new Error("didn't manage to hoist Funder's Trove to head of SortedTroves");
   }
 
-  await deployerLiquity.setPrice(0.001);
+  await deployerMosaic.setPrice(0.001);
 
   let numberOfTroves: number;
-  while ((numberOfTroves = await funderLiquity.getNumberOfTroves()) > 1) {
+  while ((numberOfTroves = await funderMosaic.getNumberOfTroves()) > 1) {
     const numberOfTrovesToLiquidate = numberOfTroves > 10 ? 10 : numberOfTroves - 1;
 
     console.log(`${numberOfTroves} Troves left.`);
-    await funderLiquity.liquidateUpTo(numberOfTrovesToLiquidate);
+    await funderMosaic.liquidateUpTo(numberOfTrovesToLiquidate);
   }
 
-  await deployerLiquity.setPrice(initialPrice);
+  await deployerMosaic.setPrice(initialPrice);
 
-  if ((await funderLiquity.getNumberOfTroves()) !== 1) {
+  if ((await funderMosaic.getNumberOfTroves()) !== 1) {
     throw new Error("didn't manage to liquidate every Trove");
   }
 
-  const funderTrove = await funderLiquity.getTrove();
-  const total = await funderLiquity.getTotal();
+  const funderTrove = await funderMosaic.getTrove();
+  const total = await funderMosaic.getTotal();
 
   const collateralDifference = Difference.between(total.collateral, funderTrove.collateral);
   const debtDifference = Difference.between(total.debt, funderTrove.debt);

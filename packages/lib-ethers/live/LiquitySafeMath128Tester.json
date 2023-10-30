@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "LiquitySafeMath128Tester",
-  "sourceName": "contracts/TestContracts/LiquitySafeMath128Tester.sol",
+  "contractName": "MosaicSafeMath128Tester",
+  "sourceName": "contracts/TestContracts/MosaicSafeMath128Tester.sol",
   "abi": [
     {
       "inputs": [

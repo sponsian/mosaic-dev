@@ -17,7 +17,7 @@ const _abi = [
                     },
                     {
                         internalType: "address",
-                        name: "lusdTokenAddress",
+                        name: "msicTokenAddress",
                         type: "address",
                     },
                     {
@@ -52,7 +52,7 @@ const _abi = [
                     },
                     {
                         internalType: "address",
-                        name: "bLUSDTokenAddress",
+                        name: "bMoUSDTokenAddress",
                         type: "address",
                     },
                     {
@@ -134,7 +134,7 @@ const _abi = [
                     },
                     {
                         internalType: "uint256",
-                        name: "minBLUSDSupply",
+                        name: "minBMoUSDSupply",
                         type: "uint256",
                     },
                     {
@@ -191,19 +191,19 @@ const _abi = [
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "bLusdAmount",
+                name: "bMousdAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "minLusdAmount",
+                name: "minMousdAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "lusdAmount",
+                name: "msicAmount",
                 type: "uint256",
             },
             {
@@ -219,7 +219,7 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        name: "BLUSDRedeemed",
+        name: "BMoUSDRedeemed",
         type: "event",
     },
     {
@@ -253,19 +253,19 @@ const _abi = [
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "principalLusdAmount",
+                name: "principalMousdAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "minLusdAmount",
+                name: "minMousdAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "withdrawnLusdAmount",
+                name: "withdrawnMousdAmount",
                 type: "uint256",
             },
             {
@@ -296,19 +296,19 @@ const _abi = [
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "lusdAmount",
+                name: "msicAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "bLusdAmount",
+                name: "bMousdAmount",
                 type: "uint256",
             },
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "lusdSurplus",
+                name: "msicSurplus",
                 type: "uint256",
             },
             {
@@ -383,7 +383,7 @@ const _abi = [
             {
                 indexed: false,
                 internalType: "uint256",
-                name: "previousPermanentLUSD",
+                name: "previousPermanentMoUSD",
                 type: "uint256",
             },
         ],
@@ -470,7 +470,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "INDEX_OF_LUSD_TOKEN_IN_CURVE_POOL",
+        name: "INDEX_OF_MoUSD_TOKEN_IN_CURVE_POOL",
         outputs: [
             {
                 internalType: "int128",
@@ -496,7 +496,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "MIN_BLUSD_SUPPLY",
+        name: "MIN_BMoUSD_SUPPLY",
         outputs: [
             {
                 internalType: "uint256",
@@ -576,7 +576,7 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_bammLUSDValue",
+                name: "_bammMoUSDValue",
                 type: "uint256",
             },
         ],
@@ -652,10 +652,10 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "bLUSDToken",
+        name: "bMoUSDToken",
         outputs: [
             {
-                internalType: "contract IBLUSDToken",
+                internalType: "contract IBMoUSDToken",
                 name: "",
                 type: "address",
             },
@@ -710,7 +710,7 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        name: "calcAccruedBLUSD",
+        name: "calcAccruedBMoUSD",
         outputs: [
             {
                 internalType: "uint256",
@@ -729,7 +729,7 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        name: "calcBondBLUSDCap",
+        name: "calcBondBMoUSDCap",
         outputs: [
             {
                 internalType: "uint256",
@@ -744,7 +744,7 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_fractionOfBLUSDToRedeem",
+                name: "_fractionOfBMoUSDToRedeem",
                 type: "uint256",
             },
         ],
@@ -774,7 +774,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "calcTotalLUSDValue",
+        name: "calcTotalMoUSDValue",
         outputs: [
             {
                 internalType: "uint256",
@@ -833,7 +833,7 @@ const _abi = [
             },
             {
                 internalType: "uint256",
-                name: "_minLUSD",
+                name: "_minMoUSD",
                 type: "uint256",
             },
         ],
@@ -872,7 +872,7 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_lusdAmount",
+                name: "_msicAmount",
                 type: "uint256",
             },
         ],
@@ -946,7 +946,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "curveDepositLUSD3CRVExchangeRateThreshold",
+        name: "curveDepositMoUSD3CRVExchangeRateThreshold",
         outputs: [
             {
                 internalType: "uint256",
@@ -985,7 +985,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "curveWithdrawal3CRVLUSDExchangeRateThreshold",
+        name: "curveWithdrawal3CRVMoUSDExchangeRateThreshold",
         outputs: [
             {
                 internalType: "uint256",
@@ -1024,7 +1024,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getAcquiredLUSDInCurve",
+        name: "getAcquiredMoUSDInCurve",
         outputs: [
             {
                 internalType: "uint256",
@@ -1037,7 +1037,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getAcquiredLUSDInSP",
+        name: "getAcquiredMoUSDInSP",
         outputs: [
             {
                 internalType: "uint256",
@@ -1050,7 +1050,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getBAMMLUSDDebt",
+        name: "getBAMMMoUSDDebt",
         outputs: [
             {
                 internalType: "uint256",
@@ -1073,12 +1073,12 @@ const _abi = [
         outputs: [
             {
                 internalType: "uint256",
-                name: "lusdAmount",
+                name: "msicAmount",
                 type: "uint256",
             },
             {
                 internalType: "uint64",
-                name: "claimedBLUSD",
+                name: "claimedBMoUSD",
                 type: "uint64",
             },
             {
@@ -1102,7 +1102,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getLUSDInBAMMSPVault",
+        name: "getMoUSDInBAMMSPVault",
         outputs: [
             {
                 internalType: "uint256",
@@ -1121,7 +1121,7 @@ const _abi = [
                 type: "uint256",
             },
         ],
-        name: "getLUSDToAcquire",
+        name: "getMoUSDToAcquire",
         outputs: [
             {
                 internalType: "uint256",
@@ -1147,7 +1147,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getOwnedLUSDInCurve",
+        name: "getOwnedMoUSDInCurve",
         outputs: [
             {
                 internalType: "uint256",
@@ -1160,7 +1160,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getOwnedLUSDInSP",
+        name: "getOwnedMoUSDInSP",
         outputs: [
             {
                 internalType: "uint256",
@@ -1173,7 +1173,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getPendingLUSD",
+        name: "getPendingMoUSD",
         outputs: [
             {
                 internalType: "uint256",
@@ -1186,7 +1186,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getPermanentLUSD",
+        name: "getPermanentMoUSD",
         outputs: [
             {
                 internalType: "uint256",
@@ -1199,7 +1199,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getTotalAcquiredLUSD",
+        name: "getTotalAcquiredMoUSD",
         outputs: [
             {
                 internalType: "uint256",
@@ -1212,7 +1212,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "getTotalLUSDInCurve",
+        name: "getTotalMoUSDInCurve",
         outputs: [
             {
                 internalType: "uint256",
@@ -1229,17 +1229,17 @@ const _abi = [
         outputs: [
             {
                 internalType: "uint256",
-                name: "_pendingLUSD",
+                name: "_pendingMoUSD",
                 type: "uint256",
             },
             {
                 internalType: "uint256",
-                name: "_totalAcquiredLUSD",
+                name: "_totalAcquiredMoUSD",
                 type: "uint256",
             },
             {
                 internalType: "uint256",
-                name: "_permanentLUSD",
+                name: "_permanentMoUSD",
                 type: "uint256",
             },
         ],
@@ -1274,10 +1274,10 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "lusdToken",
+        name: "msicToken",
         outputs: [
             {
-                internalType: "contract ILUSDToken",
+                internalType: "contract IMoUSDToken",
                 name: "",
                 type: "address",
             },
@@ -1315,12 +1315,12 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_bLUSDToRedeem",
+                name: "_bMoUSDToRedeem",
                 type: "uint256",
             },
             {
                 internalType: "uint256",
-                name: "_minLUSDFromBAMMSPVault",
+                name: "_minMoUSDFromBAMMSPVault",
                 type: "uint256",
             },
         ],
@@ -1344,7 +1344,7 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_lusdAmount",
+                name: "_msicAmount",
                 type: "uint256",
             },
         ],
@@ -1357,11 +1357,11 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_maxLUSDToShift",
+                name: "_maxMoUSDToShift",
                 type: "uint256",
             },
         ],
-        name: "shiftLUSDFromCurveToSP",
+        name: "shiftMoUSDFromCurveToSP",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
@@ -1370,11 +1370,11 @@ const _abi = [
         inputs: [
             {
                 internalType: "uint256",
-                name: "_maxLUSDToShift",
+                name: "_maxMoUSDToShift",
                 type: "uint256",
             },
         ],
-        name: "shiftLUSDFromSPToCurve",
+        name: "shiftMoUSDFromSPToCurve",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",

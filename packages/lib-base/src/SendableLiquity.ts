@@ -7,21 +7,21 @@ import {
   RedemptionDetails,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
-  TransactableLiquity,
+  TransactableMosaic,
   TroveAdjustmentDetails,
   TroveClosureDetails,
   TroveCreationDetails
-} from "./TransactableLiquity";
+} from "./TransactableMosaic";
 
 /**
  * A transaction that has already been sent.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#SentEthersLiquityTransaction}.
+ * Implemented by {@link @mosaic/lib-ethers#SentEthersMosaicTransaction}.
  *
  * @public
  */
-export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = LiquityReceipt> {
+export interface SentMosaicTransaction<S = unknown, T extends MosaicReceipt = MosaicReceipt> {
   /** Implementation-specific sent transaction object. */
   readonly rawSentTransaction: S;
 
@@ -29,7 +29,7 @@ export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = 
    * Check whether the transaction has been mined, and whether it was successful.
    *
    * @remarks
-   * Unlike {@link @liquity/lib-base#SentLiquityTransaction.waitForReceipt | waitForReceipt()},
+   * Unlike {@link @mosaic/lib-base#SentMosaicTransaction.waitForReceipt | waitForReceipt()},
    * this function doesn't wait for the transaction to be mined.
    */
   getReceipt(): Promise<T>;
@@ -37,8 +37,8 @@ export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = 
   /**
    * Wait for the transaction to be mined, and check whether it was successful.
    *
-   * @returns Either a {@link @liquity/lib-base#FailedReceipt} or a
-   *          {@link @liquity/lib-base#SuccessfulReceipt}.
+   * @returns Either a {@link @mosaic/lib-base#FailedReceipt} or a
+   *          {@link @mosaic/lib-base#SuccessfulReceipt}.
    */
   waitForReceipt(): Promise<Extract<T, MinedReceipt>>;
 }
@@ -47,7 +47,7 @@ export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = 
  * Indicates that the transaction hasn't been mined yet.
  *
  * @remarks
- * Returned by {@link SentLiquityTransaction.getReceipt}.
+ * Returned by {@link SentMosaicTransaction.getReceipt}.
  *
  * @public
  */
@@ -62,8 +62,8 @@ export const _pendingReceipt: PendingReceipt = { status: "pending" };
  * @remarks
  * The `rawReceipt` property is an implementation-specific transaction receipt object.
  *
- * Returned by {@link SentLiquityTransaction.getReceipt} and
- * {@link SentLiquityTransaction.waitForReceipt}.
+ * Returned by {@link SentMosaicTransaction.getReceipt} and
+ * {@link SentMosaicTransaction.waitForReceipt}.
  *
  * @public
  */
@@ -82,11 +82,11 @@ export const _failedReceipt = <R>(rawReceipt: R): FailedReceipt<R> => ({
  * The `rawReceipt` property is an implementation-specific transaction receipt object.
  *
  * The `details` property may contain more information about the transaction.
- * See the return types of {@link TransactableLiquity} functions for the exact contents of `details`
- * for each type of Liquity transaction.
+ * See the return types of {@link TransactableMosaic} functions for the exact contents of `details`
+ * for each type of Mosaic transaction.
  *
- * Returned by {@link SentLiquityTransaction.getReceipt} and
- * {@link SentLiquityTransaction.waitForReceipt}.
+ * Returned by {@link SentMosaicTransaction.getReceipt} and
+ * {@link SentMosaicTransaction.waitForReceipt}.
  *
  * @public
  */
@@ -120,151 +120,151 @@ export type MinedReceipt<R = unknown, D = unknown> = FailedReceipt<R> | Successf
  *
  * @public
  */
-export type LiquityReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
+export type MosaicReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
 
 /** @internal */
 export type _SendableFrom<T, R, S> = {
   [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer D>
-    ? (...args: A) => Promise<SentLiquityTransaction<S, LiquityReceipt<R, D>>>
+    ? (...args: A) => Promise<SentMosaicTransaction<S, MosaicReceipt<R, D>>>
     : never;
 };
 
 /**
- * Send Liquity transactions.
+ * Send Mosaic transactions.
  *
  * @remarks
- * The functions return an object implementing {@link SentLiquityTransaction}, which can be used
+ * The functions return an object implementing {@link SentMosaicTransaction}, which can be used
  * to monitor the transaction and get its details when it succeeds.
  *
- * Implemented by {@link @liquity/lib-ethers#SendableEthersLiquity}.
+ * Implemented by {@link @mosaic/lib-ethers#SendableEthersMosaic}.
  *
  * @public
  */
-export interface SendableLiquity<R = unknown, S = unknown>
-  extends _SendableFrom<TransactableLiquity, R, S> {
+export interface SendableMosaic<R = unknown, S = unknown>
+  extends _SendableFrom<TransactableMosaic, R, S> {
   // Methods re-declared for documentation purposes
 
-  /** {@inheritDoc TransactableLiquity.openTrove} */
+  /** {@inheritDoc TransactableMosaic.openTrove} */
   openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveCreationDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.closeTrove} */
-  closeTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>;
+  /** {@inheritDoc TransactableMosaic.closeTrove} */
+  closeTrove(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveClosureDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.adjustTrove} */
+  /** {@inheritDoc TransactableMosaic.adjustTrove} */
   adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.depositCollateral} */
+  /** {@inheritDoc TransactableMosaic.depositCollateral} */
   depositCollateral(
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawCollateral} */
+  /** {@inheritDoc TransactableMosaic.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.borrowLUSD} */
-  borrowLUSD(
+  /** {@inheritDoc TransactableMosaic.borrowMoUSD} */
+  borrowMoUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.repayLUSD} */
-  repayLUSD(
+  /** {@inheritDoc TransactableMosaic.repayMoUSD} */
+  repayMoUSD(
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
   /** @internal */
-  setPrice(price: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  setPrice(price: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.liquidate} */
+  /** {@inheritDoc TransactableMosaic.liquidate} */
   liquidate(
     address: string | string[]
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.liquidateUpTo} */
+  /** {@inheritDoc TransactableMosaic.liquidateUpTo} */
   liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.depositLUSDInStabilityPool} */
-  depositLUSDInStabilityPool(
+  /** {@inheritDoc TransactableMosaic.depositMoUSDInStabilityPool} */
+  depositMoUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawLUSDFromStabilityPool} */
-  withdrawLUSDFromStabilityPool(
+  /** {@inheritDoc TransactableMosaic.withdrawMoUSDFromStabilityPool} */
+  withdrawMoUSDFromStabilityPool(
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc TransactableMosaic.withdrawGainsFromStabilityPool} */
   withdrawGainsFromStabilityPool(): Promise<
-    SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>
+    SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc TransactableMosaic.transferCollateralGainToTrove} */
   transferCollateralGainToTrove(): Promise<
-    SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>
+    SentMosaicTransaction<S, MosaicReceipt<R, CollateralGainTransferDetails>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.sendLUSD} */
-  sendLUSD(
+  /** {@inheritDoc TransactableMosaic.sendMoUSD} */
+  sendMoUSD(
     toAddress: string,
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.sendLQTY} */
-  sendLQTY(
+  /** {@inheritDoc TransactableMosaic.sendMSIC} */
+  sendMSIC(
     toAddress: string,
     amount: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.redeemLUSD} */
-  redeemLUSD(
+  /** {@inheritDoc TransactableMosaic.redeemMoUSD} */
+  redeemMoUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>>;
 
-  /** {@inheritDoc TransactableLiquity.claimCollateralSurplus} */
-  claimCollateralSurplus(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.claimCollateralSurplus} */
+  claimCollateralSurplus(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.stakeLQTY} */
-  stakeLQTY(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.stakeMSIC} */
+  stakeMSIC(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.unstakeLQTY} */
-  unstakeLQTY(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.unstakeMSIC} */
+  unstakeMSIC(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStaking} */
-  withdrawGainsFromStaking(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.withdrawGainsFromStaking} */
+  withdrawGainsFromStaking(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.approveUniTokens} */
+  /** {@inheritDoc TransactableMosaic.approveUniTokens} */
   approveUniTokens(
     allowance?: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.stakeUniTokens} */
-  stakeUniTokens(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.stakeUniTokens} */
+  stakeUniTokens(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.unstakeUniTokens} */
-  unstakeUniTokens(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.unstakeUniTokens} */
+  unstakeUniTokens(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawLQTYRewardFromLiquidityMining} */
-  withdrawLQTYRewardFromLiquidityMining(): Promise<
-    SentLiquityTransaction<S, LiquityReceipt<R, void>>
+  /** {@inheritDoc TransactableMosaic.withdrawMSICRewardFromLiquidityMining} */
+  withdrawMSICRewardFromLiquidityMining(): Promise<
+    SentMosaicTransaction<S, MosaicReceipt<R, void>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.exitLiquidityMining} */
-  exitLiquidityMining(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  /** {@inheritDoc TransactableMosaic.exitLiquidityMining} */
+  exitLiquidityMining(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableLiquity.registerFrontend} */
+  /** {@inheritDoc TransactableMosaic.registerFrontend} */
   registerFrontend(
     kickbackRate: Decimalish
-  ): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+  ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 }

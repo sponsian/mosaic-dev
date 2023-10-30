@@ -1,7 +1,7 @@
 server {
     listen 443 ssl;
 
-    server_name liquity.example.com;
+    server_name mosaic.example.com;
 
     include /config/nginx/ssl.conf;
 

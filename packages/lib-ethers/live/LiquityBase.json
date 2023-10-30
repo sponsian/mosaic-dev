@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "LiquityBase",
-  "sourceName": "contracts/Dependencies/LiquityBase.sol",
+  "contractName": "MosaicBase",
+  "sourceName": "contracts/Dependencies/MosaicBase.sol",
   "abi": [
     {
       "inputs": [],
@@ -44,7 +44,7 @@
     },
     {
       "inputs": [],
-      "name": "LUSD_GAS_COMPENSATION",
+      "name": "MoUSD_GAS_COMPENSATION",
       "outputs": [
         {
           "internalType": "uint256",

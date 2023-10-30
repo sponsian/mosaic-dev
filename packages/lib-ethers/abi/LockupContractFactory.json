@@ -5,11 +5,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lqtyTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       }
     ],
-    "name": "LQTYTokenAddressSet",
+    "name": "MSICTokenAddressSet",
     "type": "event"
   },
   {
@@ -159,7 +159,7 @@
   },
   {
     "inputs": [],
-    "name": "lqtyTokenAddress",
+    "name": "msicTokenAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -187,11 +187,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_lqtyTokenAddress",
+        "name": "_msicTokenAddress",
         "type": "address"
       }
     ],
-    "name": "setLQTYTokenAddress",
+    "name": "setMSICTokenAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

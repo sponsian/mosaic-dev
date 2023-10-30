@@ -1,13 +1,13 @@
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const MosaicMathTester = artifacts.require("./MosaicMathTester.sol")
 
-contract('LiquityMath', async accounts => {
-  let liquityMathTester
+contract('MosaicMath', async accounts => {
+  let mosaicMathTester
   beforeEach('deploy tester', async () => {
-    liquityMathTester = await LiquityMathTester.new()
+    mosaicMathTester = await MosaicMathTester.new()
   })
 
   const checkFunction = async (func, cond, params) => {
-    assert.equal(await liquityMathTester[func](...params), cond(...params))
+    assert.equal(await mosaicMathTester[func](...params), cond(...params))
   }
 
   it('max works if a > b', async () => {

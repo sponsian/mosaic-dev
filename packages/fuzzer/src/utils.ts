@@ -9,11 +9,11 @@ import {
   Percent,
   Trove,
   TroveWithPendingRedistribution,
-  ReadableLiquity,
-  LUSD_LIQUIDATION_RESERVE
-} from "@liquity/lib-base";
-import { EthersLiquity, ReadableEthersLiquity } from "@liquity/lib-ethers";
-import { SubgraphLiquity } from "@liquity/lib-subgraph";
+  ReadableMosaic,
+  MoUSD_LIQUIDATION_RESERVE
+} from "@mosaic/lib-base";
+import { EthersMosaic, ReadableEthersMosaic } from "@mosaic/lib-ethers";
+import { SubgraphMosaic } from "@mosaic/lib-subgraph";
 
 export const objToString = (o: Record<string, unknown>) =>
   "{ " +
@@ -38,11 +38,11 @@ export const createRandomTrove = (price: Decimal) => {
   if (Math.random() < 0.5) {
     const collateral = Decimal.from(randomValue);
     const maxDebt = parseInt(price.mul(collateral).toString(0));
-    const debt = LUSD_LIQUIDATION_RESERVE.add(truncateLastDigits(maxDebt - benford(maxDebt)));
+    const debt = MoUSD_LIQUIDATION_RESERVE.add(truncateLastDigits(maxDebt - benford(maxDebt)));
 
     return new Trove(collateral, debt);
   } else {
-    const debt = LUSD_LIQUIDATION_RESERVE.add(100 * randomValue);
+    const debt = MoUSD_LIQUIDATION_RESERVE.add(100 * randomValue);
 
     const collateral = Decimal.from(
       debt
@@ -63,25 +63,25 @@ export const randomCollateralChange = ({ collateral }: Trove) =>
 
 export const randomDebtChange = ({ debt }: Trove) =>
   Math.random() < 0.5
-    ? { repayLUSD: debt.mul(1.1 * Math.random()) }
-    : { borrowLUSD: debt.mul(0.5 * Math.random()) };
+    ? { repayMoUSD: debt.mul(1.1 * Math.random()) }
+    : { borrowMoUSD: debt.mul(0.5 * Math.random()) };
 
-export const getListOfTroves = async (liquity: ReadableLiquity) =>
-  liquity.getTroves({
-    first: await liquity.getNumberOfTroves(),
+export const getListOfTroves = async (mosaic: ReadableMosaic) =>
+  mosaic.getTroves({
+    first: await mosaic.getNumberOfTroves(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: false
   });
 
-export const getListOfTrovesBeforeRedistribution = async (liquity: ReadableLiquity) =>
-  liquity.getTroves({
-    first: await liquity.getNumberOfTroves(),
+export const getListOfTrovesBeforeRedistribution = async (mosaic: ReadableMosaic) =>
+  mosaic.getTroves({
+    first: await mosaic.getNumberOfTroves(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: true
   });
 
-export const getListOfTroveOwners = async (liquity: ReadableLiquity) =>
-  getListOfTrovesBeforeRedistribution(liquity).then(troves =>
+export const getListOfTroveOwners = async (mosaic: ReadableMosaic) =>
+  getListOfTrovesBeforeRedistribution(mosaic).then(troves =>
     troves.map(trove => trove.ownerAddress)
   );
 
@@ -163,12 +163,12 @@ export const checkTroveOrdering = (
 };
 
 export const checkPoolBalances = async (
-  liquity: ReadableEthersLiquity,
+  mosaic: ReadableEthersMosaic,
   listOfTroves: TroveWithPendingRedistribution[],
   totalRedistributed: Trove
 ) => {
-  const activePool = await liquity._getActivePool();
-  const defaultPool = await liquity._getDefaultPool();
+  const activePool = await mosaic._getActivePool();
+  const defaultPool = await mosaic._getDefaultPool();
 
   const [activeTotal, defaultTotal] = listOfTroves.reduce(
     ([activeTotal, defaultTotal], troveActive) => {
@@ -212,12 +212,12 @@ const trovesRoughlyEqual = (troveA: Trove, troveB: Trove) =>
 
 class EqualityCheck<T> {
   private name: string;
-  private get: (l: ReadableLiquity) => Promise<T>;
+  private get: (l: ReadableMosaic) => Promise<T>;
   private equals: (a: T, b: T) => boolean;
 
   constructor(
     name: string,
-    get: (l: ReadableLiquity) => Promise<T>,
+    get: (l: ReadableMosaic) => Promise<T>,
     equals: (a: T, b: T) => boolean
   ) {
     this.name = name;
@@ -225,7 +225,7 @@ class EqualityCheck<T> {
     this.equals = equals;
   }
 
-  async allEqual(liquities: ReadableLiquity[]) {
+  async allEqual(liquities: ReadableMosaic[]) {
     const [a, ...rest] = await Promise.all(liquities.map(l => this.get(l)));
 
     if (!rest.every(b => this.equals(a, b))) {
@@ -239,13 +239,13 @@ const checks = [
   new EqualityCheck("price", l => l.getPrice(), decimalsEqual),
   new EqualityCheck("total", l => l.getTotal(), trovesRoughlyEqual),
   new EqualityCheck("totalRedistributed", l => l.getTotalRedistributed(), trovesEqual),
-  new EqualityCheck("tokensInStabilityPool", l => l.getLUSDInStabilityPool(), decimalsEqual)
+  new EqualityCheck("tokensInStabilityPool", l => l.getMoUSDInStabilityPool(), decimalsEqual)
 ];
 
-export const checkSubgraph = async (subgraph: SubgraphLiquity, l1Liquity: ReadableLiquity) => {
-  await Promise.all(checks.map(check => check.allEqual([subgraph, l1Liquity])));
+export const checkSubgraph = async (subgraph: SubgraphMosaic, l1Mosaic: ReadableMosaic) => {
+  await Promise.all(checks.map(check => check.allEqual([subgraph, l1Mosaic])));
 
-  const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Liquity);
+  const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Mosaic);
   const subgraphListOfTroves = await getListOfTrovesBeforeRedistribution(subgraph);
   listOfTrovesShouldBeEqual(l1ListOfTroves, subgraphListOfTroves);
 
@@ -327,4 +327,4 @@ const truncateLastDigits = (n: number) => {
 };
 
 export const connectUsers = (users: Signer[]) =>
-  Promise.all(users.map(user => EthersLiquity.connect(user)));
+  Promise.all(users.map(user => EthersMosaic.connect(user)));

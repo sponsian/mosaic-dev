@@ -3,17 +3,17 @@
 pragma solidity 0.6.11;
 
 import "../Dependencies/SafeMath.sol";
-import "../Interfaces/ILQTYToken.sol";
+import "../Interfaces/IMSICToken.sol";
 
 /*
 * The lockup contract architecture utilizes a single LockupContract, with an unlockTime. The unlockTime is passed as an argument 
 * to the LockupContract's constructor. The contract's balance can be withdrawn by the beneficiary when block.timestamp > unlockTime. 
-* At construction, the contract checks that unlockTime is at least one year later than the Liquity system's deployment time. 
+* At construction, the contract checks that unlockTime is at least one year later than the Mosaic system's deployment time. 
 
-* Within the first year from deployment, the deployer of the LQTYToken (Liquity AG's address) may transfer LQTY only to valid 
-* LockupContracts, and no other addresses (this is enforced in LQTYToken.sol's transfer() function).
+* Within the first year from deployment, the deployer of the MSICToken (Mosaic AG's address) may transfer MSIC only to valid 
+* LockupContracts, and no other addresses (this is enforced in MSICToken.sol's transfer() function).
 * 
-* The above two restrictions ensure that until one year after system deployment, LQTY tokens originating from Liquity AG cannot 
+* The above two restrictions ensure that until one year after system deployment, MSIC tokens originating from Mosaic AG cannot 
 * enter circulating supply and cannot be staked to earn system revenue.
 */
 contract LockupContract {
@@ -26,7 +26,7 @@ contract LockupContract {
 
     address public immutable beneficiary;
 
-    ILQTYToken public lqtyToken;
+    IMSICToken public msicToken;
 
     // Unlock time is the Unix point in time at which the beneficiary can withdraw.
     uint public unlockTime;
@@ -34,19 +34,19 @@ contract LockupContract {
     // --- Events ---
 
     event LockupContractCreated(address _beneficiary, uint _unlockTime);
-    event LockupContractEmptied(uint _LQTYwithdrawal);
+    event LockupContractEmptied(uint _MSICwithdrawal);
 
     // --- Functions ---
 
     constructor 
     (
-        address _lqtyTokenAddress, 
+        address _msicTokenAddress, 
         address _beneficiary, 
         uint _unlockTime
     )
         public 
     {
-        lqtyToken = ILQTYToken(_lqtyTokenAddress);
+        msicToken = IMSICToken(_msicTokenAddress);
 
         /*
         * Set the unlock time to a chosen instant in the future, as long as it is at least 1 year after
@@ -59,14 +59,14 @@ contract LockupContract {
         emit LockupContractCreated(_beneficiary, _unlockTime);
     }
 
-    function withdrawLQTY() external {
+    function withdrawMSIC() external {
         _requireCallerIsBeneficiary();
         _requireLockupDurationHasPassed();
 
-        ILQTYToken lqtyTokenCached = lqtyToken;
-        uint LQTYBalance = lqtyTokenCached.balanceOf(address(this));
-        lqtyTokenCached.transfer(beneficiary, LQTYBalance);
-        emit LockupContractEmptied(LQTYBalance);
+        IMSICToken msicTokenCached = msicToken;
+        uint MSICBalance = msicTokenCached.balanceOf(address(this));
+        msicTokenCached.transfer(beneficiary, MSICBalance);
+        emit LockupContractEmptied(MSICBalance);
     }
 
     // --- 'require' functions ---
@@ -80,7 +80,7 @@ contract LockupContract {
     }
 
     function _requireUnlockTimeIsAtLeastOneYearAfterSystemDeployment(uint _unlockTime) internal view {
-        uint systemDeploymentTime = lqtyToken.getDeploymentStartTime();
+        uint systemDeploymentTime = msicToken.getDeploymentStartTime();
         require(_unlockTime >= systemDeploymentTime.add(SECONDS_IN_ONE_YEAR), "LockupContract: unlock time must be at least one year after system deployment");
     }
 }

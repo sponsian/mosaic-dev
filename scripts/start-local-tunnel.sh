@@ -23,7 +23,7 @@ cast client --rpc-url "http://localhost:8545" > /dev/null || (echo -e "\n${RED}R
 
 # Check ngrok config file exists
 if ! [ -f "../ngrok.config.yml" ]; then
-    echo "\n${RED}You need to create an ngrok.config.yml inside the Liquity dev repository root."
+    echo "\n${RED}You need to create an ngrok.config.yml inside the Mosaic dev repository root."
     echo "\nSee ngrok.config.template.yml for an example."
     exit 1
 fi
@@ -58,4 +58,4 @@ fi
 
 
 # Start frontend with configured RPC URL
-PORT=32318 BROWSER=none VITE_APP_RPC_URL="$NGROK_RPC_URL" yarn workspace @liquity/dev-frontend start-demo >/dev/null &
+PORT=32318 BROWSER=none VITE_APP_RPC_URL="$NGROK_RPC_URL" yarn workspace @mosaic/dev-frontend start-demo >/dev/null &

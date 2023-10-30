@@ -1,11 +1,11 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import React, { useState } from "react";
 import { Flex, Button, Spinner } from "theme-ui";
 import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { EditableRow, StaticAmounts, StaticRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { ApprovePressedPayload, BLusdAmmTokenIndex } from "../../context/transitions";
+import { ApprovePressedPayload, BMousdAmmTokenIndex } from "../../context/transitions";
 import { PoolBalance } from "./PoolBalance";
 
 export const StakePane: React.FC = () => {
@@ -13,7 +13,7 @@ export const StakePane: React.FC = () => {
     dispatchEvent,
     statuses,
     lpTokenBalance,
-    isBLusdLpApprovedWithGauge,
+    isBMousdLpApprovedWithGauge,
     addresses,
     protocolInfo
   } = useBondView();
@@ -28,10 +28,10 @@ export const StakePane: React.FC = () => {
 
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map();
-    if (!isBLusdLpApprovedWithGauge) {
+    if (!isBMousdLpApprovedWithGauge) {
       tokensNeedingApproval.set(
-        BLusdAmmTokenIndex.BLUSD_LUSD_LP,
-        addresses.BLUSD_AMM_STAKING_ADDRESS
+        BMousdAmmTokenIndex.BMoUSD_MoUSD_LP,
+        addresses.BMoUSD_AMM_STAKING_ADDRESS
       );
     }
     dispatchEvent("APPROVE_PRESSED", {
@@ -64,17 +64,17 @@ export const StakePane: React.FC = () => {
       />
 
       <Flex mt={3}>
-        <StaticRow label="bLUSD LP APR">
+        <StaticRow label="bMoUSD LP APR">
           <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
             <PoolBalance symbol="%">
-              {(protocolInfo?.bLusdLpApr ?? Decimal.INFINITY).prettify(2)}
+              {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
             </PoolBalance>{" "}
           </StaticAmounts>
         </StaticRow>
       </Flex>
 
       <Flex my={3} sx={{ fontWeight: 300, fontSize: "16px" }}>
-        Your LP tokens will be staked in the bLUSD Curve gauge to earn protocol fees and Curve
+        Your LP tokens will be staked in the bMoUSD Curve gauge to earn protocol fees and Curve
         rewards.
       </Flex>
 
@@ -90,7 +90,7 @@ export const StakePane: React.FC = () => {
           Back
         </Button>
 
-        {!isBLusdLpApprovedWithGauge && (
+        {!isBMousdLpApprovedWithGauge && (
           <Button
             variant="primary"
             onClick={handleApprovePressed}
@@ -100,7 +100,7 @@ export const StakePane: React.FC = () => {
           </Button>
         )}
 
-        {isBLusdLpApprovedWithGauge && (
+        {isBMousdLpApprovedWithGauge && (
           <Button
             variant="primary"
             onClick={handleConfirmPressed}

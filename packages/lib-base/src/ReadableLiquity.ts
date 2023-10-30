@@ -2,13 +2,13 @@ import { Decimal } from "./Decimal";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
+import { MSICStake } from "./MSICStake";
 
 /**
- * Represents whether an address has been registered as a Liquity frontend.
+ * Represents whether an address has been registered as a Mosaic frontend.
  *
  * @remarks
- * Returned by the {@link ReadableLiquity.getFrontendStatus | getFrontendStatus()} function.
+ * Returned by the {@link ReadableMosaic.getFrontendStatus | getFrontendStatus()} function.
  *
  * When `status` is `"registered"`, `kickbackRate` gives the frontend's kickback rate as a
  * {@link Decimal} between 0 and 1.
@@ -20,7 +20,7 @@ export type FrontendStatus =
   | { status: "registered"; kickbackRate: Decimal };
 
 /**
- * Parameters of the {@link ReadableLiquity.(getTroves:2) | getTroves()} function.
+ * Parameters of the {@link ReadableMosaic.(getTroves:2) | getTroves()} function.
  *
  * @public
  */
@@ -45,19 +45,19 @@ export interface TroveListingParams {
 }
 
 /**
- * Read the state of the Liquity protocol.
+ * Read the state of the Mosaic protocol.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#EthersLiquity}.
+ * Implemented by {@link @mosaic/lib-ethers#EthersMosaic}.
  *
  * @public
  */
-export interface ReadableLiquity {
+export interface ReadableMosaic {
   /**
    * Get the total collateral and debt per stake that has been liquidated through redistribution.
    *
    * @remarks
-   * Needed when dealing with instances of {@link @liquity/lib-base#TroveWithPendingRedistribution}.
+   * Needed when dealing with instances of {@link @mosaic/lib-base#TroveWithPendingRedistribution}.
    */
   getTotalRedistributed(): Promise<Trove>;
 
@@ -68,7 +68,7 @@ export interface ReadableLiquity {
    *
    * @remarks
    * The current state of a Trove can be fetched using
-   * {@link @liquity/lib-base#ReadableLiquity.getTrove | getTrove()}.
+   * {@link @mosaic/lib-base#ReadableMosaic.getTrove | getTrove()}.
    */
   getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
 
@@ -90,7 +90,7 @@ export interface ReadableLiquity {
   getPrice(): Promise<Decimal>;
 
   /**
-   * Get the total amount of collateral and debt in the Liquity system.
+   * Get the total amount of collateral and debt in the Mosaic system.
    */
   getTotal(): Promise<Trove>;
 
@@ -102,66 +102,66 @@ export interface ReadableLiquity {
   getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
 
   /**
-   * Get the remaining LQTY that will be collectively rewarded to stability depositors.
+   * Get the remaining MSIC that will be collectively rewarded to stability depositors.
    */
-  getRemainingStabilityPoolLQTYReward(): Promise<Decimal>;
+  getRemainingStabilityPoolMSICReward(): Promise<Decimal>;
 
   /**
-   * Get the total amount of LUSD currently deposited in the Stability Pool.
+   * Get the total amount of MoUSD currently deposited in the Stability Pool.
    */
-  getLUSDInStabilityPool(): Promise<Decimal>;
+  getMoUSDInStabilityPool(): Promise<Decimal>;
 
   /**
-   * Get the amount of LUSD held by an address.
+   * Get the amount of MoUSD held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
-  getLUSDBalance(address?: string): Promise<Decimal>;
+  getMoUSDBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the amount of LQTY held by an address.
+   * Get the amount of MSIC held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
-  getLQTYBalance(address?: string): Promise<Decimal>;
+  getMSICBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the amount of Uniswap ETH/LUSD LP tokens held by an address.
+   * Get the amount of Uniswap ETH/MoUSD LP tokens held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
   getUniTokenBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the liquidity mining contract's allowance of a holder's Uniswap ETH/LUSD LP tokens.
+   * Get the liquidity mining contract's allowance of a holder's Uniswap ETH/MoUSD LP tokens.
    *
-   * @param address - Address holding the Uniswap ETH/LUSD LP tokens.
+   * @param address - Address holding the Uniswap ETH/MoUSD LP tokens.
    */
   getUniTokenAllowance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the remaining LQTY that will be collectively rewarded to liquidity miners.
+   * Get the remaining MSIC that will be collectively rewarded to liquidity miners.
    */
-  getRemainingLiquidityMiningLQTYReward(): Promise<Decimal>;
+  getRemainingLiquidityMiningMSICReward(): Promise<Decimal>;
 
   /**
-   * Get the amount of Uniswap ETH/LUSD LP tokens currently staked by an address in liquidity mining.
+   * Get the amount of Uniswap ETH/MoUSD LP tokens currently staked by an address in liquidity mining.
    *
    * @param address - Address whose LP stake should be retrieved.
    */
   getLiquidityMiningStake(address?: string): Promise<Decimal>;
 
   /**
-   * Get the total amount of Uniswap ETH/LUSD LP tokens currently staked in liquidity mining.
+   * Get the total amount of Uniswap ETH/MoUSD LP tokens currently staked in liquidity mining.
    */
   getTotalStakedUniTokens(): Promise<Decimal>;
 
   /**
-   * Get the amount of LQTY earned by an address through mining liquidity.
+   * Get the amount of MSIC earned by an address through mining liquidity.
    *
-   * @param address - Address whose LQTY reward should be retrieved.
+   * @param address - Address whose MSIC reward should be retrieved.
    */
-  getLiquidityMiningLQTYReward(address?: string): Promise<Decimal>;
+  getLiquidityMiningMSICReward(address?: string): Promise<Decimal>;
 
   /**
    * Get the amount of leftover collateral available for withdrawal by an address.
@@ -170,7 +170,7 @@ export interface ReadableLiquity {
    * When a Trove gets liquidated or redeemed, any collateral it has above 110% (in case of
    * liquidation) or 100% collateralization (in case of redemption) gets sent to a pool, where it
    * can be withdrawn from using
-   * {@link @liquity/lib-base#TransactableLiquity.claimCollateralSurplus | claimCollateralSurplus()}.
+   * {@link @mosaic/lib-base#TransactableMosaic.claimCollateralSurplus | claimCollateralSurplus()}.
    */
   getCollateralSurplusBalance(address?: string): Promise<Decimal>;
 
@@ -193,19 +193,19 @@ export interface ReadableLiquity {
   getFees(): Promise<Fees>;
 
   /**
-   * Get the current state of an LQTY Stake.
+   * Get the current state of an MSIC Stake.
    *
-   * @param address - Address that owns the LQTY Stake.
+   * @param address - Address that owns the MSIC Stake.
    */
-  getLQTYStake(address?: string): Promise<LQTYStake>;
+  getMSICStake(address?: string): Promise<MSICStake>;
 
   /**
-   * Get the total amount of LQTY currently staked.
+   * Get the total amount of MSIC currently staked.
    */
-  getTotalStakedLQTY(): Promise<Decimal>;
+  getTotalStakedMSIC(): Promise<Decimal>;
 
   /**
-   * Check whether an address is registered as a Liquity frontend, and what its kickback rate is.
+   * Check whether an address is registered as a Mosaic frontend, and what its kickback rate is.
    *
    * @param address - Address to check.
    */

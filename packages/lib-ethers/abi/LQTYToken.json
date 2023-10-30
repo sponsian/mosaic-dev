@@ -8,7 +8,7 @@
       },
       {
         "internalType": "address",
-        "name": "_lqtyStakingAddress",
+        "name": "_msicStakingAddress",
         "type": "address"
       },
       {
@@ -79,11 +79,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lqtyStakingAddress",
+        "name": "_msicStakingAddress",
         "type": "address"
       }
     ],
-    "name": "LQTYStakingAddressSet",
+    "name": "MSICStakingAddressSet",
     "type": "event"
   },
   {
@@ -332,7 +332,7 @@
   },
   {
     "inputs": [],
-    "name": "lqtyStakingAddress",
+    "name": "msicStakingAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -457,7 +457,7 @@
         "type": "uint256"
       }
     ],
-    "name": "sendToLQTYStaking",
+    "name": "sendToMSICStaking",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

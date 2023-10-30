@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import React, { useEffect, useState } from "react";
 import { Flex, Button, Spinner, Label, Radio, Text } from "theme-ui";
 import { Amount } from "../../../ActionDescription";
@@ -7,12 +7,12 @@ import { Icon } from "../../../Icon";
 import { DisabledEditableAmounts, DisabledEditableRow, EditableRow } from "../../../Trove/Editor";
 import { Warning } from "../../../Warning";
 import { useBondView } from "../../context/BondViewContext";
-import { ApprovePressedPayload, BLusdAmmTokenIndex } from "../../context/transitions";
+import { ApprovePressedPayload, BMousdAmmTokenIndex } from "../../context/transitions";
 import { PoolDetails } from "./PoolDetails";
 
 const tokenSymbol = new Map([
-  [BLusdAmmTokenIndex.BLUSD, "bLUSD"],
-  [BLusdAmmTokenIndex.LUSD, "LUSD"]
+  [BMousdAmmTokenIndex.BMoUSD, "bMoUSD"],
+  [BMousdAmmTokenIndex.MoUSD, "MoUSD"]
 ]);
 
 const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => (
@@ -23,22 +23,22 @@ const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => 
   </>
 );
 
-const checkOutput = (value: string): BLusdAmmTokenIndex | "both" => {
+const checkOutput = (value: string): BMousdAmmTokenIndex | "both" => {
   if (value === "both") {
     return "both";
   }
 
   const i = parseInt(value);
-  if (i === BLusdAmmTokenIndex.BLUSD || i === BLusdAmmTokenIndex.LUSD) {
+  if (i === BMousdAmmTokenIndex.BMoUSD || i === BMousdAmmTokenIndex.MoUSD) {
     return i;
   }
 
   throw new Error(`invalid output choice "${value}"`);
 };
 
-const zeros = new Map<BLusdAmmTokenIndex, Decimal>([
-  [BLusdAmmTokenIndex.BLUSD, Decimal.ZERO],
-  [BLusdAmmTokenIndex.LUSD, Decimal.ZERO]
+const zeros = new Map<BMousdAmmTokenIndex, Decimal>([
+  [BMousdAmmTokenIndex.BMoUSD, Decimal.ZERO],
+  [BMousdAmmTokenIndex.MoUSD, Decimal.ZERO]
 ]);
 
 export const WithdrawPane: React.FC = () => {
@@ -47,26 +47,26 @@ export const WithdrawPane: React.FC = () => {
     statuses,
     lpTokenBalance,
     getExpectedWithdrawal,
-    isBLusdLpApprovedWithAmmZapper,
+    isBMousdLpApprovedWithAmmZapper,
     stakedLpTokenBalance,
     addresses
   } = useBondView();
 
   const editingState = useState<string>();
   const [burnLpTokens, setBurnLp] = useState<Decimal>(Decimal.ZERO);
-  const [output, setOutput] = useState<BLusdAmmTokenIndex | "both">("both");
-  const [withdrawal, setWithdrawal] = useState<Map<BLusdAmmTokenIndex, Decimal>>(zeros);
+  const [output, setOutput] = useState<BMousdAmmTokenIndex | "both">("both");
+  const [withdrawal, setWithdrawal] = useState<Map<BMousdAmmTokenIndex, Decimal>>(zeros);
 
   const isApprovePending = statuses.APPROVE_SPENDER === "PENDING";
   const coalescedLpTokenBalance = lpTokenBalance ?? Decimal.ZERO;
   const isManageLiquidityPending = statuses.MANAGE_LIQUIDITY === "PENDING";
   const isBalanceInsufficient = burnLpTokens.gt(coalescedLpTokenBalance);
-  const needsApproval = output !== BLusdAmmTokenIndex.BLUSD && !isBLusdLpApprovedWithAmmZapper;
+  const needsApproval = output !== BMousdAmmTokenIndex.BMoUSD && !isBMousdLpApprovedWithAmmZapper;
 
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map();
     if (needsApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.BLUSD_LUSD_LP, addresses.BLUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMoUSD_MoUSD_LP, addresses.BMoUSD_LP_ZAP_ADDRESS);
     }
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);
   };
@@ -77,17 +77,17 @@ export const WithdrawPane: React.FC = () => {
   const handleConfirmPressed = () => {
     const curveSlippage = 0.001; // Allow mininum of %0.1% slippage due to Curve rounding issues
     if (output === "both") {
-      const minBLusdAmount = withdrawal.get(BLusdAmmTokenIndex.BLUSD)?.mul(1 - curveSlippage);
-      const minLusdAmount = withdrawal.get(BLusdAmmTokenIndex.LUSD)?.mul(1 - curveSlippage);
+      const minBMousdAmount = withdrawal.get(BMousdAmmTokenIndex.BMoUSD)?.mul(1 - curveSlippage);
+      const minMousdAmount = withdrawal.get(BMousdAmmTokenIndex.MoUSD)?.mul(1 - curveSlippage);
 
-      if (minBLusdAmount === undefined || minBLusdAmount === Decimal.ZERO) return;
-      if (minLusdAmount === undefined || minLusdAmount === Decimal.ZERO) return;
+      if (minBMousdAmount === undefined || minBMousdAmount === Decimal.ZERO) return;
+      if (minMousdAmount === undefined || minMousdAmount === Decimal.ZERO) return;
 
       dispatchEvent("CONFIRM_PRESSED", {
         action: "removeLiquidity",
         burnLpTokens,
-        minBLusdAmount,
-        minLusdAmount
+        minBMousdAmount,
+        minMousdAmount
       });
     } else {
       const minAmount = withdrawal.get(output)?.mul(1 - curveSlippage);

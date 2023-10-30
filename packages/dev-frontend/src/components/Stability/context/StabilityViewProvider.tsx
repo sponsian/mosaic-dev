@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useLiquitySelector } from "@liquity/lib-react";
-import { LiquityStoreState, StabilityDeposit } from "@liquity/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState, StabilityDeposit } from "@mosaic/lib-base";
 import { StabilityViewContext } from "./StabilityViewContext";
 import type { StabilityView, StabilityEvent } from "./types";
 
@@ -38,11 +38,11 @@ const getInitialView = (stabilityDeposit: StabilityDeposit): StabilityView => {
   return stabilityDeposit.isEmpty ? "NONE" : "ACTIVE";
 };
 
-const select = ({ stabilityDeposit }: LiquityStoreState): StabilityDeposit => stabilityDeposit;
+const select = ({ stabilityDeposit }: MosaicStoreState): StabilityDeposit => stabilityDeposit;
 
 export const StabilityViewProvider: React.FC = props => {
   const { children } = props;
-  const stabilityDeposit = useLiquitySelector(select);
+  const stabilityDeposit = useMosaicSelector(select);
 
   const [view, setView] = useState<StabilityView>(getInitialView(stabilityDeposit));
   const viewRef = useRef<StabilityView>(view);

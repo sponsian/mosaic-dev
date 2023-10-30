@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "LQTYTokenTester",
-  "sourceName": "contracts/TestContracts/LQTYTokenTester.sol",
+  "contractName": "MSICTokenTester",
+  "sourceName": "contracts/TestContracts/MSICTokenTester.sol",
   "abi": [
     {
       "inputs": [
@@ -12,7 +12,7 @@
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         },
         {
@@ -83,11 +83,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_msicStakingAddress",
           "type": "address"
         }
       ],
-      "name": "LQTYStakingAddressSet",
+      "name": "MSICStakingAddressSet",
       "type": "event"
     },
     {
@@ -407,7 +407,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyStakingAddress",
+      "name": "msicStakingAddress",
       "outputs": [
         {
           "internalType": "address",
@@ -532,7 +532,7 @@
           "type": "uint256"
         }
       ],
-      "name": "sendToLQTYStaking",
+      "name": "sendToMSICStaking",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -647,7 +647,7 @@
           "type": "uint256"
         }
       ],
-      "name": "unprotectedSendToLQTYStaking",
+      "name": "unprotectedSendToMSICStaking",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

@@ -7,7 +7,7 @@ const { dec, toBN, assertRevert, ZERO_ADDRESS } = th
 
 contract('During the initial lockup period', async accounts => {
   const [
-    liquityAG,
+    mosaicAG,
     teamMember_1,
     teamMember_2,
     teamMember_3,
@@ -30,7 +30,7 @@ contract('During the initial lockup period', async accounts => {
   const SECONDS_IN_ONE_MONTH = timeValues.SECONDS_IN_ONE_MONTH
   const SECONDS_IN_364_DAYS = timeValues.SECONDS_IN_ONE_DAY * 364
 
-  let LQTYContracts
+  let MSICContracts
   let coreContracts
 
   // LCs for team members on vesting schedules
@@ -51,42 +51,42 @@ contract('During the initial lockup period', async accounts => {
   const investorInitialEntitlement_2 = dec(5, 24)
   const investorInitialEntitlement_3 = dec(6, 24)
 
-  const LQTYEntitlement_A = dec(1, 24)
-  const LQTYEntitlement_B = dec(2, 24)
-  const LQTYEntitlement_C = dec(3, 24)
-  const LQTYEntitlement_D = dec(4, 24)
-  const LQTYEntitlement_E = dec(5, 24)
+  const MSICEntitlement_A = dec(1, 24)
+  const MSICEntitlement_B = dec(2, 24)
+  const MSICEntitlement_C = dec(3, 24)
+  const MSICEntitlement_D = dec(4, 24)
+  const MSICEntitlement_E = dec(5, 24)
 
   let oneYearFromSystemDeployment
   let twoYearsFromSystemDeployment
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    coreContracts = await deploymentHelper.deployLiquityCore()
-    LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
+    coreContracts = await deploymentHelper.deployMosaicCore()
+    MSICContracts = await deploymentHelper.deployMSICTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
 
-    lqtyStaking = LQTYContracts.lqtyStaking
-    lqtyToken = LQTYContracts.lqtyToken
-    communityIssuance = LQTYContracts.communityIssuance
-    lockupContractFactory = LQTYContracts.lockupContractFactory
+    msicStaking = MSICContracts.msicStaking
+    msicToken = MSICContracts.msicToken
+    communityIssuance = MSICContracts.communityIssuance
+    lockupContractFactory = MSICContracts.lockupContractFactory
 
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectCoreContracts(coreContracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, coreContracts)
+    await deploymentHelper.connectMSICContracts(MSICContracts)
+    await deploymentHelper.connectCoreContracts(coreContracts, MSICContracts)
+    await deploymentHelper.connectMSICContractsToCore(MSICContracts, coreContracts)
 
-    oneYearFromSystemDeployment = await th.getTimeFromSystemDeployment(lqtyToken, web3, timeValues.SECONDS_IN_ONE_YEAR)
+    oneYearFromSystemDeployment = await th.getTimeFromSystemDeployment(msicToken, web3, timeValues.SECONDS_IN_ONE_YEAR)
     const secondsInTwoYears = toBN(timeValues.SECONDS_IN_ONE_YEAR).mul(toBN('2'))
-    twoYearsFromSystemDeployment = await th.getTimeFromSystemDeployment(lqtyToken, web3, secondsInTwoYears)
+    twoYearsFromSystemDeployment = await th.getTimeFromSystemDeployment(msicToken, web3, secondsInTwoYears)
 
     // Deploy 3 LCs for team members on vesting schedules
-    const deployedLCtx_T1 = await lockupContractFactory.deployLockupContract(teamMember_1, oneYearFromSystemDeployment, { from: liquityAG })
-    const deployedLCtx_T2 = await lockupContractFactory.deployLockupContract(teamMember_2, oneYearFromSystemDeployment, { from: liquityAG })
-    const deployedLCtx_T3 = await lockupContractFactory.deployLockupContract(teamMember_3, oneYearFromSystemDeployment, { from: liquityAG })
+    const deployedLCtx_T1 = await lockupContractFactory.deployLockupContract(teamMember_1, oneYearFromSystemDeployment, { from: mosaicAG })
+    const deployedLCtx_T2 = await lockupContractFactory.deployLockupContract(teamMember_2, oneYearFromSystemDeployment, { from: mosaicAG })
+    const deployedLCtx_T3 = await lockupContractFactory.deployLockupContract(teamMember_3, oneYearFromSystemDeployment, { from: mosaicAG })
 
     // Deploy 3 LCs for investors
-    const deployedLCtx_I1 = await lockupContractFactory.deployLockupContract(investor_1, oneYearFromSystemDeployment, { from: liquityAG })
-    const deployedLCtx_I2 = await lockupContractFactory.deployLockupContract(investor_2, oneYearFromSystemDeployment, { from: liquityAG })
-    const deployedLCtx_I3 = await lockupContractFactory.deployLockupContract(investor_3, oneYearFromSystemDeployment, { from: liquityAG })
+    const deployedLCtx_I1 = await lockupContractFactory.deployLockupContract(investor_1, oneYearFromSystemDeployment, { from: mosaicAG })
+    const deployedLCtx_I2 = await lockupContractFactory.deployLockupContract(investor_2, oneYearFromSystemDeployment, { from: mosaicAG })
+    const deployedLCtx_I3 = await lockupContractFactory.deployLockupContract(investor_3, oneYearFromSystemDeployment, { from: mosaicAG })
 
     // LCs for team members on vesting schedules
     LC_T1 = await th.getLCFromDeploymentTx(deployedLCtx_T1)
@@ -98,162 +98,162 @@ contract('During the initial lockup period', async accounts => {
     LC_I2 = await th.getLCFromDeploymentTx(deployedLCtx_I2)
     LC_I3 = await th.getLCFromDeploymentTx(deployedLCtx_I3)
 
-    // Multisig transfers initial LQTY entitlements to LCs
-    await lqtyToken.transfer(LC_T1.address, teamMemberInitialEntitlement_1, { from: multisig })
-    await lqtyToken.transfer(LC_T2.address, teamMemberInitialEntitlement_2, { from: multisig })
-    await lqtyToken.transfer(LC_T3.address, teamMemberInitialEntitlement_3, { from: multisig })
+    // Multisig transfers initial MSIC entitlements to LCs
+    await msicToken.transfer(LC_T1.address, teamMemberInitialEntitlement_1, { from: multisig })
+    await msicToken.transfer(LC_T2.address, teamMemberInitialEntitlement_2, { from: multisig })
+    await msicToken.transfer(LC_T3.address, teamMemberInitialEntitlement_3, { from: multisig })
 
-    await lqtyToken.transfer(LC_I1.address, investorInitialEntitlement_1, { from: multisig })
-    await lqtyToken.transfer(LC_I2.address, investorInitialEntitlement_2, { from: multisig })
-    await lqtyToken.transfer(LC_I3.address, investorInitialEntitlement_3, { from: multisig })
+    await msicToken.transfer(LC_I1.address, investorInitialEntitlement_1, { from: multisig })
+    await msicToken.transfer(LC_I2.address, investorInitialEntitlement_2, { from: multisig })
+    await msicToken.transfer(LC_I3.address, investorInitialEntitlement_3, { from: multisig })
 
     // Fast forward time 364 days, so that still less than 1 year since launch has passed
     await th.fastForwardTime(SECONDS_IN_364_DAYS, web3.currentProvider)
   })
 
-  describe('LQTY transfer during first year after LQTY deployment', async accounts => {
-    // --- Liquity AG transfer restriction, 1st year ---
-    it("Liquity multisig can not transfer LQTY to a LC that was deployed directly", async () => {
-      // Liquity multisig deploys LC_A
-      const LC_A = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: multisig })
+  describe('MSIC transfer during first year after MSIC deployment', async accounts => {
+    // --- Mosaic AG transfer restriction, 1st year ---
+    it("Mosaic multisig can not transfer MSIC to a LC that was deployed directly", async () => {
+      // Mosaic multisig deploys LC_A
+      const LC_A = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: multisig })
 
       // Account F deploys LC_B
-      const LC_B = await LockupContract.new(lqtyToken.address, B, oneYearFromSystemDeployment, { from: F })
+      const LC_B = await LockupContract.new(msicToken.address, B, oneYearFromSystemDeployment, { from: F })
 
-      // LQTY deployer deploys LC_C
-      const LC_C = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: liquityAG })
+      // MSIC deployer deploys LC_C
+      const LC_C = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: mosaicAG })
 
-      // Liquity multisig attempts LQTY transfer to LC_A
+      // Mosaic multisig attempts MSIC transfer to LC_A
       try {
-        const LQTYtransferTx_A = await lqtyToken.transfer(LC_A.address, dec(1, 18), { from: multisig })
-        assert.isFalse(LQTYtransferTx_A.receipt.status)
+        const MSICtransferTx_A = await msicToken.transfer(LC_A.address, dec(1, 18), { from: multisig })
+        assert.isFalse(MSICtransferTx_A.receipt.status)
       } catch (error) {
-        assert.include(error.message, "LQTYToken: recipient must be a LockupContract registered in the Factory")
+        assert.include(error.message, "MSICToken: recipient must be a LockupContract registered in the Factory")
       }
 
-      // Liquity multisig attempts LQTY transfer to LC_B
+      // Mosaic multisig attempts MSIC transfer to LC_B
       try {
-        const LQTYtransferTx_B = await lqtyToken.transfer(LC_B.address, dec(1, 18), { from: multisig })
-        assert.isFalse(LQTYtransferTx_B.receipt.status)
+        const MSICtransferTx_B = await msicToken.transfer(LC_B.address, dec(1, 18), { from: multisig })
+        assert.isFalse(MSICtransferTx_B.receipt.status)
       } catch (error) {
-        assert.include(error.message, "LQTYToken: recipient must be a LockupContract registered in the Factory")
+        assert.include(error.message, "MSICToken: recipient must be a LockupContract registered in the Factory")
       }
 
       try {
-        const LQTYtransferTx_C = await lqtyToken.transfer(LC_C.address, dec(1, 18), { from: multisig })
-        assert.isFalse(LQTYtransferTx_C.receipt.status)
+        const MSICtransferTx_C = await msicToken.transfer(LC_C.address, dec(1, 18), { from: multisig })
+        assert.isFalse(MSICtransferTx_C.receipt.status)
       } catch (error) {
-        assert.include(error.message, "LQTYToken: recipient must be a LockupContract registered in the Factory")
+        assert.include(error.message, "MSICToken: recipient must be a LockupContract registered in the Factory")
       }
     })
 
-    it("Liquity multisig can not transfer to an EOA or Liquity system contracts", async () => {
-      // Multisig attempts LQTY transfer to EOAs
-      const LQTYtransferTxPromise_1 = lqtyToken.transfer(A, dec(1, 18), { from: multisig })
-      const LQTYtransferTxPromise_2 = lqtyToken.transfer(B, dec(1, 18), { from: multisig })
-      await assertRevert(LQTYtransferTxPromise_1)
-      await assertRevert(LQTYtransferTxPromise_2)
+    it("Mosaic multisig can not transfer to an EOA or Mosaic system contracts", async () => {
+      // Multisig attempts MSIC transfer to EOAs
+      const MSICtransferTxPromise_1 = msicToken.transfer(A, dec(1, 18), { from: multisig })
+      const MSICtransferTxPromise_2 = msicToken.transfer(B, dec(1, 18), { from: multisig })
+      await assertRevert(MSICtransferTxPromise_1)
+      await assertRevert(MSICtransferTxPromise_2)
 
-      // Multisig attempts LQTY transfer to core Liquity contracts
+      // Multisig attempts MSIC transfer to core Mosaic contracts
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYtransferTxPromise = lqtyToken.transfer(coreContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYtransferTxPromise, "LQTYToken: recipient must be a LockupContract registered in the Factory")
+        const MSICtransferTxPromise = msicToken.transfer(coreContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICtransferTxPromise, "MSICToken: recipient must be a LockupContract registered in the Factory")
       }
 
-      // Multisig attempts LQTY transfer to LQTY contracts (excluding LCs)
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYtransferTxPromise = lqtyToken.transfer(LQTYContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYtransferTxPromise, "LQTYToken: recipient must be a LockupContract registered in the Factory")
+      // Multisig attempts MSIC transfer to MSIC contracts (excluding LCs)
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICtransferTxPromise = msicToken.transfer(MSICContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICtransferTxPromise, "MSICToken: recipient must be a LockupContract registered in the Factory")
       }
     })
 
-    // --- Liquity AG approval restriction, 1st year ---
-    it("Liquity multisig can not approve any EOA or Liquity system contract to spend their LQTY", async () => {
-      // Multisig attempts to approve EOAs to spend LQTY
-      const LQTYApproveTxPromise_1 = lqtyToken.approve(A, dec(1, 18), { from: multisig })
-      const LQTYApproveTxPromise_2 = lqtyToken.approve(B, dec(1, 18), { from: multisig })
-      await assertRevert(LQTYApproveTxPromise_1, "LQTYToken: caller must not be the multisig")
-      await assertRevert(LQTYApproveTxPromise_2, "LQTYToken: caller must not be the multisig")
+    // --- Mosaic AG approval restriction, 1st year ---
+    it("Mosaic multisig can not approve any EOA or Mosaic system contract to spend their MSIC", async () => {
+      // Multisig attempts to approve EOAs to spend MSIC
+      const MSICApproveTxPromise_1 = msicToken.approve(A, dec(1, 18), { from: multisig })
+      const MSICApproveTxPromise_2 = msicToken.approve(B, dec(1, 18), { from: multisig })
+      await assertRevert(MSICApproveTxPromise_1, "MSICToken: caller must not be the multisig")
+      await assertRevert(MSICApproveTxPromise_2, "MSICToken: caller must not be the multisig")
 
-      // Multisig attempts to approve Liquity contracts to spend LQTY
+      // Multisig attempts to approve Mosaic contracts to spend MSIC
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYApproveTxPromise = lqtyToken.approve(coreContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYApproveTxPromise, "LQTYToken: caller must not be the multisig")
+        const MSICApproveTxPromise = msicToken.approve(coreContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICApproveTxPromise, "MSICToken: caller must not be the multisig")
       }
 
-      // Multisig attempts to approve LQTY contracts to spend LQTY (excluding LCs)
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYApproveTxPromise = lqtyToken.approve(LQTYContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYApproveTxPromise, "LQTYToken: caller must not be the multisig")
+      // Multisig attempts to approve MSIC contracts to spend MSIC (excluding LCs)
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICApproveTxPromise = msicToken.approve(MSICContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICApproveTxPromise, "MSICToken: caller must not be the multisig")
       }
     })
 
-    // --- Liquity AG increaseAllowance restriction, 1st year ---
-    it("Liquity multisig can not increaseAllowance for any EOA or Liquity contract", async () => {
-      // Multisig attempts to approve EOAs to spend LQTY
-      const LQTYIncreaseAllowanceTxPromise_1 = lqtyToken.increaseAllowance(A, dec(1, 18), { from: multisig })
-      const LQTYIncreaseAllowanceTxPromise_2 = lqtyToken.increaseAllowance(B, dec(1, 18), { from: multisig })
-      await assertRevert(LQTYIncreaseAllowanceTxPromise_1, "LQTYToken: caller must not be the multisig")
-      await assertRevert(LQTYIncreaseAllowanceTxPromise_2, "LQTYToken: caller must not be the multisig")
+    // --- Mosaic AG increaseAllowance restriction, 1st year ---
+    it("Mosaic multisig can not increaseAllowance for any EOA or Mosaic contract", async () => {
+      // Multisig attempts to approve EOAs to spend MSIC
+      const MSICIncreaseAllowanceTxPromise_1 = msicToken.increaseAllowance(A, dec(1, 18), { from: multisig })
+      const MSICIncreaseAllowanceTxPromise_2 = msicToken.increaseAllowance(B, dec(1, 18), { from: multisig })
+      await assertRevert(MSICIncreaseAllowanceTxPromise_1, "MSICToken: caller must not be the multisig")
+      await assertRevert(MSICIncreaseAllowanceTxPromise_2, "MSICToken: caller must not be the multisig")
 
-      // Multisig attempts to approve Liquity contracts to spend LQTY
+      // Multisig attempts to approve Mosaic contracts to spend MSIC
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYIncreaseAllowanceTxPromise = lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYIncreaseAllowanceTxPromise, "LQTYToken: caller must not be the multisig")
+        const MSICIncreaseAllowanceTxPromise = msicToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICIncreaseAllowanceTxPromise, "MSICToken: caller must not be the multisig")
       }
 
-      // Multisig attempts to approve LQTY contracts to spend LQTY (excluding LCs)
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTxPromise = lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYIncreaseAllowanceTxPromise, "LQTYToken: caller must not be the multisig")
+      // Multisig attempts to approve MSIC contracts to spend MSIC (excluding LCs)
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICIncreaseAllowanceTxPromise = msicToken.increaseAllowance(MSICContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICIncreaseAllowanceTxPromise, "MSICToken: caller must not be the multisig")
       }
     })
 
-    // --- Liquity AG decreaseAllowance restriction, 1st year ---
-    it("Liquity multisig can not decreaseAllowance for any EOA or Liquity contract", async () => {
+    // --- Mosaic AG decreaseAllowance restriction, 1st year ---
+    it("Mosaic multisig can not decreaseAllowance for any EOA or Mosaic contract", async () => {
       // Multisig attempts to decreaseAllowance on EOAs 
-      const LQTYDecreaseAllowanceTxPromise_1 = lqtyToken.decreaseAllowance(A, dec(1, 18), { from: multisig })
-      const LQTYDecreaseAllowanceTxPromise_2 = lqtyToken.decreaseAllowance(B, dec(1, 18), { from: multisig })
-      await assertRevert(LQTYDecreaseAllowanceTxPromise_1, "LQTYToken: caller must not be the multisig")
-      await assertRevert(LQTYDecreaseAllowanceTxPromise_2, "LQTYToken: caller must not be the multisig")
+      const MSICDecreaseAllowanceTxPromise_1 = msicToken.decreaseAllowance(A, dec(1, 18), { from: multisig })
+      const MSICDecreaseAllowanceTxPromise_2 = msicToken.decreaseAllowance(B, dec(1, 18), { from: multisig })
+      await assertRevert(MSICDecreaseAllowanceTxPromise_1, "MSICToken: caller must not be the multisig")
+      await assertRevert(MSICDecreaseAllowanceTxPromise_2, "MSICToken: caller must not be the multisig")
 
-      // Multisig attempts to decrease allowance on Liquity contracts
+      // Multisig attempts to decrease allowance on Mosaic contracts
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYDecreaseAllowanceTxPromise = lqtyToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYDecreaseAllowanceTxPromise, "LQTYToken: caller must not be the multisig")
+        const MSICDecreaseAllowanceTxPromise = msicToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICDecreaseAllowanceTxPromise, "MSICToken: caller must not be the multisig")
       }
 
-      // Multisig attempts to decrease allowance on LQTY contracts (excluding LCs)
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYDecreaseAllowanceTxPromise = lqtyToken.decreaseAllowance(LQTYContracts[contract].address, dec(1, 18), { from: multisig })
-        await assertRevert(LQTYDecreaseAllowanceTxPromise, "LQTYToken: caller must not be the multisig")
+      // Multisig attempts to decrease allowance on MSIC contracts (excluding LCs)
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICDecreaseAllowanceTxPromise = msicToken.decreaseAllowance(MSICContracts[contract].address, dec(1, 18), { from: multisig })
+        await assertRevert(MSICDecreaseAllowanceTxPromise, "MSICToken: caller must not be the multisig")
       }
     })
 
-    // --- Liquity multisig transferFrom restriction, 1st year ---
-    it("Liquity multisig can not be the sender in a transferFrom() call", async () => {
+    // --- Mosaic multisig transferFrom restriction, 1st year ---
+    it("Mosaic multisig can not be the sender in a transferFrom() call", async () => {
       // EOAs attempt to use multisig as sender in a transferFrom()
-      const LQTYtransferFromTxPromise_1 = lqtyToken.transferFrom(multisig, A, dec(1, 18), { from: A })
-      const LQTYtransferFromTxPromise_2 = lqtyToken.transferFrom(multisig, C, dec(1, 18), { from: B })
-      await assertRevert(LQTYtransferFromTxPromise_1, "LQTYToken: sender must not be the multisig")
-      await assertRevert(LQTYtransferFromTxPromise_2, "LQTYToken: sender must not be the multisig")
+      const MSICtransferFromTxPromise_1 = msicToken.transferFrom(multisig, A, dec(1, 18), { from: A })
+      const MSICtransferFromTxPromise_2 = msicToken.transferFrom(multisig, C, dec(1, 18), { from: B })
+      await assertRevert(MSICtransferFromTxPromise_1, "MSICToken: sender must not be the multisig")
+      await assertRevert(MSICtransferFromTxPromise_2, "MSICToken: sender must not be the multisig")
     })
 
     //  --- staking, 1st year ---
-    it("Liquity multisig can not stake their LQTY in the staking contract", async () => {
-      const LQTYStakingTxPromise_1 = lqtyStaking.stake(dec(1, 18), { from: multisig })
-      await assertRevert(LQTYStakingTxPromise_1, "LQTYToken: sender must not be the multisig")
+    it("Mosaic multisig can not stake their MSIC in the staking contract", async () => {
+      const MSICStakingTxPromise_1 = msicStaking.stake(dec(1, 18), { from: multisig })
+      await assertRevert(MSICStakingTxPromise_1, "MSICToken: sender must not be the multisig")
     })
 
     // --- Anyone else ---
 
-    it("Anyone (other than Liquity multisig) can transfer LQTY to LCs deployed by anyone through the Factory", async () => {
-      // Start D, E, F with some LQTY
-      await lqtyToken.unprotectedMint(D, dec(1, 24))
-      await lqtyToken.unprotectedMint(E, dec(2, 24))
-      await lqtyToken.unprotectedMint(F, dec(3, 24))
+    it("Anyone (other than Mosaic multisig) can transfer MSIC to LCs deployed by anyone through the Factory", async () => {
+      // Start D, E, F with some MSIC
+      await msicToken.unprotectedMint(D, dec(1, 24))
+      await msicToken.unprotectedMint(E, dec(2, 24))
+      await msicToken.unprotectedMint(F, dec(3, 24))
 
-      // H, I, and Liquity AG deploy lockup contracts with A, B, C as beneficiaries, respectively
+      // H, I, and Mosaic AG deploy lockup contracts with A, B, C as beneficiaries, respectively
       const deployedLCtx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: H })
       const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, { from: I })
       const deployedLCtx_C = await lockupContractFactory.deployLockupContract(C, oneYearFromSystemDeployment, { from: multisig })
@@ -264,165 +264,165 @@ contract('During the initial lockup period', async accounts => {
       const LCAddress_C = await th.getLCAddressFromDeploymentTx(deployedLCtx_C)
 
       // Check balances of LCs are 0
-      assert.equal(await lqtyToken.balanceOf(LCAddress_A), '0')
-      assert.equal(await lqtyToken.balanceOf(LCAddress_B), '0')
-      assert.equal(await lqtyToken.balanceOf(LCAddress_C), '0')
+      assert.equal(await msicToken.balanceOf(LCAddress_A), '0')
+      assert.equal(await msicToken.balanceOf(LCAddress_B), '0')
+      assert.equal(await msicToken.balanceOf(LCAddress_C), '0')
 
-      // D, E, F transfer LQTY to LCs
-      await lqtyToken.transfer(LCAddress_A, dec(1, 24), { from: D })
-      await lqtyToken.transfer(LCAddress_B, dec(2, 24), { from: E })
-      await lqtyToken.transfer(LCAddress_C, dec(3, 24), { from: F })
+      // D, E, F transfer MSIC to LCs
+      await msicToken.transfer(LCAddress_A, dec(1, 24), { from: D })
+      await msicToken.transfer(LCAddress_B, dec(2, 24), { from: E })
+      await msicToken.transfer(LCAddress_C, dec(3, 24), { from: F })
 
       // Check balances of LCs has increased
-      assert.equal(await lqtyToken.balanceOf(LCAddress_A), dec(1, 24))
-      assert.equal(await lqtyToken.balanceOf(LCAddress_B), dec(2, 24))
-      assert.equal(await lqtyToken.balanceOf(LCAddress_C), dec(3, 24))
+      assert.equal(await msicToken.balanceOf(LCAddress_A), dec(1, 24))
+      assert.equal(await msicToken.balanceOf(LCAddress_B), dec(2, 24))
+      assert.equal(await msicToken.balanceOf(LCAddress_C), dec(3, 24))
     })
 
-    it("Anyone (other than Liquity multisig) can transfer LQTY to LCs deployed by anyone directly", async () => {
-      // Start D, E, F with some LQTY
-      await lqtyToken.unprotectedMint(D, dec(1, 24))
-      await lqtyToken.unprotectedMint(E, dec(2, 24))
-      await lqtyToken.unprotectedMint(F, dec(3, 24))
+    it("Anyone (other than Mosaic multisig) can transfer MSIC to LCs deployed by anyone directly", async () => {
+      // Start D, E, F with some MSIC
+      await msicToken.unprotectedMint(D, dec(1, 24))
+      await msicToken.unprotectedMint(E, dec(2, 24))
+      await msicToken.unprotectedMint(F, dec(3, 24))
 
       // H, I, LiqAG deploy lockup contracts with A, B, C as beneficiaries, respectively
-      const LC_A = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: H })
-      const LC_B = await LockupContract.new(lqtyToken.address, B, oneYearFromSystemDeployment, { from: I })
-      const LC_C = await LockupContract.new(lqtyToken.address, C, oneYearFromSystemDeployment, { from: multisig })
+      const LC_A = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: H })
+      const LC_B = await LockupContract.new(msicToken.address, B, oneYearFromSystemDeployment, { from: I })
+      const LC_C = await LockupContract.new(msicToken.address, C, oneYearFromSystemDeployment, { from: multisig })
 
       // Check balances of LCs are 0
-      assert.equal(await lqtyToken.balanceOf(LC_A.address), '0')
-      assert.equal(await lqtyToken.balanceOf(LC_B.address), '0')
-      assert.equal(await lqtyToken.balanceOf(LC_C.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_A.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_B.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_C.address), '0')
 
-      // D, E, F transfer LQTY to LCs
-      await lqtyToken.transfer(LC_A.address, dec(1, 24), { from: D })
-      await lqtyToken.transfer(LC_B.address, dec(2, 24), { from: E })
-      await lqtyToken.transfer(LC_C.address, dec(3, 24), { from: F })
+      // D, E, F transfer MSIC to LCs
+      await msicToken.transfer(LC_A.address, dec(1, 24), { from: D })
+      await msicToken.transfer(LC_B.address, dec(2, 24), { from: E })
+      await msicToken.transfer(LC_C.address, dec(3, 24), { from: F })
 
       // Check balances of LCs has increased
-      assert.equal(await lqtyToken.balanceOf(LC_A.address), dec(1, 24))
-      assert.equal(await lqtyToken.balanceOf(LC_B.address), dec(2, 24))
-      assert.equal(await lqtyToken.balanceOf(LC_C.address), dec(3, 24))
+      assert.equal(await msicToken.balanceOf(LC_A.address), dec(1, 24))
+      assert.equal(await msicToken.balanceOf(LC_B.address), dec(2, 24))
+      assert.equal(await msicToken.balanceOf(LC_C.address), dec(3, 24))
     })
 
-    it("Anyone (other than liquity multisig) can transfer to an EOA", async () => {
-      // Start D, E, F with some LQTY
-      await lqtyToken.unprotectedMint(D, dec(1, 24))
-      await lqtyToken.unprotectedMint(E, dec(2, 24))
-      await lqtyToken.unprotectedMint(F, dec(3, 24))
+    it("Anyone (other than mosaic multisig) can transfer to an EOA", async () => {
+      // Start D, E, F with some MSIC
+      await msicToken.unprotectedMint(D, dec(1, 24))
+      await msicToken.unprotectedMint(E, dec(2, 24))
+      await msicToken.unprotectedMint(F, dec(3, 24))
 
-      // LQTY holders transfer to other transfer to EOAs
-      const LQTYtransferTx_1 = await lqtyToken.transfer(A, dec(1, 18), { from: D })
-      const LQTYtransferTx_2 = await lqtyToken.transfer(B, dec(1, 18), { from: E })
-      const LQTYtransferTx_3 = await lqtyToken.transfer(multisig, dec(1, 18), { from: F })
+      // MSIC holders transfer to other transfer to EOAs
+      const MSICtransferTx_1 = await msicToken.transfer(A, dec(1, 18), { from: D })
+      const MSICtransferTx_2 = await msicToken.transfer(B, dec(1, 18), { from: E })
+      const MSICtransferTx_3 = await msicToken.transfer(multisig, dec(1, 18), { from: F })
 
-      assert.isTrue(LQTYtransferTx_1.receipt.status)
-      assert.isTrue(LQTYtransferTx_2.receipt.status)
-      assert.isTrue(LQTYtransferTx_3.receipt.status)
+      assert.isTrue(MSICtransferTx_1.receipt.status)
+      assert.isTrue(MSICtransferTx_2.receipt.status)
+      assert.isTrue(MSICtransferTx_3.receipt.status)
     })
 
-    it("Anyone (other than liquity multisig) can approve any EOA or to spend their LQTY", async () => {
-      // EOAs approve EOAs to spend LQTY
-      const LQTYapproveTx_1 = await lqtyToken.approve(A, dec(1, 18), { from: F })
-      const LQTYapproveTx_2 = await lqtyToken.approve(B, dec(1, 18), { from: G })
-      await assert.isTrue(LQTYapproveTx_1.receipt.status)
-      await assert.isTrue(LQTYapproveTx_2.receipt.status)
+    it("Anyone (other than mosaic multisig) can approve any EOA or to spend their MSIC", async () => {
+      // EOAs approve EOAs to spend MSIC
+      const MSICapproveTx_1 = await msicToken.approve(A, dec(1, 18), { from: F })
+      const MSICapproveTx_2 = await msicToken.approve(B, dec(1, 18), { from: G })
+      await assert.isTrue(MSICapproveTx_1.receipt.status)
+      await assert.isTrue(MSICapproveTx_2.receipt.status)
     })
 
-    it("Anyone (other than liquity multisig) can increaseAllowance for any EOA or Liquity contract", async () => {
-      // Anyone can increaseAllowance of EOAs to spend LQTY
-      const LQTYIncreaseAllowanceTx_1 = await lqtyToken.increaseAllowance(A, dec(1, 18), { from: F })
-      const LQTYIncreaseAllowanceTx_2 = await lqtyToken.increaseAllowance(B, dec(1, 18), { from: G })
-      await assert.isTrue(LQTYIncreaseAllowanceTx_1.receipt.status)
-      await assert.isTrue(LQTYIncreaseAllowanceTx_2.receipt.status)
+    it("Anyone (other than mosaic multisig) can increaseAllowance for any EOA or Mosaic contract", async () => {
+      // Anyone can increaseAllowance of EOAs to spend MSIC
+      const MSICIncreaseAllowanceTx_1 = await msicToken.increaseAllowance(A, dec(1, 18), { from: F })
+      const MSICIncreaseAllowanceTx_2 = await msicToken.increaseAllowance(B, dec(1, 18), { from: G })
+      await assert.isTrue(MSICIncreaseAllowanceTx_1.receipt.status)
+      await assert.isTrue(MSICIncreaseAllowanceTx_2.receipt.status)
 
-      // Increase allowance of core Liquity contracts
+      // Increase allowance of core Mosaic contracts
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status)
+        const MSICIncreaseAllowanceTx = await msicToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICIncreaseAllowanceTx.receipt.status)
       }
 
-      // Increase allowance of LQTY contracts
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status)
+      // Increase allowance of MSIC contracts
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICIncreaseAllowanceTx = await msicToken.increaseAllowance(MSICContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICIncreaseAllowanceTx.receipt.status)
       }
     })
 
-    it("Anyone (other than liquity multisig) can decreaseAllowance for any EOA or Liquity contract", async () => {
-      //First, increase allowance of A, B and coreContracts and LQTY contracts
-      const LQTYIncreaseAllowanceTx_1 = await lqtyToken.increaseAllowance(A, dec(1, 18), { from: F })
-      const LQTYIncreaseAllowanceTx_2 = await lqtyToken.increaseAllowance(B, dec(1, 18), { from: G })
-      await assert.isTrue(LQTYIncreaseAllowanceTx_1.receipt.status)
-      await assert.isTrue(LQTYIncreaseAllowanceTx_2.receipt.status)
+    it("Anyone (other than mosaic multisig) can decreaseAllowance for any EOA or Mosaic contract", async () => {
+      //First, increase allowance of A, B and coreContracts and MSIC contracts
+      const MSICIncreaseAllowanceTx_1 = await msicToken.increaseAllowance(A, dec(1, 18), { from: F })
+      const MSICIncreaseAllowanceTx_2 = await msicToken.increaseAllowance(B, dec(1, 18), { from: G })
+      await assert.isTrue(MSICIncreaseAllowanceTx_1.receipt.status)
+      await assert.isTrue(MSICIncreaseAllowanceTx_2.receipt.status)
 
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYtransferTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYtransferTx.receipt.status)
+        const MSICtransferTx = await msicToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICtransferTx.receipt.status)
       }
 
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYtransferTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYtransferTx.receipt.status)
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICtransferTx = await msicToken.increaseAllowance(MSICContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICtransferTx.receipt.status)
       }
 
       // Decrease allowance of A, B
-      const LQTYDecreaseAllowanceTx_1 = await lqtyToken.decreaseAllowance(A, dec(1, 18), { from: F })
-      const LQTYDecreaseAllowanceTx_2 = await lqtyToken.decreaseAllowance(B, dec(1, 18), { from: G })
-      await assert.isTrue(LQTYDecreaseAllowanceTx_1.receipt.status)
-      await assert.isTrue(LQTYDecreaseAllowanceTx_2.receipt.status)
+      const MSICDecreaseAllowanceTx_1 = await msicToken.decreaseAllowance(A, dec(1, 18), { from: F })
+      const MSICDecreaseAllowanceTx_2 = await msicToken.decreaseAllowance(B, dec(1, 18), { from: G })
+      await assert.isTrue(MSICDecreaseAllowanceTx_1.receipt.status)
+      await assert.isTrue(MSICDecreaseAllowanceTx_2.receipt.status)
 
       // Decrease allowance of core contracts
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYDecreaseAllowanceTx.receipt.status)
+        const MSICDecreaseAllowanceTx = await msicToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICDecreaseAllowanceTx.receipt.status)
       }
 
-      // Decrease allowance of LQTY contracts
-      for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(LQTYContracts[contract].address, dec(1, 18), { from: F })
-        await assert.isTrue(LQTYDecreaseAllowanceTx.receipt.status)
+      // Decrease allowance of MSIC contracts
+      for (const contract of Object.keys(MSICContracts)) {
+        const MSICDecreaseAllowanceTx = await msicToken.decreaseAllowance(MSICContracts[contract].address, dec(1, 18), { from: F })
+        await assert.isTrue(MSICDecreaseAllowanceTx.receipt.status)
       }
     })
 
-    it("Anyone (other than liquity multisig) can be the sender in a transferFrom() call", async () => {
+    it("Anyone (other than mosaic multisig) can be the sender in a transferFrom() call", async () => {
       // Fund A, B
-      await lqtyToken.unprotectedMint(A, dec(1, 18))
-      await lqtyToken.unprotectedMint(B, dec(1, 18))
+      await msicToken.unprotectedMint(A, dec(1, 18))
+      await msicToken.unprotectedMint(B, dec(1, 18))
 
       // A, B approve F, G
-      await lqtyToken.approve(F, dec(1, 18), { from: A })
-      await lqtyToken.approve(G, dec(1, 18), { from: B })
+      await msicToken.approve(F, dec(1, 18), { from: A })
+      await msicToken.approve(G, dec(1, 18), { from: B })
 
-      const LQTYtransferFromTx_1 = await lqtyToken.transferFrom(A, F, dec(1, 18), { from: F })
-      const LQTYtransferFromTx_2 = await lqtyToken.transferFrom(B, C, dec(1, 18), { from: G })
-      await assert.isTrue(LQTYtransferFromTx_1.receipt.status)
-      await assert.isTrue(LQTYtransferFromTx_2.receipt.status)
+      const MSICtransferFromTx_1 = await msicToken.transferFrom(A, F, dec(1, 18), { from: F })
+      const MSICtransferFromTx_2 = await msicToken.transferFrom(B, C, dec(1, 18), { from: G })
+      await assert.isTrue(MSICtransferFromTx_1.receipt.status)
+      await assert.isTrue(MSICtransferFromTx_2.receipt.status)
     })
 
-    it("Anyone (other than liquity AG) can stake their LQTY in the staking contract", async () => {
+    it("Anyone (other than mosaic AG) can stake their MSIC in the staking contract", async () => {
       // Fund F
-      await lqtyToken.unprotectedMint(F, dec(1, 18))
+      await msicToken.unprotectedMint(F, dec(1, 18))
 
-      const LQTYStakingTx_1 = await lqtyStaking.stake(dec(1, 18), { from: F })
-      await assert.isTrue(LQTYStakingTx_1.receipt.status)
+      const MSICStakingTx_1 = await msicStaking.stake(dec(1, 18), { from: F })
+      await assert.isTrue(MSICStakingTx_1.receipt.status)
     })
 
   })
   // --- LCF ---
 
   describe('Lockup Contract Factory negative tests', async accounts => {
-    it("deployLockupContract(): reverts when LQTY token address is not set", async () => {
+    it("deployLockupContract(): reverts when MSIC token address is not set", async () => {
       // Fund F
-      await lqtyToken.unprotectedMint(F, dec(20, 24))
+      await msicToken.unprotectedMint(F, dec(20, 24))
 
       // deploy new LCF
       const LCFNew = await LockupContractFactory.new()
 
-      // Check LQTYToken address not registered
-      const registeredLQTYTokenAddr = await LCFNew.lqtyTokenAddress()
-      assert.equal(registeredLQTYTokenAddr, ZERO_ADDRESS)
+      // Check MSICToken address not registered
+      const registeredMSICTokenAddr = await LCFNew.msicTokenAddress()
+      assert.equal(registeredMSICTokenAddr, ZERO_ADDRESS)
 
       const tx = LCFNew.deployLockupContract(A, oneYearFromSystemDeployment, { from: F })
       await assertRevert(tx)
@@ -430,55 +430,55 @@ contract('During the initial lockup period', async accounts => {
   })
 
   // --- LCs ---
-  describe('Transferring LQTY to LCs', async accounts => {
-    it("Liquity multisig can transfer LQTY (vesting) to lockup contracts they deployed", async () => {
-      const initialLQTYBalanceOfLC_T1 = await lqtyToken.balanceOf(LC_T1.address)
-      const initialLQTYBalanceOfLC_T2 = await lqtyToken.balanceOf(LC_T2.address)
-      const initialLQTYBalanceOfLC_T3 = await lqtyToken.balanceOf(LC_T3.address)
+  describe('Transferring MSIC to LCs', async accounts => {
+    it("Mosaic multisig can transfer MSIC (vesting) to lockup contracts they deployed", async () => {
+      const initialMSICBalanceOfLC_T1 = await msicToken.balanceOf(LC_T1.address)
+      const initialMSICBalanceOfLC_T2 = await msicToken.balanceOf(LC_T2.address)
+      const initialMSICBalanceOfLC_T3 = await msicToken.balanceOf(LC_T3.address)
 
       // Check initial LC balances == entitlements
-      assert.equal(initialLQTYBalanceOfLC_T1, teamMemberInitialEntitlement_1)
-      assert.equal(initialLQTYBalanceOfLC_T2, teamMemberInitialEntitlement_2)
-      assert.equal(initialLQTYBalanceOfLC_T3, teamMemberInitialEntitlement_3)
+      assert.equal(initialMSICBalanceOfLC_T1, teamMemberInitialEntitlement_1)
+      assert.equal(initialMSICBalanceOfLC_T2, teamMemberInitialEntitlement_2)
+      assert.equal(initialMSICBalanceOfLC_T3, teamMemberInitialEntitlement_3)
 
       // One month passes
       await th.fastForwardTime(SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
-      // Liquity multisig transfers vesting amount
-      await lqtyToken.transfer(LC_T1.address, dec(1, 24), { from: multisig })
-      await lqtyToken.transfer(LC_T2.address, dec(1, 24), { from: multisig })
-      await lqtyToken.transfer(LC_T3.address, dec(1, 24), { from: multisig })
+      // Mosaic multisig transfers vesting amount
+      await msicToken.transfer(LC_T1.address, dec(1, 24), { from: multisig })
+      await msicToken.transfer(LC_T2.address, dec(1, 24), { from: multisig })
+      await msicToken.transfer(LC_T3.address, dec(1, 24), { from: multisig })
 
-      // Get new LC LQTY balances
-      const LQTYBalanceOfLC_T1_1 = await lqtyToken.balanceOf(LC_T1.address)
-      const LQTYBalanceOfLC_T2_1 = await lqtyToken.balanceOf(LC_T2.address)
-      const LQTYBalanceOfLC_T3_1 = await lqtyToken.balanceOf(LC_T3.address)
+      // Get new LC MSIC balances
+      const MSICBalanceOfLC_T1_1 = await msicToken.balanceOf(LC_T1.address)
+      const MSICBalanceOfLC_T2_1 = await msicToken.balanceOf(LC_T2.address)
+      const MSICBalanceOfLC_T3_1 = await msicToken.balanceOf(LC_T3.address)
 
       // // Check team member LC balances have increased 
-      assert.isTrue(LQTYBalanceOfLC_T1_1.eq(th.toBN(initialLQTYBalanceOfLC_T1).add(th.toBN(dec(1, 24)))))
-      assert.isTrue(LQTYBalanceOfLC_T2_1.eq(th.toBN(initialLQTYBalanceOfLC_T2).add(th.toBN(dec(1, 24)))))
-      assert.isTrue(LQTYBalanceOfLC_T3_1.eq(th.toBN(initialLQTYBalanceOfLC_T3).add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T1_1.eq(th.toBN(initialMSICBalanceOfLC_T1).add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T2_1.eq(th.toBN(initialMSICBalanceOfLC_T2).add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T3_1.eq(th.toBN(initialMSICBalanceOfLC_T3).add(th.toBN(dec(1, 24)))))
 
       // Another month passes
       await th.fastForwardTime(SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
-      // Liquity multisig transfers vesting amount
-      await lqtyToken.transfer(LC_T1.address, dec(1, 24), { from: multisig })
-      await lqtyToken.transfer(LC_T2.address, dec(1, 24), { from: multisig })
-      await lqtyToken.transfer(LC_T3.address, dec(1, 24), { from: multisig })
+      // Mosaic multisig transfers vesting amount
+      await msicToken.transfer(LC_T1.address, dec(1, 24), { from: multisig })
+      await msicToken.transfer(LC_T2.address, dec(1, 24), { from: multisig })
+      await msicToken.transfer(LC_T3.address, dec(1, 24), { from: multisig })
 
-      // Get new LC LQTY balances
-      const LQTYBalanceOfLC_T1_2 = await lqtyToken.balanceOf(LC_T1.address)
-      const LQTYBalanceOfLC_T2_2 = await lqtyToken.balanceOf(LC_T2.address)
-      const LQTYBalanceOfLC_T3_2 = await lqtyToken.balanceOf(LC_T3.address)
+      // Get new LC MSIC balances
+      const MSICBalanceOfLC_T1_2 = await msicToken.balanceOf(LC_T1.address)
+      const MSICBalanceOfLC_T2_2 = await msicToken.balanceOf(LC_T2.address)
+      const MSICBalanceOfLC_T3_2 = await msicToken.balanceOf(LC_T3.address)
 
       // Check team member LC balances have increased again
-      assert.isTrue(LQTYBalanceOfLC_T1_2.eq(LQTYBalanceOfLC_T1_1.add(th.toBN(dec(1, 24)))))
-      assert.isTrue(LQTYBalanceOfLC_T2_2.eq(LQTYBalanceOfLC_T2_1.add(th.toBN(dec(1, 24)))))
-      assert.isTrue(LQTYBalanceOfLC_T3_2.eq(LQTYBalanceOfLC_T3_1.add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T1_2.eq(MSICBalanceOfLC_T1_1.add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T2_2.eq(MSICBalanceOfLC_T2_1.add(th.toBN(dec(1, 24)))))
+      assert.isTrue(MSICBalanceOfLC_T3_2.eq(MSICBalanceOfLC_T3_1.add(th.toBN(dec(1, 24)))))
     })
 
-    it("Liquity multisig can transfer LQTY to lockup contracts deployed by anyone", async () => {
+    it("Mosaic multisig can transfer MSIC to lockup contracts deployed by anyone", async () => {
       // A, B, C each deploy a lockup contract with themself as beneficiary
       const deployedLCtx_A = await lockupContractFactory.deployLockupContract(A, twoYearsFromSystemDeployment, { from: A })
       const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, twoYearsFromSystemDeployment, { from: B })
@@ -490,39 +490,39 @@ contract('During the initial lockup period', async accounts => {
       const LC_C = await th.getLCFromDeploymentTx(deployedLCtx_C)
 
       // Check balances of LCs are 0
-      assert.equal(await lqtyToken.balanceOf(LC_A.address), '0')
-      assert.equal(await lqtyToken.balanceOf(LC_B.address), '0')
-      assert.equal(await lqtyToken.balanceOf(LC_C.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_A.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_B.address), '0')
+      assert.equal(await msicToken.balanceOf(LC_C.address), '0')
 
       // One month passes
       await th.fastForwardTime(SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
-      // Liquity multisig transfers LQTY to LCs deployed by other accounts
-      await lqtyToken.transfer(LC_A.address, dec(1, 24), { from: multisig })
-      await lqtyToken.transfer(LC_B.address, dec(2, 24), { from: multisig })
-      await lqtyToken.transfer(LC_C.address, dec(3, 24), { from: multisig })
+      // Mosaic multisig transfers MSIC to LCs deployed by other accounts
+      await msicToken.transfer(LC_A.address, dec(1, 24), { from: multisig })
+      await msicToken.transfer(LC_B.address, dec(2, 24), { from: multisig })
+      await msicToken.transfer(LC_C.address, dec(3, 24), { from: multisig })
 
       // Check balances of LCs have increased
-      assert.equal(await lqtyToken.balanceOf(LC_A.address), dec(1, 24))
-      assert.equal(await lqtyToken.balanceOf(LC_B.address), dec(2, 24))
-      assert.equal(await lqtyToken.balanceOf(LC_C.address), dec(3, 24))
+      assert.equal(await msicToken.balanceOf(LC_A.address), dec(1, 24))
+      assert.equal(await msicToken.balanceOf(LC_B.address), dec(2, 24))
+      assert.equal(await msicToken.balanceOf(LC_C.address), dec(3, 24))
     })
   })
 
   describe('Deploying new LCs', async accounts => {
-    it("LQTY Deployer can deploy LCs through the Factory", async () => {
-      // LQTY deployer deploys LCs
-      const LCDeploymentTx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: liquityAG })
-      const LCDeploymentTx_B = await lockupContractFactory.deployLockupContract(B, twoYearsFromSystemDeployment, { from: liquityAG })
-      const LCDeploymentTx_C = await lockupContractFactory.deployLockupContract(C, '9595995999999900000023423234', { from: liquityAG })
+    it("MSIC Deployer can deploy LCs through the Factory", async () => {
+      // MSIC deployer deploys LCs
+      const LCDeploymentTx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: mosaicAG })
+      const LCDeploymentTx_B = await lockupContractFactory.deployLockupContract(B, twoYearsFromSystemDeployment, { from: mosaicAG })
+      const LCDeploymentTx_C = await lockupContractFactory.deployLockupContract(C, '9595995999999900000023423234', { from: mosaicAG })
 
       assert.isTrue(LCDeploymentTx_A.receipt.status)
       assert.isTrue(LCDeploymentTx_B.receipt.status)
       assert.isTrue(LCDeploymentTx_C.receipt.status)
     })
 
-    it("Liquity multisig can deploy LCs through the Factory", async () => {
-      // LQTY deployer deploys LCs
+    it("Mosaic multisig can deploy LCs through the Factory", async () => {
+      // MSIC deployer deploys LCs
       const LCDeploymentTx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: multisig })
       const LCDeploymentTx_B = await lockupContractFactory.deployLockupContract(B, twoYearsFromSystemDeployment, { from: multisig })
       const LCDeploymentTx_C = await lockupContractFactory.deployLockupContract(C, '9595995999999900000023423234', { from: multisig })
@@ -536,7 +536,7 @@ contract('During the initial lockup period', async accounts => {
       // Various EOAs deploy LCs
       const LCDeploymentTx_1 = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: teamMember_1 })
       const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(C, twoYearsFromSystemDeployment, { from: investor_2 })
-      const LCDeploymentTx_3 = await lockupContractFactory.deployLockupContract(liquityAG, '9595995999999900000023423234', { from: A })
+      const LCDeploymentTx_3 = await lockupContractFactory.deployLockupContract(mosaicAG, '9595995999999900000023423234', { from: A })
       const LCDeploymentTx_4 = await lockupContractFactory.deployLockupContract(D, twoYearsFromSystemDeployment, { from: B })
 
       assert.isTrue(LCDeploymentTx_1.receipt.status)
@@ -545,15 +545,15 @@ contract('During the initial lockup period', async accounts => {
       assert.isTrue(LCDeploymentTx_4.receipt.status)
     })
 
-    it("LQTY Deployer can deploy LCs directly", async () => {
-      // LQTY deployer deploys LCs
-      const LC_A = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: liquityAG })
+    it("MSIC Deployer can deploy LCs directly", async () => {
+      // MSIC deployer deploys LCs
+      const LC_A = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: mosaicAG })
       const LC_A_txReceipt = await web3.eth.getTransactionReceipt(LC_A.transactionHash)
 
-      const LC_B = await LockupContract.new(lqtyToken.address, B, twoYearsFromSystemDeployment, { from: liquityAG })
+      const LC_B = await LockupContract.new(msicToken.address, B, twoYearsFromSystemDeployment, { from: mosaicAG })
       const LC_B_txReceipt = await web3.eth.getTransactionReceipt(LC_B.transactionHash)
 
-      const LC_C = await LockupContract.new(lqtyToken.address, C, twoYearsFromSystemDeployment, { from: liquityAG })
+      const LC_C = await LockupContract.new(msicToken.address, C, twoYearsFromSystemDeployment, { from: mosaicAG })
       const LC_C_txReceipt = await web3.eth.getTransactionReceipt(LC_C.transactionHash)
 
       // Check deployment succeeded
@@ -562,15 +562,15 @@ contract('During the initial lockup period', async accounts => {
       assert.isTrue(LC_C_txReceipt.status)
     })
 
-    it("Liquity multisig can deploy LCs directly", async () => {
-      // LQTY deployer deploys LCs
-      const LC_A = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: multisig })
+    it("Mosaic multisig can deploy LCs directly", async () => {
+      // MSIC deployer deploys LCs
+      const LC_A = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: multisig })
       const LC_A_txReceipt = await web3.eth.getTransactionReceipt(LC_A.transactionHash)
 
-      const LC_B = await LockupContract.new(lqtyToken.address, B, twoYearsFromSystemDeployment, { from: multisig })
+      const LC_B = await LockupContract.new(msicToken.address, B, twoYearsFromSystemDeployment, { from: multisig })
       const LC_B_txReceipt = await web3.eth.getTransactionReceipt(LC_B.transactionHash)
 
-      const LC_C = await LockupContract.new(lqtyToken.address, C, twoYearsFromSystemDeployment, { from: multisig })
+      const LC_C = await LockupContract.new(msicToken.address, C, twoYearsFromSystemDeployment, { from: multisig })
       const LC_C_txReceipt = await web3.eth.getTransactionReceipt(LC_C.transactionHash)
 
       // Check deployment succeeded
@@ -581,13 +581,13 @@ contract('During the initial lockup period', async accounts => {
 
     it("Anyone can deploy LCs directly", async () => {
       // Various EOAs deploy LCs
-      const LC_A = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: D })
+      const LC_A = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: D })
       const LC_A_txReceipt = await web3.eth.getTransactionReceipt(LC_A.transactionHash)
 
-      const LC_B = await LockupContract.new(lqtyToken.address, B, twoYearsFromSystemDeployment, { from: E })
+      const LC_B = await LockupContract.new(msicToken.address, B, twoYearsFromSystemDeployment, { from: E })
       const LC_B_txReceipt = await web3.eth.getTransactionReceipt(LC_B.transactionHash)
 
-      const LC_C = await LockupContract.new(lqtyToken.address, C, twoYearsFromSystemDeployment, { from: F })
+      const LC_C = await LockupContract.new(msicToken.address, C, twoYearsFromSystemDeployment, { from: F })
       const LC_C_txReceipt = await web3.eth.getTransactionReceipt(LC_C.transactionHash)
 
       // Check deployment succeeded
@@ -598,18 +598,18 @@ contract('During the initial lockup period', async accounts => {
 
     it("Anyone can deploy LCs with unlockTime = one year from deployment, directly and through factory", async () => {
       // Deploy directly
-      const LC_1 = await LockupContract.new(lqtyToken.address, A, oneYearFromSystemDeployment, { from: D })
+      const LC_1 = await LockupContract.new(msicToken.address, A, oneYearFromSystemDeployment, { from: D })
       const LCTxReceipt_1 = await web3.eth.getTransactionReceipt(LC_1.transactionHash)
 
-      const LC_2 = await LockupContract.new(lqtyToken.address, B, oneYearFromSystemDeployment, { from: liquityAG })
+      const LC_2 = await LockupContract.new(msicToken.address, B, oneYearFromSystemDeployment, { from: mosaicAG })
       const LCTxReceipt_2 = await web3.eth.getTransactionReceipt(LC_2.transactionHash)
 
-      const LC_3 = await LockupContract.new(lqtyToken.address, C, oneYearFromSystemDeployment, { from: multisig })
+      const LC_3 = await LockupContract.new(msicToken.address, C, oneYearFromSystemDeployment, { from: multisig })
       const LCTxReceipt_3 = await web3.eth.getTransactionReceipt(LC_2.transactionHash)
 
       // Deploy through factory
       const LCDeploymentTx_4 = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: E })
-      const LCDeploymentTx_5 = await lockupContractFactory.deployLockupContract(C, twoYearsFromSystemDeployment, { from: liquityAG })
+      const LCDeploymentTx_5 = await lockupContractFactory.deployLockupContract(C, twoYearsFromSystemDeployment, { from: mosaicAG })
       const LCDeploymentTx_6 = await lockupContractFactory.deployLockupContract(D, twoYearsFromSystemDeployment, { from: multisig })
 
       // Check deployments succeeded
@@ -626,13 +626,13 @@ contract('During the initial lockup period', async accounts => {
       const _17YearsFromDeployment = oneYearFromSystemDeployment.add(toBN(timeValues.SECONDS_IN_ONE_YEAR).mul(toBN('2')))
       
       // Deploy directly
-      const LC_1 = await LockupContract.new(lqtyToken.address, A, twoYearsFromSystemDeployment, { from: D })
+      const LC_1 = await LockupContract.new(msicToken.address, A, twoYearsFromSystemDeployment, { from: D })
       const LCTxReceipt_1 = await web3.eth.getTransactionReceipt(LC_1.transactionHash)
 
-      const LC_2 = await LockupContract.new(lqtyToken.address, B, justOverOneYear, { from: multisig })
+      const LC_2 = await LockupContract.new(msicToken.address, B, justOverOneYear, { from: multisig })
       const LCTxReceipt_2 = await web3.eth.getTransactionReceipt(LC_2.transactionHash)
 
-      const LC_3 = await LockupContract.new(lqtyToken.address, E, _17YearsFromDeployment, { from: E })
+      const LC_3 = await LockupContract.new(msicToken.address, E, _17YearsFromDeployment, { from: E })
       const LCTxReceipt_3 = await web3.eth.getTransactionReceipt(LC_3.transactionHash)
 
       // Deploy through factory
@@ -653,9 +653,9 @@ contract('During the initial lockup period', async accounts => {
       const justUnderOneYear = oneYearFromSystemDeployment.sub(toBN('1'))
      
       // Attempt to deploy directly
-      const directDeploymentTxPromise_1 = LockupContract.new(lqtyToken.address, A, justUnderOneYear, { from: D })
-      const directDeploymentTxPromise_2 = LockupContract.new(lqtyToken.address, B, '43200', { from: multisig })
-      const directDeploymentTxPromise_3 =  LockupContract.new(lqtyToken.address, E, '354534', { from: E })
+      const directDeploymentTxPromise_1 = LockupContract.new(msicToken.address, A, justUnderOneYear, { from: D })
+      const directDeploymentTxPromise_2 = LockupContract.new(msicToken.address, B, '43200', { from: multisig })
+      const directDeploymentTxPromise_3 =  LockupContract.new(msicToken.address, E, '354534', { from: E })
   
       // Attempt to deploy through factory
       const factoryDploymentTxPromise_1 = lockupContractFactory.deployLockupContract(A, justUnderOneYear, { from: E })
@@ -673,38 +673,38 @@ contract('During the initial lockup period', async accounts => {
 
 
     describe('Withdrawal Attempts on LCs before unlockTime has passed ', async accounts => {
-      it("Liquity multisig can't withdraw from a funded LC they deployed for another beneficiary through the Factory before the unlockTime", async () => {
+      it("Mosaic multisig can't withdraw from a funded LC they deployed for another beneficiary through the Factory before the unlockTime", async () => {
 
         // Check currentTime < unlockTime
         const currentTime = toBN(await th.getLatestBlockTimestamp(web3))
         const unlockTime = await LC_T1.unlockTime()
         assert.isTrue(currentTime.lt(unlockTime))
 
-        // Liquity multisig attempts withdrawal from LC they deployed through the Factory
+        // Mosaic multisig attempts withdrawal from LC they deployed through the Factory
         try {
-          const withdrawalAttempt = await LC_T1.withdrawLQTY({ from: multisig })
+          const withdrawalAttempt = await LC_T1.withdrawMSIC({ from: multisig })
           assert.isFalse(withdrawalAttempt.receipt.status)
         } catch (error) {
           assert.include(error.message, "LockupContract: caller is not the beneficiary")
         }
       })
 
-      it("Liquity multisig can't withdraw from a funded LC that someone else deployed before the unlockTime", async () => {
+      it("Mosaic multisig can't withdraw from a funded LC that someone else deployed before the unlockTime", async () => {
         // Account D deploys a new LC via the Factory
         const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, { from: D })
         const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B)
 
-        //LQTY multisig fund the newly deployed LCs
-        await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
+        //MSIC multisig fund the newly deployed LCs
+        await msicToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
 
         // Check currentTime < unlockTime
         const currentTime = toBN(await th.getLatestBlockTimestamp(web3))
         const unlockTime = await LC_B.unlockTime()
         assert.isTrue(currentTime.lt(unlockTime))
 
-        // Liquity multisig attempts withdrawal from LCs
+        // Mosaic multisig attempts withdrawal from LCs
         try {
-          const withdrawalAttempt_B = await LC_B.withdrawLQTY({ from: multisig })
+          const withdrawalAttempt_B = await LC_B.withdrawMSIC({ from: multisig })
           assert.isFalse(withdrawalAttempt_B.receipt.status)
         } catch (error) {
           assert.include(error.message, "LockupContract: caller is not the beneficiary")
@@ -716,8 +716,8 @@ contract('During the initial lockup period', async accounts => {
         const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, { from: D })
         const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B)
 
-        // Liquity multisig funds contracts
-        await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
+        // Mosaic multisig funds contracts
+        await msicToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
 
         // Check currentTime < unlockTime
         const currentTime = toBN(await th.getLatestBlockTimestamp(web3))
@@ -739,7 +739,7 @@ contract('During the initial lockup period', async accounts => {
         for (LC of LCs) {
           try {
             const beneficiary = await LC.beneficiary()
-            const withdrawalAttempt = await LC.withdrawLQTY({ from: beneficiary })
+            const withdrawalAttempt = await LC.withdrawMSIC({ from: beneficiary })
             assert.isFalse(withdrawalAttempt.receipt.status)
           } catch (error) {
             assert.include(error.message, "LockupContract: The lockup duration must have passed")
@@ -752,30 +752,30 @@ contract('During the initial lockup period', async accounts => {
         const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, { from: D })
         const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B)
 
-        // Liquity multisig funds contract
-        await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
+        // Mosaic multisig funds contract
+        await msicToken.transfer(LC_B.address, dec(2, 18), { from: multisig })
 
         // Check currentTime < unlockTime
         const currentTime = toBN(await th.getLatestBlockTimestamp(web3))
         const unlockTime = await LC_B.unlockTime()
         assert.isTrue(currentTime.lt(unlockTime))
 
-        const variousEOAs = [teamMember_2, liquityAG, multisig, investor_1, A, C, D, E]
+        const variousEOAs = [teamMember_2, mosaicAG, multisig, investor_1, A, C, D, E]
 
         // Several EOAs attempt to withdraw from LC deployed by D
         for (account of variousEOAs) {
           try {
-            const withdrawalAttempt = await LC_B.withdrawLQTY({ from: account })
+            const withdrawalAttempt = await LC_B.withdrawMSIC({ from: account })
             assert.isFalse(withdrawalAttempt.receipt.status)
           } catch (error) {
             assert.include(error.message, "LockupContract: caller is not the beneficiary")
           }
         }
 
-        // Several EOAs attempt to withdraw from LC_T1 deployed by LQTY deployer
+        // Several EOAs attempt to withdraw from LC_T1 deployed by MSIC deployer
         for (account of variousEOAs) {
           try {
-            const withdrawalAttempt = await LC_T1.withdrawLQTY({ from: account })
+            const withdrawalAttempt = await LC_T1.withdrawMSIC({ from: account })
             assert.isFalse(withdrawalAttempt.receipt.status)
           } catch (error) {
             assert.include(error.message, "LockupContract: caller is not the beneficiary")

@@ -5,10 +5,10 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 
 import "react-circular-progressbar/dist/styles.css";
 
-import { EthersTransactionOverrides, EthersTransactionCancelledError } from "@liquity/lib-ethers";
-import { SentLiquityTransaction, LiquityReceipt } from "@liquity/lib-base";
+import { EthersTransactionOverrides, EthersTransactionCancelledError } from "@mosaic/lib-ethers";
+import { SentMosaicTransaction, MosaicReceipt } from "@mosaic/lib-base";
 
-import { useLiquity } from "../hooks/LiquityContext";
+import { useMosaic } from "../hooks/MosaicContext";
 
 import { Tooltip } from "./Tooltip";
 import type { TooltipProps } from "./Tooltip";
@@ -102,9 +102,9 @@ type ButtonlikeProps = {
   onClick?: () => void;
 };
 
-type SentTransaction = SentLiquityTransaction<
+type SentTransaction = SentMosaicTransaction<
   TransactionResponse,
-  LiquityReceipt<TransactionReceipt>
+  MosaicReceipt<TransactionReceipt>
 >;
 
 export type TransactionFunction = (
@@ -226,7 +226,7 @@ const tryToGetRevertReason = async (provider: Provider, tx: TransactionReceipt) 
 };
 
 export const TransactionMonitor: React.FC = () => {
-  const { provider } = useLiquity();
+  const { provider } = useMosaic();
   const [transactionState, setTransactionState] = useTransactionState();
 
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;

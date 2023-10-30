@@ -1,7 +1,7 @@
 const { red, blue, green, yellow, dim, bold } = require("chalk");
 const { Wallet, providers } = require("ethers");
-const { Decimal, UserTrove, LUSD_LIQUIDATION_RESERVE } = require("@liquity/lib-base");
-const { EthersLiquity, EthersLiquityWithStore } = require("@liquity/lib-ethers");
+const { Decimal, UserTrove, MoUSD_LIQUIDATION_RESERVE } = require("@mosaic/lib-base");
+const { EthersMosaic, EthersMosaicWithStore } = require("@mosaic/lib-ethers");
 
 function log(message) {
   console.log(`${dim(`[${new Date().toLocaleTimeString()}]`)} ${message}`);
@@ -16,21 +16,21 @@ async function main() {
   // Replace URL if not using a local node
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const liquity = await EthersLiquity.connect(wallet, { useStore: "blockPolled" });
+  const mosaic = await EthersMosaic.connect(wallet, { useStore: "blockPolled" });
 
-  liquity.store.onLoaded = () => {
+  mosaic.store.onLoaded = () => {
     info("Waiting for price drops...");
-    tryToLiquidate(liquity);
+    tryToLiquidate(mosaic);
   };
 
-  liquity.store.subscribe(({ newState, oldState }) => {
+  mosaic.store.subscribe(({ newState, oldState }) => {
     // Try to liquidate whenever the price drops
     if (newState.price.lt(oldState.price)) {
-      tryToLiquidate(liquity);
+      tryToLiquidate(mosaic);
     }
   });
 
-  liquity.store.start();
+  mosaic.store.start();
 }
 
 /**
@@ -47,17 +47,17 @@ const byDescendingCollateral = ({ collateral: a }, { collateral: b }) =>
   b.gt(a) ? 1 : b.lt(a) ? -1 : 0;
 
 /**
- * @param {EthersLiquityWithStore} [liquity]
+ * @param {EthersMosaicWithStore} [mosaic]
  */
-async function tryToLiquidate(liquity) {
-  const { store } = liquity;
+async function tryToLiquidate(mosaic) {
+  const { store } = mosaic;
 
   const [gasPrice, riskiestTroves] = await Promise.all([
-    liquity.connection.provider
+    mosaic.connection.provider
       .getGasPrice()
       .then(bn => Decimal.fromBigNumberString(bn.toHexString())),
 
-    liquity.getTroves({
+    mosaic.getTroves({
       first: 1000,
       sortedBy: "ascendingCollateralRatio"
     })
@@ -76,7 +76,7 @@ async function tryToLiquidate(liquity) {
   const addresses = troves.map(trove => trove.ownerAddress);
 
   try {
-    const liquidation = await liquity.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
+    const liquidation = await mosaic.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
     const gasLimit = liquidation.rawPopulatedTransaction.gasLimit.toNumber();
     const expectedCost = gasPrice.mul(gasLimit).mul(store.state.price);
 
@@ -84,7 +84,7 @@ async function tryToLiquidate(liquity) {
     const expectedCompensation = total.collateral
       .mul(0.005)
       .mul(store.state.price)
-      .add(LUSD_LIQUIDATION_RESERVE.mul(troves.length));
+      .add(MoUSD_LIQUIDATION_RESERVE.mul(troves.length));
 
     if (expectedCost.gt(expectedCompensation)) {
       // In reality, the TX cost will be lower than this thanks to storage refunds, but let's be
@@ -106,15 +106,15 @@ async function tryToLiquidate(liquity) {
       return;
     }
 
-    const { collateralGasCompensation, lusdGasCompensation, liquidatedAddresses } = receipt.details;
+    const { collateralGasCompensation, msicGasCompensation, liquidatedAddresses } = receipt.details;
     const gasCost = gasPrice.mul(receipt.rawReceipt.gasUsed.toNumber()).mul(store.state.price);
     const totalCompensation = collateralGasCompensation
       .mul(store.state.price)
-      .add(lusdGasCompensation);
+      .add(msicGasCompensation);
 
     success(
       `Received ${bold(`${collateralGasCompensation.toString(4)} ETH`)} + ` +
-        `${bold(`${lusdGasCompensation.toString(2)} LUSD`)} compensation (` +
+        `${bold(`${msicGasCompensation.toString(2)} MoUSD`)} compensation (` +
         (totalCompensation.gte(gasCost)
           ? `${green(`$${totalCompensation.sub(gasCost).toString(2)}`)} profit`
           : `${red(`$${gasCost.sub(totalCompensation).toString(2)}`)} loss`) +

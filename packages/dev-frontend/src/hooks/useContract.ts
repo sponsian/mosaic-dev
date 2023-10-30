@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ContractInterface, ethers } from "ethers";
-import { useLiquity } from "./LiquityContext";
+import { useMosaic } from "./MosaicContext";
 
 type ContractStatus = "UNKNOWN" | "LOADED" | "FAILED";
 type Contract<TContractType> = { instance: TContractType | undefined; status: ContractStatus };
@@ -9,7 +9,7 @@ export function useContract<TContractType>(
   address: string | null,
   abi: ContractInterface
 ): [TContractType | undefined, ContractStatus] {
-  const { provider } = useLiquity();
+  const { provider } = useMosaic();
   const [contract, setContract] = useState<Contract<TContractType>>();
 
   useEffect(() => {

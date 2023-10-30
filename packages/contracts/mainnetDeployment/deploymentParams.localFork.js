@@ -10,9 +10,9 @@ const externalAddrs  = {
   WETH_ERC20: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 }
 
-const liquityAddrs = {
+const mosaicAddrs = {
   GENERAL_SAFE:"0x8be7e24263c199ebfcfd6aebca83f8d7ed85a5dd",  // Hardhat dev address
-  LQTY_SAFE:"0x20c81d658aae3a8580d990e441a9ef2c9809be74",  //  Hardhat dev address
+  MSIC_SAFE:"0x20c81d658aae3a8580d990e441a9ef2c9809be74",  //  Hardhat dev address
   DEPLOYER: "0x31c57298578f7508B5982062cfEc5ec8BD346247" // hardhat first account
 }
 
@@ -37,7 +37,7 @@ const TX_CONFIRMATIONS = 1 // for local fork test
 
 module.exports = {
   externalAddrs,
-  liquityAddrs,
+  mosaicAddrs,
   beneficiaries,
   OUTPUT_FILE,
   waitFunction,

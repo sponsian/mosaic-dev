@@ -1,31 +1,31 @@
 import React from "react";
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 import { Container, Flex, Box } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
-import { useLiquity } from "../hooks/LiquityContext";
+import { useMosaic } from "../hooks/MosaicContext";
 
-import { LiquityLogo } from "./LiquityLogo";
+import { MosaicLogo } from "./MosaicLogo";
 import { Nav } from "./Nav";
 import { SideNav } from "./SideNav";
 
 const logoHeight = "32px";
 
-const select = ({ frontend }: LiquityStoreState) => ({
+const select = ({ frontend }: MosaicStoreState) => ({
   frontend
 });
 
 export const Header: React.FC = ({ children }) => {
   const {
     config: { frontendTag }
-  } = useLiquity();
-  const { frontend } = useLiquitySelector(select);
+  } = useMosaic();
+  const { frontend } = useMosaicSelector(select);
   const isFrontendRegistered = frontendTag === AddressZero || frontend.status === "registered";
 
   return (
     <Container variant="header">
       <Flex sx={{ alignItems: "center", flex: 1 }}>
-        <LiquityLogo height={logoHeight} />
+        <MosaicLogo height={logoHeight} />
 
         <Box
           sx={{

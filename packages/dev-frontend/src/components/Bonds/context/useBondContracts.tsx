@@ -1,98 +1,98 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import {
-  BLUSDLPZap,
-  BLUSDLPZap__factory,
-  BLUSDToken,
+  BMoUSDLPZap,
+  BMoUSDLPZap__factory,
+  BMoUSDToken,
   BondNFT,
   ChickenBondManager,
   ERC20Faucet,
   ERC20Faucet__factory
-} from "@liquity/chicken-bonds/lusd/types";
+} from "@mosaic/chicken-bonds/msic/types";
 import {
   CurveCryptoSwap2ETH,
   CurveLiquidityGaugeV5__factory
-} from "@liquity/chicken-bonds/lusd/types/external";
-import { CurveCryptoSwap2ETH__factory } from "@liquity/chicken-bonds/lusd/types/external";
+} from "@mosaic/chicken-bonds/msic/types/external";
+import { CurveCryptoSwap2ETH__factory } from "@mosaic/chicken-bonds/msic/types/external";
 import {
-  BLUSDToken__factory,
+  BMoUSDToken__factory,
   BondNFT__factory,
   ChickenBondManager__factory
-} from "@liquity/chicken-bonds/lusd/types";
-import type { LUSDToken } from "@liquity/lib-ethers/dist/types";
-import LUSDTokenAbi from "@liquity/lib-ethers/abi/LUSDToken.json";
+} from "@mosaic/chicken-bonds/msic/types";
+import type { MoUSDToken } from "@mosaic/lib-ethers/dist/types";
+import MoUSDTokenAbi from "@mosaic/lib-ethers/abi/MoUSDToken.json";
 import { useContract } from "../../../hooks/useContract";
-import { useLiquity } from "../../../hooks/LiquityContext";
+import { useMosaic } from "../../../hooks/MosaicContext";
 import { useCallback } from "react";
 import type { BondsApi } from "./api";
-import type { BLusdLpRewards, Bond, ProtocolInfo, Stats } from "./transitions";
-import { BLusdAmmTokenIndex } from "./transitions";
+import type { BMousdLpRewards, Bond, ProtocolInfo, Stats } from "./transitions";
+import { BMousdAmmTokenIndex } from "./transitions";
 import type { Addresses } from "./transitions";
 import { useChainId } from "wagmi";
 import { useBondAddresses } from "./BondAddressesContext";
-import type { CurveLiquidityGaugeV5 } from "@liquity/chicken-bonds/lusd/types/external/CurveLiquidityGaugeV5";
+import type { CurveLiquidityGaugeV5 } from "@mosaic/chicken-bonds/msic/types/external/CurveLiquidityGaugeV5";
 
 type BondsInformation = {
   protocolInfo: ProtocolInfo;
   bonds: Bond[];
   stats: Stats;
-  bLusdBalance: Decimal;
-  lusdBalance: Decimal;
+  bMousdBalance: Decimal;
+  msicBalance: Decimal;
   lpTokenBalance: Decimal;
   stakedLpTokenBalance: Decimal;
   lpTokenSupply: Decimal;
-  bLusdAmmBLusdBalance: Decimal;
-  bLusdAmmLusdBalance: Decimal;
-  lpRewards: BLusdLpRewards;
+  bMousdAmmBMousdBalance: Decimal;
+  bMousdAmmMousdBalance: Decimal;
+  lpRewards: BMousdLpRewards;
 };
 
 type BondContracts = {
   addresses: Addresses;
-  lusdToken: LUSDToken | undefined;
-  bLusdToken: BLUSDToken | undefined;
+  msicToken: MoUSDToken | undefined;
+  bMousdToken: BMoUSDToken | undefined;
   bondNft: BondNFT | undefined;
   chickenBondManager: ChickenBondManager | undefined;
-  bLusdAmm: CurveCryptoSwap2ETH | undefined;
-  bLusdAmmZapper: BLUSDLPZap | undefined;
-  bLusdGauge: CurveLiquidityGaugeV5 | undefined;
+  bMousdAmm: CurveCryptoSwap2ETH | undefined;
+  bMousdAmmZapper: BMoUSDLPZap | undefined;
+  bMousdGauge: CurveLiquidityGaugeV5 | undefined;
   hasFoundContracts: boolean;
   getLatestData: (account: string, api: BondsApi) => Promise<BondsInformation | undefined>;
 };
 
 export const useBondContracts = (): BondContracts => {
-  const { liquity } = useLiquity();
+  const { mosaic } = useMosaic();
   const chainId = useChainId();
   const isMainnet = chainId === 1;
 
   const addresses = useBondAddresses();
 
   const {
-    BLUSD_AMM_ADDRESS,
-    BLUSD_TOKEN_ADDRESS,
+    BMoUSD_AMM_ADDRESS,
+    BMoUSD_TOKEN_ADDRESS,
     BOND_NFT_ADDRESS,
     CHICKEN_BOND_MANAGER_ADDRESS,
-    LUSD_OVERRIDE_ADDRESS,
-    BLUSD_LP_ZAP_ADDRESS,
-    BLUSD_AMM_STAKING_ADDRESS
+    MoUSD_OVERRIDE_ADDRESS,
+    BMoUSD_LP_ZAP_ADDRESS,
+    BMoUSD_AMM_STAKING_ADDRESS
   } = addresses;
 
-  const [lusdTokenDefault, lusdTokenDefaultStatus] = useContract<LUSDToken>(
-    liquity.connection.addresses.lusdToken,
-    LUSDTokenAbi
+  const [msicTokenDefault, msicTokenDefaultStatus] = useContract<MoUSDToken>(
+    mosaic.connection.addresses.msicToken,
+    MoUSDTokenAbi
   );
 
-  const [lusdTokenOverride, lusdTokenOverrideStatus] = useContract<ERC20Faucet>(
-    LUSD_OVERRIDE_ADDRESS,
+  const [msicTokenOverride, msicTokenOverrideStatus] = useContract<ERC20Faucet>(
+    MoUSD_OVERRIDE_ADDRESS,
     ERC20Faucet__factory.abi
   );
 
-  const [lusdToken, lusdTokenStatus] =
-    LUSD_OVERRIDE_ADDRESS === null
-      ? [lusdTokenDefault, lusdTokenDefaultStatus]
-      : [(lusdTokenOverride as unknown) as LUSDToken, lusdTokenOverrideStatus];
+  const [msicToken, msicTokenStatus] =
+    MoUSD_OVERRIDE_ADDRESS === null
+      ? [msicTokenDefault, msicTokenDefaultStatus]
+      : [(msicTokenOverride as unknown) as MoUSDToken, msicTokenOverrideStatus];
 
-  const [bLusdToken, bLusdTokenStatus] = useContract<BLUSDToken>(
-    BLUSD_TOKEN_ADDRESS,
-    BLUSDToken__factory.abi
+  const [bMousdToken, bMousdTokenStatus] = useContract<BMoUSDToken>(
+    BMoUSD_TOKEN_ADDRESS,
+    BMoUSDToken__factory.abi
   );
 
   const [bondNft, bondNftStatus] = useContract<BondNFT>(BOND_NFT_ADDRESS, BondNFT__factory.abi);
@@ -101,48 +101,48 @@ export const useBondContracts = (): BondContracts => {
     ChickenBondManager__factory.abi
   );
 
-  const [bLusdAmm, bLusdAmmStatus] = useContract<CurveCryptoSwap2ETH>(
-    BLUSD_AMM_ADDRESS,
+  const [bMousdAmm, bMousdAmmStatus] = useContract<CurveCryptoSwap2ETH>(
+    BMoUSD_AMM_ADDRESS,
     CurveCryptoSwap2ETH__factory.abi
   );
 
-  const [bLusdAmmZapper, bLusdAmmZapperStatus] = useContract<BLUSDLPZap>(
-    BLUSD_LP_ZAP_ADDRESS,
-    BLUSDLPZap__factory.abi
+  const [bMousdAmmZapper, bMousdAmmZapperStatus] = useContract<BMoUSDLPZap>(
+    BMoUSD_LP_ZAP_ADDRESS,
+    BMoUSDLPZap__factory.abi
   );
 
-  const [bLusdGauge, bLusdGaugeStatus] = useContract<CurveLiquidityGaugeV5>(
-    BLUSD_AMM_STAKING_ADDRESS,
+  const [bMousdGauge, bMousdGaugeStatus] = useContract<CurveLiquidityGaugeV5>(
+    BMoUSD_AMM_STAKING_ADDRESS,
     CurveLiquidityGaugeV5__factory.abi
   );
 
   const hasFoundContracts =
     [
-      lusdTokenStatus,
+      msicTokenStatus,
       bondNftStatus,
       chickenBondManagerStatus,
-      bLusdTokenStatus,
-      bLusdAmmStatus,
-      ...(isMainnet ? [bLusdAmmZapperStatus] : []),
-      bLusdGaugeStatus
+      bMousdTokenStatus,
+      bMousdAmmStatus,
+      ...(isMainnet ? [bMousdAmmZapperStatus] : []),
+      bMousdGaugeStatus
     ].find(status => status === "FAILED") === undefined;
 
   const getLatestData = useCallback(
     async (account: string, api: BondsApi): Promise<BondsInformation | undefined> => {
       if (
-        lusdToken === undefined ||
+        msicToken === undefined ||
         bondNft === undefined ||
         chickenBondManager === undefined ||
-        bLusdToken === undefined ||
-        bLusdAmm === undefined ||
-        bLusdGauge === undefined
+        bMousdToken === undefined ||
+        bMousdAmm === undefined ||
+        bMousdGauge === undefined
       ) {
         return undefined;
       }
 
       const protocolInfoPromise = api.getProtocolInfo(
-        bLusdToken,
-        bLusdAmm,
+        bMousdToken,
+        bMousdAmm,
         chickenBondManager,
         isMainnet
       );
@@ -157,25 +157,25 @@ export const useBondContracts = (): BondContracts => {
       const [protocolInfo, stats, lpToken] = await Promise.all([
         protocolInfoPromise,
         api.getStats(chickenBondManager),
-        api.getLpToken(bLusdAmm)
+        api.getLpToken(bMousdAmm)
       ]);
 
       const [
-        bLusdBalance,
-        lusdBalance,
+        bMousdBalance,
+        msicBalance,
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bLusdAmmCoinBalances,
+        bMousdAmmCoinBalances,
         lpRewards
       ] = await Promise.all([
-        api.getTokenBalance(account, bLusdToken),
-        api.getTokenBalance(account, lusdToken),
+        api.getTokenBalance(account, bMousdToken),
+        api.getTokenBalance(account, msicToken),
         api.getTokenBalance(account, lpToken),
-        isMainnet ? api.getTokenBalance(account, bLusdGauge) : Decimal.ZERO,
+        isMainnet ? api.getTokenBalance(account, bMousdGauge) : Decimal.ZERO,
         api.getTokenTotalSupply(lpToken),
-        api.getCoinBalances(bLusdAmm),
-        isMainnet ? api.getLpRewards(account, bLusdGauge) : []
+        api.getCoinBalances(bMousdAmm),
+        isMainnet ? api.getLpRewards(account, bMousdGauge) : []
       ]);
 
       const bonds = await bondsPromise;
@@ -184,28 +184,28 @@ export const useBondContracts = (): BondContracts => {
         protocolInfo,
         bonds,
         stats,
-        bLusdBalance,
-        lusdBalance,
+        bMousdBalance,
+        msicBalance,
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bLusdAmmBLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.BLUSD],
-        bLusdAmmLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.LUSD],
+        bMousdAmmBMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.BMoUSD],
+        bMousdAmmMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.MoUSD],
         lpRewards
       };
     },
-    [chickenBondManager, bondNft, bLusdToken, lusdToken, bLusdAmm, isMainnet, bLusdGauge]
+    [chickenBondManager, bondNft, bMousdToken, msicToken, bMousdAmm, isMainnet, bMousdGauge]
   );
 
   return {
     addresses,
-    lusdToken,
-    bLusdToken,
+    msicToken,
+    bMousdToken,
     bondNft,
     chickenBondManager,
-    bLusdAmm,
-    bLusdAmmZapper,
-    bLusdGauge,
+    bMousdAmm,
+    bMousdAmmZapper,
+    bMousdGauge,
     getLatestData,
     hasFoundContracts
   };

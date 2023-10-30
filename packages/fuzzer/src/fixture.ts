@@ -3,15 +3,15 @@ import { Signer } from "@ethersproject/abstract-signer";
 import {
   Decimal,
   Decimalish,
-  LQTYStake,
-  LUSD_MINIMUM_DEBT,
+  MSICStake,
+  MoUSD_MINIMUM_DEBT,
   StabilityDeposit,
-  TransactableLiquity,
+  TransactableMosaic,
   Trove,
   TroveAdjustmentParams
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
-import { EthersLiquity as Liquity } from "@liquity/lib-ethers";
+import { EthersMosaic as Mosaic } from "@mosaic/lib-ethers";
 
 import {
   createRandomTrove,
@@ -32,21 +32,21 @@ type _GasHistogramsFrom<T> = {
 };
 
 type GasHistograms = Pick<
-  _GasHistogramsFrom<TransactableLiquity>,
+  _GasHistogramsFrom<TransactableMosaic>,
   | "openTrove"
   | "adjustTrove"
   | "closeTrove"
-  | "redeemLUSD"
-  | "depositLUSDInStabilityPool"
-  | "withdrawLUSDFromStabilityPool"
-  | "stakeLQTY"
-  | "unstakeLQTY"
+  | "redeemMoUSD"
+  | "depositMoUSDInStabilityPool"
+  | "withdrawMoUSDFromStabilityPool"
+  | "stakeMSIC"
+  | "unstakeMSIC"
 >;
 
 export class Fixture {
-  private readonly deployerLiquity: Liquity;
+  private readonly deployerMosaic: Mosaic;
   private readonly funder: Signer;
-  private readonly funderLiquity: Liquity;
+  private readonly funderMosaic: Mosaic;
   private readonly funderAddress: string;
   private readonly frontendAddress: string;
   private readonly gasHistograms: GasHistograms;
@@ -56,16 +56,16 @@ export class Fixture {
   totalNumberOfLiquidations = 0;
 
   private constructor(
-    deployerLiquity: Liquity,
+    deployerMosaic: Mosaic,
     funder: Signer,
-    funderLiquity: Liquity,
+    funderMosaic: Mosaic,
     funderAddress: string,
     frontendAddress: string,
     price: Decimal
   ) {
-    this.deployerLiquity = deployerLiquity;
+    this.deployerMosaic = deployerMosaic;
     this.funder = funder;
-    this.funderLiquity = funderLiquity;
+    this.funderMosaic = funderMosaic;
     this.funderAddress = funderAddress;
     this.frontendAddress = frontendAddress;
     this.price = price;
@@ -74,56 +74,56 @@ export class Fixture {
       openTrove: new GasHistogram(),
       adjustTrove: new GasHistogram(),
       closeTrove: new GasHistogram(),
-      redeemLUSD: new GasHistogram(),
-      depositLUSDInStabilityPool: new GasHistogram(),
-      withdrawLUSDFromStabilityPool: new GasHistogram(),
-      stakeLQTY: new GasHistogram(),
-      unstakeLQTY: new GasHistogram()
+      redeemMoUSD: new GasHistogram(),
+      depositMoUSDInStabilityPool: new GasHistogram(),
+      withdrawMoUSDFromStabilityPool: new GasHistogram(),
+      stakeMSIC: new GasHistogram(),
+      unstakeMSIC: new GasHistogram()
     };
   }
 
   static async setup(
-    deployerLiquity: Liquity,
+    deployerMosaic: Mosaic,
     funder: Signer,
-    funderLiquity: Liquity,
+    funderMosaic: Mosaic,
     frontendAddress: string,
-    frontendLiquity: Liquity
+    frontendMosaic: Mosaic
   ) {
     const funderAddress = await funder.getAddress();
-    const price = await deployerLiquity.getPrice();
+    const price = await deployerMosaic.getPrice();
 
-    await frontendLiquity.registerFrontend(Decimal.from(10).div(11));
+    await frontendMosaic.registerFrontend(Decimal.from(10).div(11));
 
     return new Fixture(
-      deployerLiquity,
+      deployerMosaic,
       funder,
-      funderLiquity,
+      funderMosaic,
       funderAddress,
       frontendAddress,
       price
     );
   }
 
-  private async sendLUSDFromFunder(toAddress: string, amount: Decimalish) {
+  private async sendMoUSDFromFunder(toAddress: string, amount: Decimalish) {
     amount = Decimal.from(amount);
 
-    const lusdBalance = await this.funderLiquity.getLUSDBalance();
+    const msicBalance = await this.funderMosaic.getMoUSDBalance();
 
-    if (lusdBalance.lt(amount)) {
-      const trove = await this.funderLiquity.getTrove();
-      const total = await this.funderLiquity.getTotal();
-      const fees = await this.funderLiquity.getFees();
+    if (msicBalance.lt(amount)) {
+      const trove = await this.funderMosaic.getTrove();
+      const total = await this.funderMosaic.getTotal();
+      const fees = await this.funderMosaic.getFees();
 
       const targetCollateralRatio =
         trove.isEmpty || !total.collateralRatioIsBelowCritical(this.price)
           ? 1.51
           : Decimal.max(trove.collateralRatio(this.price).add(0.00001), 1.11);
 
-      let newTrove = trove.isEmpty ? Trove.create({ depositCollateral: 1, borrowLUSD: 0 }) : trove;
-      newTrove = newTrove.adjust({ borrowLUSD: amount.sub(lusdBalance).mul(2) });
+      let newTrove = trove.isEmpty ? Trove.create({ depositCollateral: 1, borrowMoUSD: 0 }) : trove;
+      newTrove = newTrove.adjust({ borrowMoUSD: amount.sub(msicBalance).mul(2) });
 
-      if (newTrove.debt.lt(LUSD_MINIMUM_DEBT)) {
-        newTrove = newTrove.setDebt(LUSD_MINIMUM_DEBT);
+      if (newTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
+        newTrove = newTrove.setDebt(MoUSD_MINIMUM_DEBT);
       }
 
       newTrove = newTrove.setCollateral(newTrove.debt.mulDiv(targetCollateralRatio, this.price));
@@ -131,7 +131,7 @@ export class Fixture {
       if (trove.isEmpty) {
         const params = Trove.recreate(newTrove, fees.borrowingRate());
         console.log(`[funder] openTrove(${objToString(params)})`);
-        await this.funderLiquity.openTrove(params);
+        await this.funderMosaic.openTrove(params);
       } else {
         let newTotal = total.add(newTrove).subtract(trove);
 
@@ -145,26 +145,26 @@ export class Fixture {
 
         const params = trove.adjustTo(newTrove, fees.borrowingRate());
         console.log(`[funder] adjustTrove(${objToString(params)})`);
-        await this.funderLiquity.adjustTrove(params);
+        await this.funderMosaic.adjustTrove(params);
       }
     }
 
-    await this.funderLiquity.sendLUSD(toAddress, amount);
+    await this.funderMosaic.sendMoUSD(toAddress, amount);
   }
 
   async setRandomPrice() {
     this.price = this.price.add(200 * Math.random() + 100).div(2);
     console.log(`[deployer] setPrice(${this.price})`);
-    await this.deployerLiquity.setPrice(this.price);
+    await this.deployerMosaic.setPrice(this.price);
 
     return this.price;
   }
 
   async liquidateRandomNumberOfTroves(price: Decimal) {
-    const lusdInStabilityPoolBefore = await this.deployerLiquity.getLUSDInStabilityPool();
-    console.log(`// Stability Pool balance: ${lusdInStabilityPoolBefore}`);
+    const msicInStabilityPoolBefore = await this.deployerMosaic.getMoUSDInStabilityPool();
+    console.log(`// Stability Pool balance: ${msicInStabilityPoolBefore}`);
 
-    const trovesBefore = await getListOfTroves(this.deployerLiquity);
+    const trovesBefore = await getListOfTroves(this.deployerMosaic);
 
     if (trovesBefore.length === 0) {
       console.log("// No Troves to liquidate");
@@ -181,9 +181,9 @@ export class Fixture {
 
     const maximumNumberOfTrovesToLiquidate = Math.floor(50 * Math.random()) + 1;
     console.log(`[deployer] liquidateUpTo(${maximumNumberOfTrovesToLiquidate})`);
-    await this.deployerLiquity.liquidateUpTo(maximumNumberOfTrovesToLiquidate);
+    await this.deployerMosaic.liquidateUpTo(maximumNumberOfTrovesToLiquidate);
 
-    const troveOwnersAfter = await getListOfTroveOwners(this.deployerLiquity);
+    const troveOwnersAfter = await getListOfTroveOwners(this.deployerMosaic);
     const liquidatedTroves = listDifference(troveOwnersBefore, troveOwnersAfter);
 
     if (liquidatedTroves.length > 0) {
@@ -194,18 +194,18 @@ export class Fixture {
 
     this.totalNumberOfLiquidations += liquidatedTroves.length;
 
-    const lusdInStabilityPoolAfter = await this.deployerLiquity.getLUSDInStabilityPool();
-    console.log(`// Stability Pool balance: ${lusdInStabilityPoolAfter}`);
+    const msicInStabilityPoolAfter = await this.deployerMosaic.getMoUSDInStabilityPool();
+    console.log(`// Stability Pool balance: ${msicInStabilityPoolAfter}`);
   }
 
-  async openRandomTrove(userAddress: string, liquity: Liquity) {
-    const total = await liquity.getTotal();
-    const fees = await liquity.getFees();
+  async openRandomTrove(userAddress: string, mosaic: Mosaic) {
+    const total = await mosaic.getTotal();
+    const fees = await mosaic.getFees();
 
     let newTrove: Trove;
 
     const cannotOpen = (newTrove: Trove) =>
-      newTrove.debt.lt(LUSD_MINIMUM_DEBT) ||
+      newTrove.debt.lt(MoUSD_MINIMUM_DEBT) ||
       (total.collateralRatioIsBelowCritical(this.price)
         ? !newTrove.isOpenableInRecoveryMode(this.price)
         : newTrove.collateralRatioIsBelowMinimum(this.price) ||
@@ -228,20 +228,20 @@ export class Fixture {
       );
 
       await this.gasHistograms.openTrove.expectFailure(() =>
-        liquity.openTrove(params, undefined, { gasPrice: 0 })
+        mosaic.openTrove(params, undefined, { gasPrice: 0 })
       );
     } else {
       console.log(`[${shortenAddress(userAddress)}] openTrove(${objToString(params)})`);
 
       await this.gasHistograms.openTrove.expectSuccess(() =>
-        liquity.send.openTrove(params, undefined, { gasPrice: 0 })
+        mosaic.send.openTrove(params, undefined, { gasPrice: 0 })
       );
     }
   }
 
-  async randomlyAdjustTrove(userAddress: string, liquity: Liquity, trove: Trove) {
-    const total = await liquity.getTotal();
-    const fees = await liquity.getFees();
+  async randomlyAdjustTrove(userAddress: string, mosaic: Mosaic, trove: Trove) {
+    const total = await mosaic.getTotal();
+    const fees = await mosaic.getFees();
     const x = Math.random();
 
     const params: TroveAdjustmentParams<Decimal> =
@@ -254,7 +254,7 @@ export class Fixture {
     const cannotAdjust = (trove: Trove, params: TroveAdjustmentParams<Decimal>) => {
       if (
         params.withdrawCollateral?.gte(trove.collateral) ||
-        params.repayLUSD?.gt(trove.debt.sub(LUSD_MINIMUM_DEBT))
+        params.repayMoUSD?.gt(trove.debt.sub(MoUSD_MINIMUM_DEBT))
       ) {
         return true;
       }
@@ -262,7 +262,7 @@ export class Fixture {
       const adjusted = trove.adjust(params, fees.borrowingRate());
 
       return (
-        (params.withdrawCollateral?.nonZero || params.borrowLUSD?.nonZero) &&
+        (params.withdrawCollateral?.nonZero || params.borrowMoUSD?.nonZero) &&
         (adjusted.collateralRatioIsBelowMinimum(this.price) ||
           (total.collateralRatioIsBelowCritical(this.price)
             ? adjusted._nominalCollateralRatio.lt(trove._nominalCollateralRatio)
@@ -277,8 +277,8 @@ export class Fixture {
       });
     }
 
-    if (params.repayLUSD) {
-      await this.sendLUSDFromFunder(userAddress, params.repayLUSD);
+    if (params.repayMoUSD) {
+      await this.sendMoUSDFromFunder(userAddress, params.repayMoUSD);
     }
 
     if (cannotAdjust(trove, params)) {
@@ -287,19 +287,19 @@ export class Fixture {
       );
 
       await this.gasHistograms.adjustTrove.expectFailure(() =>
-        liquity.adjustTrove(params, undefined, { gasPrice: 0 })
+        mosaic.adjustTrove(params, undefined, { gasPrice: 0 })
       );
     } else {
       console.log(`[${shortenAddress(userAddress)}] adjustTrove(${objToString(params)})`);
 
       await this.gasHistograms.adjustTrove.expectSuccess(() =>
-        liquity.send.adjustTrove(params, undefined, { gasPrice: 0 })
+        mosaic.send.adjustTrove(params, undefined, { gasPrice: 0 })
       );
     }
   }
 
-  async closeTrove(userAddress: string, liquity: Liquity, trove: Trove) {
-    const total = await liquity.getTotal();
+  async closeTrove(userAddress: string, mosaic: Mosaic, trove: Trove) {
+    const total = await mosaic.getTotal();
 
     if (total.collateralRatioIsBelowCritical(this.price)) {
       // Cannot close Trove during recovery mode
@@ -307,31 +307,31 @@ export class Fixture {
       return;
     }
 
-    await this.sendLUSDFromFunder(userAddress, trove.netDebt);
+    await this.sendMoUSDFromFunder(userAddress, trove.netDebt);
 
     console.log(`[${shortenAddress(userAddress)}] closeTrove()`);
 
     await this.gasHistograms.closeTrove.expectSuccess(() =>
-      liquity.send.closeTrove({ gasPrice: 0 })
+      mosaic.send.closeTrove({ gasPrice: 0 })
     );
   }
 
-  async redeemRandomAmount(userAddress: string, liquity: Liquity) {
-    const total = await liquity.getTotal();
+  async redeemRandomAmount(userAddress: string, mosaic: Mosaic) {
+    const total = await mosaic.getTotal();
 
     if (total.collateralRatioIsBelowMinimum(this.price)) {
-      console.log("// Skipping redeemLUSD() when TCR < MCR");
+      console.log("// Skipping redeemMoUSD() when TCR < MCR");
       return;
     }
 
     const amount = benford(10000);
-    await this.sendLUSDFromFunder(userAddress, amount);
+    await this.sendMoUSDFromFunder(userAddress, amount);
 
-    console.log(`[${shortenAddress(userAddress)}] redeemLUSD(${amount})`);
+    console.log(`[${shortenAddress(userAddress)}] redeemMoUSD(${amount})`);
 
     try {
-      await this.gasHistograms.redeemLUSD.expectSuccess(() =>
-        liquity.send.redeemLUSD(amount, undefined, { gasPrice: 0 })
+      await this.gasHistograms.redeemMoUSD.expectSuccess(() =>
+        mosaic.send.redeemMoUSD(amount, undefined, { gasPrice: 0 })
       );
     } catch (error) {
       if (error instanceof Error && error.message.includes("amount too low to redeem")) {
@@ -342,15 +342,15 @@ export class Fixture {
     }
   }
 
-  async depositRandomAmountInStabilityPool(userAddress: string, liquity: Liquity) {
+  async depositRandomAmountInStabilityPool(userAddress: string, mosaic: Mosaic) {
     const amount = benford(20000);
 
-    await this.sendLUSDFromFunder(userAddress, amount);
+    await this.sendMoUSDFromFunder(userAddress, amount);
 
-    console.log(`[${shortenAddress(userAddress)}] depositLUSDInStabilityPool(${amount})`);
+    console.log(`[${shortenAddress(userAddress)}] depositMoUSDInStabilityPool(${amount})`);
 
-    await this.gasHistograms.depositLUSDInStabilityPool.expectSuccess(() =>
-      liquity.send.depositLUSDInStabilityPool(amount, this.frontendAddress, {
+    await this.gasHistograms.depositMoUSDInStabilityPool.expectSuccess(() =>
+      mosaic.send.depositMoUSDInStabilityPool(amount, this.frontendAddress, {
         gasPrice: 0
       })
     );
@@ -358,15 +358,15 @@ export class Fixture {
 
   async withdrawRandomAmountFromStabilityPool(
     userAddress: string,
-    liquity: Liquity,
+    mosaic: Mosaic,
     deposit: StabilityDeposit
   ) {
-    const [lastTrove] = await liquity.getTroves({
+    const [lastTrove] = await mosaic.getTroves({
       first: 1,
       sortedBy: "ascendingCollateralRatio"
     });
 
-    const amount = deposit.currentLUSD.mul(1.1 * Math.random()).add(10 * Math.random());
+    const amount = deposit.currentMoUSD.mul(1.1 * Math.random()).add(10 * Math.random());
 
     const cannotWithdraw = (amount: Decimal) =>
       amount.nonZero && lastTrove.collateralRatioIsBelowMinimum(this.price);
@@ -374,65 +374,65 @@ export class Fixture {
     if (cannotWithdraw(amount)) {
       console.log(
         `// [${shortenAddress(userAddress)}] ` +
-          `withdrawLUSDFromStabilityPool(${amount}) expected to fail`
+          `withdrawMoUSDFromStabilityPool(${amount}) expected to fail`
       );
 
-      await this.gasHistograms.withdrawLUSDFromStabilityPool.expectFailure(() =>
-        liquity.withdrawLUSDFromStabilityPool(amount, { gasPrice: 0 })
+      await this.gasHistograms.withdrawMoUSDFromStabilityPool.expectFailure(() =>
+        mosaic.withdrawMoUSDFromStabilityPool(amount, { gasPrice: 0 })
       );
     } else {
-      console.log(`[${shortenAddress(userAddress)}] withdrawLUSDFromStabilityPool(${amount})`);
+      console.log(`[${shortenAddress(userAddress)}] withdrawMoUSDFromStabilityPool(${amount})`);
 
-      await this.gasHistograms.withdrawLUSDFromStabilityPool.expectSuccess(() =>
-        liquity.send.withdrawLUSDFromStabilityPool(amount, { gasPrice: 0 })
+      await this.gasHistograms.withdrawMoUSDFromStabilityPool.expectSuccess(() =>
+        mosaic.send.withdrawMoUSDFromStabilityPool(amount, { gasPrice: 0 })
       );
     }
   }
 
-  async stakeRandomAmount(userAddress: string, liquity: Liquity) {
-    const lqtyBalance = await this.funderLiquity.getLQTYBalance();
-    const amount = lqtyBalance.mul(Math.random() / 2);
+  async stakeRandomAmount(userAddress: string, mosaic: Mosaic) {
+    const msicBalance = await this.funderMosaic.getMSICBalance();
+    const amount = msicBalance.mul(Math.random() / 2);
 
-    await this.funderLiquity.sendLQTY(userAddress, amount);
+    await this.funderMosaic.sendMSIC(userAddress, amount);
 
     if (amount.eq(0)) {
-      console.log(`// [${shortenAddress(userAddress)}] stakeLQTY(${amount}) expected to fail`);
+      console.log(`// [${shortenAddress(userAddress)}] stakeMSIC(${amount}) expected to fail`);
 
-      await this.gasHistograms.stakeLQTY.expectFailure(() =>
-        liquity.stakeLQTY(amount, { gasPrice: 0 })
+      await this.gasHistograms.stakeMSIC.expectFailure(() =>
+        mosaic.stakeMSIC(amount, { gasPrice: 0 })
       );
     } else {
-      console.log(`[${shortenAddress(userAddress)}] stakeLQTY(${amount})`);
+      console.log(`[${shortenAddress(userAddress)}] stakeMSIC(${amount})`);
 
-      await this.gasHistograms.stakeLQTY.expectSuccess(() =>
-        liquity.send.stakeLQTY(amount, { gasPrice: 0 })
+      await this.gasHistograms.stakeMSIC.expectSuccess(() =>
+        mosaic.send.stakeMSIC(amount, { gasPrice: 0 })
       );
     }
   }
 
-  async unstakeRandomAmount(userAddress: string, liquity: Liquity, stake: LQTYStake) {
-    const amount = stake.stakedLQTY.mul(1.1 * Math.random()).add(10 * Math.random());
+  async unstakeRandomAmount(userAddress: string, mosaic: Mosaic, stake: MSICStake) {
+    const amount = stake.stakedMSIC.mul(1.1 * Math.random()).add(10 * Math.random());
 
-    console.log(`[${shortenAddress(userAddress)}] unstakeLQTY(${amount})`);
+    console.log(`[${shortenAddress(userAddress)}] unstakeMSIC(${amount})`);
 
-    await this.gasHistograms.unstakeLQTY.expectSuccess(() =>
-      liquity.send.unstakeLQTY(amount, { gasPrice: 0 })
+    await this.gasHistograms.unstakeMSIC.expectSuccess(() =>
+      mosaic.send.unstakeMSIC(amount, { gasPrice: 0 })
     );
   }
 
-  async sweepLUSD(liquity: Liquity) {
-    const lusdBalance = await liquity.getLUSDBalance();
+  async sweepMoUSD(mosaic: Mosaic) {
+    const msicBalance = await mosaic.getMoUSDBalance();
 
-    if (lusdBalance.nonZero) {
-      await liquity.sendLUSD(this.funderAddress, lusdBalance, { gasPrice: 0 });
+    if (msicBalance.nonZero) {
+      await mosaic.sendMoUSD(this.funderAddress, msicBalance, { gasPrice: 0 });
     }
   }
 
-  async sweepLQTY(liquity: Liquity) {
-    const lqtyBalance = await liquity.getLQTYBalance();
+  async sweepMSIC(mosaic: Mosaic) {
+    const msicBalance = await mosaic.getMSICBalance();
 
-    if (lqtyBalance.nonZero) {
-      await liquity.sendLQTY(this.funderAddress, lqtyBalance, { gasPrice: 0 });
+    if (msicBalance.nonZero) {
+      await mosaic.sendMSIC(this.funderAddress, msicBalance, { gasPrice: 0 });
     }
   }
 

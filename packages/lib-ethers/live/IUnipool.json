@@ -59,7 +59,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_msicTokenAddress",
           "type": "address"
         },
         {
