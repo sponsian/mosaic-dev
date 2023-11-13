@@ -1,6 +1,6 @@
 # Mosaic: Decentralized Borrowing Protocol
 
-![Tests](https://github.com/commcommxyz/mosaic-dev/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.mosaicprotocol.xyz) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/1141867960819011664?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/commcommxyz/mosaic-dev/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/mosaic/dev-frontend) [![codecov](https://codecov.io/gh/mosaic/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/mosaic/dev)
+![Tests](https://github.com/commcommxyz/mosaic-dev/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.mosaicprotocol.xyz) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/1141867960819011664?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/commcommxyz/mosaic-dev/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/liquity/dev-frontend) [![codecov](https://codecov.io/gh/liquity/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/liquity/dev)
 
 
 Mosaic is a decentralized protocol that allows REEF holders to obtain maximum liquidity against
@@ -460,7 +460,7 @@ ICRs are computed dynamically at runtime, and not stored on the node. This is be
 
 The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active Troves (though it does decrease the ICR of each active Trove above the MCR).
 
-The fact that ordering is maintained as redistributions occur, is not immediately obvious: please see the [mathematical proof](https://github.com/mosaic/dev/blob/main/papers) which shows that this holds in Mosaic.
+The fact that ordering is maintained as redistributions occur, is not immediately obvious: please see the [mathematical proof](https://github.com/commcommxyz/mosaic-dev//dev/blob/main/papers) which shows that this holds in Mosaic.
 
 A node inserted based on current ICR will maintain the correct position, relative to its peers, as liquidation gains accumulate, as long as its raw collateral and debt have not changed.
 
@@ -691,11 +691,11 @@ To check test coverage you can run:
 yarn coverage
 ```
 
-You can see the coverage status at mainnet deployment [here](https://codecov.io/gh/mosaic/dev/tree/8f52f2906f99414c0b1c3a84c95c74c319b7a8c6).
+You can see the coverage status at mainnet deployment for Liquity protocol [here](https://codecov.io/gh/liquity/dev/tree/8f52f2906f99414c0b1c3a84c95c74c319b7a8c6).
 
-![Impacted file tree graph](https://codecov.io/gh/mosaic/dev/pull/707/graphs/tree.svg?width=650&height=150&src=pr&token=7AJPQ3TW0O&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=mosaic)
+![Impacted file tree graph](https://codecov.io/gh/liquity/dev/pull/707/graphs/tree.svg?width=650&height=150&src=pr&token=7AJPQ3TW0O&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=mosaic)
 
-There’s also a [pull request](https://github.com/mosaic/dev/pull/515) to increase the coverage, but it hasn’t been merged yet because it modifies some smart contracts (mostly removing unnecessary checks).
+There’s also a [pull request](https://github.com/liquity/dev/pull/515) to increase the coverage, but it hasn’t been merged yet into Liquity's codebase because it modifies some smart contracts (mostly removing unnecessary checks).
 
 
 ## System Quantities - Units and Representation
@@ -1126,7 +1126,7 @@ A mathematical manipulation allows us to factor out the initial deposit, and acc
 
 The formula for a depositor’s accumulated REEF gain is derived here:
 
-[Scalable reward distribution for compounding, decreasing stake](https://github.com/mosaic/dev/blob/main/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf)
+[Scalable reward distribution for compounding, decreasing stake](https://github.com/liquity/dev/blob/main/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf)
 
 Each liquidation updates `P` and `S`. After a series of liquidations, a compounded deposit and corresponding REEF gain can be calculated using the initial deposit, the depositor’s snapshots, and the current values of `P` and `S`.
 
@@ -1175,7 +1175,7 @@ In a MSIC reward event, the MSIC to be issued is calculated based on time passed
 
 The MSIC produced in this issuance event is shared between depositors, in proportion to their deposit sizes.
 
-To efficiently and accurately track MSIC gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/mosaic/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the REEF gain from liquidations.
+To efficiently and accurately track MSIC gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the REEF gain from liquidations.
 
 The same product `P` is used, and a sum `G` is used to track MSIC rewards, and each deposit gets a new snapshot of `P` and `G` when it is updated.
 
@@ -1287,7 +1287,7 @@ When a liquidation occurs and the Stability Pool is empty or smaller than the li
 
 For two Troves A and B with collateral `A.coll > B.coll`, Trove A should earn a bigger share of the liquidated collateral and debt.
 
-In Mosaic it is important that all active Troves remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Troves’ collateral, preserves the ordering of active Troves by ICR, as liquidations occur over time.  Please see the [proofs section](https://github.com/mosaic/dev/tree/main/papers).
+In Mosaic it is important that all active Troves remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Troves’ collateral, preserves the ordering of active Troves by ICR, as liquidations occur over time.  Please see the [proofs section](https://github.com/commcommxyz/mosaic-dev/dev/tree/main/papers).
 
 However, when it comes to implementation, Ethereum gas costs make it too expensive to loop over all Troves and write new data to storage for each one. When a Trove receives redistribution rewards, the system does not update the Trove's collateral and debt properties - instead, the Trove’s rewards remain "pending" until the borrower's next operation.
 
@@ -1301,7 +1301,7 @@ Consider the case where new Trove is created after all active Troves have receiv
 
 The fresh trove would earns rewards based on its **entire** collateral, whereas old Troves would earn rewards based only on **some portion** of their collateral - since a part of their collateral is pending, and not included in the Trove’s `coll` property.
 
-This can break the ordering of Troves by ICR - see the [proofs section](https://github.com/mosaic/dev/tree/main/papers).
+This can break the ordering of Troves by ICR - see the [proofs section](https://github.com/commcommxyz/mosaic-dev/dev/tree/main/papers).
 
 ### Corrected Stake Solution
 
@@ -1319,7 +1319,7 @@ It then earns redistribution rewards based on this corrected stake. A newly open
 
 Whenever a borrower adjusts their Trove’s collateral, their pending rewards are applied, and a fresh corrected stake is computed.
 
-To convince yourself this corrected stake preserves ordering of active Troves by ICR, please see the [proofs section](https://github.com/mosaic/dev/blob/main/papers).
+To convince yourself this corrected stake preserves ordering of active Troves by ICR, please see the [proofs section](https://github.com/commcommxyz/mosaic-dev/dev/blob/main/papers).
 
 ## Math Proofs
 
@@ -1330,7 +1330,7 @@ In particular, we have:
 - Proofs that Trove ordering is maintained throughout a series of liquidations and new Trove openings
 - A derivation of a formula and implementation for a highly scalable (O(1) complexity) reward distribution in the Stability Pool, involving compounding and decreasing stakes.
 
-PDFs of these can be found in https://github.com/mosaic/dev/blob/main/papers
+PDFs of these can be found in https://github.com/commcommxyz/mosaic-dev/dev/blob/main/papers
 
 ## Definitions
 
@@ -1422,7 +1422,7 @@ Note: you can skip the manual installation of node-gyp itself (`npm install -g n
 ### Clone & Install
 
 ```
-git clone https://github.com/mosaic/dev.git mosaic
+git clone https://github.com/commcommxyz/mosaic-dev/dev.git mosaic
 cd mosaic
 yarn
 ```
@@ -1575,7 +1575,7 @@ Your custom built frontend can be configured by putting a file named `config.jso
 
 ## Running a frontend with Docker
 
-The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/mosaic/dev-frontend) available on Docker Hub.
+The quickest way to get a frontend up and running is to use Liquity's [prebuilt image](https://hub.docker.com/r/liquity/dev-frontend) available on Docker Hub.
 
 ### Prerequisites
 
@@ -1669,7 +1669,7 @@ Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-com
 
 When liquidating a trove with `ICR > 110%`, a collateral surplus remains claimable by the borrower. This collateral surplus should be excluded from subsequent TCR calculations, but within the liquidation sequence in `batchLiquidateTroves` in Recovery Mode, it is not. This results in a slight distortion to the TCR value used at each step of the liquidation sequence going forward. This distortion only persists for the duration the `batchLiquidateTroves` function call, and the TCR is again calculated correctly after the liquidation sequence ends. In most cases there is no impact at all, and when there is, the effect tends to be minor. The issue is not present at all in Normal Mode. 
 
-There is a theoretical and extremely rare case where it incorrectly causes a loss for Stability Depositors instead of a gain. It relies on the stars aligning: the system must be in Recovery Mode, the TCR must be very close to the 150% boundary, a large trove must be liquidated, and the REEF price must drop by >10% at exactly the right moment. No profitable exploit is possible. For more details, please see [this security advisory](https://github.com/mosaic/dev/security/advisories/GHSA-xh2p-7p87-fhgh).
+There is a theoretical and extremely rare case where it incorrectly causes a loss for Stability Depositors instead of a gain. It relies on the stars aligning: the system must be in Recovery Mode, the TCR must be very close to the 150% boundary, a large trove must be liquidated, and the REEF price must drop by >10% at exactly the right moment. No profitable exploit is possible. For more details, please see [this security advisory](https://github.com/commcommxyz/mosaic-dev/dev/security/advisories/GHSA-xh2p-7p87-fhgh).
 
 ### SortedTroves edge cases - top and bottom of the sorted list
 
@@ -1717,7 +1717,7 @@ Such flash deposit-liquidations would actually be beneficial (in terms of TCR) t
 
 It’s theoretically possible to increase the number of the troves that need to be traversed on-chain. That is, an attacker that sees a pending borrower transaction (or redemption or liquidation transaction) could try to increase the number of traversed troves by introducing additional troves on the way. However, the number of troves that an attacker can inject before the pending transaction gets mined is limited by the amount of spendable gas. Also, the total costs of making the path longer by 1 are significantly higher (gas costs of opening a trove, plus the 0.5% borrowing fee) than the costs of one extra traversal step (simply reading from storage). The attacker also needs significant capital on-hand, since the minimum debt for a trove is 2000 MoUSD.
 
-In case of a redemption, the “last” trove affected by the transaction may end up being only partially redeemed from, which means that its ICR will change so that it needs to be reinserted at a different place in the sorted trove list (note that this is not the case for partial liquidations in recovery mode, which preserve the ICR). A special ICR hint therefore needs to be provided by the transaction sender for that matter, which may become incorrect if another transaction changes the order before the redemption is processed. The protocol gracefully handles this by terminating the redemption sequence at the last fully redeemed trove (see [here](https://github.com/mosaic/dev#hints-for-redeemcollateral)).
+In case of a redemption, the “last” trove affected by the transaction may end up being only partially redeemed from, which means that its ICR will change so that it needs to be reinserted at a different place in the sorted trove list (note that this is not the case for partial liquidations in recovery mode, which preserve the ICR). A special ICR hint therefore needs to be provided by the transaction sender for that matter, which may become incorrect if another transaction changes the order before the redemption is processed. The protocol gracefully handles this by terminating the redemption sequence at the last fully redeemed trove (see [here](https://github.com/commcommxyz/mosaic-dev/dev#hints-for-redeemcollateral)).
 
 An attacker trying to DoS redemptions could be bypassed by redeeming an amount that exactly corresponds to the debt of the affected trove(s).
 
