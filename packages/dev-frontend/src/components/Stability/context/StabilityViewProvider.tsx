@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useMosaicSelector } from "@mosaic/lib-react";
-import { MosaicStoreState, StabilityDeposit } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState, StabilityDeposit } from "@liquity/lib-base";
 import { StabilityViewContext } from "./StabilityViewContext";
 import type { StabilityView, StabilityEvent } from "./types";
 

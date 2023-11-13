@@ -1,6 +1,6 @@
 import { Button } from "theme-ui";
-import { Decimal, MosaicStoreState, StabilityDepositChange } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { Decimal, MosaicStoreState, StabilityDepositChange } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { useMosaic } from "../../hooks/MosaicContext";
 import { useTransactionFunction } from "../Transaction";

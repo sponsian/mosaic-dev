@@ -17,7 +17,7 @@ import {
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Implemented by {@link @mosaic/lib-ethers#PopulatedEthersMosaicTransaction}.
+ * Implemented by {@link @liquity/lib-ethers#PopulatedEthersMosaicTransaction}.
  *
  * @public
  */
@@ -31,7 +31,7 @@ export interface PopulatedMosaicTransaction<
   /**
    * Send the transaction.
    *
-   * @returns An object that implements {@link @mosaic/lib-base#SentMosaicTransaction}.
+   * @returns An object that implements {@link @liquity/lib-base#SentMosaicTransaction}.
    */
   send(): Promise<T>;
 }
@@ -42,16 +42,16 @@ export interface PopulatedMosaicTransaction<
  * @remarks
  * The Mosaic protocol fulfills redemptions by repaying the debt of Troves in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
- * {@link @mosaic/lib-base#MoUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
+ * {@link @liquity/lib-base#MoUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
  * some MoUSD amounts are not possible to redeem exactly.
  *
- * When {@link @mosaic/lib-base#PopulatableMosaic.redeemMoUSD | redeemMoUSD()} is called with an
+ * When {@link @liquity/lib-base#PopulatableMosaic.redeemMoUSD | redeemMoUSD()} is called with an
  * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMoUSDAmount`
  * property). When this happens, the redeemer can either redeem the truncated amount by sending the
  * transaction unchanged, or prepare a new transaction by
- * {@link @mosaic/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
+ * {@link @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
  * to the next lowest possible value, which is the sum of the truncated amount and
- * {@link @mosaic/lib-base#MoUSD_MINIMUM_NET_DEBT}.
+ * {@link @liquity/lib-base#MoUSD_MINIMUM_NET_DEBT}.
  *
  * @public
  */
@@ -74,7 +74,7 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
    * value.
    *
    * @param maxRedemptionRate - Maximum acceptable
-   *                            {@link @mosaic/lib-base#Fees.redemptionRate | redemption rate} to
+   *                            {@link @liquity/lib-base#Fees.redemptionRate | redemption rate} to
    *                            use in the new transaction.
    *
    * @remarks
@@ -103,7 +103,7 @@ export type _PopulatableFrom<T, P> = {
  * The functions return an object implementing {@link PopulatedMosaicTransaction}, which can be
  * used to send the transaction and get a {@link SentMosaicTransaction}.
  *
- * Implemented by {@link @mosaic/lib-ethers#PopulatableEthersMosaic}.
+ * Implemented by {@link @liquity/lib-ethers#PopulatableEthersMosaic}.
  *
  * @public
  */

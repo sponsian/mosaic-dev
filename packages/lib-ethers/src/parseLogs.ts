@@ -3,7 +3,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Log, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { LogDescription, Interface } from "@ethersproject/abi";
 
-import { Decimal } from "@mosaic/lib-base";
+import { Decimal } from "@liquity/lib-base";
 
 import { _MosaicContracts, _TypedMosaicContract } from "./contracts";
 

@@ -7,9 +7,9 @@ import {
   StabilityDeposit,
   MosaicStoreState,
   Difference
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { COIN, GT } from "../../strings";
 

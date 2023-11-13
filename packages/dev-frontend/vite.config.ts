@@ -13,9 +13,9 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       "@mosaic/providers",
-      "@mosaic/lib-ethers",
-      "@mosaic/lib-base",
-      "@mosaic/lib-react"
+      "@liquity/lib-ethers",
+      "@liquity/lib-base",
+      "@liquity/lib-react"
     ],
     esbuildOptions: {
       plugins: [NodeModulesPolyfillPlugin()]

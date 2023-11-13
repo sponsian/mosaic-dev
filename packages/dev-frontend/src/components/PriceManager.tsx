@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
 
-import { Decimal, MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { Decimal, MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { useMosaic } from "../hooks/MosaicContext";
 

@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Card, Heading, Box, Flex, Button } from "theme-ui";
-import { useMosaicSelector } from "@mosaic/lib-react";
-import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@liquity/lib-base";
 import { DisabledEditableRow } from "./Editor";
 import { useTroveView } from "./context/TroveViewContext";
 import { Icon } from "../Icon";

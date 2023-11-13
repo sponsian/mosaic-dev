@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Button, Flex, Spinner } from "theme-ui";
 
-import { MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { useMosaic } from "../hooks/MosaicContext";
 

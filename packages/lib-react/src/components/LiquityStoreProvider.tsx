@@ -1,4 +1,4 @@
-import { MosaicStore } from "@mosaic/lib-base";
+import { MosaicStore } from "@liquity/lib-base";
 import React, { createContext, useEffect, useState } from "react";
 
 export const MosaicStoreContext = createContext<MosaicStore | undefined>(undefined);

@@ -1,5 +1,5 @@
 {
-  "name": "@mosaic/lib-base",
+  "name": "@liquity/lib-base",
   "version": "0.0.0-semantic-release",
   "description": "Mosaic SDK shared interfaces",
   "keywords": [

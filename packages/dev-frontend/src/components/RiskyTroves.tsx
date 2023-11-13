@@ -8,9 +8,9 @@ import {
   CRITICAL_COLLATERAL_RATIO,
   UserTrove,
   Decimal
-} from "@mosaic/lib-base";
-import { BlockPolledMosaicStoreState } from "@mosaic/lib-ethers";
-import { useMosaicSelector } from "@mosaic/lib-react";
+} from "@liquity/lib-base";
+import { BlockPolledMosaicStoreState } from "@liquity/lib-ethers";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { shortenAddress } from "../utils/shortenAddress";
 import { useMosaic } from "../hooks/MosaicContext";

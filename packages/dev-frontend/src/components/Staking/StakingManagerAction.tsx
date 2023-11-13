@@ -1,6 +1,6 @@
 import { Button } from "theme-ui";
 
-import { Decimal, MSICStakeChange } from "@mosaic/lib-base";
+import { Decimal, MSICStakeChange } from "@liquity/lib-base";
 
 import { useMosaic } from "../../hooks/MosaicContext";
 import { useTransactionFunction } from "../Transaction";

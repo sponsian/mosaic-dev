@@ -1,4 +1,4 @@
-import { Decimal } from "@mosaic/lib-base";
+import { Decimal } from "@liquity/lib-base";
 import {
   BMoUSDLPZap,
   BMoUSDLPZap__factory,
@@ -18,8 +18,8 @@ import {
   BondNFT__factory,
   ChickenBondManager__factory
 } from "@mosaic/chicken-bonds/msic/types";
-import type { MoUSDToken } from "@mosaic/lib-ethers/dist/types";
-import MoUSDTokenAbi from "@mosaic/lib-ethers/abi/MoUSDToken.json";
+import type { MoUSDToken } from "@liquity/lib-ethers/dist/types";
+import MoUSDTokenAbi from "@liquity/lib-ethers/abi/MoUSDToken.json";
 import { useContract } from "../../../hooks/useContract";
 import { useMosaic } from "../../../hooks/MosaicContext";
 import { useCallback } from "react";

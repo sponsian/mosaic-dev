@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
-import { Decimal, TroveChange } from "@mosaic/lib-base";
-import { PopulatedEthersMosaicTransaction } from "@mosaic/lib-ethers";
+import { Decimal, TroveChange } from "@liquity/lib-base";
+import { PopulatedEthersMosaicTransaction } from "@liquity/lib-ethers";
 
 import { useMosaic } from "../../hooks/MosaicContext";
 import { Warning } from "../Warning";

@@ -25,7 +25,7 @@ import {
   TroveListingParams,
   TroveWithPendingRedistribution,
   UserTrove
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import {
   EthersMosaicConnection,
@@ -157,12 +157,12 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return false;
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalRedistributed} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalRedistributed} */
   getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
     return this._readable.getTotalRedistributed(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTroveBeforeRedistribution} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTroveBeforeRedistribution} */
   getTroveBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
@@ -170,17 +170,17 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return this._readable.getTroveBeforeRedistribution(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTrove} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTrove} */
   getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
     return this._readable.getTrove(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getNumberOfTroves} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getNumberOfTroves} */
   getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
     return this._readable.getNumberOfTroves(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getPrice} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getPrice} */
   getPrice(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getPrice(overrides);
   }
@@ -195,42 +195,42 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return this._readable._getDefaultPool(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotal} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotal} */
   getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
     return this._readable.getTotal(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getStabilityDeposit} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getStabilityDeposit} */
   getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit> {
     return this._readable.getStabilityDeposit(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getRemainingStabilityPoolMSICReward} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getRemainingStabilityPoolMSICReward} */
   getRemainingStabilityPoolMSICReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getRemainingStabilityPoolMSICReward(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
   getMoUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getMoUSDInStabilityPool(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDBalance} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMoUSDBalance} */
   getMoUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getMoUSDBalance(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICBalance} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMSICBalance} */
   getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getMSICBalance(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getUniTokenBalance} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getUniTokenBalance} */
   getUniTokenBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getUniTokenBalance(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getUniTokenAllowance} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getUniTokenAllowance} */
   getUniTokenAllowance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getUniTokenAllowance(address, overrides);
   }
@@ -242,27 +242,27 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return this._readable._getRemainingLiquidityMiningMSICRewardCalculator(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getRemainingLiquidityMiningMSICReward} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getRemainingLiquidityMiningMSICReward} */
   getRemainingLiquidityMiningMSICReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getRemainingLiquidityMiningMSICReward(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getLiquidityMiningStake} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getLiquidityMiningStake} */
   getLiquidityMiningStake(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getLiquidityMiningStake(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalStakedUniTokens} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalStakedUniTokens} */
   getTotalStakedUniTokens(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getTotalStakedUniTokens(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getLiquidityMiningMSICReward} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getLiquidityMiningMSICReward} */
   getLiquidityMiningMSICReward(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getLiquidityMiningMSICReward(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getCollateralSurplusBalance} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getCollateralSurplusBalance} */
   getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getCollateralSurplusBalance(address, overrides);
   }
@@ -273,7 +273,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     overrides?: EthersCallOverrides
   ): Promise<TroveWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.(getTroves:2)} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.(getTroves:2)} */
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
 
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]> {
@@ -292,28 +292,28 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return this._readable._getFeesFactory(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getFees} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getFees} */
   getFees(overrides?: EthersCallOverrides): Promise<Fees> {
     return this._readable.getFees(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICStake} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMSICStake} */
   getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake> {
     return this._readable.getMSICStake(address, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalStakedMSIC} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalStakedMSIC} */
   getTotalStakedMSIC(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getTotalStakedMSIC(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getFrontendStatus} */
+  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getFrontendStatus} */
   getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus> {
     return this._readable.getFrontendStatus(address, overrides);
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.openTrove}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.openTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -330,7 +330,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.closeTrove}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.closeTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -341,7 +341,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.adjustTrove}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.adjustTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -358,7 +358,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.depositCollateral}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.depositCollateral}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -372,7 +372,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawCollateral}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.withdrawCollateral}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -386,7 +386,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.borrowMoUSD}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.borrowMoUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -401,7 +401,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.repayMoUSD}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.repayMoUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -420,7 +420,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.liquidate}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.liquidate}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -434,7 +434,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.liquidateUpTo}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.liquidateUpTo}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -448,7 +448,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.depositMoUSDInStabilityPool}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.depositMoUSDInStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -463,7 +463,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawMoUSDFromStabilityPool}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.withdrawMoUSDFromStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -477,7 +477,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawGainsFromStabilityPool}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.withdrawGainsFromStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -490,7 +490,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.transferCollateralGainToTrove}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.transferCollateralGainToTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -503,7 +503,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.sendMoUSD}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.sendMoUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -518,7 +518,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.sendMSIC}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.sendMSIC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -533,7 +533,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.redeemMoUSD}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.redeemMoUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -548,7 +548,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.claimCollateralSurplus}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.claimCollateralSurplus}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -559,7 +559,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.stakeMSIC}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.stakeMSIC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -570,7 +570,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.unstakeMSIC}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.unstakeMSIC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -581,7 +581,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawGainsFromStaking}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.withdrawGainsFromStaking}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -592,7 +592,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.registerFrontend}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.registerFrontend}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -612,7 +612,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.approveUniTokens}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.approveUniTokens}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -623,7 +623,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.stakeUniTokens}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.stakeUniTokens}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -634,7 +634,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.unstakeUniTokens}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.unstakeUniTokens}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -645,7 +645,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawMSICRewardFromLiquidityMining}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.withdrawMSICRewardFromLiquidityMining}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -656,7 +656,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.exitLiquidityMining}
+   * {@inheritDoc @liquity/lib-base#TransactableMosaic.exitLiquidityMining}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -668,7 +668,7 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
 }
 
 /**
- * Variant of {@link EthersMosaic} that exposes a {@link @mosaic/lib-base#MosaicStore}.
+ * Variant of {@link EthersMosaic} that exposes a {@link @liquity/lib-base#MosaicStore}.
  *
  * @public
  */

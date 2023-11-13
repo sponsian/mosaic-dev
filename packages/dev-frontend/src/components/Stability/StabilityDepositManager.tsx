@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from "react";
 import { Button, Flex } from "theme-ui";
 
-import { Decimal, Decimalish, MosaicStoreState } from "@mosaic/lib-base";
-import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@mosaic/lib-react";
+import { Decimal, Decimalish, MosaicStoreState } from "@liquity/lib-base";
+import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@liquity/lib-react";
 
 import { COIN } from "../../strings";
 

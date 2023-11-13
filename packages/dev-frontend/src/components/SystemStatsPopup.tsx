@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Container, Flex, Button } from "theme-ui";
 
-import { MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { Icon } from "./Icon";
 import { SystemStats } from "./SystemStats";

@@ -5,8 +5,8 @@ import { defaultAbiCoder } from "@ethersproject/abi";
 
 import "react-circular-progressbar/dist/styles.css";
 
-import { EthersTransactionOverrides, EthersTransactionCancelledError } from "@mosaic/lib-ethers";
-import { SentMosaicTransaction, MosaicReceipt } from "@mosaic/lib-base";
+import { EthersTransactionOverrides, EthersTransactionCancelledError } from "@liquity/lib-ethers";
+import { SentMosaicTransaction, MosaicReceipt } from "@liquity/lib-base";
 
 import { useMosaic } from "../hooks/MosaicContext";
 

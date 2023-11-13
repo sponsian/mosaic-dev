@@ -3,8 +3,8 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
-import { EthersMosaic, EthersMosaicWithStore, BlockPolledMosaicStore } from "@mosaic/lib-ethers";
+import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@liquity/lib-base";
+import { EthersMosaic, EthersMosaicWithStore, BlockPolledMosaicStore } from "@liquity/lib-ethers";
 
 import {
   Batched,

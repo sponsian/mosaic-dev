@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useMosaicSelector } from "@mosaic/lib-react";
-import { MosaicStoreState, UserTroveStatus } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState, UserTroveStatus } from "@liquity/lib-base";
 import { TroveViewContext } from "./TroveViewContext";
 import type { TroveView, TroveEvent } from "./types";
 

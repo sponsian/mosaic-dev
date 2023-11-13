@@ -1,6 +1,6 @@
 import React from "react";
-import { MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 import { Container, Flex, Box } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
 import { useMosaic } from "../hooks/MosaicContext";

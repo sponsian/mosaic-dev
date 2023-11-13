@@ -6,7 +6,7 @@ import {
   MoUSD_MINIMUM_DEBT,
   Trove,
   TroveWithPendingRedistribution
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import { Fixture } from "../fixture";
 import { deployer, funder, provider, subgraph } from "../globals";

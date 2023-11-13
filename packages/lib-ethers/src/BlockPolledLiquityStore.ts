@@ -10,7 +10,7 @@ import {
   MSICStake,
   MosaicStore,
   Fees
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import { decimalify, promiseAllValues } from "./_utils";
 import { ReadableEthersMosaic } from "./ReadableEthersMosaic";
@@ -18,7 +18,7 @@ import { EthersMosaicConnection, _getProvider } from "./EthersMosaicConnection";
 import { EthersCallOverrides, EthersProvider } from "./types";
 
 /**
- * Extra state added to {@link @mosaic/lib-base#MosaicStoreState} by
+ * Extra state added to {@link @liquity/lib-base#MosaicStoreState} by
  * {@link BlockPolledMosaicStore}.
  *
  * @public
@@ -43,14 +43,14 @@ export interface BlockPolledMosaicStoreExtraState {
 
 /**
  * The type of {@link BlockPolledMosaicStore}'s
- * {@link @mosaic/lib-base#MosaicStore.state | state}.
+ * {@link @liquity/lib-base#MosaicStore.state | state}.
  *
  * @public
  */
 export type BlockPolledMosaicStoreState = MosaicStoreState<BlockPolledMosaicStoreExtraState>;
 
 /**
- * Ethers-based {@link @mosaic/lib-base#MosaicStore} that updates state whenever there's a new
+ * Ethers-based {@link @liquity/lib-base#MosaicStore} that updates state whenever there's a new
  * block.
  *
  * @public

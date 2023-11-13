@@ -11,9 +11,9 @@ import {
   TroveWithPendingRedistribution,
   ReadableMosaic,
   MoUSD_LIQUIDATION_RESERVE
-} from "@mosaic/lib-base";
-import { EthersMosaic, ReadableEthersMosaic } from "@mosaic/lib-ethers";
-import { SubgraphMosaic } from "@mosaic/lib-subgraph";
+} from "@liquity/lib-base";
+import { EthersMosaic, ReadableEthersMosaic } from "@liquity/lib-ethers";
+import { SubgraphMosaic } from "@liquity/lib-subgraph";
 
 export const objToString = (o: Record<string, unknown>) =>
   "{ " +

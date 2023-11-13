@@ -21,7 +21,7 @@ import {
   MINIMUM_BORROWING_RATE,
   MoUSD_MINIMUM_DEBT,
   MoUSD_MINIMUM_NET_DEBT
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import { HintHelpers } from "../types";
 

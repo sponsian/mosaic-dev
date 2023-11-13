@@ -7,9 +7,9 @@ import {
   MosaicStoreState,
   MSICStake,
   MSICStakeChange
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
-import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@liquity/lib-react";
 
 import { GT, COIN } from "../../strings";
 

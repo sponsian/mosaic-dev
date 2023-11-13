@@ -34,7 +34,7 @@ import {
   _normalizeTroveCreation,
   _pendingReceipt,
   _successfulReceipt
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import {
   EthersPopulatedTransaction,
@@ -247,13 +247,13 @@ export class SentEthersMosaicTransaction<T = unknown>
     }
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SentMosaicTransaction.getReceipt} */
+  /** {@inheritDoc @liquity/lib-base#SentMosaicTransaction.getReceipt} */
   async getReceipt(): Promise<MosaicReceipt<EthersTransactionReceipt, T>> {
     return this._receiptFrom(await this._waitForRawReceipt(0));
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#SentMosaicTransaction.waitForReceipt}
+   * {@inheritDoc @liquity/lib-base#SentMosaicTransaction.waitForReceipt}
    *
    * @throws
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
@@ -273,7 +273,7 @@ export class SentEthersMosaicTransaction<T = unknown>
  */
 export interface BorrowingOperationOptionalParams {
   /**
-   * Maximum acceptable {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate}
+   * Maximum acceptable {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}
    * (default: current borrowing rate plus 0.5%).
    */
   maxBorrowingRate?: Decimalish;
@@ -384,7 +384,7 @@ export class PopulatedEthersMosaicTransaction<T = unknown>
     }
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatedMosaicTransaction.send} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedMosaicTransaction.send} */
   async send(): Promise<SentEthersMosaicTransaction<T>> {
     return new SentEthersMosaicTransaction(
       await _requireSigner(this._connection).sendTransaction(this.rawPopulatedTransaction),
@@ -395,7 +395,7 @@ export class PopulatedEthersMosaicTransaction<T = unknown>
 }
 
 /**
- * {@inheritDoc @mosaic/lib-base#PopulatedRedemption}
+ * {@inheritDoc @liquity/lib-base#PopulatedRedemption}
  *
  * @public
  */
@@ -407,13 +407,13 @@ export class PopulatedEthersRedemption
       EthersTransactionResponse,
       EthersTransactionReceipt
     > {
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.attemptedMoUSDAmount} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.attemptedMoUSDAmount} */
   readonly attemptedMoUSDAmount: Decimal;
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.redeemableMoUSDAmount} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.redeemableMoUSDAmount} */
   readonly redeemableMoUSDAmount: Decimal;
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.isTruncated} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.isTruncated} */
   readonly isTruncated: boolean;
 
   private readonly _increaseAmountByMinimumNetDebt?: (
@@ -453,7 +453,7 @@ export class PopulatedEthersRedemption
     this._increaseAmountByMinimumNetDebt = increaseAmountByMinimumNetDebt;
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
   increaseAmountByMinimumNetDebt(
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedEthersRedemption> {
@@ -476,7 +476,7 @@ export interface _TroveChangeWithFees<T> {
 }
 
 /**
- * Ethers-based implementation of {@link @mosaic/lib-base#PopulatableMosaic}.
+ * Ethers-based implementation of {@link @liquity/lib-base#PopulatableMosaic}.
  *
  * @public
  */
@@ -813,7 +813,7 @@ export class PopulatableEthersMosaic
     ];
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.openTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.openTrove} */
   async openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRateOrOptionalParams?: Decimalish | BorrowingOperationOptionalParams,
@@ -893,7 +893,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.closeTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.closeTrove} */
   async closeTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<TroveClosureDetails>> {
@@ -905,7 +905,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositCollateral} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.depositCollateral} */
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -913,7 +913,7 @@ export class PopulatableEthersMosaic
     return this.adjustTrove({ depositCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawCollateral} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -921,7 +921,7 @@ export class PopulatableEthersMosaic
     return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.borrowMoUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.borrowMoUSD} */
   borrowMoUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
@@ -930,7 +930,7 @@ export class PopulatableEthersMosaic
     return this.adjustTrove({ borrowMoUSD: amount }, maxBorrowingRate, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.repayMoUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.repayMoUSD} */
   repayMoUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -938,7 +938,7 @@ export class PopulatableEthersMosaic
     return this.adjustTrove({ repayMoUSD: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.adjustTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.adjustTrove} */
   async adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRateOrOptionalParams?: Decimalish | BorrowingOperationOptionalParams,
@@ -1030,7 +1030,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.claimCollateralSurplus} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.claimCollateralSurplus} */
   async claimCollateralSurplus(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<void>> {
@@ -1059,7 +1059,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.liquidate} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.liquidate} */
   async liquidate(
     address: string | string[],
     overrides?: EthersTransactionOverrides
@@ -1082,7 +1082,7 @@ export class PopulatableEthersMosaic
     }
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.liquidateUpTo} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.liquidateUpTo} */
   async liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number,
     overrides?: EthersTransactionOverrides
@@ -1099,7 +1099,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositMoUSDInStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.depositMoUSDInStabilityPool} */
   async depositMoUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
@@ -1120,7 +1120,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMoUSDFromStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.withdrawMoUSDFromStabilityPool} */
   async withdrawMoUSDFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1137,7 +1137,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.withdrawGainsFromStabilityPool} */
   async withdrawGainsFromStabilityPool(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<StabilityPoolGainsWithdrawalDetails>> {
@@ -1153,7 +1153,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.transferCollateralGainToTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.transferCollateralGainToTrove} */
   async transferCollateralGainToTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<CollateralGainTransferDetails>> {
@@ -1176,7 +1176,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMoUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.sendMoUSD} */
   async sendMoUSD(
     toAddress: string,
     amount: Decimalish,
@@ -1195,7 +1195,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMSIC} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.sendMSIC} */
   async sendMSIC(
     toAddress: string,
     amount: Decimalish,
@@ -1214,7 +1214,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.redeemMoUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.redeemMoUSD} */
   async redeemMoUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
@@ -1285,7 +1285,7 @@ export class PopulatableEthersMosaic
     return populateRedemption(attemptedMoUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.stakeMSIC} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.stakeMSIC} */
   async stakeMSIC(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1298,7 +1298,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.unstakeMSIC} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.unstakeMSIC} */
   async unstakeMSIC(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1311,14 +1311,14 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawGainsFromStaking} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<void>> {
     return this.unstakeMSIC(Decimal.ZERO, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.registerFrontend} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.registerFrontend} */
   async registerFrontend(
     kickbackRate: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1354,7 +1354,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.approveUniTokens} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.approveUniTokens} */
   async approveUniTokens(
     allowance?: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1372,7 +1372,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.stakeUniTokens} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.stakeUniTokens} */
   async stakeUniTokens(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1389,7 +1389,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.unstakeUniTokens} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.unstakeUniTokens} */
   async unstakeUniTokens(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1406,7 +1406,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMSICRewardFromLiquidityMining} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.withdrawMSICRewardFromLiquidityMining} */
   async withdrawMSICRewardFromLiquidityMining(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<void>> {
@@ -1418,7 +1418,7 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.exitLiquidityMining} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableMosaic.exitLiquidityMining} */
   async exitLiquidityMining(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<void>> {

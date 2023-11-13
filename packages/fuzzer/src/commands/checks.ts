@@ -1,4 +1,4 @@
-import { EthersMosaic } from "@mosaic/lib-ethers";
+import { EthersMosaic } from "@liquity/lib-ethers";
 
 import { deployer, subgraph } from "../globals";
 

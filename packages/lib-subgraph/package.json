@@ -1,5 +1,5 @@
 {
-  "name": "@mosaic/lib-subgraph",
+  "name": "@liquity/lib-subgraph",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "prepare": "tsc --project tsconfig.dist.json"
   },
   "peerDependencies": {
-    "@mosaic/lib-base": "^3.0.0"
+    "@liquity/lib-base": "^3.0.0"
   },
   "devDependencies": {
     "apollo": "^2.30.3",

@@ -3,7 +3,7 @@ import {
   MosaicStoreState,
   StabilityDeposit,
   StabilityDepositChange
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import { COIN } from "../../../strings";
 import { Amount } from "../../ActionDescription";

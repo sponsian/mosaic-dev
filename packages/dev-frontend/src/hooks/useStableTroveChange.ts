@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Decimal, TroveChange } from "@mosaic/lib-base";
+import { Decimal, TroveChange } from "@liquity/lib-base";
 
 type ValidTroveChange = Exclude<TroveChange<Decimal>, { type: "invalidCreation" }>;
 

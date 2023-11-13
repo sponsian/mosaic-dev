@@ -1,4 +1,4 @@
-import { Decimal } from "@mosaic/lib-base";
+import { Decimal } from "@liquity/lib-base";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { useBondView } from "./Bonds/context/BondViewContext";
 

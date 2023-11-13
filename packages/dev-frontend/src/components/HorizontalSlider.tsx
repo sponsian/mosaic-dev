@@ -1,5 +1,5 @@
 import { Flex, Text, Slider as ThemeUiSlider, Button } from "theme-ui";
-import { Decimal } from "@mosaic/lib-base";
+import { Decimal } from "@liquity/lib-base";
 import { toFloat } from "./Bonds/utils";
 import { InfoIcon } from "./InfoIcon";
 

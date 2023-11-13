@@ -7,8 +7,8 @@ import {
   MoUSD_LIQUIDATION_RESERVE,
   Percent,
   Difference
-} from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+} from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { useStableTroveChange } from "../../hooks/useStableTroveChange";
 import { ActionDescription } from "../ActionDescription";

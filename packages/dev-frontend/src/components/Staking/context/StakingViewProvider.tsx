@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-import { MosaicStoreState, MSICStake } from "@mosaic/lib-base";
-import { MosaicStoreUpdate, useMosaicReducer } from "@mosaic/lib-react";
+import { MosaicStoreState, MSICStake } from "@liquity/lib-base";
+import { MosaicStoreUpdate, useMosaicReducer } from "@liquity/lib-react";
 
 import { useMyTransactionState } from "../../Transaction";
 

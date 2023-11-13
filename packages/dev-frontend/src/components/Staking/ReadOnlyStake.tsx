@@ -1,7 +1,7 @@
 import { Heading, Box, Card, Flex, Button } from "theme-ui";
 
-import { MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 
 import { COIN, GT } from "../../strings";
 

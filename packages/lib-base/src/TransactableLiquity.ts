@@ -161,7 +161,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
  * The functions return the details of the transaction (if any), or throw an implementation-specific
  * subclass of {@link TransactionFailedError} in case of transaction failure.
  *
- * Implemented by {@link @mosaic/lib-ethers#EthersMosaic}.
+ * Implemented by {@link @liquity/lib-ethers#EthersMosaic}.
  *
  * @public
  */
@@ -171,7 +171,7 @@ export interface TransactableMosaic {
    *
    * @param params - How much to deposit and borrow.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate}.
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -198,7 +198,7 @@ export interface TransactableMosaic {
    *
    * @param params - Parameters of the adjustment.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate} if
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate} if
    *                           `params` includes `borrowMoUSD`.
    *
    * @throws
@@ -206,7 +206,7 @@ export interface TransactableMosaic {
    *
    * @remarks
    * The transaction will fail if the Trove's debt would fall below
-   * {@link @mosaic/lib-base#MoUSD_MINIMUM_DEBT}.
+   * {@link @liquity/lib-base#MoUSD_MINIMUM_DEBT}.
    *
    * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
@@ -255,7 +255,7 @@ export interface TransactableMosaic {
    *
    * @param amount - The amount of MoUSD to borrow.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate}.
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -322,8 +322,8 @@ export interface TransactableMosaic {
    * The `frontendTag` parameter is only effective when making a new deposit.
    *
    * As a side-effect, the transaction will also pay out an existing Stability Deposit's
-   * {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.msicReward | MSIC reward}.
    */
   depositMoUSDInStabilityPool(
     amount: Decimalish,
@@ -340,14 +340,14 @@ export interface TransactableMosaic {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out the Stability Deposit's
-   * {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.msicReward | MSIC reward}.
    */
   withdrawMoUSDFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
 
   /**
-   * Withdraw {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward} from Stability Deposit.
+   * Withdraw {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.msicReward | MSIC reward} from Stability Deposit.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -355,7 +355,7 @@ export interface TransactableMosaic {
   withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
 
   /**
-   * Transfer {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} from
+   * Transfer {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} from
    * Stability Deposit to Trove.
    *
    * @throws
@@ -365,7 +365,7 @@ export interface TransactableMosaic {
    * The collateral gain is transfered to the Trove as additional collateral.
    *
    * As a side-effect, the transaction will also pay out the Stability Deposit's
-   * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.msicReward | MSIC reward}.
    */
   transferCollateralGainToTrove(): Promise<CollateralGainTransferDetails>;
 
@@ -396,7 +396,7 @@ export interface TransactableMosaic {
    *
    * @param amount - Amount of MoUSD to be redeemed.
    * @param maxRedemptionRate - Maximum acceptable
-   *                            {@link @mosaic/lib-base#Fees.redemptionRate | redemption rate}.
+   *                            {@link @liquity/lib-base#Fees.redemptionRate | redemption rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -411,7 +411,7 @@ export interface TransactableMosaic {
    * Claim leftover collateral after a liquidation or redemption.
    *
    * @remarks
-   * Use {@link @mosaic/lib-base#ReadableMosaic.getCollateralSurplusBalance | getCollateralSurplusBalance()}
+   * Use {@link @liquity/lib-base#ReadableMosaic.getCollateralSurplusBalance | getCollateralSurplusBalance()}
    * to check the amount of collateral available for withdrawal.
    *
    * @throws
@@ -429,8 +429,8 @@ export interface TransactableMosaic {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out an existing MSIC stake's
-   * {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain}.
+   * {@link @liquity/lib-base#MSICStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#MSICStake.msicGain | MoUSD gain}.
    */
   stakeMSIC(amount: Decimalish): Promise<void>;
 
@@ -444,14 +444,14 @@ export interface TransactableMosaic {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out the MSIC stake's
-   * {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain}.
+   * {@link @liquity/lib-base#MSICStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#MSICStake.msicGain | MoUSD gain}.
    */
   unstakeMSIC(amount: Decimalish): Promise<void>;
 
   /**
-   * Withdraw {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain} from MSIC stake.
+   * Withdraw {@link @liquity/lib-base#MSICStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#MSICStake.msicGain | MoUSD gain} from MSIC stake.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -460,14 +460,14 @@ export interface TransactableMosaic {
 
   /**
    * Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for
-   * {@link @mosaic/lib-base#TransactableMosaic.stakeUniTokens | staking}.
+   * {@link @liquity/lib-base#TransactableMosaic.stakeUniTokens | staking}.
    *
    * @param allowance - Maximum amount of LP tokens that will be transferrable to liquidity mining
    *                    (`2^256 - 1` by default).
    *
    * @remarks
    * Must be performed before calling
-   * {@link @mosaic/lib-base#TransactableMosaic.stakeUniTokens | stakeUniTokens()}.
+   * {@link @liquity/lib-base#TransactableMosaic.stakeUniTokens | stakeUniTokens()}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.

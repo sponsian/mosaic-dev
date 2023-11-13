@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { MosaicStore } from "@mosaic/lib-base";
+import { MosaicStore } from "@liquity/lib-base";
 
 import { MosaicStoreContext } from "../components/MosaicStoreProvider";
 

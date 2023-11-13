@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Paragraph, Text } from "theme-ui";
-import { Decimal, MosaicStoreState } from "@mosaic/lib-base";
-import { useMosaicSelector } from "@mosaic/lib-react";
+import { Decimal, MosaicStoreState } from "@liquity/lib-base";
+import { useMosaicSelector } from "@liquity/lib-react";
 import { InfoIcon } from "../InfoIcon";
 import { Badge } from "../Badge";
 import { fetchMsicPrice } from "./context/fetchMsicPrice";

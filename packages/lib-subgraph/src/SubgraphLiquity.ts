@@ -15,7 +15,7 @@ import {
   TroveWithPendingRedistribution,
   UserTrove,
   _emptyTrove
-} from "@mosaic/lib-base";
+} from "@liquity/lib-base";
 
 import { OrderDirection } from "../types/globalTypes";
 import { Global } from "../types/Global";
