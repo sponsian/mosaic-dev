@@ -1,9 +1,9 @@
 import { useCallback, useEffect } from "react";
 import { Flex, Button } from "theme-ui";
 
-import { MosaicStoreState, Decimal, Trove, Decimalish, MoUSD_MINIMUM_DEBT } from "@liquity/lib-base";
+import { MosaicStoreState, Decimal, Trove, Decimalish, MoUSD_MINIMUM_DEBT } from "@mosaic/lib-base";
 
-import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreUpdate, useMosaicReducer, useMosaicSelector } from "@mosaic/lib-react";
 
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";

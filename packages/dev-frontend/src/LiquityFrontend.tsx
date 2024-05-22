@@ -3,8 +3,8 @@ import { Flex, Container } from "theme-ui";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, Difference, Trove } from "@liquity/lib-base";
-import { MosaicStoreProvider } from "@liquity/lib-react";
+import { Decimal, Difference, Trove } from "@mosaic/lib-base";
+import { MosaicStoreProvider } from "@mosaic/lib-react";
 
 import { useMosaic } from "./hooks/MosaicContext";
 import { TransactionMonitor } from "./components/Transaction";

@@ -1,5 +1,5 @@
 {
-  "name": "@liquity/lib-react",
+  "name": "@mosaic/lib-react",
   "version": "0.0.0-semantic-release",
   "description": "Components and hooks for React-based Mosaic frontends",
   "keywords": [
@@ -21,7 +21,7 @@
     "prepare:tsc": "tsc --project tsconfig.dist.json"
   },
   "peerDependencies": {
-    "@liquity/lib-base": "^3.0.0",
+    "@mosaic/lib-base": "^3.0.0",
     "react": "^16.13.1"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from "react";
 import { Card, Heading, Box, Flex, Button } from "theme-ui";
 
-import { MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { COIN, GT } from "../../strings";
 import { Icon } from "../Icon";

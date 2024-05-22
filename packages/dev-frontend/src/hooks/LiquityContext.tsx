@@ -8,7 +8,7 @@ import {
   EthersMosaic,
   EthersMosaicWithStore,
   _connectByChainId
-} from "@liquity/lib-ethers";
+} from "@mosaic/lib-ethers";
 
 import { MosaicFrontendConfig, getConfig } from "../config";
 import { BatchedProvider } from "../providers/BatchingProvider";

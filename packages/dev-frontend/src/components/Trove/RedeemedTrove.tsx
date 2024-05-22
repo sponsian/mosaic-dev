@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { Card, Heading, Box, Button, Flex } from "theme-ui";
 import { CollateralSurplusAction } from "../CollateralSurplusAction";
-import { MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 import { useTroveView } from "./context/TroveViewContext";
 import { InfoMessage } from "../InfoMessage";
 

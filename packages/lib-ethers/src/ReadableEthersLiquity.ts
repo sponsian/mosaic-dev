@@ -13,7 +13,7 @@ import {
   TroveWithPendingRedistribution,
   UserTrove,
   UserTroveStatus
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import { MultiTroveGetter } from "../types";
 
@@ -77,7 +77,7 @@ const expectPositiveInt = <K extends string>(obj: { [P in K]?: number }, key: K)
 };
 
 /**
- * Ethers-based implementation of {@link @liquity/lib-base#ReadableMosaic}.
+ * Ethers-based implementation of {@link @mosaic/lib-base#ReadableMosaic}.
  *
  * @public
  */
@@ -146,7 +146,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return false;
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalRedistributed} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalRedistributed} */
   async getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
     const { troveManager } = _getContracts(this.connection);
 
@@ -158,7 +158,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return new Trove(collateral, debt);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTroveBeforeRedistribution} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTroveBeforeRedistribution} */
   async getTroveBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
@@ -185,7 +185,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     }
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTrove} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTrove} */
   async getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
     const [trove, totalRedistributed] = await Promise.all([
       this.getTroveBeforeRedistribution(address, overrides),
@@ -195,14 +195,14 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return trove.applyRedistribution(totalRedistributed);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getNumberOfTroves} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getNumberOfTroves} */
   async getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
     const { troveManager } = _getContracts(this.connection);
 
     return (await troveManager.getTroveOwnersCount({ ...overrides })).toNumber();
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getPrice} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getPrice} */
   getPrice(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { priceFeed } = _getContracts(this.connection);
 
@@ -237,7 +237,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return new Trove(liquidatedCollateral, closedDebt);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotal} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotal} */
   async getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
     const [activePool, defaultPool] = await Promise.all([
       this._getActivePool(overrides),
@@ -247,7 +247,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return activePool.add(defaultPool);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getStabilityDeposit} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getStabilityDeposit} */
   async getStabilityDeposit(
     address?: string,
     overrides?: EthersCallOverrides
@@ -276,7 +276,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     );
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getRemainingStabilityPoolMSICReward} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getRemainingStabilityPoolMSICReward} */
   async getRemainingStabilityPoolMSICReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { communityIssuance } = _getContracts(this.connection);
 
@@ -287,14 +287,14 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return issuanceCap.sub(totalMSICIssued);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
   getMoUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { stabilityPool } = _getContracts(this.connection);
 
     return stabilityPool.getTotalMoUSDDeposits({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMoUSDBalance} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDBalance} */
   getMoUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { msicToken } = _getContracts(this.connection);
@@ -302,7 +302,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return msicToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMSICBalance} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICBalance} */
   getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { msicToken } = _getContracts(this.connection);
@@ -310,7 +310,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return msicToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getUniTokenBalance} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getUniTokenBalance} */
   getUniTokenBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { uniToken } = _getContracts(this.connection);
@@ -318,7 +318,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return uniToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getUniTokenAllowance} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getUniTokenAllowance} */
   getUniTokenAllowance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { uniToken, unipool } = _getContracts(this.connection);
@@ -345,7 +345,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
       );
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getRemainingLiquidityMiningMSICReward} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getRemainingLiquidityMiningMSICReward} */
   async getRemainingLiquidityMiningMSICReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     const [calculateRemainingMSIC, blockTimestamp] = await Promise.all([
       this._getRemainingLiquidityMiningMSICRewardCalculator(overrides),
@@ -355,7 +355,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return calculateRemainingMSIC(blockTimestamp);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getLiquidityMiningStake} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getLiquidityMiningStake} */
   getLiquidityMiningStake(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { unipool } = _getContracts(this.connection);
@@ -363,14 +363,14 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return unipool.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalStakedUniTokens} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalStakedUniTokens} */
   getTotalStakedUniTokens(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { unipool } = _getContracts(this.connection);
 
     return unipool.totalSupply({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getLiquidityMiningMSICReward} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getLiquidityMiningMSICReward} */
   getLiquidityMiningMSICReward(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { unipool } = _getContracts(this.connection);
@@ -378,7 +378,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return unipool.earned(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getCollateralSurplusBalance} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getCollateralSurplusBalance} */
   getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { collSurplusPool } = _getContracts(this.connection);
@@ -392,7 +392,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     overrides?: EthersCallOverrides
   ): Promise<TroveWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.(getTroves:2)} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.(getTroves:2)} */
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
 
   async getTroves(
@@ -457,7 +457,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
       );
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getFees} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getFees} */
   async getFees(overrides?: EthersCallOverrides): Promise<Fees> {
     const [createFees, total, price, blockTimestamp] = await Promise.all([
       this._getFeesFactory(overrides),
@@ -469,7 +469,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return createFees(blockTimestamp, total.collateralRatioIsBelowCritical(price));
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getMSICStake} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICStake} */
   async getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake> {
     address ??= _requireAddress(this.connection);
     const { msicStaking } = _getContracts(this.connection);
@@ -485,14 +485,14 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return new MSICStake(stakedMSIC, collateralGain, msicGain);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getTotalStakedMSIC} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getTotalStakedMSIC} */
   async getTotalStakedMSIC(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { msicStaking } = _getContracts(this.connection);
 
     return msicStaking.totalMSICStaked({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @liquity/lib-base#ReadableMosaic.getFrontendStatus} */
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getFrontendStatus} */
   async getFrontendStatus(
     address?: string,
     overrides?: EthersCallOverrides
@@ -525,7 +525,7 @@ const mapBackendTroves = (troves: BackendTroves): TroveWithPendingRedistribution
   );
 
 /**
- * Variant of {@link ReadableEthersMosaic} that exposes a {@link @liquity/lib-base#MosaicStore}.
+ * Variant of {@link ReadableEthersMosaic} that exposes a {@link @mosaic/lib-base#MosaicStore}.
  *
  * @public
  */

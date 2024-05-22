@@ -1,4 +1,4 @@
-# @liquity/lib-ethers
+# @mosaic/lib-ethers
 
 [Ethers](https://www.npmjs.com/package/ethers)-based library for reading Mosaic protocol state and sending transactions.
 
@@ -7,14 +7,14 @@
 Install in your project:
 
 ```
-npm install --save @liquity/lib-base @liquity/lib-ethers ethers@^5.0.0
+npm install --save @mosaic/lib-base @mosaic/lib-ethers ethers@^5.0.0
 ```
 
 Connecting to an Ethereum node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");
-const { EthersMosaic } = require("@liquity/lib-ethers");
+const { EthersMosaic } = require("@mosaic/lib-ethers");
 
 async function example() {
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
@@ -34,7 +34,7 @@ async function example() {
 
 See [packages/examples](https://github.com/mosaic/mosaic/tree/master/packages/examples) in the repo.
 
-Mosaic's [Dev UI](https://github.com/mosaic/mosaic/tree/master/packages/dev-frontend) itself contains many examples of `@liquity/lib-ethers` use.
+Mosaic's [Dev UI](https://github.com/mosaic/mosaic/tree/master/packages/dev-frontend) itself contains many examples of `@mosaic/lib-ethers` use.
 
 ## API Reference
 

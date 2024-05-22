@@ -27,8 +27,8 @@ import type {
   BondClaimedEventObject,
   BondClaimedEvent
 } from "@mosaic/chicken-bonds/msic/types/ChickenBondManager";
-import { Decimal } from "@liquity/lib-base";
-import type { MoUSDToken } from "@liquity/lib-ethers/dist/types";
+import { Decimal } from "@mosaic/lib-base";
+import type { MoUSDToken } from "@mosaic/lib-ethers/dist/types";
 import type { ProtocolInfo, Bond, BondStatus, Stats, Maybe, BMousdLpRewards } from "./transitions";
 import {
   numberify,

@@ -9,8 +9,8 @@ import {
   Trove,
   MosaicStoreState,
   MoUSD_LIQUIDATION_RESERVE
-} from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+} from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { COIN } from "../../strings";
 

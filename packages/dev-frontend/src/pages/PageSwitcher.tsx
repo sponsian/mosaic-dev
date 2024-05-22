@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { AddressZero } from "@ethersproject/constants";
 
-import { MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { useMosaic } from "../hooks/MosaicContext";
 

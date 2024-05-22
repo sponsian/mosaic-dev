@@ -204,7 +204,7 @@ const difference = <T>(a: T, b: T) =>
  * The type parameter `T` may be used to type extra state added to {@link MosaicStoreState} by the
  * subclass.
  *
- * Implemented by {@link @liquity/lib-ethers#BlockPolledMosaicStore}.
+ * Implemented by {@link @mosaic/lib-ethers#BlockPolledMosaicStore}.
  *
  * @public
  */

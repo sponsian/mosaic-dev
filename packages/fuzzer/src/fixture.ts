@@ -9,9 +9,9 @@ import {
   TransactableMosaic,
   Trove,
   TroveAdjustmentParams
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
-import { EthersMosaic as Mosaic } from "@liquity/lib-ethers";
+import { EthersMosaic as Mosaic } from "@mosaic/lib-ethers";
 
 import {
   createRandomTrove,

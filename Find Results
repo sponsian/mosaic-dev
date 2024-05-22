@@ -3774,7 +3774,7 @@ Searching 1302 files for "@mosaic" (case sensitive)
     5        "signature": "007bbe44375983ab942770ca53a2039e"
     6      }
 
-~/github/mosaic-dev/packages/dev-frontend/.yalc/@liquity/chicken-bonds/package.json:
+~/github/mosaic-dev/packages/dev-frontend/.yalc/@mosaic/chicken-bonds/package.json:
     1  {
     2:   "name": "@mosaic/chicken-bonds",
     3    "version": "0.0.1",
@@ -9469,7 +9469,7 @@ Searching 1302 files for "@mosaic" (case sensitive)
     5        "signature": "007bbe44375983ab942770ca53a2039e"
     6      }
 
-~/github/mosaic-dev/packages/dev-frontend/.yalc/@liquity/chicken-bonds/package.json:
+~/github/mosaic-dev/packages/dev-frontend/.yalc/@mosaic/chicken-bonds/package.json:
     1  {
     2:   "name": "@mosaic/chicken-bonds",
     3    "version": "0.0.1",
@@ -15140,7 +15140,7 @@ Searching 1302 files for "@mosaic" (case sensitive)
     5        "signature": "007bbe44375983ab942770ca53a2039e"
     6      }
 
-~/github/mosaic-dev/packages/dev-frontend/.yalc/@liquity/chicken-bonds/package.json:
+~/github/mosaic-dev/packages/dev-frontend/.yalc/@mosaic/chicken-bonds/package.json:
     1  {
     2:   "name": "@mosaic/chicken-bonds",
     3    "version": "0.0.1",
@@ -20824,7 +20824,7 @@ Searching 1302 files for "@mosaic"
     5        "signature": "007bbe44375983ab942770ca53a2039e"
     6      }
 
-~/github/mosaic-dev/packages/dev-frontend/.yalc/@liquity/chicken-bonds/package.json:
+~/github/mosaic-dev/packages/dev-frontend/.yalc/@mosaic/chicken-bonds/package.json:
     1  {
     2:   "name": "@mosaic/chicken-bonds",
     3    "version": "0.0.1",

@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 
 type Idle = "IDLE";
 type Creating = "CREATING";

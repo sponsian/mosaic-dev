@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import React, { useEffect, useState } from "react";
 import { Flex, Button, Spinner, Label, Radio, Text } from "theme-ui";
 import { Amount } from "../../../ActionDescription";

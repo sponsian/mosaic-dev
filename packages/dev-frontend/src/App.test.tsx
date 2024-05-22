@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 
-import { Decimal, MoUSD_MINIMUM_NET_DEBT, Trove } from "@liquity/lib-base";
+import { Decimal, MoUSD_MINIMUM_NET_DEBT, Trove } from "@mosaic/lib-base";
 
 import App from "./App";
 

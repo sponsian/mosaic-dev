@@ -48,7 +48,7 @@ export interface TroveListingParams {
  * Read the state of the Mosaic protocol.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#EthersMosaic}.
+ * Implemented by {@link @mosaic/lib-ethers#EthersMosaic}.
  *
  * @public
  */
@@ -57,7 +57,7 @@ export interface ReadableMosaic {
    * Get the total collateral and debt per stake that has been liquidated through redistribution.
    *
    * @remarks
-   * Needed when dealing with instances of {@link @liquity/lib-base#TroveWithPendingRedistribution}.
+   * Needed when dealing with instances of {@link @mosaic/lib-base#TroveWithPendingRedistribution}.
    */
   getTotalRedistributed(): Promise<Trove>;
 
@@ -68,7 +68,7 @@ export interface ReadableMosaic {
    *
    * @remarks
    * The current state of a Trove can be fetched using
-   * {@link @liquity/lib-base#ReadableMosaic.getTrove | getTrove()}.
+   * {@link @mosaic/lib-base#ReadableMosaic.getTrove | getTrove()}.
    */
   getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
 
@@ -170,7 +170,7 @@ export interface ReadableMosaic {
    * When a Trove gets liquidated or redeemed, any collateral it has above 110% (in case of
    * liquidation) or 100% collateralization (in case of redemption) gets sent to a pool, where it
    * can be withdrawn from using
-   * {@link @liquity/lib-base#TransactableMosaic.claimCollateralSurplus | claimCollateralSurplus()}.
+   * {@link @mosaic/lib-base#TransactableMosaic.claimCollateralSurplus | claimCollateralSurplus()}.
    */
   getCollateralSurplusBalance(address?: string): Promise<Decimal>;
 

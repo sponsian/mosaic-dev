@@ -1,8 +1,8 @@
 import React from "react";
 import { Text, Flex, Box, Heading, Button } from "theme-ui";
 
-import { Decimal, MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { Decimal, MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { COIN, GT } from "../strings";
 import { useMosaic } from "../hooks/MosaicContext";

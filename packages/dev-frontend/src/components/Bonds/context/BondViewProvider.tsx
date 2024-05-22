@@ -17,7 +17,7 @@ import type {
 } from "./transitions";
 import { BMousdAmmTokenIndex } from "./transitions";
 import { transitions } from "./transitions";
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@mosaic/lib-base";
 import { useMosaic } from "../../../hooks/MosaicContext";
 import { api, _getProtocolInfo } from "./api";
 import { useTransaction } from "../../../hooks/useTransaction";

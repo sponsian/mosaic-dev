@@ -1,8 +1,8 @@
 import React from "react";
 import { Flex } from "theme-ui";
 
-import { MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 const selector = ({ remainingStabilityPoolMSICReward }: MosaicStoreState) => ({
   remainingStabilityPoolMSICReward

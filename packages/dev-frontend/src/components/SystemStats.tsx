@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, Heading, Link, Box, Text } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
-import { Decimal, Percent, MosaicStoreState } from "@liquity/lib-base";
-import { useMosaicSelector } from "@liquity/lib-react";
+import { Decimal, Percent, MosaicStoreState } from "@mosaic/lib-base";
+import { useMosaicSelector } from "@mosaic/lib-react";
 
 import { useMosaic } from "../hooks/MosaicContext";
 import { Statistic } from "./Statistic";

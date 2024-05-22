@@ -7,7 +7,7 @@ import {
   StabilityDeposit,
   Trove,
   TroveWithPendingRedistribution
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import { _getContracts, _requireAddress } from "./EthersMosaicConnection";
 import { ReadableEthersMosaic } from "./ReadableEthersMosaic";

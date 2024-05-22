@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 
-import { MosaicStoreState } from "@liquity/lib-base";
+import { MosaicStoreState } from "@mosaic/lib-base";
 
 import { equals } from "../utils/equals";
 import { useMosaicStore } from "./useMosaicStore";

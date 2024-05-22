@@ -11,7 +11,7 @@ import {
   MosaicStoreState,
   TroveClosureParams,
   TroveCreationParams
-} from "@liquity/lib-base";
+} from "@mosaic/lib-base";
 
 import { COIN } from "../../../strings";
 
