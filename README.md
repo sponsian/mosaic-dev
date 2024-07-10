@@ -1,6 +1,6 @@
 # Mosaic: Decentralized Borrowing Protocol
 
-![Tests](https://github.com/commcommxyz/mosaic-dev/dev/workflows/CI/badge.svg) [![Frontend status](https://img.shields.io/uptimerobot/status/m784948796-056b56fd51c67d682c11bb24?label=Testnet&logo=nginx&logoColor=white)](https://devui.mosaicprotocol.xyz) ![uptime](https://img.shields.io/uptimerobot/ratio/7/m784948796-056b56fd51c67d682c11bb24) [![Discord](https://img.shields.io/discord/1141867960819011664?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ) [![Docker Pulls](https://img.shields.io/docker/pulls/commcommxyz/mosaic-dev/dev-frontend?label=dev-frontend%20pulls&logo=docker&logoColor=white)](https://hub.docker.com/r/liquity/dev-frontend) [![codecov](https://codecov.io/gh/liquity/dev/branch/add_codecov/graph/badge.svg)](https://codecov.io/gh/liquity/dev)
+![Tests](https://github.com/commcommxyz/mosaic-dev/dev/workflows/CI/badge.svg) [![Discord](https://img.shields.io/discord/1141867960819011664?label=join%20chat&logo=discord&logoColor=white)](https://discord.gg/KJ89PuzvkJ)
 
 
 Mosaic is a decentralized protocol that allows REEF holders to obtain maximum liquidity against
