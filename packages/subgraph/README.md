@@ -1,5 +1,7 @@
 # Mosaic Subgraph
 
+## THIS INFORMATION IS NOT UP-TO-DATE. IT WILL BE UPDATED LATER TO REFLECT MOSAIC'S USAGE OF SUBSQUID OR SUBQUERY.
+
 Contains the entities and dependencies to populate a subgraph for Mosaic protocol.
 
 

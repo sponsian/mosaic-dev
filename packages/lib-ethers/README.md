@@ -1,5 +1,7 @@
 # @mosaic/lib-ethers
 
+## THIS LIBRARY IS NOT USABLE WITH MOSAIC. THIS WILL BE UPDATED PRIOR TO MOSAIC'S LAUNCH.
+
 [Ethers](https://www.npmjs.com/package/ethers)-based library for reading Mosaic protocol state and sending transactions.
 
 ## Quickstart
