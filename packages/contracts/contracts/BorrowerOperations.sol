@@ -29,7 +29,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     IMSICStaking public msicStaking;
     address public msicStakingAddress;
 
-    IMoUSDToken public msicToken;
+    IMoUSDToken public mousdToken;
 
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
