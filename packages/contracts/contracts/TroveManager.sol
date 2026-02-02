@@ -27,7 +27,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     ICollSurplusPool collSurplusPool;
 
-    IMoUSDToken public override msicToken;
+    IMoUSDToken public override mousdToken;
 
     IMSICToken public override msicToken;
 
@@ -239,7 +239,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         address _gasPoolAddress,
         address _collSurplusPoolAddress,
         address _priceFeedAddress,
-        address _msicTokenAddress,
+        address _mousdTokenAddress,
         address _sortedTrovesAddress,
         address _msicTokenAddress,
         address _msicStakingAddress
@@ -255,7 +255,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         checkContract(_gasPoolAddress);
         checkContract(_collSurplusPoolAddress);
         checkContract(_priceFeedAddress);
-        checkContract(_msicTokenAddress);
+        checkContract(_mousdTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_msicTokenAddress);
         checkContract(_msicStakingAddress);
@@ -267,7 +267,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         gasPoolAddress = _gasPoolAddress;
         collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
-        msicToken = IMoUSDToken(_msicTokenAddress);
+        mousdToken = IMoUSDToken(_msicTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         msicToken = IMSICToken(_msicTokenAddress);
         msicStaking = IMSICStaking(_msicStakingAddress);
