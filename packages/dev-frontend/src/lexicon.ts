@@ -7,7 +7,7 @@ export type Lexicon = {
 export const BORROW_FEE: Lexicon = {
   term: "Borrowing Fee",
   description:
-    "The Borrowing Fee is a one-off fee charged as a percentage of the borrowed amount (in MoUSD) and is part of a Trove's debt. The fee varies between 0.5% and 5% depending on MoUSD redemption volumes."
+    "The Borrowing Fee is a one-off fee charged as a percentage of the borrowed amount (in MEUR) and is part of a Trove's debt. The fee varies between 0.5% and 5% depending on MEUR redemption volumes."
 };
 
 export const TVL: Lexicon = {
@@ -33,10 +33,10 @@ export const RECOVERY_MODE: Lexicon = {
     "Recovery Mode is activated when the Total Collateral Ratio (TCR) falls below 150%. When active, your Trove can be liquidated if its collateral ratio is below the TCR. The maximum collateral you can lose from liquidation is capped at 110% of your Trove's debt. Operations are also restricted that would negatively impact the TCR."
 };
 
-export const STABILITY_POOL_MoUSD: Lexicon = {
-  term: "MoUSD in Stability Pool",
+export const STABILITY_POOL_MEUR: Lexicon = {
+  term: "MEUR in Stability Pool",
   description:
-    "The total MoUSD currently held in the Stability Pool, expressed as an amount and a fraction of the MoUSD supply."
+    "The total MEUR currently held in the Stability Pool, expressed as an amount and a fraction of the MEUR supply."
 };
 
 export const KICKBACK_RATE: Lexicon = {
@@ -49,8 +49,8 @@ export const REEF: Lexicon = {
   term: "REEF"
 };
 
-export const MoUSD: Lexicon = {
-  term: "MoUSD"
+export const MEUR: Lexicon = {
+  term: "MEUR"
 };
 
 export const MSIC: Lexicon = {
@@ -62,7 +62,7 @@ export const TROVES: Lexicon = {
   description: "The total number of active Troves in the system."
 };
 
-export const MoUSD_SUPPLY: Lexicon = {
-  term: "MoUSD supply",
-  description: "The total MoUSD minted by the Mosaic Protocol."
+export const MEUR_SUPPLY: Lexicon = {
+  term: "MEUR supply",
+  description: "The total MEUR minted by the Mosaic Protocol."
 };

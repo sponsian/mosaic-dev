@@ -115,7 +115,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_MoUSDDebt",
+        "name": "_L_MEURDebt",
         "type": "uint256"
       }
     ],
@@ -128,11 +128,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newMoUSDTokenAddress",
+        "name": "_newMEURTokenAddress",
         "type": "address"
       }
     ],
-    "name": "MoUSDTokenAddressChanged",
+    "name": "MEURTokenAddressChanged",
     "type": "event"
   },
   {
@@ -172,7 +172,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_MoUSDGasCompensation",
+        "name": "_MEURGasCompensation",
         "type": "uint256"
       }
     ],
@@ -217,13 +217,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_attemptedMoUSDAmount",
+        "name": "_attemptedMEURAmount",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_actualMoUSDAmount",
+        "name": "_actualMEURAmount",
         "type": "uint256"
       },
       {
@@ -362,7 +362,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_MoUSDDebt",
+        "name": "_L_MEURDebt",
         "type": "uint256"
       }
     ],
@@ -473,7 +473,7 @@
   },
   {
     "inputs": [],
-    "name": "MoUSD_GAS_COMPENSATION",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -499,7 +499,7 @@
   },
   {
     "inputs": [],
-    "name": "L_MoUSDDebt",
+    "name": "L_MEURDebt",
     "outputs": [
       {
         "internalType": "uint256",
@@ -873,7 +873,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_MoUSDDebt",
+        "name": "_MEURDebt",
         "type": "uint256"
       }
     ],
@@ -892,7 +892,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_MoUSDDebt",
+        "name": "_MEURDebt",
         "type": "uint256"
       }
     ],
@@ -979,7 +979,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "pendingMoUSDDebtReward",
+        "name": "pendingMEURDebtReward",
         "type": "uint256"
       },
       {
@@ -1063,7 +1063,7 @@
         "type": "address"
       }
     ],
-    "name": "getPendingMoUSDDebtReward",
+    "name": "getPendingMEURDebtReward",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1354,7 +1354,7 @@
   },
   {
     "inputs": [],
-    "name": "lastMoUSDDebtError_Redistribution",
+    "name": "lastMEURDebtError_Redistribution",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1422,7 +1422,7 @@
     "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract IMoUSDToken",
+        "internalType": "contract IMEURToken",
         "name": "",
         "type": "address"
       }
@@ -1460,7 +1460,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_MoUSDamount",
+        "name": "_MEURamount",
         "type": "uint256"
       },
       {
@@ -1529,7 +1529,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "MoUSDDebt",
+        "name": "MEURDebt",
         "type": "uint256"
       }
     ],

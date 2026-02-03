@@ -10,10 +10,10 @@ import {
 } from "ethers";
 // import { splitSignature } from "ethers/lib/utils";
 import type {
-  BMoUSDToken,
+  BMEURToken,
   BondNFT,
   ChickenBondManager,
-  BMoUSDLPZap
+  BMEURLPZap
 } from "@mosaic/chicken-bonds/msic/types";
 import {
   CurveCryptoSwap2ETH,
@@ -28,7 +28,7 @@ import type {
   BondClaimedEvent
 } from "@mosaic/chicken-bonds/msic/types/ChickenBondManager";
 import { Decimal } from "@mosaic/lib-base";
-import type { MoUSDToken } from "@mosaic/lib-ethers/dist/types";
+import type { MEURToken } from "@mosaic/lib-ethers/dist/types";
 import type { ProtocolInfo, Bond, BondStatus, Stats, Maybe, BMousdLpRewards } from "./transitions";
 import {
   numberify,
@@ -63,14 +63,14 @@ import type {
 
 const BOND_STATUS: BondStatus[] = ["NON_EXISTENT", "PENDING", "CANCELLED", "CLAIMED"];
 
-const MoUSD_3CRV_POOL_ADDRESS = "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA";
-const MoUSD_TOKEN_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
+const MEUR_3CRV_POOL_ADDRESS = "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA";
+const MEUR_TOKEN_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
 const CURVE_REGISTRY_SWAPS_ADDRESS = "0x81C46fECa27B31F3ADC2b91eE4be9717d1cd3DD7";
-const BMoUSD_MoUSD_3CRV_POOL_ADDRESS = "0x74ED5d42203806c8CDCf2F04Ca5F60DC777b901c";
+const BMEUR_MEUR_3CRV_POOL_ADDRESS = "0x74ED5d42203806c8CDCf2F04Ca5F60DC777b901c";
 const CRV_TOKEN_ADDRESS = "0xD533a949740bb3306d119CC777fa900bA034cd52";
 
 const TOKEN_ADDRESS_NAME_MAP: Record<string, string> = {
-  [MoUSD_TOKEN_ADDRESS]: "MoUSD",
+  [MEUR_TOKEN_ADDRESS]: "MEUR",
   [CRV_TOKEN_ADDRESS]: "CRV"
 };
 
@@ -86,11 +86,11 @@ const MSIC_ISSUANCE_GAS_HEADROOM = BigNumber.from(50000);
 //   token_{n}
 // ]
 const bMousdToMousdRoute: [string, string, string, string, string] = [
-  mainnet.BMoUSD_TOKEN_ADDRESS ?? "",
-  mainnet.BMoUSD_AMM_ADDRESS ?? "",
-  MoUSD_3CRV_POOL_ADDRESS, // LP token of MoUSD-3Crv-f has same address as pool
-  MoUSD_3CRV_POOL_ADDRESS,
-  MoUSD_TOKEN_ADDRESS
+  mainnet.BMEUR_TOKEN_ADDRESS ?? "",
+  mainnet.BMEUR_AMM_ADDRESS ?? "",
+  MEUR_3CRV_POOL_ADDRESS, // LP token of MEUR-3Crv-f has same address as pool
+  MEUR_3CRV_POOL_ADDRESS,
+  MEUR_TOKEN_ADDRESS
 ];
 
 const msicToBMousdRoute = [...bMousdToMousdRoute].reverse() as typeof bMousdToMousdRoute;
@@ -101,7 +101,7 @@ type RouteSwaps = [RouteSwapParams, RouteSwapParams, RouteSwapParams, RouteSwapP
 
 const getRoute = (inputToken: BMousdAmmTokenIndex): [RouteAddresses, RouteSwaps] => [
   [
-    ...(inputToken === BMousdAmmTokenIndex.BMoUSD ? bMousdToMousdRoute : msicToBMousdRoute),
+    ...(inputToken === BMousdAmmTokenIndex.BMEUR ? bMousdToMousdRoute : msicToBMousdRoute),
     constants.AddressZero,
     constants.AddressZero,
     constants.AddressZero,
@@ -119,13 +119,13 @@ const getRoute = (inputToken: BMousdAmmTokenIndex): [RouteAddresses, RouteSwaps]
     // 9 = remove_liquidity_one_coin()
     //
     // Indices:
-    // - bMoUSD pool: { 0: bMoUSD, 1: MoUSD-3Crv-f }
-    // - MoUSD-3Crv-f pool: { 0: MoUSD, 1: 3Crv }
+    // - bMEUR pool: { 0: bMEUR, 1: MEUR-3Crv-f }
+    // - MEUR-3Crv-f pool: { 0: MEUR, 1: 3Crv }
 
-    //                                          bMoUSD        MoUSD
-    inputToken === BMousdAmmTokenIndex.BMoUSD ? [0, 1, 3] : [0, 0, 6], // step 1
-    inputToken === BMousdAmmTokenIndex.BMoUSD ? [0, 0, 9] : [1, 0, 3], // step 2
-    [0, 0, 0], //                                MoUSD       bMoUSD
+    //                                          bMEUR        MEUR
+    inputToken === BMousdAmmTokenIndex.BMEUR ? [0, 1, 3] : [0, 0, 6], // step 1
+    inputToken === BMousdAmmTokenIndex.BMEUR ? [0, 0, 9] : [1, 0, 3], // step 2
+    [0, 0, 0], //                                MEUR       bMEUR
     [0, 0, 0]
   ]
 ];
@@ -178,7 +178,7 @@ const cacheCurveLpApy = async (): Promise<void> => {
     const poolData = curvePoolDataResponse.data?.poolData.find(pool => pool.id === CURVE_POOL_ID);
     const rewardsApr = poolData?.gaugeRewards.reduce((total, current) => total + current.apy, 0);
     const baseApr = curvePoolDetailsResponse?.data?.poolDetails?.find(
-      pool => pool.poolAddress === BMoUSD_MoUSD_3CRV_POOL_ADDRESS
+      pool => pool.poolAddress === BMEUR_MEUR_3CRV_POOL_ADDRESS
     )?.apy;
 
     if (rewardsApr === undefined && baseApr === undefined) return;
@@ -201,11 +201,11 @@ const cacheYearnVaultApys = async (): Promise<void> => {
     ).json()) as YearnVault[];
 
     const msic3CrvVault = yearnResponse.find(
-      vault => vault?.token?.address === MoUSD_3CRV_POOL_ADDRESS
+      vault => vault?.token?.address === MEUR_3CRV_POOL_ADDRESS
     );
 
     const stabilityPoolVault = yearnResponse.find(
-      vault => vault?.token?.address === MoUSD_TOKEN_ADDRESS
+      vault => vault?.token?.address === MEUR_TOKEN_ADDRESS
     );
 
     if (
@@ -250,12 +250,12 @@ const getAccountBonds = async (
 
     const bondRequests = {
       deposits: bondIds.map(bondId => bondNft.getBondAmount(bondId)),
-      accrueds: bondIds.map(bondId => chickenBondManager.calcAccruedBMoUSD(bondId)),
+      accrueds: bondIds.map(bondId => chickenBondManager.calcAccruedBMEUR(bondId)),
       startTimes: bondIds.map(bondId => bondNft.getBondStartTime(bondId)),
       endTimes: bondIds.map(bondId => bondNft.getBondEndTime(bondId)),
       statuses: bondIds.map(bondId => bondNft.getBondStatus(bondId)),
       tokenUris: bondIds.map(bondId => bondNft.tokenURI(bondId)),
-      claimedAmounts: bondIds.map(bondId => bondNft.getBondClaimedBMoUSD(bondId))
+      claimedAmounts: bondIds.map(bondId => bondNft.getBondClaimedBMEUR(bondId))
     };
 
     const bondDeposits = await Promise.all(bondRequests.deposits);
@@ -338,7 +338,7 @@ const getAccountBonds = async (
 
         const marketValue = decimalify(bondAccrueds[idx]).mul(marketPrice);
 
-        // Accrued bMoUSD is 0 for cancelled/claimed bonds
+        // Accrued bMEUR is 0 for cancelled/claimed bonds
         const claimNowReturn = accrued.isZero ? 0 : getReturn(accrued, deposit, marketPrice);
         const rebondReturn = accrued.isZero ? 0 : getReturn(rebondAccrual, deposit, marketPrice);
         const rebondRoi = rebondReturn / toFloat(deposit);
@@ -425,14 +425,14 @@ const marginalInputAmount = Decimal.ONE.div(1000);
 const getBmsicAmmPrice = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutput(
-      BMousdAmmTokenIndex.BMoUSD,
+      BMousdAmmTokenIndex.BMEUR,
       marginalInputAmount,
       bMousdAmm
     );
 
     return marginalOutputAmount.div(marginalInputAmount);
   } catch (error: unknown) {
-    console.error("bMoUSD AMM get_dy() price failed, probably has no liquidity?", error);
+    console.error("bMEUR AMM get_dy() price failed, probably has no liquidity?", error);
   }
 
   return Decimal.ONE.div(decimalify(await bMousdAmm.price_oracle()));
@@ -441,7 +441,7 @@ const getBmsicAmmPrice = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal
 const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutputMainnet(
-      BMousdAmmTokenIndex.BMoUSD,
+      BMousdAmmTokenIndex.BMEUR,
       marginalInputAmount,
       bMousdAmm
     );
@@ -452,7 +452,7 @@ const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<
   }
 
   const msic3CrvPool = new Contract(
-    MoUSD_3CRV_POOL_ADDRESS,
+    MEUR_3CRV_POOL_ADDRESS,
     [
       "function calc_withdraw_one_coin(uint256 burn_amount, int128 i) external view returns (uint256)"
     ],
@@ -461,20 +461,20 @@ const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<
 
   const [oraclePrice, marginalOutputAmount] = await Promise.all([
     bMousdAmm.price_oracle().then(decimalify),
-    msic3CrvPool.calc_withdraw_one_coin(marginalInputAmount.hex, 0 /* MoUSD */).then(decimalify)
+    msic3CrvPool.calc_withdraw_one_coin(marginalInputAmount.hex, 0 /* MEUR */).then(decimalify)
   ]);
 
   return marginalOutputAmount.div(marginalInputAmount).div(oraclePrice);
 };
 
 const getProtocolInfo = async (
-  bMousdToken: BMoUSDToken,
+  bMousdToken: BMEURToken,
   bMousdAmm: CurveCryptoSwap2ETH,
   chickenBondManager: ChickenBondManager,
   isMainnet: boolean
 ): Promise<ProtocolInfo> => {
   // TS breaks when including this call, or any more than 10 elements, in the Promise.all below.
-  const bammMousdDebtRequest = chickenBondManager.getBAMMMoUSDDebt().then(decimalify);
+  const bammMousdDebtRequest = chickenBondManager.getBAMMMEURDebt().then(decimalify);
 
   const [
     bMousdSupply,
@@ -491,8 +491,8 @@ const getProtocolInfo = async (
     bMousdToken.totalSupply().then(decimalify),
     isMainnet ? getBmsicAmmPriceMainnet(bMousdAmm) : getBmsicAmmPrice(bMousdAmm),
     chickenBondManager.getTreasury().then(bucket => bucket.map(decimalify)),
-    chickenBondManager.getOwnedMoUSDInSP().then(decimalify),
-    chickenBondManager.getTotalMoUSDInCurve().then(decimalify),
+    chickenBondManager.getOwnedMEURInSP().then(decimalify),
+    chickenBondManager.getTotalMEURInCurve().then(decimalify),
     chickenBondManager.calcSystemBackingRatio().then(decimalify),
     chickenBondManager.CHICKEN_IN_AMM_FEE().then(decimalify),
     chickenBondManager.calcUpdatedAccrualParameter().then(p => decimalify(p).div(24 * 60 * 60)),
@@ -656,19 +656,19 @@ const getTokenTotalSupply = async (token: ERC20): Promise<Decimal> => {
 
 const isInfiniteBondApproved = async (
   account: string,
-  msicToken: MoUSDToken,
+  msicToken: MEURToken,
   chickenBondManager: ChickenBondManager
 ): Promise<boolean> => {
   const allowance = await msicToken.allowance(account, chickenBondManager.address);
 
-  // Unlike bMoUSD, MoUSD doesn't explicitly handle infinite approvals, therefore the allowance will
+  // Unlike bMEUR, MEUR doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
   // However, it is practically impossible that it would decrease below 2**63.
   return allowance.gt(constants.MaxInt256);
 };
 
 const approveInfiniteBond = async (
-  msicToken: MoUSDToken | undefined,
+  msicToken: MEURToken | undefined,
   chickenBondManager: ChickenBondManager | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
@@ -735,7 +735,7 @@ const createBondWithPermit = async (
   msicAmount: Decimal,
   owner: string,
   msicAddress: string,
-  msicToken: MoUSDToken | undefined,
+  msicToken: MEURToken | undefined,
   chickenBondManager: ChickenBondManager | undefined,
   signer: EthersSigner
 ): Promise<BondCreatedEventObject> => {
@@ -883,7 +883,7 @@ const claimBond = async (
 
 const isTokenApprovedWithBMousdAmm = async (
   account: string,
-  token: MoUSDToken | BMoUSDToken,
+  token: MEURToken | BMEURToken,
   bMousdAmmAddress: string | null
 ): Promise<boolean> => {
   if (bMousdAmmAddress === null) {
@@ -892,7 +892,7 @@ const isTokenApprovedWithBMousdAmm = async (
 
   const allowance = await token.allowance(account, bMousdAmmAddress);
 
-  // Unlike bMoUSD, MoUSD doesn't explicitly handle infinite approvals, therefore the allowance will
+  // Unlike bMEUR, MEUR doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
   // However, it is practically impossible that it would decrease below 2**63.
   return allowance.gt(constants.MaxInt256);
@@ -900,11 +900,11 @@ const isTokenApprovedWithBMousdAmm = async (
 
 const isTokenApprovedWithBMousdAmmMainnet = async (
   account: string,
-  token: MoUSDToken | BMoUSDToken
+  token: MEURToken | BMEURToken
 ): Promise<boolean> => {
   const allowance = await token.allowance(account, CURVE_REGISTRY_SWAPS_ADDRESS);
 
-  // Unlike bMoUSD, MoUSD doesn't explicitly handle infinite approvals, therefore the allowance will
+  // Unlike bMEUR, MEUR doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
   // However, it is practically impossible that it would decrease below 2**63.
   return allowance.gt(constants.MaxInt256);
@@ -912,7 +912,7 @@ const isTokenApprovedWithBMousdAmmMainnet = async (
 
 const isTokenApprovedWithAmmZapper = async (
   account: string,
-  token: MoUSDToken | BMoUSDToken | ERC20,
+  token: MEURToken | BMEURToken | ERC20,
   ammZapperAddress: string | null
 ): Promise<boolean> => {
   if (ammZapperAddress === null) {
@@ -923,7 +923,7 @@ const isTokenApprovedWithAmmZapper = async (
 };
 
 const approveTokenWithBMousdAmm = async (
-  token: MoUSDToken | BMoUSDToken | undefined,
+  token: MEURToken | BMEURToken | undefined,
   bMousdAmmAddress: string | null,
   signer: Signer | undefined
 ) => {
@@ -938,7 +938,7 @@ const approveTokenWithBMousdAmm = async (
 };
 
 const approveToken = async (
-  token: MoUSDToken | BMoUSDToken | ERC20 | undefined,
+  token: MEURToken | BMEURToken | ERC20 | undefined,
   spenderAddress: string | null,
   signer: Signer | undefined
 ) => {
@@ -953,7 +953,7 @@ const approveToken = async (
 };
 
 const approveTokenWithBMousdAmmMainnet = async (
-  token: MoUSDToken | BMoUSDToken | undefined,
+  token: MEURToken | BMEURToken | undefined,
   signer: Signer | undefined
 ) => {
   if (token === undefined || signer === undefined) {
@@ -969,7 +969,7 @@ const approveTokenWithBMousdAmmMainnet = async (
 };
 
 const getOtherToken = (thisToken: BMousdAmmTokenIndex) =>
-  thisToken === BMousdAmmTokenIndex.BMoUSD ? BMousdAmmTokenIndex.MoUSD : BMousdAmmTokenIndex.BMoUSD;
+  thisToken === BMousdAmmTokenIndex.BMEUR ? BMousdAmmTokenIndex.MEUR : BMousdAmmTokenIndex.BMEUR;
 
 const getExpectedSwapOutput = async (
   inputToken: BMousdAmmTokenIndex,
@@ -984,7 +984,7 @@ const getExpectedSwapOutputMainnet = async (
   bMousdAmm: CurveCryptoSwap2ETH
 ): Promise<Decimal> => {
   const bMousdAmmBalance = await bMousdAmm.balances(0);
-  // Initial Curve bMoUSD price before liquidity = 1.29, reciprocal expected
+  // Initial Curve bMEUR price before liquidity = 1.29, reciprocal expected
   const reciprocal = Decimal.from(1).div(1.29);
   if (bMousdAmmBalance.eq(0)) return inputAmount.div(reciprocal);
 
@@ -1074,7 +1074,7 @@ const swapTokensMainnet = async (
 const getExpectedLpTokensAmountViaZapper = async (
   bMousdAmount: Decimal,
   msicAmount: Decimal,
-  bMousdZapper: BMoUSDLPZap
+  bMousdZapper: BMEURLPZap
 ): Promise<Decimal> => {
   // allow 0.1% rounding error
   return decimalify(await bMousdZapper.getMinLPTokens(bMousdAmount.hex, msicAmount.hex)).mul(0.99);
@@ -1083,12 +1083,12 @@ const getExpectedLpTokensAmountViaZapper = async (
 const getExpectedLpTokens = async (
   bMousdAmount: Decimal,
   msicAmount: Decimal,
-  bMousdZapper: BMoUSDLPZap
+  bMousdZapper: BMEURLPZap
 ): Promise<Decimal> => {
   // Curve's calc_token_amount has rounding errors and they enforce a minimum 0.1% slippage
   let expectedLpTokenAmount = Decimal.ZERO;
   try {
-    // If the user is depositing bMoUSD single sided, they won't have approved any.. WONT-FIX
+    // If the user is depositing bMEUR single sided, they won't have approved any.. WONT-FIX
     expectedLpTokenAmount = await getExpectedLpTokensAmountViaZapper(
       bMousdAmount,
       msicAmount,
@@ -1106,7 +1106,7 @@ const addLiquidity = async (
   msicAmount: Decimal,
   minLpTokens: Decimal,
   shouldStakeInGauge: boolean,
-  bMousdZapper: BMoUSDLPZap | undefined,
+  bMousdZapper: BMEURLPZap | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
@@ -1145,20 +1145,20 @@ const getCoinBalances = (pool: CurveCryptoSwap2ETH) =>
 const getExpectedWithdrawal = async (
   burnLp: Decimal,
   output: BMousdAmmTokenIndex | "both",
-  bMousdZapper: BMoUSDLPZap,
+  bMousdZapper: BMEURLPZap,
   bMousdAmm: CurveCryptoSwap2ETH
 ): Promise<Map<BMousdAmmTokenIndex, Decimal>> => {
   if (output === "both") {
     const [bMousdAmount, msicAmount] = await bMousdZapper.getMinWithdrawBalanced(burnLp.hex);
 
     return new Map([
-      [BMousdAmmTokenIndex.BMoUSD, decimalify(bMousdAmount)],
-      [BMousdAmmTokenIndex.MoUSD, decimalify(msicAmount)]
+      [BMousdAmmTokenIndex.BMEUR, decimalify(bMousdAmount)],
+      [BMousdAmmTokenIndex.MEUR, decimalify(msicAmount)]
     ]);
   } else {
     const withdrawEstimatorFunction =
-      output === BMousdAmmTokenIndex.MoUSD
-        ? () => bMousdZapper.getMinWithdrawMoUSD(burnLp.hex)
+      output === BMousdAmmTokenIndex.MEUR
+        ? () => bMousdZapper.getMinWithdrawMEUR(burnLp.hex)
         : () => bMousdAmm.calc_withdraw_one_coin(burnLp.hex, 0);
     return new Map([[output, await withdrawEstimatorFunction().then(decimalify)]]);
   }
@@ -1168,7 +1168,7 @@ const removeLiquidity = async (
   burnLpTokens: Decimal,
   minBMousdAmount: Decimal,
   minMousdAmount: Decimal,
-  bMousdZapper: BMoUSDLPZap | undefined,
+  bMousdZapper: BMEURLPZap | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
   if (bMousdZapper === undefined || signer === undefined) {
@@ -1188,18 +1188,18 @@ const removeLiquidity = async (
   console.log("removeLiquidity() finished");
 };
 
-const removeLiquidityMoUSD = async (
+const removeLiquidityMEUR = async (
   burnLpTokens: Decimal,
   minAmount: Decimal,
-  bMousdZapper: BMoUSDLPZap | undefined,
+  bMousdZapper: BMEURLPZap | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
   if (bMousdZapper === undefined || signer === undefined) {
-    throw new Error("removeLiquidityMoUSD() failed: a dependency is null");
+    throw new Error("removeLiquidityMEUR() failed: a dependency is null");
   }
 
-  const removeLiquidityFunction = "removeLiquidityMoUSD";
+  const removeLiquidityFunction = "removeLiquidityMEUR";
 
   const gasEstimate = await bMousdZapper.estimateGas[removeLiquidityFunction](
     burnLpTokens.hex,
@@ -1216,13 +1216,13 @@ const removeLiquidityMoUSD = async (
   ).wait();
 
   if (!receipt.status) {
-    throw new Error("removeLiquidityMoUSD() failed");
+    throw new Error("removeLiquidityMEUR() failed");
   }
 
-  console.log("removeLiquidityMoUSD() finished");
+  console.log("removeLiquidityMEUR() finished");
 };
 
-const removeLiquidityBMoUSD = async (
+const removeLiquidityBMEUR = async (
   burnLpTokens: Decimal,
   minAmount: Decimal,
   bMousdAmm: CurveCryptoSwap2ETH | undefined,
@@ -1230,7 +1230,7 @@ const removeLiquidityBMoUSD = async (
   account: string
 ): Promise<void> => {
   if (bMousdAmm === undefined || signer === undefined) {
-    throw new Error("removeLiquidityBMoUSD() failed: a dependency is null");
+    throw new Error("removeLiquidityBMEUR() failed: a dependency is null");
   }
 
   const removeLiquidityFunction = "remove_liquidity_one_coin(uint256,uint256,uint256,bool)";
@@ -1254,25 +1254,25 @@ const removeLiquidityBMoUSD = async (
   ).wait();
 
   if (!receipt.status) {
-    throw new Error("removeLiquidityBMoUSD() failed");
+    throw new Error("removeLiquidityBMEUR() failed");
   }
 
-  console.log("removeLiquidityBMoUSD() finished");
+  console.log("removeLiquidityBMEUR() finished");
 };
 
 const removeLiquidityOneCoin = async (
   burnLpTokens: Decimal,
   output: BMousdAmmTokenIndex,
   minAmount: Decimal,
-  bMousdZapper: BMoUSDLPZap | undefined,
+  bMousdZapper: BMEURLPZap | undefined,
   bMousdAmm: CurveCryptoSwap2ETH | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (output === BMousdAmmTokenIndex.MoUSD) {
-    return removeLiquidityMoUSD(burnLpTokens, minAmount, bMousdZapper, signer, account);
+  if (output === BMousdAmmTokenIndex.MEUR) {
+    return removeLiquidityMEUR(burnLpTokens, minAmount, bMousdZapper, signer, account);
   } else {
-    return removeLiquidityBMoUSD(burnLpTokens, minAmount, bMousdAmm, signer, account);
+    return removeLiquidityBMEUR(burnLpTokens, minAmount, bMousdAmm, signer, account);
   }
 };
 

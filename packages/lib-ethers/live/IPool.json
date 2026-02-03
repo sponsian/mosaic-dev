@@ -71,7 +71,7 @@
           "type": "uint256"
         }
       ],
-      "name": "MoUSDBalanceUpdated",
+      "name": "MEURBalanceUpdated",
       "type": "event"
     },
     {
@@ -95,7 +95,7 @@
           "type": "uint256"
         }
       ],
-      "name": "decreaseMoUSDDebt",
+      "name": "decreaseMEURDebt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -115,7 +115,7 @@
     },
     {
       "inputs": [],
-      "name": "getMoUSDDebt",
+      "name": "getMEURDebt",
       "outputs": [
         {
           "internalType": "uint256",
@@ -134,7 +134,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseMoUSDDebt",
+      "name": "increaseMEURDebt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

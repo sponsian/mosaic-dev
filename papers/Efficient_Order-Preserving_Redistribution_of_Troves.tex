@@ -35,7 +35,7 @@
 \section{Introduction}
 
 
-The Mosaic protocol $\cite{Whitepaper}$ issues a USD-pegged stablecoin MoUSD that is redeemable at face value against REEF: any owner of MoUSD can exchange their stablecoins for equivalent value in the underlying collateral at any time. The REEF paid to the redeemer is taken from the borrowers' collateralized debt positions (“troves”) in ascending order of collateral ratio. In other words, the system uses the redeemed MoUSD to repay the debt on the riskiest trove with the currently lowest individual collateral ratio (ICR), and transfers a corresponding amount of REEF from the trove to the redeemer. If the redeemed MoUSD is larger than the debt on the riskiest trove, the system proceeds with the second riskiest trove, and so on. \\
+The Mosaic protocol $\cite{Whitepaper}$ issues a USD-pegged stablecoin MEUR that is redeemable at face value against REEF: any owner of MEUR can exchange their stablecoins for equivalent value in the underlying collateral at any time. The REEF paid to the redeemer is taken from the borrowers' collateralized debt positions (“troves”) in ascending order of collateral ratio. In other words, the system uses the redeemed MEUR to repay the debt on the riskiest trove with the currently lowest individual collateral ratio (ICR), and transfers a corresponding amount of REEF from the trove to the redeemer. If the redeemed MEUR is larger than the debt on the riskiest trove, the system proceeds with the second riskiest trove, and so on. \\
 
 To allow for efficient redemptions despite Ethereum's gas constraints, the system keeps troves ordered by ICR, so that it can iterate over the linked list starting from the bottom. It is not feasible to sort the list after every operation. \\
 
@@ -53,7 +53,7 @@ This discrepancy means that the reward distribution scheme described in $\cite{B
 
 
 \section{Troves and Liquidations}
-Troves are collateralized debt positions held by individual borrowers, defined by their amount of debt $d$ (in MoUSD) and collateral $c$ (in REEF).
+Troves are collateralized debt positions held by individual borrowers, defined by their amount of debt $d$ (in MEUR) and collateral $c$ (in REEF).
 
 Let $\gamma_i$ denote the individual collateral ratio (ICR) of a trove $i$, i.e. the ratio of its collateral to its debt:
 
@@ -61,7 +61,7 @@ Let $\gamma_i$ denote the individual collateral ratio (ICR) of a trove $i$, i.e.
     \gamma_i = \frac{c_i} {d_i}
 \end{equation}
 
-If $\gamma_i$ falls below a minimum threshold $\delta$, the trove is subject to liquidation. As long as there are sufficient MoUSD tokens in the Stability Pool, the system can use them to repay the liquidated debt. 
+If $\gamma_i$ falls below a minimum threshold $\delta$, the trove is subject to liquidation. As long as there are sufficient MEUR tokens in the Stability Pool, the system can use them to repay the liquidated debt. 
 
 If the Stability Pool is empty, the trove's collateral and debt are redistributed to all active troves in the system as part of the liquidation process (a trove is called \textit{active} as long as it has not been liquidated, or closed by their owner or by a redemption). Every existing borrower with an active trove thus receives a share of both the collateral and the debt of the liquidated trove.
 

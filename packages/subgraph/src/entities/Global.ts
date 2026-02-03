@@ -71,11 +71,11 @@ export function getRedemptionSequenceNumber(): i32 {
   return increaseCounter("redemptionCount");
 }
 
-export function updateTotalRedistributed(L_ETH: BigInt, L_MoUSDDebt: BigInt): void {
+export function updateTotalRedistributed(L_ETH: BigInt, L_MEURDebt: BigInt): void {
   let global = getGlobal();
 
   global.rawTotalRedistributedCollateral = L_ETH;
-  global.rawTotalRedistributedDebt = L_MoUSDDebt;
+  global.rawTotalRedistributedDebt = L_MEURDebt;
   global.save();
 }
 
@@ -157,8 +157,8 @@ export function decreaseNumberOfActiveMSICStakes(): void {
   global.save();
 }
 
-export function increaseTotalBorrowingFeesPaid(_MoUSDFee: BigInt): void {
+export function increaseTotalBorrowingFeesPaid(_MEURFee: BigInt): void {
   let global = getGlobal();
-  global.totalBorrowingFeesPaid = global.totalBorrowingFeesPaid.plus(decimalize(_MoUSDFee));
+  global.totalBorrowingFeesPaid = global.totalBorrowingFeesPaid.plus(decimalize(_MEURFee));
   global.save();
 }

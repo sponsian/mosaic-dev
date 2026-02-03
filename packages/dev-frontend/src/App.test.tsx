@@ -1,10 +1,10 @@
 import { render, fireEvent } from "@testing-library/react";
 
-import { Decimal, MoUSD_MINIMUM_NET_DEBT, Trove } from "@mosaic/lib-base";
+import { Decimal, MEUR_MINIMUM_NET_DEBT, Trove } from "@mosaic/lib-base";
 
 import App from "./App";
 
-const params = { depositCollateral: Decimal.from(20), borrowMoUSD: MoUSD_MINIMUM_NET_DEBT };
+const params = { depositCollateral: Decimal.from(20), borrowMEUR: MEUR_MINIMUM_NET_DEBT };
 const trove = Trove.create(params);
 
 /*

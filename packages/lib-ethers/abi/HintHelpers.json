@@ -85,7 +85,7 @@
   },
   {
     "inputs": [],
-    "name": "MoUSD_GAS_COMPENSATION",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -309,7 +309,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_MoUSDamount",
+        "name": "_MEURamount",
         "type": "uint256"
       },
       {
@@ -337,7 +337,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "truncatedMoUSDamount",
+        "name": "truncatedMEURamount",
         "type": "uint256"
       }
     ],

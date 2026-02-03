@@ -41,7 +41,7 @@ export const Actioning: React.FC = () => {
       label: (
         <>
           <Label description={l.BOND_CREATED.description}>{l.BOND_CREATED.term}</Label>
-          <SubLabel>{`0 bMoUSD`}</SubLabel>
+          <SubLabel>{`0 bMEUR`}</SubLabel>
         </>
       )
     },
@@ -52,7 +52,7 @@ export const Actioning: React.FC = () => {
           <Label description={l.BREAK_EVEN_TIME.description}>{l.BREAK_EVEN_TIME.term}</Label>
           <SubLabel>
             <InfiniteEstimate estimate={bond.breakEvenAccrual}>
-              {bond.breakEvenAccrual.prettify(2)} bMoUSD
+              {bond.breakEvenAccrual.prettify(2)} bMEUR
             </InfiniteEstimate>
           </SubLabel>
         </>
@@ -65,7 +65,7 @@ export const Actioning: React.FC = () => {
           <Label description={l.OPTIMUM_REBOND_TIME.description}>{l.OPTIMUM_REBOND_TIME.term}</Label>
           <SubLabel>
             <InfiniteEstimate estimate={bond.rebondAccrual}>
-              {bond.rebondAccrual.prettify(2)} bMoUSD
+              {bond.rebondAccrual.prettify(2)} bMEUR
             </InfiniteEstimate>
           </SubLabel>
         </>
@@ -78,7 +78,7 @@ export const Actioning: React.FC = () => {
           <Label description={l.ACCRUED_AMOUNT.description} style={{ fontWeight: 500 }}>
             {l.ACCRUED_AMOUNT.term}
           </Label>
-          <SubLabel style={{ fontWeight: 400 }}>{`${bond.accrued.prettify(2)} bMoUSD`}</SubLabel>
+          <SubLabel style={{ fontWeight: 400 }}>{`${bond.accrued.prettify(2)} bMEUR`}</SubLabel>
         </>
       ),
       isEndOfLife: true,
@@ -105,12 +105,12 @@ export const Actioning: React.FC = () => {
         <HorizontalTimeline events={events} />
       </Flex>
       <Grid gap="12px" columns={3} sx={{ my: 4, justifyItems: "center" }}>
-        <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MoUSD" />
+        <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MEUR" />
 
-        <Record lexicon={l.MARKET_VALUE} value={bond.marketValue.prettify(2)} type="MoUSD" />
+        <Record lexicon={l.MARKET_VALUE} value={bond.marketValue.prettify(2)} type="MEUR" />
 
         {view === "CLAIMING" && (
-          <Record lexicon={l.BOND_RETURN} value={bond.claimNowReturn.toFixed(2)} type="MoUSD" />
+          <Record lexicon={l.BOND_RETURN} value={bond.claimNowReturn.toFixed(2)} type="MEUR" />
         )}
       </Grid>
       <details>
@@ -119,7 +119,7 @@ export const Actioning: React.FC = () => {
           <Record
             lexicon={l.REBOND_RETURN}
             value={bond.rebondAccrual.eq(Decimal.INFINITY) ? "N/A" : bond.rebondReturn.toFixed(2)}
-            type="MoUSD"
+            type="MEUR"
           />
 
           <Record

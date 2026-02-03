@@ -169,14 +169,14 @@ export interface SendableMosaic<R = unknown, S = unknown>
     amount: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableMosaic.borrowMoUSD} */
-  borrowMoUSD(
+  /** {@inheritDoc TransactableMosaic.borrowMEUR} */
+  borrowMEUR(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
-  /** {@inheritDoc TransactableMosaic.repayMoUSD} */
-  repayMoUSD(
+  /** {@inheritDoc TransactableMosaic.repayMEUR} */
+  repayMEUR(
     amount: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
 
@@ -193,14 +193,14 @@ export interface SendableMosaic<R = unknown, S = unknown>
     maximumNumberOfTrovesToLiquidate: number
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>;
 
-  /** {@inheritDoc TransactableMosaic.depositMoUSDInStabilityPool} */
-  depositMoUSDInStabilityPool(
+  /** {@inheritDoc TransactableMosaic.depositMEURInStabilityPool} */
+  depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
 
-  /** {@inheritDoc TransactableMosaic.withdrawMoUSDFromStabilityPool} */
-  withdrawMoUSDFromStabilityPool(
+  /** {@inheritDoc TransactableMosaic.withdrawMEURFromStabilityPool} */
+  withdrawMEURFromStabilityPool(
     amount: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
 
@@ -214,8 +214,8 @@ export interface SendableMosaic<R = unknown, S = unknown>
     SentMosaicTransaction<S, MosaicReceipt<R, CollateralGainTransferDetails>>
   >;
 
-  /** {@inheritDoc TransactableMosaic.sendMoUSD} */
-  sendMoUSD(
+  /** {@inheritDoc TransactableMosaic.sendMEUR} */
+  sendMEUR(
     toAddress: string,
     amount: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
@@ -226,8 +226,8 @@ export interface SendableMosaic<R = unknown, S = unknown>
     amount: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 
-  /** {@inheritDoc TransactableMosaic.redeemMoUSD} */
-  redeemMoUSD(
+  /** {@inheritDoc TransactableMosaic.redeemMEUR} */
+  redeemMEUR(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish
   ): Promise<SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>>;

@@ -20,10 +20,10 @@ The constructor for this class is marked as internal. Third-party code should no
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
-|  [collateralGain](./lib-base.stabilitydeposit.collateralgain.md) |  | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) received in exchange for the used-up MoUSD. |
-|  [currentMoUSD](./lib-base.stabilitydeposit.currentmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MoUSD left in the Stability Deposit. |
+|  [collateralGain](./lib-base.stabilitydeposit.collateralgain.md) |  | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) received in exchange for the used-up MEUR. |
+|  [currentMEUR](./lib-base.stabilitydeposit.currentmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR left in the Stability Deposit. |
 |  [frontendTag](./lib-base.stabilitydeposit.frontendtag.md) |  | string | Address of frontend through which this Stability Deposit was made. |
-|  [initialMoUSD](./lib-base.stabilitydeposit.initialmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MoUSD in the Stability Deposit at the time of the last direct modification. |
+|  [initialMEUR](./lib-base.stabilitydeposit.initialmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR in the Stability Deposit at the time of the last direct modification. |
 |  [isEmpty](./lib-base.stabilitydeposit.isempty.md) |  | boolean |  |
 |  [msicReward](./lib-base.stabilitydeposit.msicreward.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MSIC rewarded since the last modification of the Stability Deposit. |
 
@@ -33,5 +33,5 @@ The constructor for this class is marked as internal. Third-party code should no
 |  --- | --- | --- |
 |  [apply(change)](./lib-base.stabilitydeposit.apply.md) |  | Apply a [StabilityDepositChange](./lib-base.stabilitydepositchange.md) to this Stability Deposit. |
 |  [equals(that)](./lib-base.stabilitydeposit.equals.md) |  | Compare to another instance of <code>StabilityDeposit</code>. |
-|  [whatChanged(thatMoUSD)](./lib-base.stabilitydeposit.whatchanged.md) |  | Calculate the difference between the <code>currentMoUSD</code> in this Stability Deposit and <code>thatMoUSD</code>. |
+|  [whatChanged(thatMEUR)](./lib-base.stabilitydeposit.whatchanged.md) |  | Calculate the difference between the <code>currentMEUR</code> in this Stability Deposit and <code>thatMEUR</code>. |
 

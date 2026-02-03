@@ -68,7 +68,7 @@ General Safe balance       : 2000000.000000000000000000
 Community Issuance balance: 31951864.655992765250031575
 PriceFeed first stored price: 2096.630546500000000000
 PriceFeed initial status: 0
-Unipool's stored MoUSD-REEF Uniswap Pair address: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
+Unipool's stored MEUR-REEF Uniswap Pair address: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 system liquidation reserve: 200.000000000000000000
 system min net debt      : 1800.000000000000000000
 Deployer already has an active trove
@@ -77,19 +77,19 @@ deployer debt: 3215.000000000000000000
 deployer coll: 3.000000000000000000
 deployer stake: 3.000000000000000000
 deployer's trove status: 1
-deployer's MoUSD balance: 2273.674452917999958289
-MoUSD-REEF Pair token 0: 0xaa05...87A5,
-      MoUSDToken contract addr: 0xaa05...87A5
-MoUSD-REEF Pair token 1: 0xC02a...6Cc2,
+deployer's MEUR balance: 2273.674452917999958289
+MEUR-REEF Pair token 0: 0xaa05...87A5,
+      MEURToken contract addr: 0xaa05...87A5
+MEUR-REEF Pair token 1: 0xC02a...6Cc2,
       WETH ERC20 contract addr: 0xc02a...6cc2
-MoUSD-REEF Pair's MoUSD reserves before provision: 40.036378355965833891
-MoUSD-REEF Pair's REEF reserves before provision: .188993756164807541
+MEUR-REEF Pair's MEUR reserves before provision: 40.036378355965833891
+MEUR-REEF Pair's REEF reserves before provision: .188993756164807541
 Liquidity already provided to Uniswap
-MoUSD-REEF Pair's MoUSD reserves after provision: 40.036378355965833891
-MoUSD-REEF Pair's REEF reserves after provision: .188993756164807541
+MEUR-REEF Pair's MEUR reserves after provision: 40.036378355965833891
+MEUR-REEF Pair's REEF reserves after provision: .188993756164807541
 CHECK LP STAKING
 deployer's LP token balance: 2.194601866876996844
-MoUSDETHPair addr: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
+MEURETHPair addr: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 Pair addr stored in Unipool: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 Already staked in Unipool
 wait 90 seconds before checking earnings... 
@@ -97,7 +97,7 @@ deployer's earned MSIC from Unipool after ~1.5mins: .000000000000000707
 deployer MSIC Balance Before SP deposit: 1986.702254180435641327
 CHECK DEPLOYER MAKING DEPOSIT AND EARNING MSIC
 deployer SP deposit before making deposit: 30.000000000000000000
-deployer SP deposit after depositing 15 MoUSD: 45.000000000000000000
+deployer SP deposit after depositing 15 MEUR: 45.000000000000000000
 wait 90 seconds before withdrawing...
 deployer SP deposit after full withdrawal: .000000000000000000
 deployer MSIC Balance after SP deposit withdrawal: 2156.497045159803174982

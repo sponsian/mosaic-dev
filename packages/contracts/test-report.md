@@ -36,18 +36,18 @@ $ hardhat test
       ✓ decreaseTroveDebt(): reverts when called by an account that is not BorrowerOperations
     ActivePool
       ✓ sendETH(): reverts when called by an account that is not BO nor TroveM nor SP
-      ✓ increaseMoUSDDebt(): reverts when called by an account that is not BO nor TroveM
-      ✓ decreaseMoUSDDebt(): reverts when called by an account that is not BO nor TroveM nor SP
+      ✓ increaseMEURDebt(): reverts when called by an account that is not BO nor TroveM
+      ✓ decreaseMEURDebt(): reverts when called by an account that is not BO nor TroveM nor SP
       ✓ fallback(): reverts when called by an account that is not Borrower Operations nor Default Pool
     DefaultPool
       ✓ sendETHToActivePool(): reverts when called by an account that is not TroveManager
-      ✓ increaseMoUSDDebt(): reverts when called by an account that is not TroveManager
-      ✓ decreaseMoUSD(): reverts when called by an account that is not TroveManager
+      ✓ increaseMEURDebt(): reverts when called by an account that is not TroveManager
+      ✓ decreaseMEUR(): reverts when called by an account that is not TroveManager
       ✓ fallback(): reverts when called by an account that is not the Active Pool
     StabilityPool
       ✓ offset(): reverts when called by an account that is not TroveManager
       ✓ fallback(): reverts when called by an account that is not the Active Pool
-    MoUSDToken
+    MEURToken
       ✓ mint(): reverts when called by an account that is not BorrowerOperations
       ✓ burn(): reverts when called by an account that is not BO nor TroveM nor SP
       ✓ sendToPool(): reverts when called by an account that is not StabilityPool
@@ -59,7 +59,7 @@ $ hardhat test
     LockupContract
       ✓ withdrawMSIC(): reverts when caller is not beneficiary (68ms)
     MSICStaking
-      ✓ increaseF_MoUSD(): reverts when caller is not TroveManager
+      ✓ increaseF_MEUR(): reverts when caller is not TroveManager
     MSICToken
       ✓ sendToMSICStaking(): reverts when caller is not the MSICSstaking (49ms)
     CommunityIssuance
@@ -73,7 +73,7 @@ $ hardhat test
       ✓ addColl(), active Trove: adds the correct collateral amount to the Trove (194ms)
       ✓ addColl(), active Trove: Trove is in sortedList before and after (213ms)
       ✓ addColl(), active Trove: updates the stake and updates the total stakes (225ms)
-      ✓ addColl(), active Trove: applies pending rewards and updates user's L_ETH, L_MoUSDDebt snapshots (736ms)
+      ✓ addColl(), active Trove: applies pending rewards and updates user's L_ETH, L_MEURDebt snapshots (736ms)
       ✓ addColl(), reverts if trove is non-existent or closed (831ms)
       ✓ addColl(): can add collateral in Recovery Mode (252ms)
       ✓ withdrawColl(): reverts when withdrawal would leave trove with ICR < MCR (349ms)
@@ -88,41 +88,41 @@ $ hardhat test
       ✓ withdrawColl(): reduces ActivePool REEF and raw ether by correct amount (291ms)
       ✓ withdrawColl(): updates the stake and updates the total stakes (342ms)
       ✓ withdrawColl(): sends the correct amount of REEF to the user (289ms)
-      ✓ withdrawColl(): applies pending rewards and updates user's L_ETH, L_MoUSDDebt snapshots (1205ms)
-      ✓ withdrawMoUSD(): reverts when withdrawal would leave trove with ICR < MCR (516ms)
-      ✓ withdrawMoUSD(): decays a non-zero base rate (1192ms)
-      ✓ withdrawMoUSD(): reverts if max fee > 100% (668ms)
-      ✓ withdrawMoUSD(): reverts if max fee < 0.5% in Normal mode (639ms)
-      ✓ withdrawMoUSD(): reverts if fee exceeds max fee percentage (938ms)
-      ✓ withdrawMoUSD(): succeeds when fee is less than max fee percentage (1272ms)
-      ✓ withdrawMoUSD(): doesn't change base rate if it is already zero (1044ms)
-      ✓ withdrawMoUSD(): lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation (899ms)
-      ✓ withdrawMoUSD(): borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity (852ms)
-      ✓ withdrawMoUSD(): borrowing at non-zero base rate sends MoUSD fee to MSIC staking contract (1004ms)
-      ✓ withdrawMoUSD(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct (923ms)
-      ✓ withdrawMoUSD(): Borrowing at non-zero base rate increases the MSIC staking contract MoUSD fees-per-unit-staked (986ms)
-      ✓ withdrawMoUSD(): Borrowing at non-zero base rate sends requested amount to the user (1562ms)
-      ✓ withdrawMoUSD(): Borrowing at zero base rate changes MoUSD fees-per-unit-staked (839ms)
-      ✓ withdrawMoUSD(): Borrowing at zero base rate sends debt request to user (790ms)
-      ✓ withdrawMoUSD(): reverts when calling address does not have active trove (370ms)
-      ✓ withdrawMoUSD(): reverts when requested withdrawal amount is zero MoUSD (459ms)
-      ✓ withdrawMoUSD(): reverts when system is in Recovery Mode (649ms)
-      ✓ withdrawMoUSD(): reverts when withdrawal would bring the trove's ICR < MCR (347ms)
-      ✓ withdrawMoUSD(): reverts when a withdrawal would cause the TCR of the system to fall below the CCR (439ms)
-      ✓ withdrawMoUSD(): reverts if system is in Recovery Mode (312ms)
-      ✓ withdrawMoUSD(): increases the Trove's MoUSD debt by the correct amount (208ms)
-      ✓ withdrawMoUSD(): increases MoUSD debt in ActivePool by correct amount (230ms)
-      ✓ withdrawMoUSD(): increases user MoUSDToken balance by correct amount (243ms)
-      ✓ repayMoUSD(): reverts when repayment would leave trove with ICR < MCR (392ms)
-      ✓ repayMoUSD(): Succeeds when it would leave trove with net debt >= minimum net debt (435ms)
-      ✓ repayMoUSD(): reverts when it would leave trove with net debt < minimum net debt (256ms)
-      ✓ repayMoUSD(): reverts when calling address does not have active trove (431ms)
-      ✓ repayMoUSD(): reverts when attempted repayment is > the debt of the trove (418ms)
-      ✓ repayMoUSD(): reduces the Trove's MoUSD debt by the correct amount (403ms)
-      ✓ repayMoUSD(): decreases MoUSD debt in ActivePool by correct amount (406ms)
-      ✓ repayMoUSD(): decreases user MoUSDToken balance by correct amount (404ms)
-      ✓ repayMoUSD(): can repay debt in Recovery Mode (557ms)
-      ✓ repayMoUSD(): Reverts if borrower has insufficient MoUSD balance to cover his debt repayment (1122ms)
+      ✓ withdrawColl(): applies pending rewards and updates user's L_ETH, L_MEURDebt snapshots (1205ms)
+      ✓ withdrawMEUR(): reverts when withdrawal would leave trove with ICR < MCR (516ms)
+      ✓ withdrawMEUR(): decays a non-zero base rate (1192ms)
+      ✓ withdrawMEUR(): reverts if max fee > 100% (668ms)
+      ✓ withdrawMEUR(): reverts if max fee < 0.5% in Normal mode (639ms)
+      ✓ withdrawMEUR(): reverts if fee exceeds max fee percentage (938ms)
+      ✓ withdrawMEUR(): succeeds when fee is less than max fee percentage (1272ms)
+      ✓ withdrawMEUR(): doesn't change base rate if it is already zero (1044ms)
+      ✓ withdrawMEUR(): lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation (899ms)
+      ✓ withdrawMEUR(): borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity (852ms)
+      ✓ withdrawMEUR(): borrowing at non-zero base rate sends MEUR fee to MSIC staking contract (1004ms)
+      ✓ withdrawMEUR(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct (923ms)
+      ✓ withdrawMEUR(): Borrowing at non-zero base rate increases the MSIC staking contract MEUR fees-per-unit-staked (986ms)
+      ✓ withdrawMEUR(): Borrowing at non-zero base rate sends requested amount to the user (1562ms)
+      ✓ withdrawMEUR(): Borrowing at zero base rate changes MEUR fees-per-unit-staked (839ms)
+      ✓ withdrawMEUR(): Borrowing at zero base rate sends debt request to user (790ms)
+      ✓ withdrawMEUR(): reverts when calling address does not have active trove (370ms)
+      ✓ withdrawMEUR(): reverts when requested withdrawal amount is zero MEUR (459ms)
+      ✓ withdrawMEUR(): reverts when system is in Recovery Mode (649ms)
+      ✓ withdrawMEUR(): reverts when withdrawal would bring the trove's ICR < MCR (347ms)
+      ✓ withdrawMEUR(): reverts when a withdrawal would cause the TCR of the system to fall below the CCR (439ms)
+      ✓ withdrawMEUR(): reverts if system is in Recovery Mode (312ms)
+      ✓ withdrawMEUR(): increases the Trove's MEUR debt by the correct amount (208ms)
+      ✓ withdrawMEUR(): increases MEUR debt in ActivePool by correct amount (230ms)
+      ✓ withdrawMEUR(): increases user MEURToken balance by correct amount (243ms)
+      ✓ repayMEUR(): reverts when repayment would leave trove with ICR < MCR (392ms)
+      ✓ repayMEUR(): Succeeds when it would leave trove with net debt >= minimum net debt (435ms)
+      ✓ repayMEUR(): reverts when it would leave trove with net debt < minimum net debt (256ms)
+      ✓ repayMEUR(): reverts when calling address does not have active trove (431ms)
+      ✓ repayMEUR(): reverts when attempted repayment is > the debt of the trove (418ms)
+      ✓ repayMEUR(): reduces the Trove's MEUR debt by the correct amount (403ms)
+      ✓ repayMEUR(): decreases MEUR debt in ActivePool by correct amount (406ms)
+      ✓ repayMEUR(): decreases user MEURToken balance by correct amount (404ms)
+      ✓ repayMEUR(): can repay debt in Recovery Mode (557ms)
+      ✓ repayMEUR(): Reverts if borrower has insufficient MEUR balance to cover his debt repayment (1122ms)
       ✓ adjustTrove(): reverts when adjustment would leave trove with ICR < MCR (572ms)
       ✓ adjustTrove(): reverts if max fee < 0.5% in Normal mode (313ms)
       ✓ adjustTrove(): allows max fee < 0.5% in Recovery mode (577ms)
@@ -131,13 +131,13 @@ $ hardhat test
       ✓ adjustTrove(): doesn't change base rate if it is already zero (545ms)
       ✓ adjustTrove(): lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation (819ms)
       ✓ adjustTrove(): borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity (866ms)
-      ✓ adjustTrove(): borrowing at non-zero base rate sends MoUSD fee to MSIC staking contract (889ms)
+      ✓ adjustTrove(): borrowing at non-zero base rate sends MEUR fee to MSIC staking contract (889ms)
       ✓ adjustTrove(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct (1013ms)
-      ✓ adjustTrove(): Borrowing at non-zero base rate increases the MSIC staking contract MoUSD fees-per-unit-staked (837ms)
+      ✓ adjustTrove(): Borrowing at non-zero base rate increases the MSIC staking contract MEUR fees-per-unit-staked (837ms)
       ✓ adjustTrove(): Borrowing at non-zero base rate sends requested amount to the user (895ms)
-      ✓ adjustTrove(): Borrowing at zero base rate changes MoUSD balance of MSIC staking contract (783ms)
-      ✓ adjustTrove(): Borrowing at zero base rate changes MSIC staking contract MoUSD fees-per-unit-staked (881ms)
-      ✓ adjustTrove(): Borrowing at zero base rate sends total requested MoUSD to the user (783ms)
+      ✓ adjustTrove(): Borrowing at zero base rate changes MEUR balance of MSIC staking contract (783ms)
+      ✓ adjustTrove(): Borrowing at zero base rate changes MSIC staking contract MEUR fees-per-unit-staked (881ms)
+      ✓ adjustTrove(): Borrowing at zero base rate sends total requested MEUR to the user (783ms)
       ✓ adjustTrove(): reverts when calling address has no active trove (416ms)
       ✓ adjustTrove(): reverts in Recovery Mode when the adjustment would reduce the TCR (654ms)
       ✓ adjustTrove(): collateral withdrawal reverts in Recovery Mode (370ms)
@@ -147,7 +147,7 @@ $ hardhat test
       ✓ adjustTrove(): A trove with ICR > CCR in Recovery Mode can improve their ICR (524ms)
       ✓ adjustTrove(): debt increase in Recovery Mode charges no fee (543ms)
       ✓ adjustTrove(): reverts when change would cause the TCR of the system to fall below the CCR (587ms)
-      ✓ adjustTrove(): reverts when MoUSD repaid is > debt of the trove (451ms)
+      ✓ adjustTrove(): reverts when MEUR repaid is > debt of the trove (451ms)
       ✓ adjustTrove(): reverts when attempted REEF withdrawal is >= the trove's collateral (683ms)
       ✓ adjustTrove(): reverts when change would cause the ICR of the trove to fall below the MCR (521ms)
       ✓ adjustTrove(): With 0 coll change, doesnt change borrower's coll or ActivePool coll (289ms)
@@ -158,18 +158,18 @@ $ hardhat test
       ✓ adjustTrove(): updates borrower's debt and coll with coll decrease, debt increase (346ms)
       ✓ adjustTrove(): updates borrower's stake and totalStakes with a coll increase (385ms)
       ✓ adjustTrove():  updates borrower's stake and totalStakes with a coll decrease (553ms)
-      ✓ adjustTrove(): changes MoUSDToken balance by the requested decrease (529ms)
-      ✓ adjustTrove(): changes MoUSDToken balance by the requested increase (577ms)
+      ✓ adjustTrove(): changes MEURToken balance by the requested decrease (529ms)
+      ✓ adjustTrove(): changes MEURToken balance by the requested increase (577ms)
       ✓ adjustTrove(): Changes the activePool REEF and raw ether balance by the requested decrease (1371ms)
       ✓ adjustTrove(): Changes the activePool REEF and raw ether balance by the amount of REEF sent (548ms)
-      ✓ adjustTrove(): Changes the MoUSD debt in ActivePool by requested decrease (541ms)
-      ✓ adjustTrove(): Changes the MoUSD debt in ActivePool by requested increase (397ms)
+      ✓ adjustTrove(): Changes the MEUR debt in ActivePool by requested decrease (541ms)
+      ✓ adjustTrove(): Changes the MEUR debt in ActivePool by requested increase (397ms)
       ✓ adjustTrove(): new coll = 0 and new debt = 0 is not allowed, as gas compensation still counts toward ICR (385ms)
       ✓ adjustTrove(): Reverts if requested debt increase and amount is zero (292ms)
       ✓ adjustTrove(): Reverts if requested coll withdrawal and ether is sent (288ms)
       ✓ adjustTrove(): Reverts if it’s zero adjustment (137ms)
       ✓ adjustTrove(): Reverts if requested coll withdrawal is greater than trove's collateral (402ms)
-      ✓ adjustTrove(): Reverts if borrower has insufficient MoUSD balance to cover his debt repayment (496ms)
+      ✓ adjustTrove(): Reverts if borrower has insufficient MEUR balance to cover his debt repayment (496ms)
       ✓ Internal _adjustTrove(): reverts when op is a withdrawal and _borrower param is not the msg.sender (475ms)
       ✓ closeTrove(): reverts when it would lower the TCR below CCR (471ms)
       ✓ closeTrove(): reverts when calling address does not have active trove (221ms)
@@ -184,9 +184,9 @@ $ hardhat test
       ✓ closeTrove(): reduces ActivePool debt by correct amount (522ms)
       ✓ closeTrove(): updates the the total stakes (790ms)
       ✓ closeTrove(): sends the correct amount of REEF to the user (390ms)
-      ✓ closeTrove(): subtracts the debt of the closed Trove from the Borrower's MoUSDToken balance (405ms)
+      ✓ closeTrove(): subtracts the debt of the closed Trove from the Borrower's MEURToken balance (405ms)
       ✓ closeTrove(): applies pending rewards (1267ms)
-      ✓ closeTrove(): reverts if borrower has insufficient MoUSD balance to repay his entire debt (347ms)
+      ✓ closeTrove(): reverts if borrower has insufficient MEUR balance to repay his entire debt (347ms)
       ✓ openTrove(): emits a TroveUpdated event with the correct collateral and debt (820ms)
       ✓ openTrove(): Opens a trove with net debt >= minimum net debt (235ms)
       ✓ openTrove(): reverts if net debt < minimum net debt (294ms)
@@ -199,11 +199,11 @@ $ hardhat test
       ✓ openTrove(): reverts if fee exceeds max fee percentage (747ms)
       ✓ openTrove(): succeeds when fee is less than max fee percentage (930ms)
       ✓ openTrove(): borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity (965ms)
-      ✓ openTrove(): borrowing at non-zero base rate sends MoUSD fee to MSIC staking contract (923ms)
+      ✓ openTrove(): borrowing at non-zero base rate sends MEUR fee to MSIC staking contract (923ms)
       ✓ openTrove(): borrowing at non-zero base records the (drawn debt + fee  + liq. reserve) on the Trove struct (865ms)
-      ✓ openTrove(): Borrowing at non-zero base rate increases the MSIC staking contract MoUSD fees-per-unit-staked (794ms)
+      ✓ openTrove(): Borrowing at non-zero base rate increases the MSIC staking contract MEUR fees-per-unit-staked (794ms)
       ✓ openTrove(): Borrowing at non-zero base rate sends requested amount to the user (832ms)
-      ✓ openTrove(): Borrowing at zero base rate changes the MSIC staking contract MoUSD fees-per-unit-staked (602ms)
+      ✓ openTrove(): Borrowing at zero base rate changes the MSIC staking contract MEUR fees-per-unit-staked (602ms)
       ✓ openTrove(): Borrowing at zero base rate charges minimum fee (316ms)
       ✓ openTrove(): reverts when system is in Recovery Mode and ICR < CCR (320ms)
       ✓ openTrove(): reverts when trove ICR < MCR (536ms)
@@ -216,11 +216,11 @@ $ hardhat test
       ✓ openTrove(): creates a stake and adds it to total stakes (281ms)
       ✓ openTrove(): inserts Trove to Sorted Troves list (370ms)
       ✓ openTrove(): Increases the activePool REEF and raw ether balance by correct amount (294ms)
-      ✓ openTrove(): records up-to-date initial snapshots of L_ETH and L_MoUSDDebt (639ms)
+      ✓ openTrove(): records up-to-date initial snapshots of L_ETH and L_MEURDebt (639ms)
       ✓ openTrove(): allows a user to open a Trove, then close it, then re-open it (687ms)
-      ✓ openTrove(): increases the Trove's MoUSD debt by the correct amount (129ms)
-      ✓ openTrove(): increases MoUSD debt in ActivePool by the debt of the trove (162ms)
-      ✓ openTrove(): increases user MoUSDToken balance by correct amount (85ms)
+      ✓ openTrove(): increases the Trove's MEUR debt by the correct amount (129ms)
+      ✓ openTrove(): increases MEUR debt in ActivePool by the debt of the trove (162ms)
+      ✓ openTrove(): increases user MEURToken balance by correct amount (85ms)
       ✓ getCompositeDebt(): returns debt + gas comp
       ✓ closeTrove(): fails if owner cannot receive REEF (440ms)
       getNewICRFromTroveChange() returns the correct ICR
@@ -254,7 +254,7 @@ $ hardhat test
 
   Contract: Deployment script - Sets correct contract addresses dependencies after deployment
     ✓ Sets the correct PriceFeed address in TroveManager
-    ✓ Sets the correct MoUSDToken address in TroveManager
+    ✓ Sets the correct MEURToken address in TroveManager
     ✓ Sets the correct SortedTroves address in TroveManager
     ✓ Sets the correct BorrowerOperations address in TroveManager
     ✓ Sets the correct ActivePool address in TroveManager
@@ -267,7 +267,7 @@ $ hardhat test
     ✓ Sets the correct TroveManager address in ActivePool
     ✓ Sets the correct ActivePool address in StabilityPool
     ✓ Sets the correct BorrowerOperations address in StabilityPool
-    ✓ Sets the correct MoUSDToken address in StabilityPool
+    ✓ Sets the correct MEURToken address in StabilityPool
     ✓ Sets the correct TroveManager address in StabilityPool
     ✓ Sets the correct TroveManager address in DefaultPool
     ✓ Sets the correct ActivePool address in DefaultPool
@@ -547,19 +547,19 @@ issuance fraction after: 949066037374286
     ✓ stake(): reverts if amount is zero (74ms)
     ✓ REEF fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1562ms)
     ✓ REEF fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (3540ms)
-    ✓ MoUSD fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1757ms)
-    ✓ MoUSD fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (1705ms)
+    ✓ MEUR fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0 (1757ms)
+    ✓ MEUR fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0 (1705ms)
     ✓ MSIC Staking: A single staker earns all REEF and MSIC fees that occur (2143ms)
-    ✓ stake(): Top-up sends out all accumulated REEF and MoUSD gains to the staker (2138ms)
+    ✓ stake(): Top-up sends out all accumulated REEF and MEUR gains to the staker (2138ms)
     ✓ getPendingETHGain(): Returns the staker's correct pending REEF gain (1856ms)
-    ✓ getPendingMoUSDGain(): Returns the staker's correct pending MoUSD gain (1965ms)
+    ✓ getPendingMEURGain(): Returns the staker's correct pending MEUR gain (1965ms)
     ✓ MSIC Staking: Multiple stakers earn the correct share of all REEF and MSIC fees, based on their stake size (3133ms)
     ✓ unstake(): reverts if caller has REEF gains and can't receive REEF (1149ms)
     ✓ receive(): reverts when it receives REEF from an address that is not the Active Pool
     ✓ unstake(): reverts if user has no stake
     ✓ Test requireCallerIsTroveManager
 
-  Contract: MoUSDToken
+  Contract: MEURToken
     Basic token functions, without Proxy
       ✓ balanceOf(): gets the balance of the account
       ✓ totalSupply(): gets the total supply
@@ -628,20 +628,20 @@ issuance fraction after: 949066037374286
 
   Contract: StabilityPool
     ✓ getETH(): gets the recorded REEF balance
-    ✓ getTotalMoUSDDeposits(): gets the recorded MoUSD balance
+    ✓ getTotalMEURDeposits(): gets the recorded MEUR balance
 
   Contract: ActivePool
     ✓ getETH(): gets the recorded REEF balance
-    ✓ getMoUSDDebt(): gets the recorded MoUSD balance
-    ✓ increaseMoUSD(): increases the recorded MoUSD balance by the correct amount
-    ✓ decreaseMoUSD(): decreases the recorded MoUSD balance by the correct amount
+    ✓ getMEURDebt(): gets the recorded MEUR balance
+    ✓ increaseMEUR(): increases the recorded MEUR balance by the correct amount
+    ✓ decreaseMEUR(): decreases the recorded MEUR balance by the correct amount
     ✓ sendETH(): decreases the recorded REEF balance by the correct amount
 
   Contract: DefaultPool
-    ✓ getETH(): gets the recorded MoUSD balance
-    ✓ getMoUSDDebt(): gets the recorded MoUSD balance
-    ✓ increaseMoUSD(): increases the recorded MoUSD balance by the correct amount
-    ✓ decreaseMoUSD(): decreases the recorded MoUSD balance by the correct amount (57ms)
+    ✓ getETH(): gets the recorded MEUR balance
+    ✓ getMEURDebt(): gets the recorded MEUR balance
+    ✓ increaseMEUR(): increases the recorded MEUR balance by the correct amount
+    ✓ decreaseMEUR(): decreases the recorded MEUR balance by the correct amount (57ms)
     ✓ sendETHToActivePool(): decreases the recorded REEF balance by the correct amount (50ms)
 
   Contract: PriceFeed
@@ -773,8 +773,8 @@ issuance fraction after: 949066037374286
     ✓ claimStakingGainsAndRecycle(): only owner can call it (1384ms)
     ✓ claimStakingGainsAndRecycle(): reverts if user has no trove (1253ms)
     ✓ claimStakingGainsAndRecycle(): with only REEF gain (1595ms)
-    ✓ claimStakingGainsAndRecycle(): with only MoUSD gain (821ms)
-    ✓ claimStakingGainsAndRecycle(): with both REEF and MoUSD gains (1593ms)
+    ✓ claimStakingGainsAndRecycle(): with only MEUR gain (821ms)
+    ✓ claimStakingGainsAndRecycle(): with both REEF and MEUR gains (1593ms)
 
   Contract: SortedTroves
     SortedTroves
@@ -812,31 +812,31 @@ totalMSICIssued_2: 30370113195977152000000
       ✓ withdrawFromSP(): Depositors with varying initial deposit withdraw correct MSIC gain. No liquidations. No front end. (1925ms)
       ✓ withdrawFromSP(): Depositor withdraws correct MSIC gain after serial pool-emptying liquidations. No front-ends. (5752ms)
       ✓ MSIC issuance for a given period is not obtainable if the SP was empty during the period (551ms)
-      ✓ withdrawFromSP(): Several deposits of 100 MoUSD span one scale factor change. Depositors withdraw correct MSIC gains (6075ms)
+      ✓ withdrawFromSP(): Several deposits of 100 MEUR span one scale factor change. Depositors withdraw correct MSIC gains (6075ms)
       ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct MSIC gain. No liquidations. Front ends and kickback rates. (1660ms)
       ✓ withdrawFromSP(): Depositors with varying initial deposit withdraw correct MSIC gain. Front ends and kickback rates (2813ms)
-      ✓ withdrawFromSP(): Several deposits of 10k MoUSD span one scale factor change. Depositors withdraw correct MSIC gains (4788ms)
+      ✓ withdrawFromSP(): Several deposits of 10k MEUR span one scale factor change. Depositors withdraw correct MSIC gains (4788ms)
 
   Contract: Pool Manager: Sum-Product rounding errors
-    - Rounding errors: 100 deposits of 100MoUSD into SP, then 200 liquidations of 49MoUSD
+    - Rounding errors: 100 deposits of 100MEUR into SP, then 200 liquidations of 49MEUR
 
   Contract: StabilityPool - Withdrawal of stability deposit - Reward calculations
     Stability Pool Withdrawal
       ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after one liquidation (757ms)
       ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two identical liquidations (868ms)
       ✓ withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three identical liquidations (1051ms)
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MoUSD (965ms)
-      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MoUSD (1152ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MEUR (965ms)
+      ✓ withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MEUR (1152ms)
       ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after two identical liquidations (934ms)
       ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three identical liquidations (1130ms)
       ✓ withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three varying liquidations (1193ms)
 
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1512ms)
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1637ms)
-      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1645ms)
-      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1704ms)
-      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1753ms)
-      ✓ withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (1537ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (1512ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (1637ms)
+      ✓ withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (1645ms)
+      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (1704ms)
+      ✓ withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MEUR deposit and REEF Gain (1753ms)
+      ✓ withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MEUR. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (1537ms)
       ✓ withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool (3424ms)
       ✓ withdrawFromSP(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18 (1678ms)
       ✓ withdrawFromSP(): Depositors withdraw correct compounded deposit after liquidation empties the pool (1100ms)
@@ -848,7 +848,7 @@ totalMSICIssued_2: 30370113195977152000000
       ✓ withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (3494ms)
 alice deposit: 0
       ✓ withdrawFromSP(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0 (365ms)
-      ✓ withdrawFromSP(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (1676ms)
+      ✓ withdrawFromSP(): Several deposits of 10000 MEUR span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (1676ms)
       ✓ withdrawFromSP(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation (1848ms)
       ✓ withdrawFromSP(): Depositor's REEF gain stops increasing after two scale changes (4134ms)
       ✓ withdrawFromSP(): Large liquidated coll/debt, deposits and REEF price (932ms)
@@ -859,18 +859,18 @@ alice deposit: 0
       ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after one liquidation (1227ms)
       ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two identical liquidations (1400ms)
       ✓ withdrawETHGainToTrove():  Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three identical liquidations (1827ms)
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MoUSD (1597ms)
-      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MoUSD (1711ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MEUR (1597ms)
+      ✓ withdrawETHGainToTrove(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MEUR (1711ms)
       ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after two identical liquidations (1782ms)
       ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three identical liquidations (1798ms)
       ✓ withdrawETHGainToTrove(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three varying liquidations (4488ms)
 
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2168ms)
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (5085ms)
-      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2304ms)
-      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2335ms)
-      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2145ms)
-      ✓ withdrawETHGainToTrove(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain (2543ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (2168ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (5085ms)
+      ✓ withdrawETHGainToTrove(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (2304ms)
+      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (2335ms)
+      ✓ withdrawETHGainToTrove(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MEUR deposit and REEF Gain (2145ms)
+      ✓ withdrawETHGainToTrove(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MEUR. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MEUR deposit and REEF Gain (2543ms)
       ✓ withdrawETHGainToTrove(): Depositor withdraws correct compounded deposit after liquidation empties the pool (1889ms)
       ✓ withdrawETHGainToTrove(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18 (1891ms)
       ✓ withdrawETHGainToTrove(): Depositors withdraw correct compounded deposit after liquidation empties the pool (2324ms)
@@ -882,27 +882,27 @@ alice deposit: 0
       ✓ withdrawETHGainToTrove(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (1986ms)
 alice deposit: 0
       ✓ withdrawETHGainToTrove(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0 (3725ms)
-      ✓ withdrawETHGainToTrove(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (2361ms)
+      ✓ withdrawETHGainToTrove(): Several deposits of 10000 MEUR span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation (2361ms)
       ✓ withdrawETHGainToTrove(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation (3814ms)
       ✓ withdrawETHGainToTrove(): Large liquidated coll/debt, deposits and REEF price (959ms)
       ✓ withdrawETHGainToTrove(): Small liquidated coll/debt, large deposits and REEF price (784ms)
 
   Contract: StabilityPool
     Stability Pool Mechanisms
-      ✓ provideToSP(): increases the Stability Pool MoUSD balance (354ms)
+      ✓ provideToSP(): increases the Stability Pool MEUR balance (354ms)
       ✓ provideToSP(): updates the user's deposit record in StabilityPool (355ms)
-      ✓ provideToSP(): reduces the user's MoUSD balance by the correct amount (321ms)
-      ✓ provideToSP(): increases totalMoUSDDeposits by correct amount (283ms)
+      ✓ provideToSP(): reduces the user's MEUR balance by the correct amount (321ms)
+      ✓ provideToSP(): increases totalMEURDeposits by correct amount (283ms)
       ✓ provideToSP(): Correctly updates user snapshots of accumulated rewards per unit staked (4003ms)
       ✓ provideToSP(), multiple deposits: updates user's deposit and snapshots (2543ms)
-      ✓ provideToSP(): reverts if user tries to provide more than their MoUSD balance (1030ms)
-      ✓ provideToSP(): reverts if user tries to provide 2^256-1 MoUSD, which exceeds their balance (508ms)
+      ✓ provideToSP(): reverts if user tries to provide more than their MEUR balance (1030ms)
+      ✓ provideToSP(): reverts if user tries to provide 2^256-1 MEUR, which exceeds their balance (508ms)
       ✓ provideToSP(): reverts if cannot receive REEF Gain (1073ms)
       ✓ provideToSP(): doesn't impact other users' deposits or REEF gains (1906ms)
       ✓ provideToSP(): doesn't impact system debt, collateral or TCR (2287ms)
       ✓ provideToSP(): doesn't impact any troves, including the caller's trove (1810ms)
       ✓ provideToSP(): doesn't protect the depositor's trove from liquidation (1082ms)
-      ✓ provideToSP(): providing 0 MoUSD reverts (1091ms)
+      ✓ provideToSP(): providing 0 MEUR reverts (1091ms)
       ✓ provideToSP(), new deposit: when SP > 0, triggers MSIC reward event - increases the sum G (1072ms)
       ✓ provideToSP(), new deposit: when SP is empty, doesn't update G (4734ms)
       ✓ provideToSP(), new deposit: sets the correct front end tag (1128ms)
@@ -924,22 +924,22 @@ alice deposit: 0
       ✓ provideToSP(): reverts if provided tag is not a registered front end (587ms)
       ✓ withdrawFromSP(): reverts when user has no active deposit (597ms)
       ✓ withdrawFromSP(): reverts when amount > 0 and system has an undercollateralized trove (453ms)
-      ✓ withdrawFromSP(): partial retrieval - retrieves correct MoUSD amount and the entire REEF Gain, and updates deposit (1102ms)
-      ✓ withdrawFromSP(): partial retrieval - leaves the correct amount of MoUSD in the Stability Pool (1128ms)
-      ✓ withdrawFromSP(): full retrieval - leaves the correct amount of MoUSD in the Stability Pool (1091ms)
+      ✓ withdrawFromSP(): partial retrieval - retrieves correct MEUR amount and the entire REEF Gain, and updates deposit (1102ms)
+      ✓ withdrawFromSP(): partial retrieval - leaves the correct amount of MEUR in the Stability Pool (1128ms)
+      ✓ withdrawFromSP(): full retrieval - leaves the correct amount of MEUR in the Stability Pool (1091ms)
       ✓ withdrawFromSP(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF (1494ms)
-      ✓ withdrawFromSP(): it correctly updates the user's MoUSD and REEF snapshots of entitled reward per unit staked (1049ms)
+      ✓ withdrawFromSP(): it correctly updates the user's MEUR and REEF snapshots of entitled reward per unit staked (1049ms)
       ✓ withdrawFromSP(): decreases StabilityPool REEF (3952ms)
       ✓ withdrawFromSP(): All depositors are able to withdraw from the SP to their account (2393ms)
-      ✓ withdrawFromSP(): increases depositor's MoUSD token balance by the expected amount (2098ms)
+      ✓ withdrawFromSP(): increases depositor's MEUR token balance by the expected amount (2098ms)
       ✓ withdrawFromSP(): doesn't impact other users Stability deposits or REEF gains (4954ms)
       ✓ withdrawFromSP(): doesn't impact system debt, collateral or TCR  (1500ms)
       ✓ withdrawFromSP(): doesn't impact any troves, including the caller's trove (1085ms)
       ✓ withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove (933ms)
-      ✓ withdrawFromSP(): withdrawing 0 MoUSD doesn't alter the caller's deposit or the total MoUSD in the Stability Pool (993ms)
+      ✓ withdrawFromSP(): withdrawing 0 MEUR doesn't alter the caller's deposit or the total MEUR in the Stability Pool (993ms)
       ✓ withdrawFromSP(): withdrawing 0 REEF Gain does not alter the caller's REEF balance, their trove collateral, or the REEF  in the Stability Pool (1139ms)
       ✓ withdrawFromSP(): Request to withdraw > caller's deposit only withdraws the caller's compounded deposit (1260ms)
-      ✓ withdrawFromSP(): Request to withdraw 2^256-1 MoUSD only withdraws the caller's compounded deposit (1229ms)
+      ✓ withdrawFromSP(): Request to withdraw 2^256-1 MEUR only withdraws the caller's compounded deposit (1229ms)
       ✓ withdrawFromSP(): caller can withdraw full deposit and REEF gain during Recovery Mode (4371ms)
       ✓ getDepositorETHGain(): depositor does not earn further REEF gains from liquidations while their compounded deposit == 0:  (1831ms)
       ✓ withdrawFromSP(): triggers MSIC reward event - increases the sum G (982ms)
@@ -953,7 +953,7 @@ alice deposit: 0
       ✓ withdrawFromSP(), full withdrawal that reduces front end stake to 0: zero’s the front end’s snapshots (1248ms)
       ✓ withdrawFromSP(), reverts when initial deposit value is 0 (1037ms)
       ✓ withdrawETHGainToTrove(): reverts when user has no active deposit (1043ms)
-      ✓ withdrawETHGainToTrove(): Applies MoUSDLoss to user's deposit, and redirects REEF reward to user's Trove (932ms)
+      ✓ withdrawETHGainToTrove(): Applies MEURLoss to user's deposit, and redirects REEF reward to user's Trove (932ms)
       ✓ withdrawETHGainToTrove(): reverts if it would leave trove with ICR < MCR (3920ms)
       ✓ withdrawETHGainToTrove(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF (976ms)
       ✓ withdrawETHGainToTrove(): decreases StabilityPool REEF and increases activePool REEF (976ms)
@@ -1044,19 +1044,19 @@ B stake after A11: 39999999999999999998008332745
     ✓ liquidate(), with 100% < ICR < 110%: closes the Trove and removes it from the Trove array (965ms)
     ✓ liquidate(), with 100% < ICR < 110%: offsets as much debt as possible with the Stability Pool, then redistributes the remainder coll and debt (1034ms)
     ✓ liquidate(), with ICR > 110%, trove has lowest ICR, and StabilityPool is empty: does nothing (1245ms)
-    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: offsets the trove entirely with the pool (1265ms)
-    ✓ liquidate(), with ICR% = 110 < TCR, and StabilityPool MoUSD > debt to liquidate: offsets the trove entirely with the pool, there’s no collateral surplus (1382ms)
-    ✓ liquidate(), with  110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: removes stake and updates totalStakes (1361ms)
-    ✓ liquidate(), with  110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: updates system snapshots (1287ms)
-    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: closes the Trove (6532ms)
-    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: can liquidate troves out of order (2667ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: Trove remains active (985ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: Trove remains in TroveOwners array (1134ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: nothing happens (1146ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: updates system shapshots (1284ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: causes correct Pool offset and REEF gain, and doesn't redistribute to active troves (1266ms)
-    ✓ liquidate(), with ICR > 110%, and StabilityPool MoUSD < liquidated debt: ICR of non liquidated trove does not change (2161ms)
-    ✓ liquidate() with ICR > 110%, and StabilityPool MoUSD < liquidated debt: total liquidated coll and debt is correct (1912ms)
+    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: offsets the trove entirely with the pool (1265ms)
+    ✓ liquidate(), with ICR% = 110 < TCR, and StabilityPool MEUR > debt to liquidate: offsets the trove entirely with the pool, there’s no collateral surplus (1382ms)
+    ✓ liquidate(), with  110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: removes stake and updates totalStakes (1361ms)
+    ✓ liquidate(), with  110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: updates system snapshots (1287ms)
+    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: closes the Trove (6532ms)
+    ✓ liquidate(), with 110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: can liquidate troves out of order (2667ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: Trove remains active (985ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: Trove remains in TroveOwners array (1134ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: nothing happens (1146ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: updates system shapshots (1284ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: causes correct Pool offset and REEF gain, and doesn't redistribute to active troves (1266ms)
+    ✓ liquidate(), with ICR > 110%, and StabilityPool MEUR < liquidated debt: ICR of non liquidated trove does not change (2161ms)
+    ✓ liquidate() with ICR > 110%, and StabilityPool MEUR < liquidated debt: total liquidated coll and debt is correct (1912ms)
     ✓ liquidate(): Doesn't liquidate undercollateralized trove if it is the only trove in the system (652ms)
     ✓ liquidate(): Liquidates undercollateralized trove if there are two troves in the system (997ms)
     ✓ liquidate(): does nothing if trove has >= 110% ICR and the Stability Pool is empty (1019ms)
@@ -1104,7 +1104,7 @@ gasUsed:  636956
     ✓ batchLiquidateTroves() with a non fullfilled liquidation: total liquidated coll and debt is correct (1320ms)
     ✓ batchLiquidateTroves() with a non fullfilled liquidation: emits correct liquidation event values (1238ms)
     ✓ batchLiquidateTroves() with a non fullfilled liquidation: ICR of non liquidated trove does not change (1416ms)
-    ✓ batchLiquidateTroves(), with 110% < ICR < TCR, and StabilityPool MoUSD > debt to liquidate: can liquidate troves out of order (1357ms)
+    ✓ batchLiquidateTroves(), with 110% < ICR < TCR, and StabilityPool MEUR > debt to liquidate: can liquidate troves out of order (1357ms)
     ✓ batchLiquidateTroves(), with 110% < ICR < TCR, and StabilityPool empty: doesn't liquidate any troves (1161ms)
     ✓ batchLiquidateTroves(): skips liquidation of troves with ICR > TCR, regardless of Stability Pool size (2686ms)
     ✓ batchLiquidateTroves(): emits liquidation event with correct values when all troves have ICR > 110% and Stability Pool covers a subset of troves (1530ms)
@@ -1112,12 +1112,12 @@ gasUsed:  636956
 
   Contract: TroveManager
     ✓ liquidate(): closes a Trove that has ICR < MCR (573ms)
-    ✓ liquidate(): decreases ActivePool REEF and MoUSDDebt by correct amounts (567ms)
-    ✓ liquidate(): increases DefaultPool REEF and MoUSD debt by correct amounts (553ms)
+    ✓ liquidate(): decreases ActivePool REEF and MEURDebt by correct amounts (567ms)
+    ✓ liquidate(): increases DefaultPool REEF and MEUR debt by correct amounts (553ms)
     ✓ liquidate(): removes the Trove's stake from the total stakes (608ms)
     ✓ liquidate(): Removes the correct trove from the TroveOwners array, and moves the last array element to the new empty slot (1276ms)
     ✓ liquidate(): updates the snapshots of total stakes and total collateral (422ms)
-    ✓ liquidate(): updates the L_ETH and L_MoUSDDebt reward-per-unit-staked totals (984ms)
+    ✓ liquidate(): updates the L_ETH and L_MEURDebt reward-per-unit-staked totals (984ms)
     ✓ liquidate(): Liquidates undercollateralized trove if there are two troves in the system (503ms)
     ✓ liquidate(): reverts if trove is non-existent (303ms)
     ✓ liquidate(): reverts if trove has been closed (745ms)
@@ -1156,7 +1156,7 @@ gasUsed:  636956
     ✓ batchLiquidateTroves(): when SP is empty, doesn't update G (1655ms)
     ✓ getRedemptionHints(): gets the address of the first Trove and the final ICR of the last Trove involved in a redemption (621ms)
     ✓ getRedemptionHints(): returns 0 as partialRedemptionHintNICR when reaching _maxIterations (715ms)
-    ✓ redeemCollateral(): cancels the provided MoUSD with debt from Troves with the lowest ICRs and sends an equivalent amount of Ether (838ms)
+    ✓ redeemCollateral(): cancels the provided MEUR with debt from Troves with the lowest ICRs and sends an equivalent amount of Ether (838ms)
     ✓ redeemCollateral(): with invalid first hint, zero address (991ms)
     ✓ redeemCollateral(): with invalid first hint, non-existent trove (1003ms)
     ✓ redeemCollateral(): with invalid first hint, trove below MCR (1392ms)
@@ -1175,9 +1175,9 @@ gasUsed:  636956
     ✓ redeemCollateral(): reverts if fee exceeds max fee percentage (2899ms)
     ✓ redeemCollateral(): succeeds if fee is less than max fee percentage (3127ms)
     ✓ redeemCollateral(): doesn't affect the Stability Pool deposits or REEF gain of redeemed-from troves (2311ms)
-    ✓ redeemCollateral(): caller can redeem their entire MoUSDToken balance (1086ms)
-    ✓ redeemCollateral(): reverts when requested redemption amount exceeds caller's MoUSD token balance (1320ms)
-    ✓ redeemCollateral(): value of issued REEF == face value of redeemed MoUSD (assuming 1 MoUSD has value of $1) (1353ms)
+    ✓ redeemCollateral(): caller can redeem their entire MEURToken balance (1086ms)
+    ✓ redeemCollateral(): reverts when requested redemption amount exceeds caller's MEUR token balance (1320ms)
+    ✓ redeemCollateral(): value of issued REEF == face value of redeemed MEUR (assuming 1 MEUR has value of $1) (1353ms)
     ✓ redeemCollateral(): reverts if there is zero outstanding system debt (66ms)
     ✓ redeemCollateral(): reverts if caller's tries to redeem more than the outstanding system debt (367ms)
     ✓ redeemCollateral(): a redemption made when base rate is zero increases the base rate (1187ms)
@@ -1193,13 +1193,13 @@ gasUsed:  636956
     ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner to claim (5373ms)
     ✓ redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner after re-opening trove (2154ms)
     ✓ redeemCollateral(): reverts if fee eats up all returned collateral (1412ms)
-    ✓ getPendingMoUSDDebtReward(): Returns 0 if there is no pending MoUSDDebt reward (618ms)
+    ✓ getPendingMEURDebtReward(): Returns 0 if there is no pending MEURDebt reward (618ms)
     ✓ getPendingETHReward(): Returns 0 if there is no pending REEF reward (620ms)
     ✓ computeICR(): Returns 0 if trove's coll is worth 0
-    ✓ computeICR(): Returns 2^256-1 for REEF:USD = 100, coll = 1 REEF, debt = 100 MoUSD
-    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 200 REEF, debt = 30 MoUSD
-    ✓ computeICR(): returns correct ICR for REEF:USD = 250, coll = 1350 REEF, debt = 127 MoUSD
-    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 1 REEF, debt = 54321 MoUSD
+    ✓ computeICR(): Returns 2^256-1 for REEF:USD = 100, coll = 1 REEF, debt = 100 MEUR
+    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 200 REEF, debt = 30 MEUR
+    ✓ computeICR(): returns correct ICR for REEF:USD = 250, coll = 1350 REEF, debt = 127 MEUR
+    ✓ computeICR(): returns correct ICR for REEF:USD = 100, coll = 1 REEF, debt = 54321 MEUR
     ✓ computeICR(): Returns 2^256-1 if trove has non-zero coll and zero debt
     ✓ checkRecoveryMode(): Returns true when TCR < 150% (351ms)
     ✓ checkRecoveryMode(): Returns false when TCR == 150% (366ms)

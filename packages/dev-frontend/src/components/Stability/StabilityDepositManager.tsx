@@ -19,7 +19,7 @@ import {
 
 const init = ({ stabilityDeposit }: MosaicStoreState) => ({
   originalDeposit: stabilityDeposit,
-  editedMoUSD: stabilityDeposit.currentMoUSD,
+  editedMEUR: stabilityDeposit.currentMEUR,
   changePending: false
 });
 
@@ -43,7 +43,7 @@ const reduce = (
   // console.log(state);
   // console.log(action);
 
-  const { originalDeposit, editedMoUSD, changePending } = state;
+  const { originalDeposit, editedMEUR, changePending } = state;
 
   switch (action.type) {
     case "startChange": {
@@ -55,10 +55,10 @@ const reduce = (
       return { ...state, changePending: false };
 
     case "setDeposit":
-      return { ...state, editedMoUSD: Decimal.from(action.newValue) };
+      return { ...state, editedMEUR: Decimal.from(action.newValue) };
 
     case "revert":
-      return { ...state, editedMoUSD: originalDeposit.currentMoUSD };
+      return { ...state, editedMEUR: originalDeposit.currentMEUR };
 
     case "updateStore": {
       const {
@@ -72,8 +72,8 @@ const reduce = (
       const newState = { ...state, originalDeposit: updatedDeposit };
 
       const changeCommitted =
-        !updatedDeposit.initialMoUSD.eq(originalDeposit.initialMoUSD) ||
-        updatedDeposit.currentMoUSD.gt(originalDeposit.currentMoUSD) ||
+        !updatedDeposit.initialMEUR.eq(originalDeposit.initialMEUR) ||
+        updatedDeposit.currentMEUR.gt(originalDeposit.currentMEUR) ||
         updatedDeposit.collateralGain.lt(originalDeposit.collateralGain) ||
         updatedDeposit.msicReward.lt(originalDeposit.msicReward);
 
@@ -83,7 +83,7 @@ const reduce = (
 
       return {
         ...newState,
-        editedMoUSD: updatedDeposit.apply(originalDeposit.whatChanged(editedMoUSD))
+        editedMEUR: updatedDeposit.apply(originalDeposit.whatChanged(editedMEUR))
       };
     }
   }
@@ -92,7 +92,7 @@ const reduce = (
 const transactionId = "stability-deposit";
 
 export const StabilityDepositManager: React.FC = () => {
-  const [{ originalDeposit, editedMoUSD, changePending }, dispatch] = useMosaicReducer(reduce, init);
+  const [{ originalDeposit, editedMEUR, changePending }, dispatch] = useMosaicReducer(reduce, init);
   const validationContext = useMosaicSelector(selectForStabilityDepositChangeValidation);
   const { dispatchEvent } = useStabilityView();
 
@@ -102,7 +102,7 @@ export const StabilityDepositManager: React.FC = () => {
 
   const [validChange, description] = validateStabilityDepositChange(
     originalDeposit,
-    editedMoUSD,
+    editedMEUR,
     validationContext
   );
 
@@ -126,7 +126,7 @@ export const StabilityDepositManager: React.FC = () => {
   return (
     <StabilityDepositEditor
       originalDeposit={originalDeposit}
-      editedMoUSD={editedMoUSD}
+      editedMEUR={editedMEUR}
       changePending={changePending}
       dispatch={dispatch}
     >

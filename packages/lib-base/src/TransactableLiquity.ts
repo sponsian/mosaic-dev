@@ -31,7 +31,7 @@ export interface TroveCreationDetails {
   /** The Trove that was created by the transaction. */
   newTrove: Trove;
 
-  /** Amount of MoUSD added to the Trove's debt as borrowing fee. */
+  /** Amount of MEUR added to the Trove's debt as borrowing fee. */
   fee: Decimal;
 }
 
@@ -47,7 +47,7 @@ export interface TroveAdjustmentDetails {
   /** New state of the adjusted Trove directly after the transaction. */
   newTrove: Trove;
 
-  /** Amount of MoUSD added to the Trove's debt as borrowing fee. */
+  /** Amount of MEUR added to the Trove's debt as borrowing fee. */
   fee: Decimal;
 }
 
@@ -74,7 +74,7 @@ export interface LiquidationDetails {
   /** Total collateral liquidated and debt cleared by the transaction. */
   totalLiquidated: Trove;
 
-  /** Amount of MoUSD paid to the liquidator as gas compensation. */
+  /** Amount of MEUR paid to the liquidator as gas compensation. */
   msicGasCompensation: Decimal;
 
   /** Amount of native currency (e.g. Ether) paid to the liquidator as gas compensation. */
@@ -82,24 +82,24 @@ export interface LiquidationDetails {
 }
 
 /**
- * Details of a {@link TransactableMosaic.redeemMoUSD | redeemMoUSD()} transaction.
+ * Details of a {@link TransactableMosaic.redeemMEUR | redeemMEUR()} transaction.
  *
  * @public
  */
 export interface RedemptionDetails {
-  /** Amount of MoUSD the redeemer tried to redeem. */
-  attemptedMoUSDAmount: Decimal;
+  /** Amount of MEUR the redeemer tried to redeem. */
+  attemptedMEURAmount: Decimal;
 
   /**
-   * Amount of MoUSD that was actually redeemed by the transaction.
+   * Amount of MEUR that was actually redeemed by the transaction.
    *
    * @remarks
-   * This can end up being lower than `attemptedMoUSDAmount` due to interference from another
+   * This can end up being lower than `attemptedMEURAmount` due to interference from another
    * transaction that modifies the list of Troves.
    *
    * @public
    */
-  actualMoUSDAmount: Decimal;
+  actualMEURAmount: Decimal;
 
   /** Amount of collateral (e.g. Ether) taken from Troves by the transaction. */
   collateralTaken: Decimal;
@@ -116,11 +116,11 @@ export interface RedemptionDetails {
  * @public
  */
 export interface StabilityPoolGainsWithdrawalDetails {
-  /** Amount of MoUSD burned from the deposit by liquidations since the last modification. */
+  /** Amount of MEUR burned from the deposit by liquidations since the last modification. */
   msicLoss: Decimal;
 
-  /** Amount of MoUSD in the deposit directly after this transaction. */
-  newMoUSDDeposit: Decimal;
+  /** Amount of MEUR in the deposit directly after this transaction. */
+  newMEURDeposit: Decimal;
 
   /** Amount of native currency (e.g. Ether) paid out to the depositor in this transaction. */
   collateralGain: Decimal;
@@ -131,8 +131,8 @@ export interface StabilityPoolGainsWithdrawalDetails {
 
 /**
  * Details of a
- * {@link TransactableMosaic.depositMoUSDInStabilityPool | depositMoUSDInStabilityPool()} or
- * {@link TransactableMosaic.withdrawMoUSDFromStabilityPool | withdrawMoUSDFromStabilityPool()}
+ * {@link TransactableMosaic.depositMEURInStabilityPool | depositMEURInStabilityPool()} or
+ * {@link TransactableMosaic.withdrawMEURFromStabilityPool | withdrawMEURFromStabilityPool()}
  * transaction.
  *
  * @public
@@ -167,7 +167,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
  */
 export interface TransactableMosaic {
   /**
-   * Open a new Trove by depositing collateral and borrowing MoUSD.
+   * Open a new Trove by depositing collateral and borrowing MEUR.
    *
    * @param params - How much to deposit and borrow.
    * @param maxBorrowingRate - Maximum acceptable
@@ -199,14 +199,14 @@ export interface TransactableMosaic {
    * @param params - Parameters of the adjustment.
    * @param maxBorrowingRate - Maximum acceptable
    *                           {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate} if
-   *                           `params` includes `borrowMoUSD`.
+   *                           `params` includes `borrowMEUR`.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    *
    * @remarks
    * The transaction will fail if the Trove's debt would fall below
-   * {@link @mosaic/lib-base#MoUSD_MINIMUM_DEBT}.
+   * {@link @mosaic/lib-base#MEUR_MINIMUM_DEBT}.
    *
    * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
@@ -251,9 +251,9 @@ export interface TransactableMosaic {
   withdrawCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
 
   /**
-   * Adjust existing Trove by borrowing more MoUSD.
+   * Adjust existing Trove by borrowing more MEUR.
    *
-   * @param amount - The amount of MoUSD to borrow.
+   * @param amount - The amount of MEUR to borrow.
    * @param maxBorrowingRate - Maximum acceptable
    *                           {@link @mosaic/lib-base#Fees.borrowingRate | borrowing rate}.
    *
@@ -264,15 +264,15 @@ export interface TransactableMosaic {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ borrowMoUSD: amount }, maxBorrowingRate)
+   * adjustTrove({ borrowMEUR: amount }, maxBorrowingRate)
    * ```
    */
-  borrowMoUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
+  borrowMEUR(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
 
   /**
    * Adjust existing Trove by repaying some of its debt.
    *
-   * @param amount - The amount of MoUSD to repay.
+   * @param amount - The amount of MEUR to repay.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -281,10 +281,10 @@ export interface TransactableMosaic {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ repayMoUSD: amount })
+   * adjustTrove({ repayMEUR: amount })
    * ```
    */
-  repayMoUSD(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+  repayMEUR(amount: Decimalish): Promise<TroveAdjustmentDetails>;
 
   /** @internal */
   setPrice(price: Decimalish): Promise<void>;
@@ -312,7 +312,7 @@ export interface TransactableMosaic {
   /**
    * Make a new Stability Deposit, or top up existing one.
    *
-   * @param amount - Amount of MoUSD to add to new or existing deposit.
+   * @param amount - Amount of MEUR to add to new or existing deposit.
    * @param frontendTag - Address that should receive a share of this deposit's MSIC rewards.
    *
    * @throws
@@ -325,15 +325,15 @@ export interface TransactableMosaic {
    * {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
    * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward}.
    */
-  depositMoUSDInStabilityPool(
+  depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
   ): Promise<StabilityDepositChangeDetails>;
 
   /**
-   * Withdraw MoUSD from Stability Deposit.
+   * Withdraw MEUR from Stability Deposit.
    *
-   * @param amount - Amount of MoUSD to withdraw.
+   * @param amount - Amount of MEUR to withdraw.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -343,7 +343,7 @@ export interface TransactableMosaic {
    * {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
    * {@link @mosaic/lib-base#StabilityDeposit.msicReward | MSIC reward}.
    */
-  withdrawMoUSDFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
+  withdrawMEURFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
 
   /**
    * Withdraw {@link @mosaic/lib-base#StabilityDeposit.collateralGain | collateral gain} and
@@ -370,15 +370,15 @@ export interface TransactableMosaic {
   transferCollateralGainToTrove(): Promise<CollateralGainTransferDetails>;
 
   /**
-   * Send MoUSD tokens to an address.
+   * Send MEUR tokens to an address.
    *
    * @param toAddress - Address of receipient.
-   * @param amount - Amount of MoUSD to send.
+   * @param amount - Amount of MEUR to send.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    */
-  sendMoUSD(toAddress: string, amount: Decimalish): Promise<void>;
+  sendMEUR(toAddress: string, amount: Decimalish): Promise<void>;
 
   /**
    * Send MSIC tokens to an address.
@@ -392,9 +392,9 @@ export interface TransactableMosaic {
   sendMSIC(toAddress: string, amount: Decimalish): Promise<void>;
 
   /**
-   * Redeem MoUSD to native currency (e.g. Ether) at face value.
+   * Redeem MEUR to native currency (e.g. Ether) at face value.
    *
-   * @param amount - Amount of MoUSD to be redeemed.
+   * @param amount - Amount of MEUR to be redeemed.
    * @param maxRedemptionRate - Maximum acceptable
    *                            {@link @mosaic/lib-base#Fees.redemptionRate | redemption rate}.
    *
@@ -405,7 +405,7 @@ export interface TransactableMosaic {
    * If `maxRedemptionRate` is omitted, the current redemption rate (based on `amount`) plus 0.1%
    * is used as maximum acceptable rate.
    */
-  redeemMoUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
+  redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
 
   /**
    * Claim leftover collateral after a liquidation or redemption.
@@ -430,7 +430,7 @@ export interface TransactableMosaic {
    * @remarks
    * As a side-effect, the transaction will also pay out an existing MSIC stake's
    * {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain}.
+   * {@link @mosaic/lib-base#MSICStake.msicGain | MEUR gain}.
    */
   stakeMSIC(amount: Decimalish): Promise<void>;
 
@@ -445,13 +445,13 @@ export interface TransactableMosaic {
    * @remarks
    * As a side-effect, the transaction will also pay out the MSIC stake's
    * {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain}.
+   * {@link @mosaic/lib-base#MSICStake.msicGain | MEUR gain}.
    */
   unstakeMSIC(amount: Decimalish): Promise<void>;
 
   /**
    * Withdraw {@link @mosaic/lib-base#MSICStake.collateralGain | collateral gain} and
-   * {@link @mosaic/lib-base#MSICStake.msicGain | MoUSD gain} from MSIC stake.
+   * {@link @mosaic/lib-base#MSICStake.msicGain | MEUR gain} from MSIC stake.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -459,7 +459,7 @@ export interface TransactableMosaic {
   withdrawGainsFromStaking(): Promise<void>;
 
   /**
-   * Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for
+   * Allow the liquidity mining contract to use Uniswap REEF/MEUR LP tokens for
    * {@link @mosaic/lib-base#TransactableMosaic.stakeUniTokens | staking}.
    *
    * @param allowance - Maximum amount of LP tokens that will be transferrable to liquidity mining
@@ -475,7 +475,7 @@ export interface TransactableMosaic {
   approveUniTokens(allowance?: Decimalish): Promise<void>;
 
   /**
-   * Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC.
+   * Stake Uniswap REEF/MEUR LP tokens to participate in liquidity mining and earn MSIC.
    *
    * @param amount - Amount of LP tokens to add to new or existing stake.
    *
@@ -485,7 +485,7 @@ export interface TransactableMosaic {
   stakeUniTokens(amount: Decimalish): Promise<void>;
 
   /**
-   * Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining.
+   * Withdraw Uniswap REEF/MEUR LP tokens from liquidity mining.
    *
    * @param amount - Amount of LP tokens to withdraw.
    *

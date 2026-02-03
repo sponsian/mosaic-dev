@@ -67,11 +67,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_F_MoUSD",
+          "name": "_F_MEUR",
           "type": "uint256"
         }
       ],
-      "name": "F_MoUSDUpdated",
+      "name": "F_MEURUpdated",
       "type": "event"
     },
     {
@@ -97,7 +97,7 @@
           "type": "address"
         }
       ],
-      "name": "MoUSDTokenAddressSet",
+      "name": "MEURTokenAddressSet",
       "type": "event"
     },
     {
@@ -137,7 +137,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_F_MoUSD",
+          "name": "_F_MEUR",
           "type": "uint256"
         }
       ],
@@ -156,7 +156,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "MoUSDGain",
+          "name": "MEURGain",
           "type": "uint256"
         },
         {
@@ -222,7 +222,7 @@
           "type": "address"
         }
       ],
-      "name": "getPendingMoUSDGain",
+      "name": "getPendingMEURGain",
       "outputs": [
         {
           "internalType": "uint256",
@@ -254,7 +254,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseF_MoUSD",
+      "name": "increaseF_MEUR",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

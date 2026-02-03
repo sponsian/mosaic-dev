@@ -4,7 +4,7 @@
 
 ## TransactableMosaic.openTrove() method
 
-Open a new Trove by depositing collateral and borrowing MoUSD.
+Open a new Trove by depositing collateral and borrowing MEUR.
 
 <b>Signature:</b>
 

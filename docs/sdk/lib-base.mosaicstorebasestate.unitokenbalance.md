@@ -4,7 +4,7 @@
 
 ## MosaicStoreBaseState.uniTokenBalance property
 
-User's Uniswap REEF/MoUSD LP token balance.
+User's Uniswap REEF/MEUR LP token balance.
 
 <b>Signature:</b>
 

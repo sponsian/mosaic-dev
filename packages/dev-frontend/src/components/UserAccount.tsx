@@ -23,9 +23,9 @@ export const UserAccount: React.FC = () => {
   const { account } = useMosaic();
   const { accountBalance, msicBalance: realMousdBalance, msicBalance } = useMosaicSelector(select);
   const { bMousdBalance, msicBalance: customMousdBalance } = useBondView();
-  const { MoUSD_OVERRIDE_ADDRESS } = useBondAddresses();
+  const { MEUR_OVERRIDE_ADDRESS } = useBondAddresses();
 
-  const msicBalance = MoUSD_OVERRIDE_ADDRESS === null ? realMousdBalance : customMousdBalance;
+  const msicBalance = MEUR_OVERRIDE_ADDRESS === null ? realMousdBalance : customMousdBalance;
 
   return (
     <Flex>
@@ -56,7 +56,7 @@ export const UserAccount: React.FC = () => {
           ["REEF", accountBalance],
           [COIN, Decimal.from(msicBalance || 0)],
           [GT, Decimal.from(msicBalance)],
-          ["bMoUSD", Decimal.from(bMousdBalance || 0)]
+          ["bMEUR", Decimal.from(bMousdBalance || 0)]
         ] as const).map(([currency, balance], i) => (
           <Flex key={i} sx={{ ml: 3, flexDirection: "column" }}>
             <Heading sx={{ fontSize: 1 }}>{currency}</Heading>

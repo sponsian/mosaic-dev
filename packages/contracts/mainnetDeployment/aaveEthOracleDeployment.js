@@ -21,10 +21,10 @@ async function main() {
   const deployerWalletAddress = deployerWallet.address;
   console.log('Deployer: ', deployerWalletAddress);
 
-  const MoUSDUsdToMoUSDReefEthersFactory = await ethers.getContractFactory("MoUSDUsdToMoUSDReef", deployerWallet)
-  const msicUsdToMoUSDReef = await MoUSDUsdToMoUSDReefEthersFactory.deploy()
-  console.log(`MoUSDUsdToMoUSDEth address: ${msicUsdToMoUSDReef.address}`)
-  console.log(`MoUSDUsdToMoUSDEth price:   ${await msicUsdToMoUSDReef.latestAnswer()}`)
+  const MEURUsdToMEURReefEthersFactory = await ethers.getContractFactory("MEURUsdToMEURReef", deployerWallet)
+  const msicUsdToMEURReef = await MEURUsdToMEURReefEthersFactory.deploy()
+  console.log(`MEURUsdToMEUREth address: ${msicUsdToMEURReef.address}`)
+  console.log(`MEURUsdToMEUREth price:   ${await msicUsdToMEURReef.latestAnswer()}`)
 
 }
 

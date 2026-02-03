@@ -27,7 +27,7 @@ contract('All Mosaic functions with onlyOwner modifier', async accounts => {
   before(async () => {
     contracts = await deploymentHelper.deployMosaicCore()
     contracts.borrowerOperations = await BorrowerOperationsTester.new()
-    contracts = await deploymentHelper.deployMoUSDToken(contracts)
+    contracts = await deploymentHelper.deployMEURToken(contracts)
     const MSICContracts = await deploymentHelper.deployMSICContracts(bountyAddress, lpRewardsAddress, multisig)
 
     msicToken = contracts.msicToken

@@ -22,9 +22,9 @@ export class _CachedReadableMosaic<T extends unknown[]> implements _ReadableMosa
     // (undocumented)
     getMSICStake(address?: string, ...extraParams: T): Promise<MSICStake>;
     // (undocumented)
-    getMoUSDBalance(address?: string, ...extraParams: T): Promise<Decimal>;
+    getMEURBalance(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
-    getMoUSDInStabilityPool(...extraParams: T): Promise<Decimal>;
+    getMEURInStabilityPool(...extraParams: T): Promise<Decimal>;
     // (undocumented)
     getNumberOfTroves(...extraParams: T): Promise<number>;
     // (undocumented)
@@ -81,7 +81,7 @@ export type _CollateralWithdrawal<T> = {
 export const CRITICAL_COLLATERAL_RATIO: Decimal;
 
 // @internal (undocumented)
-export type _DebtChange<T> = (_MoUSDBorrowing<T> & _NoMoUSDRepayment) | (_MoUSDRepayment<T> & _NoMoUSDBorrowing);
+export type _DebtChange<T> = (_MEURBorrowing<T> & _NoMEURRepayment) | (_MEURRepayment<T> & _NoMEURBorrowing);
 
 // @public
 export class Decimal {
@@ -332,22 +332,22 @@ export type MSICStakeChange<T> = {
 };
 
 // @public
-export const MoUSD_LIQUIDATION_RESERVE: Decimal;
+export const MEUR_LIQUIDATION_RESERVE: Decimal;
 
 // @public
-export const MoUSD_MINIMUM_DEBT: Decimal;
+export const MEUR_MINIMUM_DEBT: Decimal;
 
 // @public
-export const MoUSD_MINIMUM_NET_DEBT: Decimal;
+export const MEUR_MINIMUM_NET_DEBT: Decimal;
 
 // @internal (undocumented)
-export type _MoUSDBorrowing<T> = {
-    borrowMoUSD: T;
+export type _MEURBorrowing<T> = {
+    borrowMEUR: T;
 };
 
 // @internal (undocumented)
-export type _MoUSDRepayment<T> = {
-    repayMoUSD: T;
+export type _MEURRepayment<T> = {
+    repayMEUR: T;
 };
 
 // @public
@@ -375,13 +375,13 @@ export type _NoCollateralDeposit = Partial<_CollateralDeposit<undefined>>;
 export type _NoCollateralWithdrawal = Partial<_CollateralWithdrawal<undefined>>;
 
 // @internal (undocumented)
-export type _NoDebtChange = _NoMoUSDBorrowing & _NoMoUSDRepayment;
+export type _NoDebtChange = _NoMEURBorrowing & _NoMEURRepayment;
 
 // @internal (undocumented)
-export type _NoMoUSDBorrowing = Partial<_MoUSDBorrowing<undefined>>;
+export type _NoMEURBorrowing = Partial<_MEURBorrowing<undefined>>;
 
 // @internal (undocumented)
-export type _NoMoUSDRepayment = Partial<_MoUSDRepayment<undefined>>;
+export type _NoMEURRepayment = Partial<_MEURRepayment<undefined>>;
 
 // @internal (undocumented)
 export const _normalizeTroveAdjustment: (params: Record<string, Decimalish | undefined>) => TroveAdjustmentParams<Decimal>;
@@ -392,9 +392,9 @@ export const _normalizeTroveCreation: (params: Record<string, Decimalish | undef
 // @alpha (undocumented)
 export interface ObservableMosaic {
     // (undocumented)
-    watchMoUSDBalance(onMoUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
+    watchMEURBalance(onMEURBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
     // (undocumented)
-    watchMoUSDInStabilityPool(onMoUSDInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void): () => void;
+    watchMEURInStabilityPool(onMEURInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void): () => void;
     // (undocumented)
     watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
     // (undocumented)
@@ -446,20 +446,20 @@ export type _PopulatableFrom<T, P> = {
 export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableMosaic<R, S>, P> {
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
     approveUniTokens(allowance?: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
-    borrowMoUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
+    borrowMEUR(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
     claimCollateralSurplus(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     closeTrove(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveClosureDetails>>>>;
     depositCollateral(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
-    depositMoUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>>;
+    depositMEURInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>>;
     exitLiquidityMining(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     liquidate(address: string | string[]): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>>;
     liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>>;
     openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveCreationDetails>>>>;
-    redeemMoUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
+    redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     registerFrontend(kickbackRate: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
-    repayMoUSD(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
+    repayMEUR(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
     sendMSIC(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
-    sendMoUSD(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
+    sendMEUR(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     stakeMSIC(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
@@ -471,7 +471,7 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown> extend
     withdrawGainsFromStabilityPool(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
     withdrawGainsFromStaking(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     withdrawMSICRewardFromLiquidityMining(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
-    withdrawMoUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>>;
+    withdrawMEURFromStabilityPool(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>>;
 }
 
 // @public
@@ -482,10 +482,10 @@ export interface PopulatedMosaicTransaction<P = unknown, T extends SentMosaicTra
 
 // @public
 export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> extends PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>> {
-    readonly attemptedMoUSDAmount: Decimal;
+    readonly attemptedMEURAmount: Decimal;
     increaseAmountByMinimumNetDebt(maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     readonly isTruncated: boolean;
-    readonly redeemableMoUSDAmount: Decimal;
+    readonly redeemableMEURAmount: Decimal;
 }
 
 // @public
@@ -497,8 +497,8 @@ export interface ReadableMosaic {
     getLiquidityMiningStake(address?: string): Promise<Decimal>;
     getMSICBalance(address?: string): Promise<Decimal>;
     getMSICStake(address?: string): Promise<MSICStake>;
-    getMoUSDBalance(address?: string): Promise<Decimal>;
-    getMoUSDInStabilityPool(): Promise<Decimal>;
+    getMEURBalance(address?: string): Promise<Decimal>;
+    getMEURInStabilityPool(): Promise<Decimal>;
     getNumberOfTroves(): Promise<number>;
     getPrice(): Promise<Decimal>;
     getRemainingLiquidityMiningMSICReward(): Promise<Decimal>;
@@ -536,8 +536,8 @@ export type _ReadableMosaicWithExtraParamsBase<T extends unknown[]> = {
 
 // @public
 export interface RedemptionDetails {
-    actualMoUSDAmount: Decimal;
-    attemptedMoUSDAmount: Decimal;
+    actualMEURAmount: Decimal;
+    attemptedMEURAmount: Decimal;
     collateralTaken: Decimal;
     fee: Decimal;
 }
@@ -553,20 +553,20 @@ export type _SendableFrom<T, R, S> = {
 export interface SendableMosaic<R = unknown, S = unknown> extends _SendableFrom<TransactableMosaic, R, S> {
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
     approveUniTokens(allowance?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
-    borrowMoUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
+    borrowMEUR(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
     claimCollateralSurplus(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     closeTrove(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveClosureDetails>>>;
     depositCollateral(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
-    depositMoUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
+    depositMEURInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
     exitLiquidityMining(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     liquidate(address: string | string[]): Promise<SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>;
     liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>;
     openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveCreationDetails>>>;
-    redeemMoUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>>;
+    redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>>;
     registerFrontend(kickbackRate: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
-    repayMoUSD(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
+    repayMEUR(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
     sendMSIC(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
-    sendMoUSD(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
+    sendMEUR(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     stakeMSIC(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
@@ -578,7 +578,7 @@ export interface SendableMosaic<R = unknown, S = unknown> extends _SendableFrom<
     withdrawGainsFromStabilityPool(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
     withdrawGainsFromStaking(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     withdrawMSICRewardFromLiquidityMining(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
-    withdrawMoUSDFromStabilityPool(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
+    withdrawMEURFromStabilityPool(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
 }
 
 // @public
@@ -591,29 +591,29 @@ export interface SentMosaicTransaction<S = unknown, T extends MosaicReceipt = Mo
 // @public
 export class StabilityDeposit {
     // @internal
-    constructor(initialMoUSD: Decimal, currentMoUSD: Decimal, collateralGain: Decimal, msicReward: Decimal, frontendTag: string);
+    constructor(initialMEUR: Decimal, currentMEUR: Decimal, collateralGain: Decimal, msicReward: Decimal, frontendTag: string);
     apply(change: StabilityDepositChange<Decimalish> | undefined): Decimal;
     readonly collateralGain: Decimal;
-    readonly currentMoUSD: Decimal;
+    readonly currentMEUR: Decimal;
     equals(that: StabilityDeposit): boolean;
     readonly frontendTag: string;
-    readonly initialMoUSD: Decimal;
+    readonly initialMEUR: Decimal;
     // (undocumented)
     get isEmpty(): boolean;
     readonly msicReward: Decimal;
     // @internal (undocumented)
     toString(): string;
-    whatChanged(thatMoUSD: Decimalish): StabilityDepositChange<Decimal> | undefined;
+    whatChanged(thatMEUR: Decimalish): StabilityDepositChange<Decimal> | undefined;
 }
 
 // @public
 export type StabilityDepositChange<T> = {
-    depositMoUSD: T;
-    withdrawMoUSD?: undefined;
+    depositMEUR: T;
+    withdrawMEUR?: undefined;
 } | {
-    depositMoUSD?: undefined;
-    withdrawMoUSD: T;
-    withdrawAllMoUSD: boolean;
+    depositMEUR?: undefined;
+    withdrawMEUR: T;
+    withdrawAllMEUR: boolean;
 };
 
 // @public
@@ -626,7 +626,7 @@ export interface StabilityPoolGainsWithdrawalDetails {
     collateralGain: Decimal;
     msicReward: Decimal;
     msicLoss: Decimal;
-    newMoUSDDeposit: Decimal;
+    newMEURDeposit: Decimal;
 }
 
 // @public
@@ -643,20 +643,20 @@ export const _successfulReceipt: <R, D>(rawReceipt: R, details: D, toString?: ((
 export interface TransactableMosaic {
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
     approveUniTokens(allowance?: Decimalish): Promise<void>;
-    borrowMoUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
+    borrowMEUR(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
     claimCollateralSurplus(): Promise<void>;
     closeTrove(): Promise<TroveClosureDetails>;
     depositCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
-    depositMoUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<StabilityDepositChangeDetails>;
+    depositMEURInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<StabilityDepositChangeDetails>;
     exitLiquidityMining(): Promise<void>;
     liquidate(address: string | string[]): Promise<LiquidationDetails>;
     liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<LiquidationDetails>;
     openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<TroveCreationDetails>;
-    redeemMoUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
+    redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
     registerFrontend(kickbackRate: Decimalish): Promise<void>;
-    repayMoUSD(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+    repayMEUR(amount: Decimalish): Promise<TroveAdjustmentDetails>;
     sendMSIC(toAddress: string, amount: Decimalish): Promise<void>;
-    sendMoUSD(toAddress: string, amount: Decimalish): Promise<void>;
+    sendMEUR(toAddress: string, amount: Decimalish): Promise<void>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<void>;
     stakeMSIC(amount: Decimalish): Promise<void>;
@@ -668,7 +668,7 @@ export interface TransactableMosaic {
     withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
     withdrawGainsFromStaking(): Promise<void>;
     withdrawMSICRewardFromLiquidityMining(): Promise<void>;
-    withdrawMoUSDFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
+    withdrawMEURFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
 }
 
 // @public
@@ -763,11 +763,11 @@ export interface TroveClosureDetails {
 
 // Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_CollateralWithdrawal" which is marked as @internal
 // Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_NoCollateralDeposit" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_MoUSDRepayment" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_NoMoUSDBorrowing" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_MEURRepayment" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_NoMEURBorrowing" which is marked as @internal
 //
 // @public
-export type TroveClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_MoUSDRepayment<T>> & _NoMoUSDBorrowing;
+export type TroveClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_MEURRepayment<T>> & _NoMEURBorrowing;
 
 // @public
 export interface TroveCreationDetails {
@@ -781,11 +781,11 @@ export type TroveCreationError = "missingLiquidationReserve";
 
 // Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_CollateralDeposit" which is marked as @internal
 // Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_NoCollateralWithdrawal" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_MoUSDBorrowing" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_NoMoUSDRepayment" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_MEURBorrowing" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_NoMEURRepayment" which is marked as @internal
 //
 // @public
-export type TroveCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _MoUSDBorrowing<T> & _NoMoUSDRepayment;
+export type TroveCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _MEURBorrowing<T> & _NoMEURRepayment;
 
 // @public
 export interface TroveListingParams {

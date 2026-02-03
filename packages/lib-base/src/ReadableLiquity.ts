@@ -107,16 +107,16 @@ export interface ReadableMosaic {
   getRemainingStabilityPoolMSICReward(): Promise<Decimal>;
 
   /**
-   * Get the total amount of MoUSD currently deposited in the Stability Pool.
+   * Get the total amount of MEUR currently deposited in the Stability Pool.
    */
-  getMoUSDInStabilityPool(): Promise<Decimal>;
+  getMEURInStabilityPool(): Promise<Decimal>;
 
   /**
-   * Get the amount of MoUSD held by an address.
+   * Get the amount of MEUR held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
-  getMoUSDBalance(address?: string): Promise<Decimal>;
+  getMEURBalance(address?: string): Promise<Decimal>;
 
   /**
    * Get the amount of MSIC held by an address.
@@ -126,16 +126,16 @@ export interface ReadableMosaic {
   getMSICBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the amount of Uniswap REEF/MoUSD LP tokens held by an address.
+   * Get the amount of Uniswap REEF/MEUR LP tokens held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
   getUniTokenBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens.
+   * Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MEUR LP tokens.
    *
-   * @param address - Address holding the Uniswap REEF/MoUSD LP tokens.
+   * @param address - Address holding the Uniswap REEF/MEUR LP tokens.
    */
   getUniTokenAllowance(address?: string): Promise<Decimal>;
 
@@ -145,14 +145,14 @@ export interface ReadableMosaic {
   getRemainingLiquidityMiningMSICReward(): Promise<Decimal>;
 
   /**
-   * Get the amount of Uniswap REEF/MoUSD LP tokens currently staked by an address in liquidity mining.
+   * Get the amount of Uniswap REEF/MEUR LP tokens currently staked by an address in liquidity mining.
    *
    * @param address - Address whose LP stake should be retrieved.
    */
   getLiquidityMiningStake(address?: string): Promise<Decimal>;
 
   /**
-   * Get the total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining.
+   * Get the total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining.
    */
   getTotalStakedUniTokens(): Promise<Decimal>;
 

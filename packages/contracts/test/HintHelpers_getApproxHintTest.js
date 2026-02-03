@@ -8,7 +8,7 @@ const moneyVals = testHelpers.MoneyValues
 let latestRandomSeed = 31337
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
-const MoUSDToken = artifacts.require("MoUSDToken")
+const MEURToken = artifacts.require("MEURToken")
 
 contract('HintHelpers', async accounts => {
  
@@ -28,19 +28,19 @@ contract('HintHelpers', async accounts => {
 
   const getNetBorrowingAmount = async (debtWithFee) => th.getNetBorrowingAmount(contracts, debtWithFee)
 
-  /* Open a Trove for each account. MoUSD debt is 200 MoUSD each, with collateral beginning at
+  /* Open a Trove for each account. MEUR debt is 200 MEUR each, with collateral beginning at
   1.5 ether, and rising by 0.01 ether per Trove.  Hence, the ICR of account (i + 1) is always 1% greater than the ICR of account i. 
  */
 
- // Open Troves in parallel, then withdraw MoUSD in parallel
+ // Open Troves in parallel, then withdraw MEUR in parallel
  const makeTrovesInParallel = async (accounts, n) => {
   activeAccounts = accounts.slice(0,n)
   // console.log(`number of accounts used is: ${activeAccounts.length}`)
   // console.time("makeTrovesInParallel")
   const openTrovepromises = activeAccounts.map((account, index) => openTrove(account, index))
   await Promise.all(openTrovepromises)
-  const withdrawMoUSDpromises = activeAccounts.map(account => withdrawMoUSDfromTrove(account))
-  await Promise.all(withdrawMoUSDpromises)
+  const withdrawMEURpromises = activeAccounts.map(account => withdrawMEURfromTrove(account))
+  await Promise.all(withdrawMEURpromises)
   // console.timeEnd("makeTrovesInParallel")
  }
 
@@ -50,11 +50,11 @@ contract('HintHelpers', async accounts => {
    await borrowerOperations.openTrove(th._100pct, 0, account, account, { from: account, value: coll })
  }
 
- const withdrawMoUSDfromTrove = async (account) => {
-  await borrowerOperations.withdrawMoUSD(th._100pct, '100000000000000000000', account, account, { from: account })
+ const withdrawMEURfromTrove = async (account) => {
+  await borrowerOperations.withdrawMEUR(th._100pct, '100000000000000000000', account, account, { from: account })
  }
 
- // Sequentially add coll and withdraw MoUSD, 1 account at a time
+ // Sequentially add coll and withdraw MEUR, 1 account at a time
   const makeTrovesInSequence = async (accounts, n) => {
     activeAccounts = accounts.slice(0,n)
     // console.log(`number of accounts used is: ${activeAccounts.length}`)
@@ -64,7 +64,7 @@ contract('HintHelpers', async accounts => {
     // console.time('makeTrovesInSequence')
     for (const account of activeAccounts) {
       const ICR_BN = toBN(ICR.toString().concat('0'.repeat(16)))
-      await th.openTrove(contracts, { extraMoUSDAmount: toBN(dec(10000, 18)), ICR: ICR_BN, extraParams: { from: account } })
+      await th.openTrove(contracts, { extraMEURAmount: toBN(dec(10000, 18)), ICR: ICR_BN, extraParams: { from: account } })
 
       ICR += 1
     }
@@ -74,7 +74,7 @@ contract('HintHelpers', async accounts => {
   before(async () => {
     contracts = await deploymentHelper.deployMosaicCore()
     contracts.troveManager = await TroveManagerTester.new()
-    contracts.msicToken = await MoUSDToken.new(
+    contracts.msicToken = await MEURToken.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address

@@ -26,7 +26,7 @@ borrowingRate(when?: Date): Decimal;
 
 By default, the fee is calculated at the time of the latest block. This can be overridden using the `when` parameter.
 
-To calculate the borrowing fee in MoUSD, multiply the borrowed MoUSD amount by the borrowing rate.
+To calculate the borrowing fee in MEUR, multiply the borrowed MEUR amount by the borrowing rate.
 
 ## Example
 
@@ -34,9 +34,9 @@ To calculate the borrowing fee in MoUSD, multiply the borrowed MoUSD amount by t
 ```typescript
 const fees = await mosaic.getFees();
 
-const borrowedMoUSDAmount = 100;
+const borrowedMEURAmount = 100;
 const borrowingRate = fees.borrowingRate();
-const borrowingFeeMoUSD = borrowingRate.mul(borrowedMoUSDAmount);
+const borrowingFeeMEUR = borrowingRate.mul(borrowedMEURAmount);
 
 ```
 

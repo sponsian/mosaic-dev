@@ -18,6 +18,6 @@ export interface LiquidationDetails
 |  --- | --- | --- |
 |  [collateralGasCompensation](./lib-base.liquidationdetails.collateralgascompensation.md) | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) paid to the liquidator as gas compensation. |
 |  [liquidatedAddresses](./lib-base.liquidationdetails.liquidatedaddresses.md) | string\[\] | Addresses whose Troves were liquidated by the transaction. |
-|  [msicGasCompensation](./lib-base.liquidationdetails.msicgascompensation.md) | [Decimal](./lib-base.decimal.md) | Amount of MoUSD paid to the liquidator as gas compensation. |
+|  [msicGasCompensation](./lib-base.liquidationdetails.msicgascompensation.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR paid to the liquidator as gas compensation. |
 |  [totalLiquidated](./lib-base.liquidationdetails.totalliquidated.md) | [Trove](./lib-base.trove.md) | Total collateral liquidated and debt cleared by the transaction. |
 

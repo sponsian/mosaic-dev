@@ -52,23 +52,23 @@ Using previously deployed ACCOUNT_3 lockup contract at address 0xC4aC0c3083B566C
 current Chainlink price: 208245000000
 current Tellor price: 2079719999
 current Tellor timestamp: 1617543803
-MoUSD-REEF Pair's current MoUSD reserves: 40.036378355965833891
-MoUSD-REEF Pair's current REEF reserves: .188993756164807541
+MEUR-REEF Pair's current MEUR reserves: 40.036378355965833891
+MEUR-REEF Pair's current REEF reserves: .188993756164807541
 number of troves: 3 
 Trove list size: 3 
 Entire system debt: 7425.000000000000000000
 Entire system coll: 6.000000000000000000
 Base rate: .000000000000000000
 Current borrowing rate: .005000000000000000
-Total MoUSD SP deposits: 34.160000000000000000
+Total MEUR SP deposits: 34.160000000000000000
 Total MSIC staked: 39.000000000000000000
-Total LP (MoUSD-REEF) tokens staked in unipool: .552691887045032822
+Total LP (MEUR-REEF) tokens staked in unipool: .552691887045032822
 TroveManager state variables:
 Total trove stakes: 6.000000000000000000
 Snapshot of total trove stakes before last liq. : .000000000000000000
 Snapshot of total trove collateral before last liq. : .000000000000000000
 L_ETH: .000000000000000000
-L_MoUSDDebt: .000000000000000000
+L_MEURDebt: .000000000000000000
 StabilityPool state variables:
 Product P: 1.000000000000000000
 Current epoch: .000000000000000000
@@ -76,7 +76,7 @@ Current scale: .000000000000000000
 Sum S, at current epoch and scale: .000000000000000000
 Sum G, at current epoch and scale: 3238094900601384338112.000000000000000000
 MSICStaking state variables:
-F_MoUSD: .867298124760811327
+F_MEUR: .867298124760811327
 F_ETH: .000000000000000000
 CommunityIssuance state variables:
 Total MSIC issued to depositors / front ends: 182628.086243545504000000

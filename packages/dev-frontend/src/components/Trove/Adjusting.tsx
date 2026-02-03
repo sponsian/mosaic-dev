@@ -4,7 +4,7 @@ import {
   MosaicStoreState,
   Decimal,
   Trove,
-  MoUSD_LIQUIDATION_RESERVE,
+  MEUR_LIQUIDATION_RESERVE,
   Percent,
   Difference
 } from "@mosaic/lib-base";
@@ -44,8 +44,8 @@ const GAS_ROOM_ETH = Decimal.from(0.1);
 const feeFrom = (original: Trove, edited: Trove, borrowingRate: Decimal): Decimal => {
   const change = original.whatChanged(edited, borrowingRate);
 
-  if (change && change.type !== "invalidCreation" && change.params.borrowMoUSD) {
-    return change.params.borrowMoUSD.mul(borrowingRate);
+  if (change && change.type !== "invalidCreation" && change.params.borrowMEUR) {
+    return change.params.borrowMEUR.mul(borrowingRate);
   } else {
     return Decimal.ZERO;
   }
@@ -128,7 +128,7 @@ export const Adjusting: React.FC = () => {
   const fee = isDebtIncrease
     ? feeFrom(trove, new Trove(trove.collateral, trove.debt.add(debtIncreaseAmount)), borrowingRate)
     : Decimal.ZERO;
-  const totalDebt = netDebt.add(MoUSD_LIQUIDATION_RESERVE).add(fee);
+  const totalDebt = netDebt.add(MEUR_LIQUIDATION_RESERVE).add(fee);
   const maxBorrowingRate = borrowingRate.add(0.005);
   const updatedTrove = isDirty ? new Trove(collateral, totalDebt) : trove;
   const feePct = new Percent(borrowingRate);
@@ -196,7 +196,7 @@ export const Adjusting: React.FC = () => {
         <StaticRow
           label="Liquidation Reserve"
           inputId="trove-liquidation-reserve"
-          amount={`${MoUSD_LIQUIDATION_RESERVE}`}
+          amount={`${MEUR_LIQUIDATION_RESERVE}`}
           unit={COIN}
           infoIcon={
             <InfoIcon
@@ -238,11 +238,11 @@ export const Adjusting: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "240px" }}>
-                  The total amount of MoUSD your Trove will hold.{" "}
+                  The total amount of MEUR your Trove will hold.{" "}
                   {isDirty && (
                     <>
-                      You will need to repay {totalDebt.sub(MoUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
-                      MoUSD to reclaim your collateral ({MoUSD_LIQUIDATION_RESERVE.toString()} MoUSD
+                      You will need to repay {totalDebt.sub(MEUR_LIQUIDATION_RESERVE).prettify(2)}{" "}
+                      MEUR to reclaim your collateral ({MEUR_LIQUIDATION_RESERVE.toString()} MEUR
                       Liquidation Reserve excluded).
                     </>
                   )}

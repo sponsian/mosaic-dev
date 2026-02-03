@@ -119,9 +119,9 @@ export const BondsTable: React.FC = () => {
               );
               return (
                 <React.Fragment key={idx}>
-                  <Text>{bond.deposit.shorten()} MoUSD</Text>
-                  <Text>{bond.accrued.shorten()} bMoUSD</Text>
-                  <Text>{bond.marketValue.shorten()} MoUSD</Text>
+                  <Text>{bond.deposit.shorten()} MEUR</Text>
+                  <Text>{bond.accrued.shorten()} bMEUR</Text>
+                  <Text>{bond.marketValue.shorten()} MEUR</Text>
                   <Text>
                     <InfiniteEstimate estimate={breakEvenDays} />
                   </Text>

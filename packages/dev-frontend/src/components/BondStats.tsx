@@ -32,15 +32,15 @@ export const BondStats: React.FC<BondStatsProps> = () => {
 
   return (
     <Card variant="info">
-      <Heading sx={{ fontweight: "bold" }}>MoUSD bonds</Heading>
+      <Heading sx={{ fontweight: "bold" }}>MEUR bonds</Heading>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
-        bMoUSD
+        bMEUR
       </Heading>
-      <Statistic lexicon={l.BMoUSD_MARKET_PRICE}>
-        <Metric value={protocolInfo.marketPrice.prettify(3)} unit="MoUSD" />
+      <Statistic lexicon={l.BMEUR_MARKET_PRICE}>
+        <Metric value={protocolInfo.marketPrice.prettify(3)} unit="MEUR" />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_FAIR_PRICE}>
+      <Statistic lexicon={l.BMEUR_FAIR_PRICE}>
         <Metric
           value={
             protocolInfo.fairPrice.lower.eq(Decimal.INFINITY)
@@ -49,16 +49,16 @@ export const BondStats: React.FC<BondStatsProps> = () => {
                   2
                 )} - ${protocolInfo.fairPrice.upper.prettify(2)}`
           }
-          unit="MoUSD"
+          unit="MEUR"
         />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_FLOOR_PRICE}>
-        <Metric value={protocolInfo.floorPriceWithoutPendingHarvests.prettify(4)} unit="MoUSD" />
+      <Statistic lexicon={l.BMEUR_FLOOR_PRICE}>
+        <Metric value={protocolInfo.floorPriceWithoutPendingHarvests.prettify(4)} unit="MEUR" />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_WIND_DOWN_PRICE}>
-        <Metric value={protocolInfo.windDownPrice.prettify(4)} unit="MoUSD" />
+      <Statistic lexicon={l.BMEUR_WIND_DOWN_PRICE}>
+        <Metric value={protocolInfo.windDownPrice.prettify(4)} unit="MEUR" />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_APR}>
+      <Statistic lexicon={l.BMEUR_APR}>
         <Metric
           value={
             protocolInfo.bMousdApr && protocolInfo.bMousdSupply.gt(0)
@@ -68,7 +68,7 @@ export const BondStats: React.FC<BondStatsProps> = () => {
           unit="%"
         />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_LP_APR}>
+      <Statistic lexicon={l.BMEUR_LP_APR}>
         <Metric
           value={
             protocolInfo?.bMousdLpApr !== undefined ? protocolInfo.bMousdLpApr.prettify(2) : "N/A"
@@ -76,7 +76,7 @@ export const BondStats: React.FC<BondStatsProps> = () => {
           unit="%"
         />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_YIELD_AMPLIFICATION}>
+      <Statistic lexicon={l.BMEUR_YIELD_AMPLIFICATION}>
         <Metric
           value={
             protocolInfo.yieldAmplification && protocolInfo.bMousdSupply.gt(0)
@@ -86,8 +86,8 @@ export const BondStats: React.FC<BondStatsProps> = () => {
           unit="x"
         />
       </Statistic>
-      <Statistic lexicon={l.BMoUSD_SUPPLY}>
-        <Metric value={protocolInfo.bMousdSupply.shorten()} unit="bMoUSD" />
+      <Statistic lexicon={l.BMEUR_SUPPLY}>
+        <Metric value={protocolInfo.bMousdSupply.shorten()} unit="bMEUR" />
       </Statistic>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
@@ -110,16 +110,16 @@ export const BondStats: React.FC<BondStatsProps> = () => {
         Treasury
       </Heading>
       <Statistic lexicon={l.TREASURY_PENDING}>
-        <Metric value={protocolInfo.treasury.pending.shorten()} unit="MoUSD" />
+        <Metric value={protocolInfo.treasury.pending.shorten()} unit="MEUR" />
       </Statistic>
       <Statistic lexicon={l.TREASURY_ACQUIRED}>
-        <Metric value={protocolInfo.treasury.reserve.shorten()} unit="MoUSD" />
+        <Metric value={protocolInfo.treasury.reserve.shorten()} unit="MEUR" />
       </Statistic>
       <Statistic lexicon={l.TREASURY_PERMANENT}>
-        <Metric value={protocolInfo.treasury.permanent.shorten()} unit="MoUSD" />
+        <Metric value={protocolInfo.treasury.permanent.shorten()} unit="MEUR" />
       </Statistic>
       <Statistic lexicon={l.TREASURY_TOTAL}>
-        <Metric value={protocolInfo.treasury.total.shorten()} unit="MoUSD" />
+        <Metric value={protocolInfo.treasury.total.shorten()} unit="MEUR" />
       </Statistic>
 
       <Flex mt={3}>

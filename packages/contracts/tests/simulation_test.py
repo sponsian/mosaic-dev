@@ -121,7 +121,7 @@ def contracts():
     contracts.collSurplusPool = CollSurplusPool.deploy({ 'from': accounts[0] })
     contracts.borrowerOperations = BorrowerOperationsTester.deploy({ 'from': accounts[0] })
     contracts.hintHelpers = HintHelpers.deploy({ 'from': accounts[0] })
-    contracts.msicToken = MoUSDToken.deploy(
+    contracts.msicToken = MEURToken.deploy(
         contracts.troveManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address,
@@ -181,15 +181,15 @@ def _test_test(contracts):
 * open troves
 * issuance fee
 * trove pool formed
-* MoUSD supply determined
-* MoUSD stability pool demand determined
-* MoUSD liquidity pool demand determined
-* MoUSD price determined
+* MEUR supply determined
+* MEUR stability pool demand determined
+* MEUR liquidity pool demand determined
+* MEUR price determined
 * redemption & redemption fee
 * MSIC pool return determined
 """
 def test_run_simulation(add_accounts, contracts, print_expectations):
-    MoUSD_GAS_COMPENSATION = contracts.troveManager.MoUSD_GAS_COMPENSATION() / 1e18
+    MEUR_GAS_COMPENSATION = contracts.troveManager.MEUR_GAS_COMPENSATION() / 1e18
     MIN_NET_DEBT = contracts.troveManager.MIN_NET_DEBT() / 1e18
 
     contracts.priceFeedTestnet.setPrice(floatToWei(price_ether[0]), { 'from': accounts[0] })
@@ -202,7 +202,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
     active_accounts = []
     inactive_accounts = [*range(1, len(accounts))]
 
-    price_MoUSD = 1
+    price_MEUR = 1
     price_MSIC_current = price_MSIC_initial
 
     data = {"airdrop_gain": [0] * n_sim, "liquidation_gain": [0] * n_sim, "issuance_fee": [0] * n_sim, "redemption_fee": [0] * n_sim}
@@ -217,7 +217,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
 
     with open('tests/simulation.csv', 'w', newline='') as csvfile:
         datawriter = csv.writer(csvfile, delimiter=',')
-        datawriter.writerow(['iteration', 'ETH_price', 'price_MoUSD', 'price_MSIC', 'num_troves', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_MoUSD', 'SP_ETH', 'total_coll_added', 'total_coll_liquidated', 'total_msic_redempted'])
+        datawriter.writerow(['iteration', 'ETH_price', 'price_MEUR', 'price_MSIC', 'num_troves', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_MEUR', 'SP_ETH', 'total_coll_added', 'total_coll_liquidated', 'total_msic_redempted'])
 
         #Simulation Process
         for index in range(1, n_sim):
@@ -228,18 +228,18 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             contracts.priceFeedTestnet.setPrice(floatToWei(price_ether_current), { 'from': accounts[0] })
 
             #trove liquidation & return of stability pool
-            result_liquidation = liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MoUSD, price_MSIC_current, data, index)
+            result_liquidation = liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MEUR, price_MSIC_current, data, index)
             total_coll_liquidated = total_coll_liquidated + result_liquidation[0]
             return_stability = result_liquidation[1]
 
             #close troves
-            result_close = close_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MoUSD, index)
+            result_close = close_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MEUR, index)
 
             #adjust troves
-            [coll_added_adjust, issuance_MoUSD_adjust] = adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, index)
+            [coll_added_adjust, issuance_MEUR_adjust] = adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, index)
 
             #open troves
-            [coll_added_open, issuance_MoUSD_open] = open_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MoUSD, index)
+            [coll_added_open, issuance_MEUR_open] = open_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MEUR, index)
             total_coll_added = total_coll_added + coll_added_adjust + coll_added_open
             #active_accounts.sort(key=lambda a : a.get('CR_initial'))
 
@@ -247,12 +247,12 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             stability_update(accounts, contracts, active_accounts, return_stability, index)
 
             #Calculating Price, Liquidity Pool, and Redemption
-            [price_MoUSD, redemption_pool, redemption_fee, issuance_MoUSD_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MoUSD, index)
+            [price_MEUR, redemption_pool, redemption_fee, issuance_MEUR_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_MEUR, index)
             total_msic_redempted = total_msic_redempted + redemption_pool
-            print('MoUSD price', price_MoUSD)
+            print('MEUR price', price_MEUR)
             print('MSIC price', price_MSIC_current)
 
-            issuance_fee = price_MoUSD * (issuance_MoUSD_adjust + issuance_MoUSD_open + issuance_MoUSD_stabilizer)
+            issuance_fee = price_MEUR * (issuance_MEUR_adjust + issuance_MEUR_open + issuance_MEUR_stabilizer)
             data['issuance_fee'][index] = issuance_fee
             data['redemption_fee'][index] = redemption_fee
 
@@ -262,13 +262,13 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             #annualized_earning = result_MSIC[1]
             #MC_MSIC_current = result_MSIC[2]
 
-            [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MoUSD, SP_ETH] = logGlobalState(contracts)
+            [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MEUR, SP_ETH] = logGlobalState(contracts)
             print('Total redempted ', total_msic_redempted)
             print('Total REEF added ', total_coll_added)
             print('Total REEF liquid', total_coll_liquidated)
             print(f'Ratio REEF liquid {100 * total_coll_liquidated / total_coll_added}%')
             print(' ----------------------\n')
 
-            datawriter.writerow([index, ETH_price, price_MoUSD, price_MSIC_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MoUSD, SP_ETH, total_coll_added, total_coll_liquidated, total_msic_redempted])
+            datawriter.writerow([index, ETH_price, price_MEUR, price_MSIC_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_MEUR, SP_ETH, total_coll_added, total_coll_liquidated, total_msic_redempted])
 
-            assert price_MoUSD > 0
+            assert price_MEUR > 0

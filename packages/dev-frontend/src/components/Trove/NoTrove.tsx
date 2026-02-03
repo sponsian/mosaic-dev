@@ -14,8 +14,8 @@ export const NoTrove: React.FC = () => {
     <Card>
       <Heading>Trove</Heading>
       <Box sx={{ p: [2, 3] }}>
-        <InfoMessage title="You haven't borrowed any MoUSD yet.">
-          You can borrow MoUSD by opening a Trove.
+        <InfoMessage title="You haven't borrowed any MEUR yet.">
+          You can borrow MEUR by opening a Trove.
         </InfoMessage>
 
         <Flex variant="layout.actions">

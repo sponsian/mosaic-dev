@@ -48,12 +48,12 @@ export const Yield: React.FC = () => {
         tooltip={
           <Card variant="tooltip" sx={{ width: ["220px", "518px"] }}>
             <Paragraph>
-              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the MSIC return on the MoUSD
+              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the MSIC return on the MEUR
               deposited to the Stability Pool over the next year, not including your REEF gains from
               liquidations.
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace", mt: 2 }}>
-              ($MSIC_REWARDS * DAILY_ISSUANCE% / DEPOSITED_MoUSD) * 365 * 100 ={" "}
+              ($MSIC_REWARDS * DAILY_ISSUANCE% / DEPOSITED_MEUR) * 365 * 100 ={" "}
               <Text sx={{ fontWeight: "bold" }}> APR</Text>
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace" }}>

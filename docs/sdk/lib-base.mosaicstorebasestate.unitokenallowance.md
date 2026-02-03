@@ -4,7 +4,7 @@
 
 ## MosaicStoreBaseState.uniTokenAllowance property
 
-The liquidity mining contract's allowance of user's Uniswap REEF/MoUSD LP tokens.
+The liquidity mining contract's allowance of user's Uniswap REEF/MEUR LP tokens.
 
 <b>Signature:</b>
 

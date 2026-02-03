@@ -1,6 +1,6 @@
 const { red, blue, green, yellow, dim, bold } = require("chalk");
 const { Wallet, providers } = require("ethers");
-const { Decimal, UserTrove, MoUSD_LIQUIDATION_RESERVE } = require("@mosaic/lib-base");
+const { Decimal, UserTrove, MEUR_LIQUIDATION_RESERVE } = require("@mosaic/lib-base");
 const { EthersMosaic, EthersMosaicWithStore } = require("@mosaic/lib-ethers");
 
 function log(message) {
@@ -84,7 +84,7 @@ async function tryToLiquidate(mosaic) {
     const expectedCompensation = total.collateral
       .mul(0.005)
       .mul(store.state.price)
-      .add(MoUSD_LIQUIDATION_RESERVE.mul(troves.length));
+      .add(MEUR_LIQUIDATION_RESERVE.mul(troves.length));
 
     if (expectedCost.gt(expectedCompensation)) {
       // In reality, the TX cost will be lower than this thanks to storage refunds, but let's be
@@ -114,7 +114,7 @@ async function tryToLiquidate(mosaic) {
 
     success(
       `Received ${bold(`${collateralGasCompensation.toString(4)} REEF`)} + ` +
-        `${bold(`${msicGasCompensation.toString(2)} MoUSD`)} compensation (` +
+        `${bold(`${msicGasCompensation.toString(2)} MEUR`)} compensation (` +
         (totalCompensation.gte(gasCost)
           ? `${green(`$${totalCompensation.sub(gasCost).toString(2)}`)} profit`
           : `${red(`$${gasCost.sub(totalCompensation).toString(2)}`)} loss`) +

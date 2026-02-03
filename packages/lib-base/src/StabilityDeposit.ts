@@ -6,8 +6,8 @@ import { Decimal, Decimalish } from "./Decimal";
  * @public
  */
 export type StabilityDepositChange<T> =
-  | { depositMoUSD: T; withdrawMoUSD?: undefined }
-  | { depositMoUSD?: undefined; withdrawMoUSD: T; withdrawAllMoUSD: boolean };
+  | { depositMEUR: T; withdrawMEUR?: undefined }
+  | { depositMEUR?: undefined; withdrawMEUR: T; withdrawAllMEUR: boolean };
 
 /**
  * A Stability Deposit and its accrued gains.
@@ -15,13 +15,13 @@ export type StabilityDepositChange<T> =
  * @public
  */
 export class StabilityDeposit {
-  /** Amount of MoUSD in the Stability Deposit at the time of the last direct modification. */
-  readonly initialMoUSD: Decimal;
+  /** Amount of MEUR in the Stability Deposit at the time of the last direct modification. */
+  readonly initialMEUR: Decimal;
 
-  /** Amount of MoUSD left in the Stability Deposit. */
-  readonly currentMoUSD: Decimal;
+  /** Amount of MEUR left in the Stability Deposit. */
+  readonly currentMEUR: Decimal;
 
-  /** Amount of native currency (e.g. Ether) received in exchange for the used-up MoUSD. */
+  /** Amount of native currency (e.g. Ether) received in exchange for the used-up MEUR. */
   readonly collateralGain: Decimal;
 
   /** Amount of MSIC rewarded since the last modification of the Stability Deposit. */
@@ -38,27 +38,27 @@ export class StabilityDeposit {
 
   /** @internal */
   constructor(
-    initialMoUSD: Decimal,
-    currentMoUSD: Decimal,
+    initialMEUR: Decimal,
+    currentMEUR: Decimal,
     collateralGain: Decimal,
     msicReward: Decimal,
     frontendTag: string
   ) {
-    this.initialMoUSD = initialMoUSD;
-    this.currentMoUSD = currentMoUSD;
+    this.initialMEUR = initialMEUR;
+    this.currentMEUR = currentMEUR;
     this.collateralGain = collateralGain;
     this.msicReward = msicReward;
     this.frontendTag = frontendTag;
 
-    if (this.currentMoUSD.gt(this.initialMoUSD)) {
-      throw new Error("currentMoUSD can't be greater than initialMoUSD");
+    if (this.currentMEUR.gt(this.initialMEUR)) {
+      throw new Error("currentMEUR can't be greater than initialMEUR");
     }
   }
 
   get isEmpty(): boolean {
     return (
-      this.initialMoUSD.isZero &&
-      this.currentMoUSD.isZero &&
+      this.initialMEUR.isZero &&
+      this.currentMEUR.isZero &&
       this.collateralGain.isZero &&
       this.msicReward.isZero
     );
@@ -67,8 +67,8 @@ export class StabilityDeposit {
   /** @internal */
   toString(): string {
     return (
-      `{ initialMoUSD: ${this.initialMoUSD}` +
-      `, currentMoUSD: ${this.currentMoUSD}` +
+      `{ initialMEUR: ${this.initialMEUR}` +
+      `, currentMEUR: ${this.currentMEUR}` +
       `, collateralGain: ${this.collateralGain}` +
       `, msicReward: ${this.msicReward}` +
       `, frontendTag: "${this.frontendTag}" }`
@@ -80,8 +80,8 @@ export class StabilityDeposit {
    */
   equals(that: StabilityDeposit): boolean {
     return (
-      this.initialMoUSD.eq(that.initialMoUSD) &&
-      this.currentMoUSD.eq(that.currentMoUSD) &&
+      this.initialMEUR.eq(that.initialMEUR) &&
+      this.currentMEUR.eq(that.currentMEUR) &&
       this.collateralGain.eq(that.collateralGain) &&
       this.msicReward.eq(that.msicReward) &&
       this.frontendTag === that.frontendTag
@@ -89,38 +89,38 @@ export class StabilityDeposit {
   }
 
   /**
-   * Calculate the difference between the `currentMoUSD` in this Stability Deposit and `thatMoUSD`.
+   * Calculate the difference between the `currentMEUR` in this Stability Deposit and `thatMEUR`.
    *
    * @returns An object representing the change, or `undefined` if the deposited amounts are equal.
    */
-  whatChanged(thatMoUSD: Decimalish): StabilityDepositChange<Decimal> | undefined {
-    thatMoUSD = Decimal.from(thatMoUSD);
+  whatChanged(thatMEUR: Decimalish): StabilityDepositChange<Decimal> | undefined {
+    thatMEUR = Decimal.from(thatMEUR);
 
-    if (thatMoUSD.lt(this.currentMoUSD)) {
-      return { withdrawMoUSD: this.currentMoUSD.sub(thatMoUSD), withdrawAllMoUSD: thatMoUSD.isZero };
+    if (thatMEUR.lt(this.currentMEUR)) {
+      return { withdrawMEUR: this.currentMEUR.sub(thatMEUR), withdrawAllMEUR: thatMEUR.isZero };
     }
 
-    if (thatMoUSD.gt(this.currentMoUSD)) {
-      return { depositMoUSD: thatMoUSD.sub(this.currentMoUSD) };
+    if (thatMEUR.gt(this.currentMEUR)) {
+      return { depositMEUR: thatMEUR.sub(this.currentMEUR) };
     }
   }
 
   /**
    * Apply a {@link StabilityDepositChange} to this Stability Deposit.
    *
-   * @returns The new deposited MoUSD amount.
+   * @returns The new deposited MEUR amount.
    */
   apply(change: StabilityDepositChange<Decimalish> | undefined): Decimal {
     if (!change) {
-      return this.currentMoUSD;
+      return this.currentMEUR;
     }
 
-    if (change.withdrawMoUSD !== undefined) {
-      return change.withdrawAllMoUSD || this.currentMoUSD.lte(change.withdrawMoUSD)
+    if (change.withdrawMEUR !== undefined) {
+      return change.withdrawAllMEUR || this.currentMEUR.lte(change.withdrawMEUR)
         ? Decimal.ZERO
-        : this.currentMoUSD.sub(change.withdrawMoUSD);
+        : this.currentMEUR.sub(change.withdrawMEUR);
     } else {
-      return this.currentMoUSD.add(change.depositMoUSD);
+      return this.currentMEUR.add(change.depositMEUR);
     }
   }
 }

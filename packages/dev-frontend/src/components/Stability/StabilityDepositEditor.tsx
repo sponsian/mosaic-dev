@@ -25,14 +25,14 @@ const select = ({ msicBalance, msicInStabilityPool }: MosaicStoreState) => ({
 
 type StabilityDepositEditorProps = {
   originalDeposit: StabilityDeposit;
-  editedMoUSD: Decimal;
+  editedMEUR: Decimal;
   changePending: boolean;
   dispatch: (action: { type: "setDeposit"; newValue: Decimalish } | { type: "revert" }) => void;
 };
 
 export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
   originalDeposit,
-  editedMoUSD,
+  editedMEUR,
   changePending,
   dispatch,
   children
@@ -40,19 +40,19 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
   const { msicBalance, msicInStabilityPool } = useMosaicSelector(select);
   const editingState = useState<string>();
 
-  const edited = !editedMoUSD.eq(originalDeposit.currentMoUSD);
+  const edited = !editedMEUR.eq(originalDeposit.currentMEUR);
 
-  const maxAmount = originalDeposit.currentMoUSD.add(msicBalance);
-  const maxedOut = editedMoUSD.eq(maxAmount);
+  const maxAmount = originalDeposit.currentMEUR.add(msicBalance);
+  const maxedOut = editedMEUR.eq(maxAmount);
 
   const msicInStabilityPoolAfterChange = msicInStabilityPool
-    .sub(originalDeposit.currentMoUSD)
-    .add(editedMoUSD);
+    .sub(originalDeposit.currentMEUR)
+    .add(editedMEUR);
 
-  const originalPoolShare = originalDeposit.currentMoUSD.mulDiv(100, msicInStabilityPool);
-  const newPoolShare = editedMoUSD.mulDiv(100, msicInStabilityPoolAfterChange);
+  const originalPoolShare = originalDeposit.currentMEUR.mulDiv(100, msicInStabilityPool);
+  const newPoolShare = editedMEUR.mulDiv(100, msicInStabilityPoolAfterChange);
   const poolShareChange =
-    originalDeposit.currentMoUSD.nonZero &&
+    originalDeposit.currentMEUR.nonZero &&
     Difference.between(newPoolShare, originalPoolShare).nonZero;
 
   return (
@@ -74,12 +74,12 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
         <EditableRow
           label="Deposit"
           inputId="deposit-msic"
-          amount={editedMoUSD.prettify()}
+          amount={editedMEUR.prettify()}
           maxAmount={maxAmount.toString()}
           maxedOut={maxedOut}
           unit={COIN}
           {...{ editingState }}
-          editedAmount={editedMoUSD.toString(2)}
+          editedAmount={editedMEUR.toString(2)}
           setEditedAmount={newValue => dispatch({ type: "setDeposit", newValue })}
         />
 

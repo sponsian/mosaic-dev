@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Mosaic is a decentralized borrowing protocol (fork of Liquity) enabling REEF token holders to obtain liquidity via the MoUSD stablecoin without paying interest. Key components: MoUSD (stablecoin), MSIC (governance token), Stability Pool, Trove system with 110% min collateralization.
+Mosaic is a decentralized borrowing protocol (fork of Liquity) enabling REEF token holders to obtain liquidity via the MEUR stablecoin without paying interest. Key components: MEUR (EUR-pegged stablecoin), MSIC (governance token), Stability Pool, Trove system with 110% min collateralization.
 
 ## Monorepo Structure
 

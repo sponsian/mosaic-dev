@@ -31,10 +31,10 @@
 |  [PopulatedMosaicTransaction](./lib-base.populatedmosaictransaction.md) | A transaction that has been prepared for sending. |
 |  [PopulatedRedemption](./lib-base.populatedredemption.md) | A redemption transaction that has been prepared for sending. |
 |  [ReadableMosaic](./lib-base.readablemosaic.md) | Read the state of the Mosaic protocol. |
-|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemMoUSD()](./lib-base.transactablemosaic.redeemmsic.md) transaction. |
+|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemMEUR()](./lib-base.transactablemosaic.redeemmsic.md) transaction. |
 |  [SendableMosaic](./lib-base.sendablemosaic.md) | Send Mosaic transactions. |
 |  [SentMosaicTransaction](./lib-base.sentmosaictransaction.md) | A transaction that has already been sent. |
-|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositMoUSDInStabilityPool()](./lib-base.transactablemosaic.depositmsicinstabilitypool.md) or [withdrawMoUSDFromStabilityPool()](./lib-base.transactablemosaic.withdrawmsicfromstabilitypool.md) transaction. |
+|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositMEURInStabilityPool()](./lib-base.transactablemosaic.depositmsicinstabilitypool.md) or [withdrawMEURFromStabilityPool()](./lib-base.transactablemosaic.withdrawmsicfromstabilitypool.md) transaction. |
 |  [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md) | Details of a [withdrawGainsFromStabilityPool()](./lib-base.transactablemosaic.withdrawgainsfromstabilitypool.md) transaction. |
 |  [TransactableMosaic](./lib-base.transactablemosaic.md) | Send Mosaic transactions and wait for them to succeed. |
 |  [TroveAdjustmentDetails](./lib-base.troveadjustmentdetails.md) | Details of an [adjustTrove()](./lib-base.transactablemosaic.adjusttrove.md) transaction. |
@@ -47,9 +47,9 @@
 |  Variable | Description |
 |  --- | --- |
 |  [CRITICAL\_COLLATERAL\_RATIO](./lib-base.critical_collateral_ratio.md) | Total collateral ratio below which recovery mode is triggered. |
-|  [MoUSD\_LIQUIDATION\_RESERVE](./lib-base.msic_liquidation_reserve.md) | Amount of MoUSD that's reserved for compensating the liquidator of a Trove. |
-|  [MoUSD\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md) | A Trove must always have at least this much debt. |
-|  [MoUSD\_MINIMUM\_NET\_DEBT](./lib-base.msic_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.msic_liquidation_reserve.md)<!-- -->. |
+|  [MEUR\_LIQUIDATION\_RESERVE](./lib-base.msic_liquidation_reserve.md) | Amount of MEUR that's reserved for compensating the liquidator of a Trove. |
+|  [MEUR\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md) | A Trove must always have at least this much debt. |
+|  [MEUR\_MINIMUM\_NET\_DEBT](./lib-base.msic_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.msic_liquidation_reserve.md)<!-- -->. |
 |  [MAXIMUM\_BORROWING\_RATE](./lib-base.maximum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never exceed. |
 |  [MINIMUM\_BORROWING\_RATE](./lib-base.minimum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never decay below. |
 |  [MINIMUM\_COLLATERAL\_RATIO](./lib-base.minimum_collateral_ratio.md) | Collateral ratio below which a Trove can be liquidated in normal mode. |

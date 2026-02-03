@@ -25,7 +25,7 @@
 |  Interface | Description |
 |  --- | --- |
 |  [BlockPolledMosaicStoreExtraState](./lib-ethers.blockpolledmosaicstoreextrastate.md) | Extra state added to [MosaicStoreState](./lib-base.mosaicstorestate.md) by [BlockPolledMosaicStore](./lib-ethers.blockpolledmosaicstore.md)<!-- -->. |
-|  [BorrowingOperationOptionalParams](./lib-ethers.borrowingoperationoptionalparams.md) | Optional parameters of a transaction that borrows MoUSD. |
+|  [BorrowingOperationOptionalParams](./lib-ethers.borrowingoperationoptionalparams.md) | Optional parameters of a transaction that borrows MEUR. |
 |  [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) | Optional parameters taken by [ReadableEthersMosaic](./lib-ethers.readableethersmosaic.md) functions. |
 |  [EthersMosaicConnection](./lib-ethers.ethersmosaicconnection.md) | Information about a connection to the Mosaic protocol. |
 |  [EthersMosaicConnectionOptionalParams](./lib-ethers.ethersmosaicconnectionoptionalparams.md) | Optional parameters of [ReadableEthersMosaic.connect()](./lib-ethers.readableethersmosaic.connect_1.md) and [EthersMosaic.connect()](./lib-ethers.ethersmosaic.connect_1.md)<!-- -->. |

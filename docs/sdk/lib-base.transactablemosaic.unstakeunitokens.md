@@ -4,7 +4,7 @@
 
 ## TransactableMosaic.unstakeUniTokens() method
 
-Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining.
+Withdraw Uniswap REEF/MEUR LP tokens from liquidity mining.
 
 <b>Signature:</b>
 

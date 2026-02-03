@@ -76,11 +76,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_MoUSDFee",
+        "name": "_MEURFee",
         "type": "uint256"
       }
     ],
-    "name": "MoUSDBorrowingFeePaid",
+    "name": "MEURBorrowingFeePaid",
     "type": "event"
   },
   {
@@ -93,7 +93,7 @@
         "type": "address"
       }
     ],
-    "name": "MoUSDTokenAddressChanged",
+    "name": "MEURTokenAddressChanged",
     "type": "event"
   },
   {
@@ -264,7 +264,7 @@
   },
   {
     "inputs": [],
-    "name": "MoUSD_GAS_COMPENSATION",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -385,7 +385,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_MoUSDChange",
+        "name": "_MEURChange",
         "type": "uint256"
       },
       {
@@ -525,7 +525,7 @@
     "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract IMoUSDToken",
+        "internalType": "contract IMEURToken",
         "name": "",
         "type": "address"
       }
@@ -565,7 +565,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_MoUSDAmount",
+        "name": "_MEURAmount",
         "type": "uint256"
       },
       {
@@ -614,7 +614,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_MoUSDAmount",
+        "name": "_MEURAmount",
         "type": "uint256"
       },
       {
@@ -628,7 +628,7 @@
         "type": "address"
       }
     ],
-    "name": "repayMoUSD",
+    "name": "repayMEUR",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -749,7 +749,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_MoUSDAmount",
+        "name": "_MEURAmount",
         "type": "uint256"
       },
       {
@@ -763,7 +763,7 @@
         "type": "address"
       }
     ],
-    "name": "withdrawMoUSD",
+    "name": "withdrawMEUR",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

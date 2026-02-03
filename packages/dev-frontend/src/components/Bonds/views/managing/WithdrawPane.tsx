@@ -11,8 +11,8 @@ import { ApprovePressedPayload, BMousdAmmTokenIndex } from "../../context/transi
 import { PoolDetails } from "./PoolDetails";
 
 const tokenSymbol = new Map([
-  [BMousdAmmTokenIndex.BMoUSD, "bMoUSD"],
-  [BMousdAmmTokenIndex.MoUSD, "MoUSD"]
+  [BMousdAmmTokenIndex.BMEUR, "bMEUR"],
+  [BMousdAmmTokenIndex.MEUR, "MEUR"]
 ]);
 
 const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => (
@@ -29,7 +29,7 @@ const checkOutput = (value: string): BMousdAmmTokenIndex | "both" => {
   }
 
   const i = parseInt(value);
-  if (i === BMousdAmmTokenIndex.BMoUSD || i === BMousdAmmTokenIndex.MoUSD) {
+  if (i === BMousdAmmTokenIndex.BMEUR || i === BMousdAmmTokenIndex.MEUR) {
     return i;
   }
 
@@ -37,8 +37,8 @@ const checkOutput = (value: string): BMousdAmmTokenIndex | "both" => {
 };
 
 const zeros = new Map<BMousdAmmTokenIndex, Decimal>([
-  [BMousdAmmTokenIndex.BMoUSD, Decimal.ZERO],
-  [BMousdAmmTokenIndex.MoUSD, Decimal.ZERO]
+  [BMousdAmmTokenIndex.BMEUR, Decimal.ZERO],
+  [BMousdAmmTokenIndex.MEUR, Decimal.ZERO]
 ]);
 
 export const WithdrawPane: React.FC = () => {
@@ -61,12 +61,12 @@ export const WithdrawPane: React.FC = () => {
   const coalescedLpTokenBalance = lpTokenBalance ?? Decimal.ZERO;
   const isManageLiquidityPending = statuses.MANAGE_LIQUIDITY === "PENDING";
   const isBalanceInsufficient = burnLpTokens.gt(coalescedLpTokenBalance);
-  const needsApproval = output !== BMousdAmmTokenIndex.BMoUSD && !isBMousdLpApprovedWithAmmZapper;
+  const needsApproval = output !== BMousdAmmTokenIndex.BMEUR && !isBMousdLpApprovedWithAmmZapper;
 
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map();
     if (needsApproval) {
-      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMoUSD_MoUSD_LP, addresses.BMoUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMEUR_MEUR_LP, addresses.BMEUR_LP_ZAP_ADDRESS);
     }
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);
   };
@@ -77,8 +77,8 @@ export const WithdrawPane: React.FC = () => {
   const handleConfirmPressed = () => {
     const curveSlippage = 0.001; // Allow mininum of %0.1% slippage due to Curve rounding issues
     if (output === "both") {
-      const minBMousdAmount = withdrawal.get(BMousdAmmTokenIndex.BMoUSD)?.mul(1 - curveSlippage);
-      const minMousdAmount = withdrawal.get(BMousdAmmTokenIndex.MoUSD)?.mul(1 - curveSlippage);
+      const minBMousdAmount = withdrawal.get(BMousdAmmTokenIndex.BMEUR)?.mul(1 - curveSlippage);
+      const minMousdAmount = withdrawal.get(BMousdAmmTokenIndex.MEUR)?.mul(1 - curveSlippage);
 
       if (minBMousdAmount === undefined || minBMousdAmount === Decimal.ZERO) return;
       if (minMousdAmount === undefined || minMousdAmount === Decimal.ZERO) return;

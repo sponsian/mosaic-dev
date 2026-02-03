@@ -4,7 +4,7 @@
 
 ## PopulatableMosaic.withdrawGainsFromStaking() method
 
-Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md) from MSIC stake.
+Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MEUR gain](./lib-base.msicstake.msicgain.md) from MSIC stake.
 
 <b>Signature:</b>
 

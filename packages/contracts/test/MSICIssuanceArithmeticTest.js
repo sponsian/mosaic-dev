@@ -52,7 +52,7 @@ contract('MSIC community issuance arithmetic tests', async accounts => {
     contracts = await deploymentHelper.deployMosaicCore()
     const MSICContracts = await deploymentHelper.deployMSICTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
     contracts.stabilityPool = await StabilityPool.new()
-    contracts = await deploymentHelper.deployMoUSDToken(contracts)
+    contracts = await deploymentHelper.deployMEURToken(contracts)
 
     stabilityPool = contracts.stabilityPool
     borrowerOperations = contracts.borrowerOperations

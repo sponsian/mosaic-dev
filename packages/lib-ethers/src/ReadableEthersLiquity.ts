@@ -152,7 +152,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
 
     const [collateral, debt] = await Promise.all([
       troveManager.L_ETH({ ...overrides }).then(decimalify),
-      troveManager.L_MoUSDDebt({ ...overrides }).then(decimalify)
+      troveManager.L_MEURDebt({ ...overrides }).then(decimalify)
     ]);
 
     return new Trove(collateral, debt);
@@ -178,7 +178,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
         decimalify(trove.coll),
         decimalify(trove.debt),
         decimalify(trove.stake),
-        new Trove(decimalify(snapshot.REEF), decimalify(snapshot.MoUSDDebt))
+        new Trove(decimalify(snapshot.REEF), decimalify(snapshot.MEURDebt))
       );
     } else {
       return new TroveWithPendingRedistribution(address, userTroveStatusFrom(trove.status));
@@ -216,7 +216,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     const [activeCollateral, activeDebt] = await Promise.all(
       [
         activePool.getETH({ ...overrides }),
-        activePool.getMoUSDDebt({ ...overrides })
+        activePool.getMEURDebt({ ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
 
@@ -230,7 +230,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     const [liquidatedCollateral, closedDebt] = await Promise.all(
       [
         defaultPool.getETH({ ...overrides }),
-        defaultPool.getMoUSDDebt({ ...overrides })
+        defaultPool.getMEURDebt({ ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
 
@@ -257,19 +257,19 @@ export class ReadableEthersMosaic implements ReadableMosaic {
 
     const [
       { frontEndTag, initialValue },
-      currentMoUSD,
+      currentMEUR,
       collateralGain,
       msicReward
     ] = await Promise.all([
       stabilityPool.deposits(address, { ...overrides }),
-      stabilityPool.getCompoundedMoUSDDeposit(address, { ...overrides }),
+      stabilityPool.getCompoundedMEURDeposit(address, { ...overrides }),
       stabilityPool.getDepositorETHGain(address, { ...overrides }),
       stabilityPool.getDepositorMSICGain(address, { ...overrides })
     ]);
 
     return new StabilityDeposit(
       decimalify(initialValue),
-      decimalify(currentMoUSD),
+      decimalify(currentMEUR),
       decimalify(collateralGain),
       decimalify(msicReward),
       frontEndTag
@@ -287,15 +287,15 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     return issuanceCap.sub(totalMSICIssued);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
-  getMoUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMEURInStabilityPool} */
+  getMEURInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { stabilityPool } = _getContracts(this.connection);
 
-    return stabilityPool.getTotalMoUSDDeposits({ ...overrides }).then(decimalify);
+    return stabilityPool.getTotalMEURDeposits({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDBalance} */
-  getMoUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMEURBalance} */
+  getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { msicToken } = _getContracts(this.connection);
 
@@ -478,7 +478,7 @@ export class ReadableEthersMosaic implements ReadableMosaic {
       [
         msicStaking.stakes(address, { ...overrides }),
         msicStaking.getPendingETHGain(address, { ...overrides }),
-        msicStaking.getPendingMoUSDGain(address, { ...overrides })
+        msicStaking.getPendingMEURGain(address, { ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
 
@@ -520,7 +520,7 @@ const mapBackendTroves = (troves: BackendTroves): TroveWithPendingRedistribution
         decimalify(trove.coll),
         decimalify(trove.debt),
         decimalify(trove.stake),
-        new Trove(decimalify(trove.snapshotETH), decimalify(trove.snapshotMoUSDDebt))
+        new Trove(decimalify(trove.snapshotETH), decimalify(trove.snapshotMEURDebt))
       )
   );
 
@@ -626,16 +626,16 @@ class _BlockPolledReadableEthersMosaic
       : this._readable.getRemainingStabilityPoolMSICReward(overrides);
   }
 
-  async getMoUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
+  async getMEURInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._blockHit(overrides)
       ? this.store.state.msicInStabilityPool
-      : this._readable.getMoUSDInStabilityPool(overrides);
+      : this._readable.getMEURInStabilityPool(overrides);
   }
 
-  async getMoUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+  async getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._userHit(address, overrides)
       ? this.store.state.msicBalance
-      : this._readable.getMoUSDBalance(address, overrides);
+      : this._readable.getMEURBalance(address, overrides);
   }
 
   async getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {

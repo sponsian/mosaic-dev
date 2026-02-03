@@ -17,7 +17,7 @@ type Global @entity {
   totalNumberOfMSICStakes: Int!
   numberOfActiveMSICStakes: Int!
 
-  "Total amount of MoUSD paid as borrowing fees"
+  "Total amount of MEUR paid as borrowing fees"
   totalBorrowingFeesPaid: BigDecimal!
   "Total amount of REEF paid as redemption fees"
   totalRedemptionFeesPaid: BigDecimal!

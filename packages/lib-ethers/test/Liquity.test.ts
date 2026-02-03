@@ -16,11 +16,11 @@ import {
   SentMosaicTransaction,
   TroveCreationParams,
   Fees,
-  MoUSD_LIQUIDATION_RESERVE,
+  MEUR_LIQUIDATION_RESERVE,
   MAXIMUM_BORROWING_RATE,
   MINIMUM_BORROWING_RATE,
-  MoUSD_MINIMUM_DEBT,
-  MoUSD_MINIMUM_NET_DEBT
+  MEUR_MINIMUM_DEBT,
+  MEUR_MINIMUM_NET_DEBT
 } from "@mosaic/lib-base";
 
 import { HintHelpers } from "../types";
@@ -241,7 +241,7 @@ describe("EthersMosaic", () => {
 
       const nominalCollateralRatio = Decimal.from(0.05);
 
-      const params = Trove.recreate(new Trove(Decimal.from(1), MoUSD_MINIMUM_DEBT));
+      const params = Trove.recreate(new Trove(Decimal.from(1), MEUR_MINIMUM_DEBT));
       const trove = Trove.create(params);
       expect(`${trove._nominalCollateralRatio}`).to.equal(`${nominalCollateralRatio}`);
 
@@ -271,23 +271,23 @@ describe("EthersMosaic", () => {
 
     it("should fail to create an undercollateralized Trove", async () => {
       const price = await mosaic.getPrice();
-      const undercollateralized = new Trove(MoUSD_MINIMUM_DEBT.div(price), MoUSD_MINIMUM_DEBT);
+      const undercollateralized = new Trove(MEUR_MINIMUM_DEBT.div(price), MEUR_MINIMUM_DEBT);
 
       await expect(mosaic.openTrove(Trove.recreate(undercollateralized))).to.eventually.be.rejected;
     });
 
     it("should fail to create a Trove with too little debt", async () => {
-      const withTooLittleDebt = new Trove(Decimal.from(50), MoUSD_MINIMUM_DEBT.sub(1));
+      const withTooLittleDebt = new Trove(Decimal.from(50), MEUR_MINIMUM_DEBT.sub(1));
 
       await expect(mosaic.openTrove(Trove.recreate(withTooLittleDebt))).to.eventually.be.rejected;
     });
 
-    const withSomeBorrowing = { depositCollateral: 50, borrowMoUSD: MoUSD_MINIMUM_NET_DEBT.add(100) };
+    const withSomeBorrowing = { depositCollateral: 50, borrowMEUR: MEUR_MINIMUM_NET_DEBT.add(100) };
 
     it("should create a Trove with some borrowing", async () => {
       const { newTrove, fee } = await mosaic.openTrove(withSomeBorrowing);
       expect(newTrove).to.deep.equal(Trove.create(withSomeBorrowing));
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(withSomeBorrowing.borrowMoUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(withSomeBorrowing.borrowMEUR)}`);
     });
 
     it("should fail to withdraw all the collateral while the Trove has debt", async () => {
@@ -296,22 +296,22 @@ describe("EthersMosaic", () => {
       await expect(mosaic.withdrawCollateral(trove.collateral)).to.eventually.be.rejected;
     });
 
-    const repaySomeDebt = { repayMoUSD: 10 };
+    const repaySomeDebt = { repayMEUR: 10 };
 
     it("should repay some debt", async () => {
-      const { newTrove, fee } = await mosaic.repayMoUSD(repaySomeDebt.repayMoUSD);
+      const { newTrove, fee } = await mosaic.repayMEUR(repaySomeDebt.repayMEUR);
       expect(newTrove).to.deep.equal(Trove.create(withSomeBorrowing).adjust(repaySomeDebt));
       expect(`${fee}`).to.equal("0");
     });
 
-    const borrowSomeMore = { borrowMoUSD: 20 };
+    const borrowSomeMore = { borrowMEUR: 20 };
 
     it("should borrow some more", async () => {
-      const { newTrove, fee } = await mosaic.borrowMoUSD(borrowSomeMore.borrowMoUSD);
+      const { newTrove, fee } = await mosaic.borrowMEUR(borrowSomeMore.borrowMEUR);
       expect(newTrove).to.deep.equal(
         Trove.create(withSomeBorrowing).adjust(repaySomeDebt).adjust(borrowSomeMore)
       );
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowSomeMore.borrowMoUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowSomeMore.borrowMEUR)}`);
     });
 
     const depositMoreCollateral = { depositCollateral: 1 };
@@ -326,7 +326,7 @@ describe("EthersMosaic", () => {
       );
     });
 
-    const repayAndWithdraw = { repayMoUSD: 60, withdrawCollateral: 0.5 };
+    const repayAndWithdraw = { repayMEUR: 60, withdrawCollateral: 0.5 };
 
     it("should repay some debt and withdraw some collateral at the same time", async () => {
       const {
@@ -350,7 +350,7 @@ describe("EthersMosaic", () => {
       expect(`${ethBalance}`).to.equal(`${expectedBalance}`);
     });
 
-    const borrowAndDeposit = { borrowMoUSD: 60, depositCollateral: 0.5 };
+    const borrowAndDeposit = { borrowMEUR: 60, depositCollateral: 0.5 };
 
     it("should borrow more and deposit some collateral at the same time", async () => {
       const {
@@ -367,7 +367,7 @@ describe("EthersMosaic", () => {
           .adjust(borrowAndDeposit)
       );
 
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowAndDeposit.borrowMoUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowAndDeposit.borrowMEUR)}`);
 
       const ethBalance = await user.getBalance();
       const expectedBalance = BigNumber.from(STARTING_BALANCE.sub(0.5).hex).sub(
@@ -377,25 +377,25 @@ describe("EthersMosaic", () => {
       expect(`${ethBalance}`).to.equal(`${expectedBalance}`);
     });
 
-    it("should close the Trove with some MoUSD from another user", async () => {
+    it("should close the Trove with some MEUR from another user", async () => {
       const price = await mosaic.getPrice();
       const initialTrove = await mosaic.getTrove();
       const msicBalance = await mosaic.getMSICBalance();
       const msicShortage = initialTrove.netDebt.sub(msicBalance);
 
-      let funderTrove = Trove.create({ depositCollateral: 1, borrowMoUSD: msicShortage });
-      funderTrove = funderTrove.setDebt(Decimal.max(funderTrove.debt, MoUSD_MINIMUM_DEBT));
+      let funderTrove = Trove.create({ depositCollateral: 1, borrowMEUR: msicShortage });
+      funderTrove = funderTrove.setDebt(Decimal.max(funderTrove.debt, MEUR_MINIMUM_DEBT));
       funderTrove = funderTrove.setCollateral(funderTrove.debt.mulDiv(1.51, price));
 
       const funderMosaic = await connectToDeployment(deployment, funder);
       await funderMosaic.openTrove(Trove.recreate(funderTrove));
-      await funderMosaic.sendMoUSD(await user.getAddress(), msicShortage);
+      await funderMosaic.sendMEUR(await user.getAddress(), msicShortage);
 
       const { params } = await mosaic.closeTrove();
 
       expect(params).to.deep.equal({
         withdrawCollateral: initialTrove.collateral,
-        repayMoUSD: initialTrove.netDebt
+        repayMEUR: initialTrove.netDebt
       });
 
       const finalTrove = await mosaic.getTrove();
@@ -407,7 +407,7 @@ describe("EthersMosaic", () => {
     it("should parse failed transactions without throwing", async () => {
       // By passing a gasLimit, we avoid automatic use of estimateGas which would throw
       const tx = await mosaic.send.openTrove(
-        { depositCollateral: 0.01, borrowMoUSD: 0.01 },
+        { depositCollateral: 0.01, borrowMEUR: 0.01 },
         undefined,
         { gasLimit: 1e6 }
       );
@@ -444,9 +444,9 @@ describe("EthersMosaic", () => {
       });
 
       const otherMosaic = await connectToDeployment(deployment, otherUsers[0], frontendTag);
-      await otherMosaic.openTrove({ depositCollateral: 20, borrowMoUSD: MoUSD_MINIMUM_DEBT });
+      await otherMosaic.openTrove({ depositCollateral: 20, borrowMEUR: MEUR_MINIMUM_DEBT });
 
-      await otherMosaic.depositMoUSDInStabilityPool(MoUSD_MINIMUM_DEBT);
+      await otherMosaic.depositMEURInStabilityPool(MEUR_MINIMUM_DEBT);
 
       const deposit = await otherMosaic.getStabilityDeposit();
       expect(deposit.frontendTag).to.equal(frontendTag);
@@ -465,13 +465,13 @@ describe("EthersMosaic", () => {
 
       await funder.sendTransaction({
         to: otherUsers[0].getAddress(),
-        value: MoUSD_MINIMUM_DEBT.div(170).hex
+        value: MEUR_MINIMUM_DEBT.div(170).hex
       });
     });
 
     const initialTroveOfDepositor = Trove.create({
-      depositCollateral: MoUSD_MINIMUM_DEBT.div(100),
-      borrowMoUSD: MoUSD_MINIMUM_NET_DEBT
+      depositCollateral: MEUR_MINIMUM_DEBT.div(100),
+      borrowMEUR: MEUR_MINIMUM_NET_DEBT
     });
 
     const smallStabilityDeposit = Decimal.from(10);
@@ -480,23 +480,23 @@ describe("EthersMosaic", () => {
       const { newTrove } = await mosaic.openTrove(Trove.recreate(initialTroveOfDepositor));
       expect(newTrove).to.deep.equal(initialTroveOfDepositor);
 
-      const details = await mosaic.depositMoUSDInStabilityPool(smallStabilityDeposit);
+      const details = await mosaic.depositMEURInStabilityPool(smallStabilityDeposit);
 
       expect(details).to.deep.equal({
         msicLoss: Decimal.from(0),
-        newMoUSDDeposit: smallStabilityDeposit,
+        newMEURDeposit: smallStabilityDeposit,
         collateralGain: Decimal.from(0),
         msicReward: Decimal.from(0),
 
         change: {
-          depositMoUSD: smallStabilityDeposit
+          depositMEUR: smallStabilityDeposit
         }
       });
     });
 
     const troveWithVeryLowICR = Trove.create({
-      depositCollateral: MoUSD_MINIMUM_DEBT.div(180),
-      borrowMoUSD: MoUSD_MINIMUM_NET_DEBT
+      depositCollateral: MEUR_MINIMUM_DEBT.div(180),
+      borrowMEUR: MEUR_MINIMUM_NET_DEBT
     });
 
     it("other user should make a Trove with very low ICR", async () => {
@@ -522,7 +522,7 @@ describe("EthersMosaic", () => {
         liquidatedAddresses: [await otherUsers[0].getAddress()],
 
         collateralGasCompensation: troveWithVeryLowICR.collateral.mul(0.005), // 0.5%
-        msicGasCompensation: MoUSD_LIQUIDATION_RESERVE,
+        msicGasCompensation: MEUR_LIQUIDATION_RESERVE,
 
         totalLiquidated: new Trove(
           troveWithVeryLowICR.collateral
@@ -588,7 +588,7 @@ describe("EthersMosaic", () => {
 
       expect(details).to.deep.equal({
         msicLoss: smallStabilityDeposit,
-        newMoUSDDeposit: Decimal.ZERO,
+        newMEURDeposit: Decimal.ZERO,
         msicReward: Decimal.ZERO,
 
         collateralGain: troveWithVeryLowICR.collateral
@@ -626,20 +626,20 @@ describe("EthersMosaic", () => {
         let price = Decimal.from(200);
         await deployerMosaic.setPrice(price);
 
-        // Use this account to print MoUSD
-        await mosaic.openTrove({ depositCollateral: 50, borrowMoUSD: 5000 });
+        // Use this account to print MEUR
+        await mosaic.openTrove({ depositCollateral: 50, borrowMEUR: 5000 });
 
         // otherLiquities[0-2] will be independent stability depositors
-        await mosaic.sendMoUSD(await otherUsers[0].getAddress(), 3000);
-        await mosaic.sendMoUSD(await otherUsers[1].getAddress(), 1000);
-        await mosaic.sendMoUSD(await otherUsers[2].getAddress(), 1000);
+        await mosaic.sendMEUR(await otherUsers[0].getAddress(), 3000);
+        await mosaic.sendMEUR(await otherUsers[1].getAddress(), 1000);
+        await mosaic.sendMEUR(await otherUsers[2].getAddress(), 1000);
 
         // otherLiquities[3-4] will be Trove owners whose Troves get liquidated
-        await otherLiquities[3].openTrove({ depositCollateral: 21, borrowMoUSD: 2900 });
-        await otherLiquities[4].openTrove({ depositCollateral: 21, borrowMoUSD: 2900 });
+        await otherLiquities[3].openTrove({ depositCollateral: 21, borrowMEUR: 2900 });
+        await otherLiquities[4].openTrove({ depositCollateral: 21, borrowMEUR: 2900 });
 
-        await otherLiquities[0].depositMoUSDInStabilityPool(3000);
-        await otherLiquities[1].depositMoUSDInStabilityPool(1000);
+        await otherLiquities[0].depositMEURInStabilityPool(3000);
+        await otherLiquities[1].depositMEURInStabilityPool(1000);
         // otherLiquities[2] doesn't deposit yet
 
         // Tank the price so we can liquidate
@@ -651,20 +651,20 @@ describe("EthersMosaic", () => {
         expect((await otherLiquities[3].getTrove()).isEmpty).to.be.true;
 
         // Now otherLiquities[2] makes their deposit too
-        await otherLiquities[2].depositMoUSDInStabilityPool(1000);
+        await otherLiquities[2].depositMEURInStabilityPool(1000);
 
         // Liquidate second victim
         await mosaic.liquidate(await otherUsers[4].getAddress());
         expect((await otherLiquities[4].getTrove()).isEmpty).to.be.true;
 
         // Stability Pool is now empty
-        expect(`${await mosaic.getMoUSDInStabilityPool()}`).to.equal("0");
+        expect(`${await mosaic.getMEURInStabilityPool()}`).to.equal("0");
       });
 
       it("should still be able to withdraw remaining deposit", async () => {
         for (const l of [otherLiquities[0], otherLiquities[1], otherLiquities[2]]) {
           const stabilityDeposit = await l.getStabilityDeposit();
-          await l.withdrawMoUSDFromStabilityPool(stabilityDeposit.currentMoUSD);
+          await l.withdrawMEURFromStabilityPool(stabilityDeposit.currentMEUR);
         }
       });
     });
@@ -672,10 +672,10 @@ describe("EthersMosaic", () => {
 
   describe("Redemption", () => {
     const troveCreations = [
-      { depositCollateral: 99, borrowMoUSD: 4600 },
-      { depositCollateral: 20, borrowMoUSD: 2000 }, // net debt: 2010
-      { depositCollateral: 20, borrowMoUSD: 2100 }, // net debt: 2110.5
-      { depositCollateral: 20, borrowMoUSD: 2200 } //  net debt: 2211
+      { depositCollateral: 99, borrowMEUR: 4600 },
+      { depositCollateral: 20, borrowMEUR: 2000 }, // net debt: 2010
+      { depositCollateral: 20, borrowMEUR: 2100 }, // net debt: 2110.5
+      { depositCollateral: 20, borrowMEUR: 2200 } //  net debt: 2211
     ];
 
     before(async function () {
@@ -704,12 +704,12 @@ describe("EthersMosaic", () => {
       await otherLiquities[1].openTrove(troveCreations[2]);
       await otherLiquities[2].openTrove(troveCreations[3]);
 
-      await expect(mosaic.redeemMoUSD(4326.5)).to.eventually.be.rejected;
+      await expect(mosaic.redeemMEUR(4326.5)).to.eventually.be.rejected;
     });
 
-    const someMoUSD = Decimal.from(4326.5);
+    const someMEUR = Decimal.from(4326.5);
 
-    it("should redeem some MoUSD after the bootstrap phase", async () => {
+    it("should redeem some MEUR after the bootstrap phase", async () => {
       // Fast-forward 15 days
       await increaseTime(60 * 60 * 24 * 15);
 
@@ -725,15 +725,15 @@ describe("EthersMosaic", () => {
       expect(total).to.deep.equal(expectedTotal);
 
       const expectedDetails = {
-        attemptedMoUSDAmount: someMoUSD,
-        actualMoUSDAmount: someMoUSD,
-        collateralTaken: someMoUSD.div(200),
+        attemptedMEURAmount: someMEUR,
+        actualMEURAmount: someMEUR,
+        collateralTaken: someMEUR.div(200),
         fee: new Fees(0, 0.99, 2, new Date(), new Date(), false)
-          .redemptionRate(someMoUSD.div(total.debt))
-          .mul(someMoUSD.div(200))
+          .redemptionRate(someMEUR.div(total.debt))
+          .mul(someMEUR.div(200))
       };
 
-      const { rawReceipt, details } = await waitForSuccess(mosaic.send.redeemMoUSD(someMoUSD));
+      const { rawReceipt, details } = await waitForSuccess(mosaic.send.redeemMEUR(someMEUR));
       expect(details).to.deep.equal(expectedDetails);
 
       const balance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
@@ -745,11 +745,11 @@ describe("EthersMosaic", () => {
           .sub(gasCost)}`
       );
 
-      expect(`${await mosaic.getMoUSDBalance()}`).to.equal("273.5");
+      expect(`${await mosaic.getMEURBalance()}`).to.equal("273.5");
 
       expect(`${(await otherLiquities[0].getTrove()).debt}`).to.equal(
         `${Trove.create(troveCreations[1]).debt.sub(
-          someMoUSD
+          someMEUR
             .sub(Trove.create(troveCreations[2]).netDebt)
             .sub(Trove.create(troveCreations[3]).netDebt)
         )}`
@@ -798,22 +798,22 @@ describe("EthersMosaic", () => {
     });
 
     it("borrowing rate should be maxed out now", async () => {
-      const borrowMoUSD = Decimal.from(10);
+      const borrowMEUR = Decimal.from(10);
 
-      const { fee, newTrove } = await mosaic.borrowMoUSD(borrowMoUSD);
-      expect(`${fee}`).to.equal(`${borrowMoUSD.mul(MAXIMUM_BORROWING_RATE)}`);
+      const { fee, newTrove } = await mosaic.borrowMEUR(borrowMEUR);
+      expect(`${fee}`).to.equal(`${borrowMEUR.mul(MAXIMUM_BORROWING_RATE)}`);
 
       expect(newTrove).to.deep.equal(
-        Trove.create(troveCreations[0]).adjust({ borrowMoUSD }, MAXIMUM_BORROWING_RATE)
+        Trove.create(troveCreations[0]).adjust({ borrowMEUR }, MAXIMUM_BORROWING_RATE)
       );
     });
   });
 
   describe("Redemption (truncation)", () => {
-    const troveCreationParams = { depositCollateral: 20, borrowMoUSD: 2000 };
+    const troveCreationParams = { depositCollateral: 20, borrowMEUR: 2000 };
     const netDebtPerTrove = Trove.create(troveCreationParams).netDebt;
     const amountToAttempt = Decimal.from(3000);
-    const expectedRedeemable = netDebtPerTrove.mul(2).sub(MoUSD_MINIMUM_NET_DEBT);
+    const expectedRedeemable = netDebtPerTrove.mul(2).sub(MEUR_MINIMUM_NET_DEBT);
 
     before(function () {
       if (network.name !== "hardhat") {
@@ -836,7 +836,7 @@ describe("EthersMosaic", () => {
 
       await sendToEach(otherUsersSubset, 20.1);
 
-      await mosaic.openTrove({ depositCollateral: 99, borrowMoUSD: 5000 });
+      await mosaic.openTrove({ depositCollateral: 99, borrowMEUR: 5000 });
       await otherLiquities[0].openTrove(troveCreationParams);
       await otherLiquities[1].openTrove(troveCreationParams);
       await otherLiquities[2].openTrove(troveCreationParams);
@@ -845,32 +845,32 @@ describe("EthersMosaic", () => {
     });
 
     it("should truncate the amount if it would put the last Trove below the min debt", async () => {
-      const redemption = await mosaic.populate.redeemMoUSD(amountToAttempt);
-      expect(`${redemption.attemptedMoUSDAmount}`).to.equal(`${amountToAttempt}`);
-      expect(`${redemption.redeemableMoUSDAmount}`).to.equal(`${expectedRedeemable}`);
+      const redemption = await mosaic.populate.redeemMEUR(amountToAttempt);
+      expect(`${redemption.attemptedMEURAmount}`).to.equal(`${amountToAttempt}`);
+      expect(`${redemption.redeemableMEURAmount}`).to.equal(`${expectedRedeemable}`);
       expect(redemption.isTruncated).to.be.true;
 
       const { details } = await waitForSuccess(redemption.send());
-      expect(`${details.attemptedMoUSDAmount}`).to.equal(`${expectedRedeemable}`);
-      expect(`${details.actualMoUSDAmount}`).to.equal(`${expectedRedeemable}`);
+      expect(`${details.attemptedMEURAmount}`).to.equal(`${expectedRedeemable}`);
+      expect(`${details.actualMEURAmount}`).to.equal(`${expectedRedeemable}`);
     });
 
     it("should increase the amount to the next lowest redeemable value", async () => {
-      const increasedRedeemable = expectedRedeemable.add(MoUSD_MINIMUM_NET_DEBT);
+      const increasedRedeemable = expectedRedeemable.add(MEUR_MINIMUM_NET_DEBT);
 
-      const initialRedemption = await mosaic.populate.redeemMoUSD(amountToAttempt);
+      const initialRedemption = await mosaic.populate.redeemMEUR(amountToAttempt);
       const increasedRedemption = await initialRedemption.increaseAmountByMinimumNetDebt();
-      expect(`${increasedRedemption.attemptedMoUSDAmount}`).to.equal(`${increasedRedeemable}`);
-      expect(`${increasedRedemption.redeemableMoUSDAmount}`).to.equal(`${increasedRedeemable}`);
+      expect(`${increasedRedemption.attemptedMEURAmount}`).to.equal(`${increasedRedeemable}`);
+      expect(`${increasedRedemption.redeemableMEURAmount}`).to.equal(`${increasedRedeemable}`);
       expect(increasedRedemption.isTruncated).to.be.false;
 
       const { details } = await waitForSuccess(increasedRedemption.send());
-      expect(`${details.attemptedMoUSDAmount}`).to.equal(`${increasedRedeemable}`);
-      expect(`${details.actualMoUSDAmount}`).to.equal(`${increasedRedeemable}`);
+      expect(`${details.attemptedMEURAmount}`).to.equal(`${increasedRedeemable}`);
+      expect(`${details.actualMEURAmount}`).to.equal(`${increasedRedeemable}`);
     });
 
     it("should fail to increase the amount if it's not truncated", async () => {
-      const redemption = await mosaic.populate.redeemMoUSD(netDebtPerTrove);
+      const redemption = await mosaic.populate.redeemMEUR(netDebtPerTrove);
       expect(redemption.isTruncated).to.be.false;
 
       expect(() => redemption.increaseAmountByMinimumNetDebt()).to.throw(
@@ -887,13 +887,13 @@ describe("EthersMosaic", () => {
     const amountToBorrowPerTrove = Decimal.from(2000);
     const netDebtPerTrove = MINIMUM_BORROWING_RATE.add(1).mul(amountToBorrowPerTrove);
     const collateralPerTrove = netDebtPerTrove
-      .add(MoUSD_LIQUIDATION_RESERVE)
+      .add(MEUR_LIQUIDATION_RESERVE)
       .mulDiv(1.5, massivePrice);
 
     const amountToRedeem = netDebtPerTrove.mul(_redeemMaxIterations);
     const amountToDeposit = MINIMUM_BORROWING_RATE.add(1)
       .mul(amountToRedeem)
-      .add(MoUSD_LIQUIDATION_RESERVE)
+      .add(MEUR_LIQUIDATION_RESERVE)
       .mulDiv(2, massivePrice);
 
     before(async function () {
@@ -920,7 +920,7 @@ describe("EthersMosaic", () => {
       for (const otherMosaic of otherLiquities) {
         await otherMosaic.openTrove({
           depositCollateral: collateralPerTrove,
-          borrowMoUSD: amountToBorrowPerTrove
+          borrowMEUR: amountToBorrowPerTrove
         });
       }
 
@@ -930,10 +930,10 @@ describe("EthersMosaic", () => {
     it("should redeem using the maximum iterations and almost all gas", async () => {
       await mosaic.openTrove({
         depositCollateral: amountToDeposit,
-        borrowMoUSD: amountToRedeem
+        borrowMEUR: amountToRedeem
       });
 
-      const { rawReceipt } = await waitForSuccess(mosaic.send.redeemMoUSD(amountToRedeem));
+      const { rawReceipt } = await waitForSuccess(mosaic.send.redeemMEUR(amountToRedeem));
 
       const gasUsed = rawReceipt.gasUsed.toNumber();
       // gasUsed is ~half the real used amount because of how refunds work, see:
@@ -1051,15 +1051,15 @@ describe("EthersMosaic", () => {
       mosaic = await connectToDeployment(deployment, user);
 
       await openTroves(eightOtherUsers, [
-        { depositCollateral: 30, borrowMoUSD: 2000 }, // 0
-        { depositCollateral: 30, borrowMoUSD: 2100 }, // 1
-        { depositCollateral: 30, borrowMoUSD: 2200 }, // 2
-        { depositCollateral: 30, borrowMoUSD: 2300 }, // 3
+        { depositCollateral: 30, borrowMEUR: 2000 }, // 0
+        { depositCollateral: 30, borrowMEUR: 2100 }, // 1
+        { depositCollateral: 30, borrowMEUR: 2200 }, // 2
+        { depositCollateral: 30, borrowMEUR: 2300 }, // 3
         // Test 1:           30,             2400
-        { depositCollateral: 30, borrowMoUSD: 2500 }, // 4
-        { depositCollateral: 30, borrowMoUSD: 2600 }, // 5
-        { depositCollateral: 30, borrowMoUSD: 2700 }, // 6
-        { depositCollateral: 30, borrowMoUSD: 2800 } //  7
+        { depositCollateral: 30, borrowMEUR: 2500 }, // 4
+        { depositCollateral: 30, borrowMEUR: 2600 }, // 5
+        { depositCollateral: 30, borrowMEUR: 2700 }, // 6
+        { depositCollateral: 30, borrowMEUR: 2800 } //  7
         // Test 2:           30,             2900
         // Test 2 (other):   30,             3000
         // Test 3:           30,             3100 -> 3200
@@ -1070,7 +1070,7 @@ describe("EthersMosaic", () => {
     it("should not use extra gas when a Trove's position doesn't change", async () => {
       const { newTrove: initialTrove } = await mosaic.openTrove({
         depositCollateral: 30,
-        borrowMoUSD: 2400
+        borrowMEUR: 2400
       });
 
       // Maintain the same ICR / position in the list
@@ -1091,8 +1091,8 @@ describe("EthersMosaic", () => {
       const initialTrove = await mosaic.getTrove();
       const bottomTrove = await bottomMosaic.getTrove();
 
-      const targetTrove = Trove.create({ depositCollateral: 30, borrowMoUSD: 2900 });
-      const interferingTrove = Trove.create({ depositCollateral: 30, borrowMoUSD: 3000 });
+      const targetTrove = Trove.create({ depositCollateral: 30, borrowMEUR: 2900 });
+      const interferingTrove = Trove.create({ depositCollateral: 30, borrowMEUR: 3000 });
 
       const tx = await mosaic.populate.adjustTrove(initialTrove.adjustTo(targetTrove));
 
@@ -1110,8 +1110,8 @@ describe("EthersMosaic", () => {
       const initialTrove = await mosaic.getTrove();
 
       const targetTrove = [
-        Trove.create({ depositCollateral: 30, borrowMoUSD: 3100 }),
-        Trove.create({ depositCollateral: 30, borrowMoUSD: 3200 })
+        Trove.create({ depositCollateral: 30, borrowMEUR: 3100 }),
+        Trove.create({ depositCollateral: 30, borrowMEUR: 3200 })
       ];
 
       await mosaic.adjustTrove(initialTrove.adjustTo(targetTrove[0]));
@@ -1151,22 +1151,22 @@ describe("EthersMosaic", () => {
       ]);
 
       await openTroves(fiveOtherUsers, [
-        { depositCollateral: 20, borrowMoUSD: 2040 },
-        { depositCollateral: 20, borrowMoUSD: 2050 },
-        { depositCollateral: 20, borrowMoUSD: 2060 },
-        { depositCollateral: 20, borrowMoUSD: 2070 },
-        { depositCollateral: 20, borrowMoUSD: 2080 }
+        { depositCollateral: 20, borrowMEUR: 2040 },
+        { depositCollateral: 20, borrowMEUR: 2050 },
+        { depositCollateral: 20, borrowMEUR: 2060 },
+        { depositCollateral: 20, borrowMEUR: 2070 },
+        { depositCollateral: 20, borrowMEUR: 2080 }
       ]);
 
       await increaseTime(60 * 60 * 24 * 15);
     });
 
     it("should include enough gas for updating lastFeeOperationTime", async () => {
-      await mosaic.openTrove({ depositCollateral: 20, borrowMoUSD: 2090 });
+      await mosaic.openTrove({ depositCollateral: 20, borrowMEUR: 2090 });
 
       // We just updated lastFeeOperationTime, so this won't anticipate having to update that
       // during estimateGas
-      const tx = await mosaic.populate.redeemMoUSD(1);
+      const tx = await mosaic.populate.redeemMEUR(1);
       const originalGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
 
       // Fast-forward 2 minutes.
@@ -1193,7 +1193,7 @@ describe("EthersMosaic", () => {
       // First, we want to test a non-borrowing case, to make sure we're not passing due to any
       // extra gas we add to cover a potential lastFeeOperationTime update
       const adjustment = trove.adjustTo(newTrove);
-      expect(adjustment.borrowMoUSD).to.be.undefined;
+      expect(adjustment.borrowMEUR).to.be.undefined;
 
       const tx = await mosaic.populate.adjustTrove(adjustment);
       const originalGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
@@ -1209,10 +1209,10 @@ describe("EthersMosaic", () => {
       await waitForSuccess(tx.send());
       expect(gasIncrease).to.be.within(10000, 25000);
 
-      assertDefined(rudeCreation.borrowMoUSD);
-      const msicShortage = rudeTrove.debt.sub(rudeCreation.borrowMoUSD);
+      assertDefined(rudeCreation.borrowMEUR);
+      const msicShortage = rudeTrove.debt.sub(rudeCreation.borrowMEUR);
 
-      await mosaic.sendMoUSD(await rudeUser.getAddress(), msicShortage);
+      await mosaic.sendMEUR(await rudeUser.getAddress(), msicShortage);
       await rudeMosaic.closeTrove();
     });
 
@@ -1224,7 +1224,7 @@ describe("EthersMosaic", () => {
 
       // Make sure we're borrowing
       const adjustment = trove.adjustTo(newTrove);
-      expect(adjustment.borrowMoUSD).to.not.be.undefined;
+      expect(adjustment.borrowMEUR).to.not.be.undefined;
 
       const tx = await mosaic.populate.adjustTrove(adjustment);
       const originalGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
@@ -1259,8 +1259,8 @@ describe("EthersMosaic", () => {
     it("should include enough gas for issuing MSIC", async function () {
       this.timeout("1m");
 
-      await mosaic.openTrove({ depositCollateral: 40, borrowMoUSD: 4000 });
-      await mosaic.depositMoUSDInStabilityPool(19);
+      await mosaic.openTrove({ depositCollateral: 40, borrowMEUR: 4000 });
+      await mosaic.depositMEURInStabilityPool(19);
 
       await increaseTime(60);
 
@@ -1270,8 +1270,8 @@ describe("EthersMosaic", () => {
       await mosaic.withdrawGainsFromStabilityPool();
 
       const claim = await mosaic.populate.withdrawGainsFromStabilityPool();
-      const deposit = await mosaic.populate.depositMoUSDInStabilityPool(1);
-      const withdraw = await mosaic.populate.withdrawMoUSDFromStabilityPool(1);
+      const deposit = await mosaic.populate.depositMEURInStabilityPool(1);
+      const withdraw = await mosaic.populate.withdrawMEURFromStabilityPool(1);
 
       for (let i = 0; i < 5; ++i) {
         for (const tx of [claim, deposit, withdraw]) {
@@ -1290,7 +1290,7 @@ describe("EthersMosaic", () => {
       const creation = Trove.recreate(new Trove(Decimal.from(11.1), Decimal.from(2000.1)));
 
       await deployerMosaic.openTrove(creation);
-      await deployerMosaic.depositMoUSDInStabilityPool(creation.borrowMoUSD);
+      await deployerMosaic.depositMEURInStabilityPool(creation.borrowMEUR);
       await deployerMosaic.setPrice(198);
 
       const liquidateTarget = await mosaic.populate.liquidate(await deployer.getAddress());
@@ -1329,14 +1329,14 @@ describe("EthersMosaic", () => {
         someMoreUsers,
         someMoreUsers.map((_, i) => ({
           depositCollateral: 20,
-          borrowMoUSD: MoUSD_MINIMUM_NET_DEBT.add(i / 10)
+          borrowMEUR: MEUR_MINIMUM_NET_DEBT.add(i / 10)
         }))
       );
 
-      // Sweep MoUSD
+      // Sweep MEUR
       await Promise.all(
         otherLiquities.map(async otherMosaic =>
-          otherMosaic.sendMoUSD(await user.getAddress(), await otherMosaic.getMoUSDBalance())
+          otherMosaic.sendMEUR(await user.getAddress(), await otherMosaic.getMEURBalance())
         )
       );
 
@@ -1344,8 +1344,8 @@ describe("EthersMosaic", () => {
 
       // Create a "designated victim" Trove that'll be redeemed
       const redeemedTroveDebt = await mosaic
-        .getMoUSDBalance()
-        .then(x => x.div(10).add(MoUSD_LIQUIDATION_RESERVE));
+        .getMEURBalance()
+        .then(x => x.div(10).add(MEUR_LIQUIDATION_RESERVE));
       const redeemedTroveCollateral = redeemedTroveDebt.mulDiv(1.1, price);
       const redeemedTrove = new Trove(redeemedTroveCollateral, redeemedTroveDebt);
 
@@ -1355,9 +1355,9 @@ describe("EthersMosaic", () => {
       await increaseTime(60 * 60 * 24 * 15);
 
       // Increase the borrowing rate by redeeming
-      const { actualMoUSDAmount } = await mosaic.redeemMoUSD(redeemedTrove.netDebt);
+      const { actualMEURAmount } = await mosaic.redeemMEUR(redeemedTrove.netDebt);
 
-      expect(`${actualMoUSDAmount}`).to.equal(`${redeemedTrove.netDebt}`);
+      expect(`${actualMEURAmount}`).to.equal(`${redeemedTrove.netDebt}`);
 
       const borrowingRate = await mosaic.getFees().then(fees => Number(fees.borrowingRate()));
       expect(borrowingRate).to.be.within(0.04, 0.049); // make sure it's high, but not clamped to 5%

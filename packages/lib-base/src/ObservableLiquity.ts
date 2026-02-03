@@ -24,9 +24,9 @@ export interface ObservableMosaic {
     address?: string
   ): () => void;
 
-  watchMoUSDInStabilityPool(
-    onMoUSDInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
+  watchMEURInStabilityPool(
+    onMEURInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
   ): () => void;
 
-  watchMoUSDBalance(onMoUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
+  watchMEURBalance(onMEURBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
 }

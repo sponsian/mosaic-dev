@@ -32,11 +32,11 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [getFees(overrides)](./lib-ethers.readableethersmosaic.getfees.md) |  | Get a calculator for current fees. |
 |  [getFrontendStatus(address, overrides)](./lib-ethers.readableethersmosaic.getfrontendstatus.md) |  | Check whether an address is registered as a Mosaic frontend, and what its kickback rate is. |
 |  [getLiquidityMiningMSICReward(address, overrides)](./lib-ethers.readableethersmosaic.getliquidityminingmsicreward.md) |  | Get the amount of MSIC earned by an address through mining liquidity. |
-|  [getLiquidityMiningStake(address, overrides)](./lib-ethers.readableethersmosaic.getliquidityminingstake.md) |  | Get the amount of Uniswap REEF/MoUSD LP tokens currently staked by an address in liquidity mining. |
+|  [getLiquidityMiningStake(address, overrides)](./lib-ethers.readableethersmosaic.getliquidityminingstake.md) |  | Get the amount of Uniswap REEF/MEUR LP tokens currently staked by an address in liquidity mining. |
 |  [getMSICBalance(address, overrides)](./lib-ethers.readableethersmosaic.getmsicbalance.md) |  | Get the amount of MSIC held by an address. |
 |  [getMSICStake(address, overrides)](./lib-ethers.readableethersmosaic.getmsicstake.md) |  | Get the current state of an MSIC Stake. |
-|  [getMoUSDBalance(address, overrides)](./lib-ethers.readableethersmosaic.getmsicbalance.md) |  | Get the amount of MoUSD held by an address. |
-|  [getMoUSDInStabilityPool(overrides)](./lib-ethers.readableethersmosaic.getmsicinstabilitypool.md) |  | Get the total amount of MoUSD currently deposited in the Stability Pool. |
+|  [getMEURBalance(address, overrides)](./lib-ethers.readableethersmosaic.getmsicbalance.md) |  | Get the amount of MEUR held by an address. |
+|  [getMEURInStabilityPool(overrides)](./lib-ethers.readableethersmosaic.getmsicinstabilitypool.md) |  | Get the total amount of MEUR currently deposited in the Stability Pool. |
 |  [getNumberOfTroves(overrides)](./lib-ethers.readableethersmosaic.getnumberoftroves.md) |  | Get number of Troves that are currently open. |
 |  [getPrice(overrides)](./lib-ethers.readableethersmosaic.getprice.md) |  | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingLiquidityMiningMSICReward(overrides)](./lib-ethers.readableethersmosaic.getremainingliquidityminingmsicreward.md) |  | Get the remaining MSIC that will be collectively rewarded to liquidity miners. |
@@ -45,12 +45,12 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [getTotal(overrides)](./lib-ethers.readableethersmosaic.gettotal.md) |  | Get the total amount of collateral and debt in the Mosaic system. |
 |  [getTotalRedistributed(overrides)](./lib-ethers.readableethersmosaic.gettotalredistributed.md) |  | Get the total collateral and debt per stake that has been liquidated through redistribution. |
 |  [getTotalStakedMSIC(overrides)](./lib-ethers.readableethersmosaic.gettotalstakedmsic.md) |  | Get the total amount of MSIC currently staked. |
-|  [getTotalStakedUniTokens(overrides)](./lib-ethers.readableethersmosaic.gettotalstakedunitokens.md) |  | Get the total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. |
+|  [getTotalStakedUniTokens(overrides)](./lib-ethers.readableethersmosaic.gettotalstakedunitokens.md) |  | Get the total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining. |
 |  [getTrove(address, overrides)](./lib-ethers.readableethersmosaic.gettrove.md) |  | Get the current state of a Trove. |
 |  [getTroveBeforeRedistribution(address, overrides)](./lib-ethers.readableethersmosaic.gettrovebeforeredistribution.md) |  | Get a Trove in its state after the last direct modification. |
 |  [getTroves(params, overrides)](./lib-ethers.readableethersmosaic.gettroves_1.md) |  | Get a slice from the list of Troves. |
-|  [getUniTokenAllowance(address, overrides)](./lib-ethers.readableethersmosaic.getunitokenallowance.md) |  | Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens. |
-|  [getUniTokenBalance(address, overrides)](./lib-ethers.readableethersmosaic.getunitokenbalance.md) |  | Get the amount of Uniswap REEF/MoUSD LP tokens held by an address. |
+|  [getUniTokenAllowance(address, overrides)](./lib-ethers.readableethersmosaic.getunitokenallowance.md) |  | Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MEUR LP tokens. |
+|  [getUniTokenBalance(address, overrides)](./lib-ethers.readableethersmosaic.getunitokenbalance.md) |  | Get the amount of Uniswap REEF/MEUR LP tokens held by an address. |
 |  [hasStore()](./lib-ethers.readableethersmosaic.hasstore.md) |  | Check whether this <code>ReadableEthersMosaic</code> is a [ReadableEthersMosaicWithStore](./lib-ethers.readableethersmosaicwithstore.md)<!-- -->. |
 |  [hasStore(store)](./lib-ethers.readableethersmosaic.hasstore_1.md) |  | Check whether this <code>ReadableEthersMosaic</code> is a [ReadableEthersMosaicWithStore](./lib-ethers.readableethersmosaicwithstore.md)<!-- -->&lt;[BlockPolledMosaicStore](./lib-ethers.blockpolledmosaicstore.md)<!-- -->&gt;<!-- -->. |
 

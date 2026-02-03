@@ -6,7 +6,7 @@ const DefaultPool = artifacts.require("./DefaultPool.sol")
 const StabilityPool = artifacts.require("./StabilityPool.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
-const MoUSDToken = artifacts.require("./MoUSDToken.sol")
+const MEURToken = artifacts.require("./MEURToken.sol")
 const FunctionCaller = artifacts.require("./FunctionCaller.sol")
 const BorrowerOperations = artifacts.require("./BorrowerOperations.sol")
 
@@ -23,7 +23,7 @@ module.exports = function(deployer) {
   deployer.deploy(ActivePool)
   deployer.deploy(StabilityPool)
   deployer.deploy(DefaultPool)
-  deployer.deploy(MoUSDToken)
+  deployer.deploy(MEURToken)
   deployer.deploy(FunctionCaller)
 
   deployer.then(async () => {
@@ -34,7 +34,7 @@ module.exports = function(deployer) {
     const activePool = await ActivePool.deployed()
     const stabilityPool = await StabilityPool.deployed()
     const defaultPool = await DefaultPool.deployed()
-    const msicToken = await MoUSDToken.deployed()
+    const msicToken = await MEURToken.deployed()
     const functionCaller = await FunctionCaller.deployed()
 
     const mosaicContracts = {

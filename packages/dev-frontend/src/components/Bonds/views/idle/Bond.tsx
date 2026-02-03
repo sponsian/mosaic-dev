@@ -16,7 +16,7 @@ const getBondEvents = (bond: BondType): EventType[] => {
       label: (
         <>
           <Label description={l.BOND_CREATED.description}>{l.BOND_CREATED.term}</Label>
-          <SubLabel>{`0.00 bMoUSD`}</SubLabel>
+          <SubLabel>{`0.00 bMEUR`}</SubLabel>
         </>
       )
     },
@@ -36,9 +36,9 @@ const getBondEvents = (bond: BondType): EventType[] => {
           </Label>
           <SubLabel style={{ fontWeight: 400 }}>
             {bond.status === "PENDING"
-              ? `${bond.accrued.prettify(2)} bMoUSD`
+              ? `${bond.accrued.prettify(2)} bMEUR`
               : bond.status === "CLAIMED"
-              ? `${bond?.claimedAmount?.prettify(2)} bMoUSD`
+              ? `${bond?.claimedAmount?.prettify(2)} bMEUR`
               : ""}
           </SubLabel>
         </>
@@ -56,7 +56,7 @@ const getBondEvents = (bond: BondType): EventType[] => {
           <Label description={l.BREAK_EVEN_TIME.description}>{l.BREAK_EVEN_TIME.term}</Label>
           <SubLabel>
             <InfiniteEstimate estimate={bond?.breakEvenAccrual}>
-              {bond?.breakEvenAccrual?.prettify(2) ?? "?"} bMoUSD
+              {bond?.breakEvenAccrual?.prettify(2) ?? "?"} bMEUR
             </InfiniteEstimate>
           </SubLabel>
         </>
@@ -70,7 +70,7 @@ const getBondEvents = (bond: BondType): EventType[] => {
           <Label description={l.OPTIMUM_REBOND_TIME.description}>{l.OPTIMUM_REBOND_TIME.term}</Label>
           <SubLabel>
             <InfiniteEstimate estimate={bond?.rebondAccrual}>
-              {bond?.rebondAccrual?.prettify(2) ?? "?"} bMoUSD
+              {bond?.rebondAccrual?.prettify(2) ?? "?"} bMEUR
             </InfiniteEstimate>
           </SubLabel>
         </>
@@ -88,7 +88,7 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
   const { BOND_NFT_ADDRESS } = useBondAddresses();
 
   const handleSellBMousdPressed = () => {
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMoUSD } as SwapPressedPayload);
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMEUR } as SwapPressedPayload);
   };
 
   return (
@@ -139,19 +139,19 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
                 fontSize: "14.5px"
               }}
             >
-              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MoUSD" />
+              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MEUR" />
               {bond.status === "PENDING" && (
                 <Record
                   lexicon={l.MARKET_VALUE}
                   value={bond?.marketValue?.prettify(2) ?? "0"}
-                  type="MoUSD"
+                  type="MEUR"
                 />
               )}
             </Flex>
             {bond.status === "PENDING" && <Actions bondId={bond.id} />}
             {bond.status !== "PENDING" && bond.status === "CLAIMED" && (
               <Button variant="outline" sx={{ height: "44px" }} onClick={handleSellBMousdPressed}>
-                Sell bMoUSD
+                Sell bMEUR
               </Button>
             )}
           </Flex>

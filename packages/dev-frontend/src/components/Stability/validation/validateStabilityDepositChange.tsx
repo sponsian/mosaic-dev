@@ -28,7 +28,7 @@ type StabilityDepositChangeValidationContext = ReturnType<
 
 export const validateStabilityDepositChange = (
   originalDeposit: StabilityDeposit,
-  editedMoUSD: Decimal,
+  editedMEUR: Decimal,
   {
     msicBalance,
     haveOwnFrontend,
@@ -38,7 +38,7 @@ export const validateStabilityDepositChange = (
   validChange: StabilityDepositChange<Decimal> | undefined,
   description: JSX.Element | undefined
 ] => {
-  const change = originalDeposit.whatChanged(editedMoUSD);
+  const change = originalDeposit.whatChanged(editedMEUR);
 
   if (haveOwnFrontend) {
     return [
@@ -53,24 +53,24 @@ export const validateStabilityDepositChange = (
     return [undefined, undefined];
   }
 
-  if (change.depositMoUSD?.gt(msicBalance)) {
+  if (change.depositMEUR?.gt(msicBalance)) {
     return [
       undefined,
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
         <Amount>
-          {change.depositMoUSD.sub(msicBalance).prettify()} {COIN}
+          {change.depositMEUR.sub(msicBalance).prettify()} {COIN}
         </Amount>
         .
       </ErrorDescription>
     ];
   }
 
-  if (change.withdrawMoUSD && haveUndercollateralizedTroves) {
+  if (change.withdrawMEUR && haveUndercollateralizedTroves) {
     return [
       undefined,
       <ErrorDescription>
-        You're not allowed to withdraw MoUSD from your Stability Deposit when there are
+        You're not allowed to withdraw MEUR from your Stability Deposit when there are
         undercollateralized Troves. Please liquidate those Troves or try again later.
       </ErrorDescription>
     ];

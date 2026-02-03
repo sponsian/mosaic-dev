@@ -4,7 +4,7 @@
 
 ## ReadableEthersMosaic.getUniTokenAllowance() method
 
-Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens.
+Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MEUR LP tokens.
 
 <b>Signature:</b>
 
@@ -16,7 +16,7 @@ getUniTokenAllowance(address?: string, overrides?: EthersCallOverrides): Promise
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  address | string | Address holding the Uniswap REEF/MoUSD LP tokens. |
+|  address | string | Address holding the Uniswap REEF/MEUR LP tokens. |
 |  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>

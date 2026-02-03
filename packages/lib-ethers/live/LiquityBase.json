@@ -44,7 +44,7 @@
     },
     {
       "inputs": [],
-      "name": "MoUSD_GAS_COMPENSATION",
+      "name": "MEUR_GAS_COMPENSATION",
       "outputs": [
         {
           "internalType": "uint256",

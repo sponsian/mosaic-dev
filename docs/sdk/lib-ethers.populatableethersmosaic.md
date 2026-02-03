@@ -24,29 +24,29 @@ export declare class PopulatableEthersMosaic implements PopulatableMosaic<Ethers
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
 |  [adjustTrove(params, maxBorrowingRateOrOptionalParams, overrides)](./lib-ethers.populatableethersmosaic.adjusttrove.md) |  | Adjust existing Trove by changing its collateral, debt, or both. |
-|  [approveUniTokens(allowance, overrides)](./lib-ethers.populatableethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap REEF/MoUSD LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
-|  [borrowMoUSD(amount, maxBorrowingRate, overrides)](./lib-ethers.populatableethersmosaic.borrowmsic.md) |  | Adjust existing Trove by borrowing more MoUSD. |
+|  [approveUniTokens(allowance, overrides)](./lib-ethers.populatableethersmosaic.approveunitokens.md) |  | Allow the liquidity mining contract to use Uniswap REEF/MEUR LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
+|  [borrowMEUR(amount, maxBorrowingRate, overrides)](./lib-ethers.populatableethersmosaic.borrowmsic.md) |  | Adjust existing Trove by borrowing more MEUR. |
 |  [claimCollateralSurplus(overrides)](./lib-ethers.populatableethersmosaic.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove(overrides)](./lib-ethers.populatableethersmosaic.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [depositCollateral(amount, overrides)](./lib-ethers.populatableethersmosaic.depositcollateral.md) |  | Adjust existing Trove by depositing more collateral. |
-|  [depositMoUSDInStabilityPool(amount, frontendTag, overrides)](./lib-ethers.populatableethersmosaic.depositmsicinstabilitypool.md) |  | Make a new Stability Deposit, or top up existing one. |
+|  [depositMEURInStabilityPool(amount, frontendTag, overrides)](./lib-ethers.populatableethersmosaic.depositmsicinstabilitypool.md) |  | Make a new Stability Deposit, or top up existing one. |
 |  [exitLiquidityMining(overrides)](./lib-ethers.populatableethersmosaic.exitliquiditymining.md) |  | Withdraw all staked LP tokens from liquidity mining and claim reward. |
 |  [liquidate(address, overrides)](./lib-ethers.populatableethersmosaic.liquidate.md) |  | Liquidate one or more undercollateralized Troves. |
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)](./lib-ethers.populatableethersmosaic.liquidateupto.md) |  | Liquidate the least collateralized Troves up to a maximum number. |
-|  [openTrove(params, maxBorrowingRateOrOptionalParams, overrides)](./lib-ethers.populatableethersmosaic.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing MoUSD. |
-|  [redeemMoUSD(amount, maxRedemptionRate, overrides)](./lib-ethers.populatableethersmosaic.redeemmsic.md) |  | Redeem MoUSD to native currency (e.g. Ether) at face value. |
+|  [openTrove(params, maxBorrowingRateOrOptionalParams, overrides)](./lib-ethers.populatableethersmosaic.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing MEUR. |
+|  [redeemMEUR(amount, maxRedemptionRate, overrides)](./lib-ethers.populatableethersmosaic.redeemmsic.md) |  | Redeem MEUR to native currency (e.g. Ether) at face value. |
 |  [registerFrontend(kickbackRate, overrides)](./lib-ethers.populatableethersmosaic.registerfrontend.md) |  | Register current wallet address as a Mosaic frontend. |
-|  [repayMoUSD(amount, overrides)](./lib-ethers.populatableethersmosaic.repaymsic.md) |  | Adjust existing Trove by repaying some of its debt. |
+|  [repayMEUR(amount, overrides)](./lib-ethers.populatableethersmosaic.repaymsic.md) |  | Adjust existing Trove by repaying some of its debt. |
 |  [sendMSIC(toAddress, amount, overrides)](./lib-ethers.populatableethersmosaic.sendmsic.md) |  | Send MSIC tokens to an address. |
-|  [sendMoUSD(toAddress, amount, overrides)](./lib-ethers.populatableethersmosaic.sendmsic.md) |  | Send MoUSD tokens to an address. |
+|  [sendMEUR(toAddress, amount, overrides)](./lib-ethers.populatableethersmosaic.sendmsic.md) |  | Send MEUR tokens to an address. |
 |  [stakeMSIC(amount, overrides)](./lib-ethers.populatableethersmosaic.stakemsic.md) |  | Stake MSIC to start earning fee revenue or increase existing stake. |
-|  [stakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.stakeunitokens.md) |  | Stake Uniswap REEF/MoUSD LP tokens to participate in liquidity mining and earn MSIC. |
+|  [stakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.stakeunitokens.md) |  | Stake Uniswap REEF/MEUR LP tokens to participate in liquidity mining and earn MSIC. |
 |  [transferCollateralGainToTrove(overrides)](./lib-ethers.populatableethersmosaic.transfercollateralgaintotrove.md) |  | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
 |  [unstakeMSIC(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakemsic.md) |  | Withdraw MSIC from staking. |
-|  [unstakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap REEF/MoUSD LP tokens from liquidity mining. |
+|  [unstakeUniTokens(amount, overrides)](./lib-ethers.populatableethersmosaic.unstakeunitokens.md) |  | Withdraw Uniswap REEF/MEUR LP tokens from liquidity mining. |
 |  [withdrawCollateral(amount, overrides)](./lib-ethers.populatableethersmosaic.withdrawcollateral.md) |  | Adjust existing Trove by withdrawing some of its collateral. |
 |  [withdrawGainsFromStabilityPool(overrides)](./lib-ethers.populatableethersmosaic.withdrawgainsfromstabilitypool.md) |  | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [MSIC reward](./lib-base.stabilitydeposit.msicreward.md) from Stability Deposit. |
-|  [withdrawGainsFromStaking(overrides)](./lib-ethers.populatableethersmosaic.withdrawgainsfromstaking.md) |  | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |
+|  [withdrawGainsFromStaking(overrides)](./lib-ethers.populatableethersmosaic.withdrawgainsfromstaking.md) |  | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MEUR gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |
 |  [withdrawMSICRewardFromLiquidityMining(overrides)](./lib-ethers.populatableethersmosaic.withdrawmsicrewardfromliquiditymining.md) |  | Withdraw MSIC that has been earned by mining liquidity. |
-|  [withdrawMoUSDFromStabilityPool(amount, overrides)](./lib-ethers.populatableethersmosaic.withdrawmsicfromstabilitypool.md) |  | Withdraw MoUSD from Stability Deposit. |
+|  [withdrawMEURFromStabilityPool(amount, overrides)](./lib-ethers.populatableethersmosaic.withdrawmsicfromstabilitypool.md) |  | Withdraw MEUR from Stability Deposit. |
 

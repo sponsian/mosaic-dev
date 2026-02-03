@@ -41,26 +41,26 @@ async function mainnetDeploy(configParams) {
   const mosaicCore = await mdh.deployMosaicCoreMainnet(configParams.externalAddrs.TELLOR_MASTER, deploymentState)
   await mdh.logContractObjects(mosaicCore)
 
-  // Check Uniswap Pair MoUSD-REEF pair before pair creation
-  let MoUSDWETHPairAddr = await uniswapV2Factory.getPair(mosaicCore.msicToken.address, configParams.externalAddrs.WETH_ERC20)
-  let WETHMoUSDPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, mosaicCore.msicToken.address)
-  assert.equal(MoUSDWETHPairAddr, WETHMoUSDPairAddr)
+  // Check Uniswap Pair MEUR-REEF pair before pair creation
+  let MEURWETHPairAddr = await uniswapV2Factory.getPair(mosaicCore.msicToken.address, configParams.externalAddrs.WETH_ERC20)
+  let WETHMEURPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, mosaicCore.msicToken.address)
+  assert.equal(MEURWETHPairAddr, WETHMEURPairAddr)
 
 
-  if (MoUSDWETHPairAddr == th.ZERO_ADDRESS) {
-    // Deploy Unipool for MoUSD-WETH
+  if (MEURWETHPairAddr == th.ZERO_ADDRESS) {
+    // Deploy Unipool for MEUR-WETH
     await mdh.sendAndWaitForTransaction(uniswapV2Factory.createPair(
       configParams.externalAddrs.WETH_ERC20,
       mosaicCore.msicToken.address,
       { gasPrice }
     ))
 
-    // Check Uniswap Pair MoUSD-WETH pair after pair creation (forwards and backwards should have same address)
-    MoUSDWETHPairAddr = await uniswapV2Factory.getPair(mosaicCore.msicToken.address, configParams.externalAddrs.WETH_ERC20)
-    assert.notEqual(MoUSDWETHPairAddr, th.ZERO_ADDRESS)
-    WETHMoUSDPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, mosaicCore.msicToken.address)
-    console.log(`MoUSD-WETH pair contract address after Uniswap pair creation: ${MoUSDWETHPairAddr}`)
-    assert.equal(WETHMoUSDPairAddr, MoUSDWETHPairAddr)
+    // Check Uniswap Pair MEUR-WETH pair after pair creation (forwards and backwards should have same address)
+    MEURWETHPairAddr = await uniswapV2Factory.getPair(mosaicCore.msicToken.address, configParams.externalAddrs.WETH_ERC20)
+    assert.notEqual(MEURWETHPairAddr, th.ZERO_ADDRESS)
+    WETHMEURPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, mosaicCore.msicToken.address)
+    console.log(`MEUR-WETH pair contract address after Uniswap pair creation: ${MEURWETHPairAddr}`)
+    assert.equal(WETHMEURPairAddr, MEURWETHPairAddr)
   }
 
   // Deploy Unipool
@@ -82,9 +82,9 @@ async function mainnetDeploy(configParams) {
   // Deploy a read-only multi-trove getter
   const multiTroveGetter = await mdh.deployMultiTroveGetterMainnet(mosaicCore, deploymentState)
 
-  // Connect Unipool to MSICToken and the MoUSD-WETH pair address, with a 6 week duration
+  // Connect Unipool to MSICToken and the MEUR-WETH pair address, with a 6 week duration
   const LPRewardsDuration = timeVals.SECONDS_IN_SIX_WEEKS
-  await mdh.connectUnipoolMainnet(unipool, MSICContracts, MoUSDWETHPairAddr, LPRewardsDuration)
+  await mdh.connectUnipoolMainnet(unipool, MSICContracts, MEURWETHPairAddr, LPRewardsDuration)
 
   // Log MSIC and Unipool addresses
   await mdh.logContractObjects(MSICContracts)
@@ -136,9 +136,9 @@ async function mainnetDeploy(configParams) {
 
   // // --- TESTS AND CHECKS  ---
 
-  // Deployer repay MoUSD
+  // Deployer repay MEUR
   // console.log(`deployer trove debt before repaying: ${await mosaicCore.troveManager.getTroveDebt(deployerWallet.address)}`)
- // await mdh.sendAndWaitForTransaction(mosaicCore.borrowerOperations.repayMoUSD(dec(800, 18), th.ZERO_ADDRESS, th.ZERO_ADDRESS, {gasPrice, gasLimit: 1000000}))
+ // await mdh.sendAndWaitForTransaction(mosaicCore.borrowerOperations.repayMEUR(dec(800, 18), th.ZERO_ADDRESS, th.ZERO_ADDRESS, {gasPrice, gasLimit: 1000000}))
   // console.log(`deployer trove debt after repaying: ${await mosaicCore.troveManager.getTroveDebt(deployerWallet.address)}`)
   
   // Deployer add coll
@@ -238,9 +238,9 @@ async function mainnetDeploy(configParams) {
 
   // // --- Unipool ---
 
-  // // Check Unipool's MoUSD-REEF Uniswap Pair address
+  // // Check Unipool's MEUR-REEF Uniswap Pair address
   // const unipoolUniswapPairAddr = await unipool.uniToken()
-  // console.log(`Unipool's stored MoUSD-REEF Uniswap Pair address: ${unipoolUniswapPairAddr}`)
+  // console.log(`Unipool's stored MEUR-REEF Uniswap Pair address: ${unipoolUniswapPairAddr}`)
 
   // console.log("SYSTEM GLOBAL VARS CHECKS")
   // // --- Sorted Troves ---
@@ -251,24 +251,24 @@ async function mainnetDeploy(configParams) {
 
   // // --- TroveManager ---
 
-  // const liqReserve = await mosaicCore.troveManager.MoUSD_GAS_COMPENSATION()
+  // const liqReserve = await mosaicCore.troveManager.MEUR_GAS_COMPENSATION()
   // const minNetDebt = await mosaicCore.troveManager.MIN_NET_DEBT()
 
   // th.logBN('system liquidation reserve', liqReserve)
   // th.logBN('system min net debt      ', minNetDebt)
 
-  // // --- Make first MoUSD-REEF liquidity provision ---
+  // // --- Make first MEUR-REEF liquidity provision ---
 
   // // Open trove if not yet opened
   // const troveStatus = await mosaicCore.troveManager.getTroveStatus(deployerWallet.address)
   // if (troveStatus.toString() != '1') {
-  //   let _3kMoUSDWithdrawal = th.dec(3000, 18) // 3000 MoUSD
+  //   let _3kMEURWithdrawal = th.dec(3000, 18) // 3000 MEUR
   //   let _3ETHcoll = th.dec(3, 'ether') // 3 REEF
   //   console.log('Opening trove...')
   //   await mdh.sendAndWaitForTransaction(
   //     mosaicCore.borrowerOperations.openTrove(
   //       th._100pct,
-  //       _3kMoUSDWithdrawal,
+  //       _3kMEURWithdrawal,
   //       th.ZERO_ADDRESS,
   //       th.ZERO_ADDRESS,
   //       { value: _3ETHcoll, gasPrice }
@@ -287,28 +287,28 @@ async function mainnetDeploy(configParams) {
   // th.logBN('deployer stake', deployerTrove[2])
   // console.log(`deployer's trove status: ${deployerTrove[3]}`)
 
-  // // Check deployer has MoUSD
-  // let deployerMoUSDBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
-  // th.logBN("deployer's MoUSD balance", deployerMoUSDBal)
+  // // Check deployer has MEUR
+  // let deployerMEURBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
+  // th.logBN("deployer's MEUR balance", deployerMEURBal)
 
-  // // Check Uniswap pool has MoUSD and WETH tokens
-  const MoUSDETHPair = await new ethers.Contract(
-    MoUSDWETHPairAddr,
+  // // Check Uniswap pool has MEUR and WETH tokens
+  const MEURETHPair = await new ethers.Contract(
+    MEURWETHPairAddr,
     UniswapV2Pair.abi,
     deployerWallet
   )
 
-  // const token0Addr = await MoUSDETHPair.token0()
-  // const token1Addr = await MoUSDETHPair.token1()
-  // console.log(`MoUSD-REEF Pair token 0: ${th.squeezeAddr(token0Addr)},
-  //       MoUSDToken contract addr: ${th.squeezeAddr(mosaicCore.msicToken.address)}`)
-  // console.log(`MoUSD-REEF Pair token 1: ${th.squeezeAddr(token1Addr)},
+  // const token0Addr = await MEURETHPair.token0()
+  // const token1Addr = await MEURETHPair.token1()
+  // console.log(`MEUR-REEF Pair token 0: ${th.squeezeAddr(token0Addr)},
+  //       MEURToken contract addr: ${th.squeezeAddr(mosaicCore.msicToken.address)}`)
+  // console.log(`MEUR-REEF Pair token 1: ${th.squeezeAddr(token1Addr)},
   //       WETH ERC20 contract addr: ${th.squeezeAddr(configParams.externalAddrs.WETH_ERC20)}`)
 
-  // // Check initial MoUSD-REEF pair reserves before provision
-  // let reserves = await MoUSDETHPair.getReserves()
-  // th.logBN("MoUSD-REEF Pair's MoUSD reserves before provision", reserves[0])
-  // th.logBN("MoUSD-REEF Pair's REEF reserves before provision", reserves[1])
+  // // Check initial MEUR-REEF pair reserves before provision
+  // let reserves = await MEURETHPair.getReserves()
+  // th.logBN("MEUR-REEF Pair's MEUR reserves before provision", reserves[0])
+  // th.logBN("MEUR-REEF Pair's REEF reserves before provision", reserves[1])
 
   // // Get the UniswapV2Router contract
   // const uniswapV2Router02 = new ethers.Contract(
@@ -317,38 +317,38 @@ async function mainnetDeploy(configParams) {
   //   deployerWallet
   // )
 
-  // // --- Provide liquidity to MoUSD-REEF pair if not yet done so ---
-  // let deployerLPTokenBal = await MoUSDETHPair.balanceOf(deployerWallet.address)
+  // // --- Provide liquidity to MEUR-REEF pair if not yet done so ---
+  // let deployerLPTokenBal = await MEURETHPair.balanceOf(deployerWallet.address)
   // if (deployerLPTokenBal.toString() == '0') {
   //   console.log('Providing liquidity to Uniswap...')
-  //   // Give router an allowance for MoUSD
+  //   // Give router an allowance for MEUR
   //   await mosaicCore.msicToken.increaseAllowance(uniswapV2Router02.address, dec(10000, 18))
 
   //   // Check Router's spending allowance
-  //   const routerMoUSDAllowanceFromDeployer = await mosaicCore.msicToken.allowance(deployerWallet.address, uniswapV2Router02.address)
-  //   th.logBN("router's spending allowance for deployer's MoUSD", routerMoUSDAllowanceFromDeployer)
+  //   const routerMEURAllowanceFromDeployer = await mosaicCore.msicToken.allowance(deployerWallet.address, uniswapV2Router02.address)
+  //   th.logBN("router's spending allowance for deployer's MEUR", routerMEURAllowanceFromDeployer)
 
   //   // Get amounts for liquidity provision
   //   const LP_ETH = dec(1, 'ether')
 
   //   // Convert 8-digit CL price to 18 and multiply by REEF amount
-  //   const MoUSDAmount = toBigNum(chainlinkPrice)
+  //   const MEURAmount = toBigNum(chainlinkPrice)
   //     .mul(toBigNum(dec(1, 10)))
   //     .mul(toBigNum(LP_ETH))
   //     .div(toBigNum(dec(1, 18)))
 
-  //   const minMoUSDAmount = MoUSDAmount.sub(toBigNum(dec(100, 18)))
+  //   const minMEURAmount = MEURAmount.sub(toBigNum(dec(100, 18)))
 
   //   latestBlock = await ethers.provider.getBlockNumber()
   //   now = (await ethers.provider.getBlock(latestBlock)).timestamp
   //   let tenMinsFromNow = now + (60 * 60 * 10)
 
-  //   // Provide liquidity to MoUSD-REEF pair
+  //   // Provide liquidity to MEUR-REEF pair
   //   await mdh.sendAndWaitForTransaction(
   //     uniswapV2Router02.addLiquidityETH(
-  //       mosaicCore.msicToken.address, // address of MoUSD token
-  //       MoUSDAmount, // MoUSD provision
-  //       minMoUSDAmount, // minimum MoUSD provision
+  //       mosaicCore.msicToken.address, // address of MEUR token
+  //       MEURAmount, // MEUR provision
+  //       minMEURAmount, // minimum MEUR provision
   //       LP_ETH, // minimum REEF provision
   //       deployerWallet.address, // address to send LP tokens to
   //       tenMinsFromNow, // deadline for this tx
@@ -362,10 +362,10 @@ async function mainnetDeploy(configParams) {
   // } else {
   //   console.log('Liquidity already provided to Uniswap')
   // }
-  // // Check MoUSD-REEF reserves after liquidity provision:
-  // reserves = await MoUSDETHPair.getReserves()
-  // th.logBN("MoUSD-REEF Pair's MoUSD reserves after provision", reserves[0])
-  // th.logBN("MoUSD-REEF Pair's REEF reserves after provision", reserves[1])
+  // // Check MEUR-REEF reserves after liquidity provision:
+  // reserves = await MEURETHPair.getReserves()
+  // th.logBN("MEUR-REEF Pair's MEUR reserves after provision", reserves[0])
+  // th.logBN("MEUR-REEF Pair's REEF reserves after provision", reserves[1])
 
 
 
@@ -373,11 +373,11 @@ async function mainnetDeploy(configParams) {
   // console.log("CHECK LP STAKING EARNS MSIC")
 
   // // Check deployer's LP tokens
-  // deployerLPTokenBal = await MoUSDETHPair.balanceOf(deployerWallet.address)
+  // deployerLPTokenBal = await MEURETHPair.balanceOf(deployerWallet.address)
   // th.logBN("deployer's LP token balance", deployerLPTokenBal)
 
   // // Stake LP tokens in Unipool
-  // console.log(`MoUSDETHPair addr: ${MoUSDETHPair.address}`)
+  // console.log(`MEURETHPair addr: ${MEURETHPair.address}`)
   // console.log(`Pair addr stored in Unipool: ${await unipool.uniToken()}`)
 
   // earnedMSIC = await unipool.earned(deployerWallet.address)
@@ -388,7 +388,7 @@ async function mainnetDeploy(configParams) {
   //   console.log('Staking to Unipool...')
   //   // Deployer approves Unipool
   //   await mdh.sendAndWaitForTransaction(
-  //     MoUSDETHPair.approve(unipool.address, deployerLPTokenBal, { gasPrice })
+  //     MEURETHPair.approve(unipool.address, deployerLPTokenBal, { gasPrice })
   //   )
 
   //   await mdh.sendAndWaitForTransaction(unipool.stake(1, { gasPrice }))
@@ -410,15 +410,15 @@ async function mainnetDeploy(configParams) {
   // // --- Make SP deposit and earn MSIC ---
   // console.log("CHECK DEPLOYER MAKING DEPOSIT AND EARNING MSIC")
 
-  // let SPDeposit = await mosaicCore.stabilityPool.getCompoundedMoUSDDeposit(deployerWallet.address)
+  // let SPDeposit = await mosaicCore.stabilityPool.getCompoundedMEURDeposit(deployerWallet.address)
   // th.logBN("deployer SP deposit before making deposit", SPDeposit)
 
   // // Provide to SP
   // await mdh.sendAndWaitForTransaction(mosaicCore.stabilityPool.provideToSP(dec(15, 18), th.ZERO_ADDRESS, { gasPrice, gasLimit: 400000 }))
 
   // // Get SP deposit 
-  // SPDeposit = await mosaicCore.stabilityPool.getCompoundedMoUSDDeposit(deployerWallet.address)
-  // th.logBN("deployer SP deposit after depositing 15 MoUSD", SPDeposit)
+  // SPDeposit = await mosaicCore.stabilityPool.getCompoundedMEURDeposit(deployerWallet.address)
+  // th.logBN("deployer SP deposit after depositing 15 MEUR", SPDeposit)
 
   // console.log("wait 90 seconds before withdrawing...")
   // // wait 90 seconds
@@ -427,7 +427,7 @@ async function mainnetDeploy(configParams) {
   // // Withdraw from SP
   // // await mdh.sendAndWaitForTransaction(mosaicCore.stabilityPool.withdrawFromSP(dec(1000, 18), { gasPrice, gasLimit: 400000 }))
 
-  // // SPDeposit = await mosaicCore.stabilityPool.getCompoundedMoUSDDeposit(deployerWallet.address)
+  // // SPDeposit = await mosaicCore.stabilityPool.getCompoundedMEURDeposit(deployerWallet.address)
   // // th.logBN("deployer SP deposit after full withdrawal", SPDeposit)
 
   // // deployerMSICBal = await MSICContracts.msicToken.balanceOf(deployerWallet.address)
@@ -482,8 +482,8 @@ async function mainnetDeploy(configParams) {
   // th.logBN("deployer stake after staking", deployerMSICStake)
 
   // // Log deployer rev share immediately after staking
-  // let deployerMoUSDRevShare = await MSICContracts.msicStaking.getPendingMoUSDGain(deployerWallet.address)
-  // th.logBN("deployer pending MoUSD revenue share", deployerMoUSDRevShare)
+  // let deployerMEURRevShare = await MSICContracts.msicStaking.getPendingMEURGain(deployerWallet.address)
+  // th.logBN("deployer pending MEUR revenue share", deployerMEURRevShare)
 
 
 
@@ -491,12 +491,12 @@ async function mainnetDeploy(configParams) {
   // const trove2Status = await mosaicCore.troveManager.getTroveStatus(account2Wallet.address)
   // if (trove2Status.toString() != '1') {
   //   console.log("Acct 2 opens a trove ...")
-  //   let _2kMoUSDWithdrawal = th.dec(2000, 18) // 2000 MoUSD
+  //   let _2kMEURWithdrawal = th.dec(2000, 18) // 2000 MEUR
   //   let _1pt5_ETHcoll = th.dec(15, 17) // 1.5 REEF
   //   const borrowerOpsEthersFactory = await ethers.getContractFactory("BorrowerOperations", account2Wallet)
   //   const borrowerOpsAcct2 = await new ethers.Contract(mosaicCore.borrowerOperations.address, borrowerOpsEthersFactory.interface, account2Wallet)
 
-  //   await mdh.sendAndWaitForTransaction(borrowerOpsAcct2.openTrove(th._100pct, _2kMoUSDWithdrawal, th.ZERO_ADDRESS, th.ZERO_ADDRESS, { value: _1pt5_ETHcoll, gasPrice, gasLimit: 1000000 }))
+  //   await mdh.sendAndWaitForTransaction(borrowerOpsAcct2.openTrove(th._100pct, _2kMEURWithdrawal, th.ZERO_ADDRESS, th.ZERO_ADDRESS, { value: _1pt5_ETHcoll, gasPrice, gasLimit: 1000000 }))
   // } else {
   //   console.log('Acct 2 already has an active trove')
   // }
@@ -507,31 +507,31 @@ async function mainnetDeploy(configParams) {
   // th.logBN('acct2 stake', acct2Trove[2])
   // console.log(`acct2 trove status: ${acct2Trove[3]}`)
 
-  // // Log deployer's pending MoUSD gain - check fees went to staker (deloyer)
-  // deployerMoUSDRevShare = await MSICContracts.msicStaking.getPendingMoUSDGain(deployerWallet.address)
-  // th.logBN("deployer pending MoUSD revenue share from staking, after acct 2 opened trove", deployerMoUSDRevShare)
+  // // Log deployer's pending MEUR gain - check fees went to staker (deloyer)
+  // deployerMEURRevShare = await MSICContracts.msicStaking.getPendingMEURGain(deployerWallet.address)
+  // th.logBN("deployer pending MEUR revenue share from staking, after acct 2 opened trove", deployerMEURRevShare)
 
   // //  --- deployer withdraws staking gains ---
   // console.log("CHECK DEPLOYER WITHDRAWING STAKING GAINS")
 
-  // // check deployer's MoUSD balance before withdrawing staking gains
-  // deployerMoUSDBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
-  // th.logBN('deployer MoUSD bal before withdrawing staking gains', deployerMoUSDBal)
+  // // check deployer's MEUR balance before withdrawing staking gains
+  // deployerMEURBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
+  // th.logBN('deployer MEUR bal before withdrawing staking gains', deployerMEURBal)
 
   // // Deployer withdraws staking gains
   // await mdh.sendAndWaitForTransaction(MSICContracts.msicStaking.unstake(0, { gasPrice, gasLimit: 1000000 }))
 
-  // // check deployer's MoUSD balance after withdrawing staking gains
-  // deployerMoUSDBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
-  // th.logBN('deployer MoUSD bal after withdrawing staking gains', deployerMoUSDBal)
+  // // check deployer's MEUR balance after withdrawing staking gains
+  // deployerMEURBal = await mosaicCore.msicToken.balanceOf(deployerWallet.address)
+  // th.logBN('deployer MEUR bal after withdrawing staking gains', deployerMEURBal)
 
 
   // // --- System stats  ---
 
-  // Uniswap MoUSD-REEF pool size
-  reserves = await MoUSDETHPair.getReserves()
-  th.logBN("MoUSD-REEF Pair's current MoUSD reserves", reserves[0])
-  th.logBN("MoUSD-REEF Pair's current REEF reserves", reserves[1])
+  // Uniswap MEUR-REEF pool size
+  reserves = await MEURETHPair.getReserves()
+  th.logBN("MEUR-REEF Pair's current MEUR reserves", reserves[0])
+  th.logBN("MEUR-REEF Pair's current REEF reserves", reserves[1])
 
   // Number of troves
   const numTroves = await mosaicCore.troveManager.getTroveOwnersCount()
@@ -558,8 +558,8 @@ async function mainnetDeploy(configParams) {
   th.logBN("Current borrowing rate", currentBorrowingRate)
 
   // total SP deposits
-  const totalSPDeposits = await mosaicCore.stabilityPool.getTotalMoUSDDeposits()
-  th.logBN("Total MoUSD SP deposits", totalSPDeposits)
+  const totalSPDeposits = await mosaicCore.stabilityPool.getTotalMEURDeposits()
+  th.logBN("Total MEUR SP deposits", totalSPDeposits)
 
   // total MSIC Staked in MSICStaking
   const totalMSICStaked = await MSICContracts.msicStaking.totalMSICStaked()
@@ -567,7 +567,7 @@ async function mainnetDeploy(configParams) {
 
   // total LP tokens staked in Unipool
   const totalLPTokensStaked = await unipool.totalSupply()
-  th.logBN("Total LP (MoUSD-REEF) tokens staked in unipool", totalLPTokensStaked)
+  th.logBN("Total LP (MEUR-REEF) tokens staked in unipool", totalLPTokensStaked)
 
   // --- State variables ---
 
@@ -581,9 +581,9 @@ async function mainnetDeploy(configParams) {
   th.logBN("Snapshot of total trove collateral before last liq. ", totalCollateralSnapshot)
 
   const L_ETH = await mosaicCore.troveManager.L_ETH()
-  const L_MoUSDDebt = await mosaicCore.troveManager.L_MoUSDDebt()
+  const L_MEURDebt = await mosaicCore.troveManager.L_MEURDebt()
   th.logBN("L_ETH", L_ETH)
-  th.logBN("L_MoUSDDebt", L_MoUSDDebt)
+  th.logBN("L_MEURDebt", L_MEURDebt)
 
   // StabilityPool
   console.log("StabilityPool state variables:")
@@ -600,9 +600,9 @@ async function mainnetDeploy(configParams) {
 
   // MSICStaking
   console.log("MSICStaking state variables:")
-  const F_MoUSD = await MSICContracts.msicStaking.F_MoUSD()
+  const F_MEUR = await MSICContracts.msicStaking.F_MEUR()
   const F_ETH = await MSICContracts.msicStaking.F_ETH()
-  th.logBN("F_MoUSD", F_MoUSD)
+  th.logBN("F_MEUR", F_MEUR)
   th.logBN("F_ETH", F_ETH)
 
 

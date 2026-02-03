@@ -1,7 +1,7 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const MoUSDTokenTester = artifacts.require("./MoUSDTokenTester.sol")
+const MEURTokenTester = artifacts.require("./MEURTokenTester.sol")
 
 const th = testHelpers.TestHelper
 const dec = th.dec
@@ -38,7 +38,7 @@ contract('TroveManager', async accounts => {
 
   let contracts
 
-  const getOpenTroveMoUSDAmount = async (totalDebt) => th.getOpenTroveMoUSDAmount(contracts, totalDebt)
+  const getOpenTroveMEURAmount = async (totalDebt) => th.getOpenTroveMEURAmount(contracts, totalDebt)
  
   const getSnapshotsRatio = async () => {
     const ratio = (await troveManager.totalStakesSnapshot())
@@ -51,7 +51,7 @@ contract('TroveManager', async accounts => {
   beforeEach(async () => {
     contracts = await deploymentHelper.deployMosaicCore()
     contracts.troveManager = await TroveManagerTester.new()
-    contracts.msicToken = await MoUSDTokenTester.new(
+    contracts.msicToken = await MEURTokenTester.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
@@ -83,19 +83,19 @@ contract('TroveManager', async accounts => {
     await priceFeed.setPrice(dec(100, 18))
   
     // Make 1 mega troves A at ~50% total collateral
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(1, 31)), ZERO_ADDRESS, ZERO_ADDRESS, { from: A, value: dec(2, 29) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(1, 31)), ZERO_ADDRESS, ZERO_ADDRESS, { from: A, value: dec(2, 29) })
     
     // Make 5 large troves B, C, D, E, F at ~10% total collateral
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: B, value: dec(4, 28) })
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: C, value: dec(4, 28) })
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: D, value: dec(4, 28) })
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: E, value: dec(4, 28) })
-    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: F, value: dec(4, 28) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: B, value: dec(4, 28) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: C, value: dec(4, 28) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: D, value: dec(4, 28) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: E, value: dec(4, 28) })
+    await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(2, 30)), ZERO_ADDRESS, ZERO_ADDRESS, { from: F, value: dec(4, 28) })
   
     // Make 10 tiny troves at relatively negligible collateral (~1e-9 of total)
     const tinyTroves = accounts.slice(10, 20)
     for (account of tinyTroves) {
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(1, 22)), ZERO_ADDRESS, ZERO_ADDRESS, { from: account, value: dec(2, 20) })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(1, 22)), ZERO_ADDRESS, ZERO_ADDRESS, { from: account, value: dec(2, 20) })
     }
 
     // liquidate 1 trove at ~50% total system collateral

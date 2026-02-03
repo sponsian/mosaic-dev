@@ -1,8 +1,8 @@
 import { Decimal } from "@mosaic/lib-base";
 import {
-  BMoUSDLPZap,
-  BMoUSDLPZap__factory,
-  BMoUSDToken,
+  BMEURLPZap,
+  BMEURLPZap__factory,
+  BMEURToken,
   BondNFT,
   ChickenBondManager,
   ERC20Faucet,
@@ -14,12 +14,12 @@ import {
 } from "@mosaic/chicken-bonds/msic/types/external";
 import { CurveCryptoSwap2ETH__factory } from "@mosaic/chicken-bonds/msic/types/external";
 import {
-  BMoUSDToken__factory,
+  BMEURToken__factory,
   BondNFT__factory,
   ChickenBondManager__factory
 } from "@mosaic/chicken-bonds/msic/types";
-import type { MoUSDToken } from "@mosaic/lib-ethers/dist/types";
-import MoUSDTokenAbi from "@mosaic/lib-ethers/abi/MoUSDToken.json";
+import type { MEURToken } from "@mosaic/lib-ethers/dist/types";
+import MEURTokenAbi from "@mosaic/lib-ethers/abi/MEURToken.json";
 import { useContract } from "../../../hooks/useContract";
 import { useMosaic } from "../../../hooks/MosaicContext";
 import { useCallback } from "react";
@@ -47,12 +47,12 @@ type BondsInformation = {
 
 type BondContracts = {
   addresses: Addresses;
-  msicToken: MoUSDToken | undefined;
-  bMousdToken: BMoUSDToken | undefined;
+  msicToken: MEURToken | undefined;
+  bMousdToken: BMEURToken | undefined;
   bondNft: BondNFT | undefined;
   chickenBondManager: ChickenBondManager | undefined;
   bMousdAmm: CurveCryptoSwap2ETH | undefined;
-  bMousdAmmZapper: BMoUSDLPZap | undefined;
+  bMousdAmmZapper: BMEURLPZap | undefined;
   bMousdGauge: CurveLiquidityGaugeV5 | undefined;
   hasFoundContracts: boolean;
   getLatestData: (account: string, api: BondsApi) => Promise<BondsInformation | undefined>;
@@ -66,33 +66,33 @@ export const useBondContracts = (): BondContracts => {
   const addresses = useBondAddresses();
 
   const {
-    BMoUSD_AMM_ADDRESS,
-    BMoUSD_TOKEN_ADDRESS,
+    BMEUR_AMM_ADDRESS,
+    BMEUR_TOKEN_ADDRESS,
     BOND_NFT_ADDRESS,
     CHICKEN_BOND_MANAGER_ADDRESS,
-    MoUSD_OVERRIDE_ADDRESS,
-    BMoUSD_LP_ZAP_ADDRESS,
-    BMoUSD_AMM_STAKING_ADDRESS
+    MEUR_OVERRIDE_ADDRESS,
+    BMEUR_LP_ZAP_ADDRESS,
+    BMEUR_AMM_STAKING_ADDRESS
   } = addresses;
 
-  const [msicTokenDefault, msicTokenDefaultStatus] = useContract<MoUSDToken>(
+  const [msicTokenDefault, msicTokenDefaultStatus] = useContract<MEURToken>(
     mosaic.connection.addresses.msicToken,
-    MoUSDTokenAbi
+    MEURTokenAbi
   );
 
   const [msicTokenOverride, msicTokenOverrideStatus] = useContract<ERC20Faucet>(
-    MoUSD_OVERRIDE_ADDRESS,
+    MEUR_OVERRIDE_ADDRESS,
     ERC20Faucet__factory.abi
   );
 
   const [msicToken, msicTokenStatus] =
-    MoUSD_OVERRIDE_ADDRESS === null
+    MEUR_OVERRIDE_ADDRESS === null
       ? [msicTokenDefault, msicTokenDefaultStatus]
-      : [(msicTokenOverride as unknown) as MoUSDToken, msicTokenOverrideStatus];
+      : [(msicTokenOverride as unknown) as MEURToken, msicTokenOverrideStatus];
 
-  const [bMousdToken, bMousdTokenStatus] = useContract<BMoUSDToken>(
-    BMoUSD_TOKEN_ADDRESS,
-    BMoUSDToken__factory.abi
+  const [bMousdToken, bMousdTokenStatus] = useContract<BMEURToken>(
+    BMEUR_TOKEN_ADDRESS,
+    BMEURToken__factory.abi
   );
 
   const [bondNft, bondNftStatus] = useContract<BondNFT>(BOND_NFT_ADDRESS, BondNFT__factory.abi);
@@ -102,17 +102,17 @@ export const useBondContracts = (): BondContracts => {
   );
 
   const [bMousdAmm, bMousdAmmStatus] = useContract<CurveCryptoSwap2ETH>(
-    BMoUSD_AMM_ADDRESS,
+    BMEUR_AMM_ADDRESS,
     CurveCryptoSwap2ETH__factory.abi
   );
 
-  const [bMousdAmmZapper, bMousdAmmZapperStatus] = useContract<BMoUSDLPZap>(
-    BMoUSD_LP_ZAP_ADDRESS,
-    BMoUSDLPZap__factory.abi
+  const [bMousdAmmZapper, bMousdAmmZapperStatus] = useContract<BMEURLPZap>(
+    BMEUR_LP_ZAP_ADDRESS,
+    BMEURLPZap__factory.abi
   );
 
   const [bMousdGauge, bMousdGaugeStatus] = useContract<CurveLiquidityGaugeV5>(
-    BMoUSD_AMM_STAKING_ADDRESS,
+    BMEUR_AMM_STAKING_ADDRESS,
     CurveLiquidityGaugeV5__factory.abi
   );
 
@@ -189,8 +189,8 @@ export const useBondContracts = (): BondContracts => {
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bMousdAmmBMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.BMoUSD],
-        bMousdAmmMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.MoUSD],
+        bMousdAmmBMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.BMEUR],
+        bMousdAmmMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.MEUR],
         lpRewards
       };
     },

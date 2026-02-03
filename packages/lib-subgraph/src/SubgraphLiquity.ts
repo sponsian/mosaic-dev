@@ -262,19 +262,19 @@ export class SubgraphMosaic implements ReadableMosaic, ObservableMosaic {
     throw new Error("Method not implemented.");
   }
 
-  getMoUSDInStabilityPool() {
+  getMEURInStabilityPool() {
     return tokensInStabilityPool.get(this.client, undefined);
   }
 
-  watchMoUSDInStabilityPool(onMoUSDInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void) {
-    return tokensInStabilityPool.watch(this.client, onMoUSDInStabilityPoolChanged, undefined);
+  watchMEURInStabilityPool(onMEURInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void) {
+    return tokensInStabilityPool.watch(this.client, onMEURInStabilityPoolChanged, undefined);
   }
 
-  getMoUSDBalance(address?: string): Promise<Decimal> {
+  getMEURBalance(address?: string): Promise<Decimal> {
     throw new Error("Method not implemented.");
   }
 
-  watchMoUSDBalance(onMoUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
+  watchMEURBalance(onMEURBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
     throw new Error("Method not implemented.");
   }
 

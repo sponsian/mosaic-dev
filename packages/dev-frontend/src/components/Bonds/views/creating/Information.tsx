@@ -23,7 +23,7 @@ const InformationContainer: React.FC = ({ children }) => {
   return (
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
-        <Flex sx={{ justifyContent: "center" }}>Bond MoUSD</Flex>
+        <Flex sx={{ justifyContent: "center" }}>Bond MEUR</Flex>
         <Close
           onClick={handleDismiss}
           sx={{
@@ -59,9 +59,9 @@ export const Information: React.FC = () => {
     <InformationContainer>
       <Box sx={{ p: [2, 3] }}>
         <Paragraph sx={{ mt: 2 }}>
-          Bonds accrue a virtual balance of boosted MoUSD tokens (bMoUSD) over time. At any time, the
-          bonder may choose to claim their bMoUSD in exchange for their MoUSD, or cancel their bond to
-          recover their deposited MoUSD.
+          Bonds accrue a virtual balance of boosted MEUR tokens (bMEUR) over time. At any time, the
+          bonder may choose to claim their bMEUR in exchange for their MEUR, or cancel their bond to
+          recover their deposited MEUR.
         </Paragraph>
         <Paragraph sx={{ mt: 3 }}>
           Please visit the&nbsp;

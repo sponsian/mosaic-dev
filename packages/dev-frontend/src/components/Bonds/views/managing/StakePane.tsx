@@ -30,8 +30,8 @@ export const StakePane: React.FC = () => {
     const tokensNeedingApproval = new Map();
     if (!isBMousdLpApprovedWithGauge) {
       tokensNeedingApproval.set(
-        BMousdAmmTokenIndex.BMoUSD_MoUSD_LP,
-        addresses.BMoUSD_AMM_STAKING_ADDRESS
+        BMousdAmmTokenIndex.BMEUR_MEUR_LP,
+        addresses.BMEUR_AMM_STAKING_ADDRESS
       );
     }
     dispatchEvent("APPROVE_PRESSED", {
@@ -64,7 +64,7 @@ export const StakePane: React.FC = () => {
       />
 
       <Flex mt={3}>
-        <StaticRow label="bMoUSD LP APR">
+        <StaticRow label="bMEUR LP APR">
           <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
             <PoolBalance symbol="%">
               {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
@@ -74,7 +74,7 @@ export const StakePane: React.FC = () => {
       </Flex>
 
       <Flex my={3} sx={{ fontWeight: 300, fontSize: "16px" }}>
-        Your LP tokens will be staked in the bMoUSD Curve gauge to earn protocol fees and Curve
+        Your LP tokens will be staked in the bMEUR Curve gauge to earn protocol fees and Curve
         rewards.
       </Flex>
 

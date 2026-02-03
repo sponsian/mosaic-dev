@@ -345,8 +345,8 @@ lockupContract addr: 0xe15f843480BAd6b9ce15338c7741ECD27335101F,
             on-chain beneficiary addr: 0x994668f7B05B30996BB7F2B87140D0A761D9f292,
             unlockTime: 1649147590
             
-MoUSD-REEF Pair's current MoUSD reserves: 30990477.408572788781506107
-MoUSD-REEF Pair's current REEF reserves: 15258.270570524213535400
+MEUR-REEF Pair's current MEUR reserves: 30990477.408572788781506107
+MEUR-REEF Pair's current REEF reserves: 15258.270570524213535400
 number of troves: 629 
 Trove list size: 629 
 Entire system debt: 224076696.929000000000000001
@@ -354,15 +354,15 @@ Entire system coll: 188347.910169118875210030
 TCR: 178447561
 Base rate: .000000000000000000
 Current borrowing rate: .005000000000000000
-Total MoUSD SP deposits: 191910262.941164732826849969
+Total MEUR SP deposits: 191910262.941164732826849969
 Total MSIC staked: 86909.187426354870595936
-Total LP (MoUSD-REEF) tokens staked in unipool: 683904.049143924186944944
+Total LP (MEUR-REEF) tokens staked in unipool: 683904.049143924186944944
 TroveManager state variables:
 Total trove stakes: 188347.910169118875210030
 Snapshot of total trove stakes before last liq. : 137204.600258289651261017
 Snapshot of total trove collateral before last liq. : 137204.600258289651261017
 L_ETH: .000000000000000000
-L_MoUSDDebt: .000000000000000000
+L_MEURDebt: .000000000000000000
 StabilityPool state variables:
 Product P: .992747893314368378
 Current epoch: .000000000000000000
@@ -370,7 +370,7 @@ Current scale: .000000000000000000
 Sum S, at current epoch and scale: 3755627158167.383944157323204956
 Sum G, at current epoch and scale: 350441167319678608925.052578485919513817
 MSICStaking state variables:
-F_MoUSD: 587.906301502359526587
+F_MEUR: 587.906301502359526587
 F_ETH: .000000000000000000
 CommunityIssuance state variables:
 Total MSIC issued to depositors / front ends: 99060.299071514592000000

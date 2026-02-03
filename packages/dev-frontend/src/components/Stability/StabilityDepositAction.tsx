@@ -25,9 +25,9 @@ export const StabilityDepositAction: React.FC<StabilityDepositActionProps> = ({
 
   const [sendTransaction] = useTransactionFunction(
     transactionId,
-    change.depositMoUSD
-      ? mosaic.send.depositMoUSDInStabilityPool.bind(mosaic.send, change.depositMoUSD, frontendTag)
-      : mosaic.send.withdrawMoUSDFromStabilityPool.bind(mosaic.send, change.withdrawMoUSD)
+    change.depositMEUR
+      ? mosaic.send.depositMEURInStabilityPool.bind(mosaic.send, change.depositMEUR, frontendTag)
+      : mosaic.send.withdrawMEURFromStabilityPool.bind(mosaic.send, change.withdrawMEUR)
   );
 
   return <Button onClick={sendTransaction}>{children}</Button>;

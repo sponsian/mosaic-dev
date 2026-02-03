@@ -56,10 +56,10 @@ export const DepositPane: React.FC = () => {
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map<BMousdAmmTokenIndex, Address>();
     if (zapperNeedsMousdApproval) {
-      tokensNeedingApproval.set(BMousdAmmTokenIndex.MoUSD, addresses.BMoUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.MEUR, addresses.BMEUR_LP_ZAP_ADDRESS);
     }
     if (zapperNeedsBMousdApproval) {
-      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMoUSD, addresses.BMoUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(BMousdAmmTokenIndex.BMEUR, addresses.BMEUR_LP_ZAP_ADDRESS);
     }
 
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);
@@ -91,14 +91,14 @@ export const DepositPane: React.FC = () => {
     setShouldDepositBalanced(toggle => !toggle);
   };
 
-  const handleSetAmount = (token: "bMoUSD" | "MoUSD", amount: Decimal) => {
+  const handleSetAmount = (token: "bMEUR" | "MEUR", amount: Decimal) => {
     if (shouldDepositBalanced) {
-      if (token === "bMoUSD") setMousdAmount(poolBalanceRatio.mul(amount));
-      else if (token === "MoUSD") setBMousdAmount(amount.div(poolBalanceRatio));
+      if (token === "bMEUR") setMousdAmount(poolBalanceRatio.mul(amount));
+      else if (token === "MEUR") setBMousdAmount(amount.div(poolBalanceRatio));
     }
 
-    if (token === "bMoUSD") setBMousdAmount(amount);
-    else if (token === "MoUSD") setMousdAmount(amount);
+    if (token === "bMEUR") setBMousdAmount(amount);
+    else if (token === "MEUR") setMousdAmount(amount);
   };
 
   useEffect(() => {
@@ -129,25 +129,25 @@ export const DepositPane: React.FC = () => {
   return (
     <>
       <EditableRow
-        label="bMoUSD amount"
+        label="bMEUR amount"
         inputId="deposit-bmsic"
         amount={bMousdAmount.prettify(2)}
-        unit="bMoUSD"
+        unit="bMEUR"
         editingState={editingState}
         editedAmount={bMousdAmount.toString()}
-        setEditedAmount={amount => handleSetAmount("bMoUSD", Decimal.from(amount))}
+        setEditedAmount={amount => handleSetAmount("bMEUR", Decimal.from(amount))}
         maxAmount={coalescedBMousdBalance.toString()}
         maxedOut={bMousdAmount.eq(coalescedBMousdBalance)}
       />
 
       <EditableRow
-        label="MoUSD amount"
+        label="MEUR amount"
         inputId="deposit-msic"
         amount={msicAmount.prettify(2)}
-        unit="MoUSD"
+        unit="MEUR"
         editingState={editingState}
         editedAmount={msicAmount.toString()}
-        setEditedAmount={amount => handleSetAmount("MoUSD", Decimal.from(amount))}
+        setEditedAmount={amount => handleSetAmount("MEUR", Decimal.from(amount))}
         maxAmount={coalescedMousdBalance.toString()}
         maxedOut={msicAmount.eq(coalescedMousdBalance)}
       />
@@ -171,8 +171,8 @@ export const DepositPane: React.FC = () => {
             size="xs"
             tooltip={
               <Card variant="tooltip">
-                Tick this box to deposit bMoUSD and MoUSD-3CRV in the pool's current liquidity ratio.
-                Current ratio = 1 bMoUSD : {poolBalanceRatio.prettify(2)} MoUSD.
+                Tick this box to deposit bMEUR and MEUR-3CRV in the pool's current liquidity ratio.
+                Current ratio = 1 bMEUR : {poolBalanceRatio.prettify(2)} MEUR.
               </Card>
             }
           />
@@ -188,7 +188,7 @@ export const DepositPane: React.FC = () => {
             size="xs"
             tooltip={
               <Card variant="tooltip">
-                Tick this box to have your Curve LP tokens staked in the bMoUSD Curve gauge. Staked LP
+                Tick this box to have your Curve LP tokens staked in the bMEUR Curve gauge. Staked LP
                 tokens will earn protocol fees and Curve rewards.
               </Card>
             }
@@ -203,12 +203,12 @@ export const DepositPane: React.FC = () => {
           Deposit exceeds your balance by{" "}
           {isBMousdBalanceInsufficient && (
             <>
-              <Amount>{bMousdAmount.sub(coalescedBMousdBalance).prettify(2)} bMoUSD</Amount>
+              <Amount>{bMousdAmount.sub(coalescedBMousdBalance).prettify(2)} bMEUR</Amount>
               {isMousdBalanceInsufficient && <> and </>}
             </>
           )}
           {isMousdBalanceInsufficient && (
-            <Amount>{msicAmount.sub(coalescedMousdBalance).prettify(2)} MoUSD</Amount>
+            <Amount>{msicAmount.sub(coalescedMousdBalance).prettify(2)} MEUR</Amount>
           )}
         </ErrorDescription>
       )}

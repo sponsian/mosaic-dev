@@ -93,7 +93,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_MoUSDAmount",
+          "name": "_MEURAmount",
           "type": "uint256"
         },
         {
@@ -130,7 +130,7 @@
           "type": "address"
         }
       ],
-      "name": "repayMoUSD",
+      "name": "repayMEUR",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -181,7 +181,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawMoUSD",
+      "name": "withdrawMEUR",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

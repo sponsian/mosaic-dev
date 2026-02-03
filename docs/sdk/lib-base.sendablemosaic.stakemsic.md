@@ -24,5 +24,5 @@ Promise&lt;[SentMosaicTransaction](./lib-base.sentmosaictransaction.md)<!-- -->&
 
 ## Remarks
 
-As a side-effect, the transaction will also pay out an existing MSIC stake's [collateral gain](./lib-base.msicstake.collateralgain.md) and [MoUSD gain](./lib-base.msicstake.msicgain.md)<!-- -->.
+As a side-effect, the transaction will also pay out an existing MSIC stake's [collateral gain](./lib-base.msicstake.collateralgain.md) and [MEUR gain](./lib-base.msicstake.msicgain.md)<!-- -->.
 

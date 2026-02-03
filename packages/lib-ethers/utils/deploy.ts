@@ -112,7 +112,7 @@ const deployContracts = async (
       msicToken: await deployContract(
         deployer,
         getContractFactory,
-        "MoUSDToken",
+        "MEURToken",
         addresses.troveManager,
         addresses.stabilityPool,
         addresses.borrowerOperations,

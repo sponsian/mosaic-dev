@@ -74,7 +74,7 @@ class MainnetDeploymentHelper {
     const collSurplusPoolFactory = await this.getFactory("CollSurplusPool")
     const borrowerOperationsFactory = await this.getFactory("BorrowerOperations")
     const hintHelpersFactory = await this.getFactory("HintHelpers")
-    const msicTokenFactory = await this.getFactory("MoUSDToken")
+    const msicTokenFactory = await this.getFactory("MEURToken")
     const tellorCallerFactory = await this.getFactory("TellorCaller")
 
     // Deploy txs
@@ -342,10 +342,10 @@ class MainnetDeploymentHelper {
       ))
   }
 
-  async connectUnipoolMainnet(uniPool, MSICContracts, MoUSDWETHPairAddr, duration) {
+  async connectUnipoolMainnet(uniPool, MSICContracts, MEURWETHPairAddr, duration) {
     const gasPrice = this.configParams.GAS_PRICE
     await this.isOwnershipRenounced(uniPool) ||
-      await this.sendAndWaitForTransaction(uniPool.setParams(MSICContracts.msicToken.address, MoUSDWETHPairAddr, duration, {gasPrice}))
+      await this.sendAndWaitForTransaction(uniPool.setParams(MSICContracts.msicToken.address, MEURWETHPairAddr, duration, {gasPrice}))
   }
 
   // --- Verify on Ethrescan ---

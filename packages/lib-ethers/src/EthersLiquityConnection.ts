@@ -263,7 +263,7 @@ export interface EthersMosaicConnectionOptionalParams {
    *
    * @remarks
    * For example
-   * {@link EthersMosaic.depositMoUSDInStabilityPool | depositMoUSDInStabilityPool(amount, frontendTag?)}
+   * {@link EthersMosaic.depositMEURInStabilityPool | depositMEURInStabilityPool(amount, frontendTag?)}
    * will tag newly made Stability Deposits with this address when its `frontendTag` parameter is
    * omitted.
    */

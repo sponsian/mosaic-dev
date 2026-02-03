@@ -11,7 +11,7 @@ import { useBondAddresses } from "../../context/BondAddressesContext";
 
 export const Idle: React.FC = () => {
   const { mosaic } = useMosaic();
-  const { MoUSD_OVERRIDE_ADDRESS } = useBondAddresses();
+  const { MEUR_OVERRIDE_ADDRESS } = useBondAddresses();
 
   const { dispatchEvent, bonds, getMousdFromFaucet, msicBalance, hasLoaded } = useBondView();
   const [chain, setChain] = useState<number>();
@@ -28,15 +28,15 @@ export const Idle: React.FC = () => {
 
   const hasBonds = bonds !== undefined && bonds.length > 0;
 
-  const showMousdFaucet = MoUSD_OVERRIDE_ADDRESS !== null && msicBalance?.eq(0);
+  const showMousdFaucet = MEUR_OVERRIDE_ADDRESS !== null && msicBalance?.eq(0);
 
   const handleManageLiquidityPressed = () => dispatchEvent("MANAGE_LIQUIDITY_PRESSED");
 
   const handleBuyBMousdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.MoUSD } as SwapPressedPayload);
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.MEUR } as SwapPressedPayload);
 
   const handleSellBMousdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMoUSD } as SwapPressedPayload);
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMEUR } as SwapPressedPayload);
 
   return (
     <>
@@ -46,16 +46,16 @@ export const Idle: React.FC = () => {
         </Button>
 
         <Button variant="outline" onClick={handleBuyBMousdPressed}>
-          Buy bMoUSD
+          Buy bMEUR
         </Button>
 
         <Button variant="outline" onClick={handleSellBMousdPressed}>
-          Sell bMoUSD
+          Sell bMEUR
         </Button>
 
         {showMousdFaucet && (
           <Button variant={hasBonds ? "outline" : "primary"} onClick={() => getMousdFromFaucet()}>
-            Get 10k MoUSD
+            Get 10k MEUR
           </Button>
         )}
 

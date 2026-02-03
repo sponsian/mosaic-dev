@@ -1,6 +1,6 @@
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
+import { Decimal, MEUR_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
 import { EthersMosaic } from "@mosaic/lib-ethers";
 
 import { deployer, funder, provider } from "../globals";
@@ -17,7 +17,7 @@ export const warzone = async ({ troves: numberOfTroves }: WarzoneParams) => {
   for (let i = 1; i <= numberOfTroves; ++i) {
     const user = Wallet.createRandom().connect(provider);
     const userAddress = await user.getAddress();
-    const debt = MoUSD_MINIMUM_DEBT.add(99999 * Math.random());
+    const debt = MEUR_MINIMUM_DEBT.add(99999 * Math.random());
     const collateral = debt.mulDiv(1.11 + 3 * Math.random(), price);
 
     const mosaic = await EthersMosaic.connect(user);
@@ -36,8 +36,8 @@ export const warzone = async ({ troves: numberOfTroves }: WarzoneParams) => {
     );
 
     if (i % 4 === 0) {
-      const msicBalance = await mosaic.getMoUSDBalance();
-      await mosaic.depositMoUSDInStabilityPool(msicBalance);
+      const msicBalance = await mosaic.getMEURBalance();
+      await mosaic.depositMEURInStabilityPool(msicBalance);
     }
 
     if (i % 10 === 0) {

@@ -15,7 +15,7 @@ import {
 import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
 import troveManagerAbi from "../abi/TroveManager.json";
-import msicTokenAbi from "../abi/MoUSDToken.json";
+import msicTokenAbi from "../abi/MEURToken.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
 import communityIssuanceAbi from "../abi/CommunityIssuance.json";
 import defaultPoolAbi from "../abi/DefaultPool.json";
@@ -37,7 +37,7 @@ import {
   ActivePool,
   BorrowerOperations,
   TroveManager,
-  MoUSDToken,
+  MEURToken,
   CollSurplusPool,
   CommunityIssuance,
   DefaultPool,
@@ -168,7 +168,7 @@ export interface _MosaicContracts {
   activePool: ActivePool;
   borrowerOperations: BorrowerOperations;
   troveManager: TroveManager;
-  msicToken: MoUSDToken;
+  msicToken: MEURToken;
   collSurplusPool: CollSurplusPool;
   communityIssuance: CommunityIssuance;
   defaultPool: DefaultPool;

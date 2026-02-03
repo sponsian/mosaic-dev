@@ -80,11 +80,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_MoUSDFee",
+          "name": "_MEURFee",
           "type": "uint256"
         }
       ],
-      "name": "MoUSDBorrowingFeePaid",
+      "name": "MEURBorrowingFeePaid",
       "type": "event"
     },
     {
@@ -97,7 +97,7 @@
           "type": "address"
         }
       ],
-      "name": "MoUSDTokenAddressChanged",
+      "name": "MEURTokenAddressChanged",
       "type": "event"
     },
     {
@@ -329,7 +329,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_MoUSDAmount",
+          "name": "_MEURAmount",
           "type": "uint256"
         },
         {
@@ -366,7 +366,7 @@
           "type": "address"
         }
       ],
-      "name": "repayMoUSD",
+      "name": "repayMEUR",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -475,7 +475,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawMoUSD",
+      "name": "withdrawMEUR",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

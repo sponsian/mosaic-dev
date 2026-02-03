@@ -103,12 +103,12 @@ class BorrowerOperationsProxy extends Proxy {
     return this.forwardFunction(params, 'withdrawColl(uint256,address,address)')
   }
 
-  async withdrawMoUSD(...params) {
-    return this.forwardFunction(params, 'withdrawMoUSD(uint256,uint256,address,address)')
+  async withdrawMEUR(...params) {
+    return this.forwardFunction(params, 'withdrawMEUR(uint256,uint256,address,address)')
   }
 
-  async repayMoUSD(...params) {
-    return this.forwardFunction(params, 'repayMoUSD(uint256,address,address)')
+  async repayMEUR(...params) {
+    return this.forwardFunction(params, 'repayMEUR(uint256,address,address)')
   }
 
   async closeTrove(...params) {
@@ -135,8 +135,8 @@ class BorrowerOperationsProxy extends Proxy {
     return this.proxyFunction('getCompositeDebt', params)
   }
 
-  async MoUSD_GAS_COMPENSATION(...params) {
-    return this.proxyFunction('MoUSD_GAS_COMPENSATION', params)
+  async MEUR_GAS_COMPENSATION(...params) {
+    return this.proxyFunction('MEUR_GAS_COMPENSATION', params)
   }
 
   async MIN_NET_DEBT(...params) {
@@ -199,8 +199,8 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('getPendingETHReward', params)
   }
 
-  async getPendingMoUSDDebtReward(...params) {
-    return this.proxyFunction('getPendingMoUSDDebtReward', params)
+  async getPendingMEURDebtReward(...params) {
+    return this.proxyFunction('getPendingMEURDebtReward', params)
   }
 
   async liquidate(user) {
@@ -231,8 +231,8 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('L_ETH', [])
   }
 
-  async L_MoUSDDebt() {
-    return this.proxyFunction('L_MoUSDDebt', [])
+  async L_MEURDebt() {
+    return this.proxyFunction('L_MEURDebt', [])
   }
 
   async rewardSnapshots(user) {
@@ -285,8 +285,8 @@ class StabilityPoolProxy extends Proxy {
     return this.forwardFunction(params, 'provideToSP(uint256,address)')
   }
 
-  async getCompoundedMoUSDDeposit(user) {
-    return this.proxyFunctionWithUser('getCompoundedMoUSDDeposit', user)
+  async getCompoundedMEURDeposit(user) {
+    return this.proxyFunctionWithUser('getCompoundedMEURDeposit', user)
   }
 
   async deposits(user) {
@@ -394,8 +394,8 @@ class MSICStakingProxy extends Proxy {
     return this.proxyFunctionWithUser('stakes', user)
   }
 
-  async F_MoUSD(user) {
-    return this.proxyFunctionWithUser('F_MoUSD', user)
+  async F_MEUR(user) {
+    return this.proxyFunctionWithUser('F_MEUR', user)
   }
 }
 

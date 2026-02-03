@@ -4,7 +4,7 @@ import {
   Decimal,
   Decimalish,
   MSICStake,
-  MoUSD_MINIMUM_DEBT,
+  MEUR_MINIMUM_DEBT,
   StabilityDeposit,
   TransactableMosaic,
   Trove,
@@ -36,9 +36,9 @@ type GasHistograms = Pick<
   | "openTrove"
   | "adjustTrove"
   | "closeTrove"
-  | "redeemMoUSD"
-  | "depositMoUSDInStabilityPool"
-  | "withdrawMoUSDFromStabilityPool"
+  | "redeemMEUR"
+  | "depositMEURInStabilityPool"
+  | "withdrawMEURFromStabilityPool"
   | "stakeMSIC"
   | "unstakeMSIC"
 >;
@@ -74,9 +74,9 @@ export class Fixture {
       openTrove: new GasHistogram(),
       adjustTrove: new GasHistogram(),
       closeTrove: new GasHistogram(),
-      redeemMoUSD: new GasHistogram(),
-      depositMoUSDInStabilityPool: new GasHistogram(),
-      withdrawMoUSDFromStabilityPool: new GasHistogram(),
+      redeemMEUR: new GasHistogram(),
+      depositMEURInStabilityPool: new GasHistogram(),
+      withdrawMEURFromStabilityPool: new GasHistogram(),
       stakeMSIC: new GasHistogram(),
       unstakeMSIC: new GasHistogram()
     };
@@ -104,10 +104,10 @@ export class Fixture {
     );
   }
 
-  private async sendMoUSDFromFunder(toAddress: string, amount: Decimalish) {
+  private async sendMEURFromFunder(toAddress: string, amount: Decimalish) {
     amount = Decimal.from(amount);
 
-    const msicBalance = await this.funderMosaic.getMoUSDBalance();
+    const msicBalance = await this.funderMosaic.getMEURBalance();
 
     if (msicBalance.lt(amount)) {
       const trove = await this.funderMosaic.getTrove();
@@ -119,11 +119,11 @@ export class Fixture {
           ? 1.51
           : Decimal.max(trove.collateralRatio(this.price).add(0.00001), 1.11);
 
-      let newTrove = trove.isEmpty ? Trove.create({ depositCollateral: 1, borrowMoUSD: 0 }) : trove;
-      newTrove = newTrove.adjust({ borrowMoUSD: amount.sub(msicBalance).mul(2) });
+      let newTrove = trove.isEmpty ? Trove.create({ depositCollateral: 1, borrowMEUR: 0 }) : trove;
+      newTrove = newTrove.adjust({ borrowMEUR: amount.sub(msicBalance).mul(2) });
 
-      if (newTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
-        newTrove = newTrove.setDebt(MoUSD_MINIMUM_DEBT);
+      if (newTrove.debt.lt(MEUR_MINIMUM_DEBT)) {
+        newTrove = newTrove.setDebt(MEUR_MINIMUM_DEBT);
       }
 
       newTrove = newTrove.setCollateral(newTrove.debt.mulDiv(targetCollateralRatio, this.price));
@@ -149,7 +149,7 @@ export class Fixture {
       }
     }
 
-    await this.funderMosaic.sendMoUSD(toAddress, amount);
+    await this.funderMosaic.sendMEUR(toAddress, amount);
   }
 
   async setRandomPrice() {
@@ -161,7 +161,7 @@ export class Fixture {
   }
 
   async liquidateRandomNumberOfTroves(price: Decimal) {
-    const msicInStabilityPoolBefore = await this.deployerMosaic.getMoUSDInStabilityPool();
+    const msicInStabilityPoolBefore = await this.deployerMosaic.getMEURInStabilityPool();
     console.log(`// Stability Pool balance: ${msicInStabilityPoolBefore}`);
 
     const trovesBefore = await getListOfTroves(this.deployerMosaic);
@@ -194,7 +194,7 @@ export class Fixture {
 
     this.totalNumberOfLiquidations += liquidatedTroves.length;
 
-    const msicInStabilityPoolAfter = await this.deployerMosaic.getMoUSDInStabilityPool();
+    const msicInStabilityPoolAfter = await this.deployerMosaic.getMEURInStabilityPool();
     console.log(`// Stability Pool balance: ${msicInStabilityPoolAfter}`);
   }
 
@@ -205,7 +205,7 @@ export class Fixture {
     let newTrove: Trove;
 
     const cannotOpen = (newTrove: Trove) =>
-      newTrove.debt.lt(MoUSD_MINIMUM_DEBT) ||
+      newTrove.debt.lt(MEUR_MINIMUM_DEBT) ||
       (total.collateralRatioIsBelowCritical(this.price)
         ? !newTrove.isOpenableInRecoveryMode(this.price)
         : newTrove.collateralRatioIsBelowMinimum(this.price) ||
@@ -254,7 +254,7 @@ export class Fixture {
     const cannotAdjust = (trove: Trove, params: TroveAdjustmentParams<Decimal>) => {
       if (
         params.withdrawCollateral?.gte(trove.collateral) ||
-        params.repayMoUSD?.gt(trove.debt.sub(MoUSD_MINIMUM_DEBT))
+        params.repayMEUR?.gt(trove.debt.sub(MEUR_MINIMUM_DEBT))
       ) {
         return true;
       }
@@ -262,7 +262,7 @@ export class Fixture {
       const adjusted = trove.adjust(params, fees.borrowingRate());
 
       return (
-        (params.withdrawCollateral?.nonZero || params.borrowMoUSD?.nonZero) &&
+        (params.withdrawCollateral?.nonZero || params.borrowMEUR?.nonZero) &&
         (adjusted.collateralRatioIsBelowMinimum(this.price) ||
           (total.collateralRatioIsBelowCritical(this.price)
             ? adjusted._nominalCollateralRatio.lt(trove._nominalCollateralRatio)
@@ -277,8 +277,8 @@ export class Fixture {
       });
     }
 
-    if (params.repayMoUSD) {
-      await this.sendMoUSDFromFunder(userAddress, params.repayMoUSD);
+    if (params.repayMEUR) {
+      await this.sendMEURFromFunder(userAddress, params.repayMEUR);
     }
 
     if (cannotAdjust(trove, params)) {
@@ -307,7 +307,7 @@ export class Fixture {
       return;
     }
 
-    await this.sendMoUSDFromFunder(userAddress, trove.netDebt);
+    await this.sendMEURFromFunder(userAddress, trove.netDebt);
 
     console.log(`[${shortenAddress(userAddress)}] closeTrove()`);
 
@@ -320,18 +320,18 @@ export class Fixture {
     const total = await mosaic.getTotal();
 
     if (total.collateralRatioIsBelowMinimum(this.price)) {
-      console.log("// Skipping redeemMoUSD() when TCR < MCR");
+      console.log("// Skipping redeemMEUR() when TCR < MCR");
       return;
     }
 
     const amount = benford(10000);
-    await this.sendMoUSDFromFunder(userAddress, amount);
+    await this.sendMEURFromFunder(userAddress, amount);
 
-    console.log(`[${shortenAddress(userAddress)}] redeemMoUSD(${amount})`);
+    console.log(`[${shortenAddress(userAddress)}] redeemMEUR(${amount})`);
 
     try {
-      await this.gasHistograms.redeemMoUSD.expectSuccess(() =>
-        mosaic.send.redeemMoUSD(amount, undefined, { gasPrice: 0 })
+      await this.gasHistograms.redeemMEUR.expectSuccess(() =>
+        mosaic.send.redeemMEUR(amount, undefined, { gasPrice: 0 })
       );
     } catch (error) {
       if (error instanceof Error && error.message.includes("amount too low to redeem")) {
@@ -345,12 +345,12 @@ export class Fixture {
   async depositRandomAmountInStabilityPool(userAddress: string, mosaic: Mosaic) {
     const amount = benford(20000);
 
-    await this.sendMoUSDFromFunder(userAddress, amount);
+    await this.sendMEURFromFunder(userAddress, amount);
 
-    console.log(`[${shortenAddress(userAddress)}] depositMoUSDInStabilityPool(${amount})`);
+    console.log(`[${shortenAddress(userAddress)}] depositMEURInStabilityPool(${amount})`);
 
-    await this.gasHistograms.depositMoUSDInStabilityPool.expectSuccess(() =>
-      mosaic.send.depositMoUSDInStabilityPool(amount, this.frontendAddress, {
+    await this.gasHistograms.depositMEURInStabilityPool.expectSuccess(() =>
+      mosaic.send.depositMEURInStabilityPool(amount, this.frontendAddress, {
         gasPrice: 0
       })
     );
@@ -366,7 +366,7 @@ export class Fixture {
       sortedBy: "ascendingCollateralRatio"
     });
 
-    const amount = deposit.currentMoUSD.mul(1.1 * Math.random()).add(10 * Math.random());
+    const amount = deposit.currentMEUR.mul(1.1 * Math.random()).add(10 * Math.random());
 
     const cannotWithdraw = (amount: Decimal) =>
       amount.nonZero && lastTrove.collateralRatioIsBelowMinimum(this.price);
@@ -374,17 +374,17 @@ export class Fixture {
     if (cannotWithdraw(amount)) {
       console.log(
         `// [${shortenAddress(userAddress)}] ` +
-          `withdrawMoUSDFromStabilityPool(${amount}) expected to fail`
+          `withdrawMEURFromStabilityPool(${amount}) expected to fail`
       );
 
-      await this.gasHistograms.withdrawMoUSDFromStabilityPool.expectFailure(() =>
-        mosaic.withdrawMoUSDFromStabilityPool(amount, { gasPrice: 0 })
+      await this.gasHistograms.withdrawMEURFromStabilityPool.expectFailure(() =>
+        mosaic.withdrawMEURFromStabilityPool(amount, { gasPrice: 0 })
       );
     } else {
-      console.log(`[${shortenAddress(userAddress)}] withdrawMoUSDFromStabilityPool(${amount})`);
+      console.log(`[${shortenAddress(userAddress)}] withdrawMEURFromStabilityPool(${amount})`);
 
-      await this.gasHistograms.withdrawMoUSDFromStabilityPool.expectSuccess(() =>
-        mosaic.send.withdrawMoUSDFromStabilityPool(amount, { gasPrice: 0 })
+      await this.gasHistograms.withdrawMEURFromStabilityPool.expectSuccess(() =>
+        mosaic.send.withdrawMEURFromStabilityPool(amount, { gasPrice: 0 })
       );
     }
   }
@@ -420,11 +420,11 @@ export class Fixture {
     );
   }
 
-  async sweepMoUSD(mosaic: Mosaic) {
-    const msicBalance = await mosaic.getMoUSDBalance();
+  async sweepMEUR(mosaic: Mosaic) {
+    const msicBalance = await mosaic.getMEURBalance();
 
     if (msicBalance.nonZero) {
-      await mosaic.sendMoUSD(this.funderAddress, msicBalance, { gasPrice: 0 });
+      await mosaic.sendMEUR(this.funderAddress, msicBalance, { gasPrice: 0 });
     }
   }
 

@@ -91,9 +91,9 @@ export const transitions: BondEventTransitions = {
 };
 
 export enum BMousdAmmTokenIndex {
-  BMoUSD,
-  MoUSD,
-  BMoUSD_MoUSD_LP
+  BMEUR,
+  MEUR,
+  BMEUR_MEUR_LP
 }
 
 export type CreateBondPayload = { deposit: Decimal };
@@ -101,7 +101,7 @@ export type CreateBondPayload = { deposit: Decimal };
 export type SelectBondPayload = { bondId: string };
 
 export type SwapPressedPayload = {
-  inputToken: BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD;
+  inputToken: BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR;
 };
 
 export type SwapPayload = {
@@ -112,13 +112,13 @@ export type SwapPayload = {
 export type Address = string | null;
 
 export type Addresses = {
-  BMoUSD_AMM_ADDRESS: Address;
-  BMoUSD_AMM_STAKING_ADDRESS: Address;
-  BMoUSD_TOKEN_ADDRESS: Address;
+  BMEUR_AMM_ADDRESS: Address;
+  BMEUR_AMM_STAKING_ADDRESS: Address;
+  BMEUR_TOKEN_ADDRESS: Address;
   BOND_NFT_ADDRESS: Address;
   CHICKEN_BOND_MANAGER_ADDRESS: Address;
-  MoUSD_OVERRIDE_ADDRESS: Address;
-  BMoUSD_LP_ZAP_ADDRESS: Address;
+  MEUR_OVERRIDE_ADDRESS: Address;
+  BMEUR_LP_ZAP_ADDRESS: Address;
 };
 
 // This payload is only dispatched by "Manage liquidity"

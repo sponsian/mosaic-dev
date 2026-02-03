@@ -210,14 +210,14 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     return this._readable.getRemainingStabilityPoolMSICReward(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDInStabilityPool} */
-  getMoUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
-    return this._readable.getMoUSDInStabilityPool(overrides);
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMEURInStabilityPool} */
+  getMEURInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
+    return this._readable.getMEURInStabilityPool(overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMoUSDBalance} */
-  getMoUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
-    return this._readable.getMoUSDBalance(address, overrides);
+  /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMEURBalance} */
+  getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+    return this._readable.getMEURBalance(address, overrides);
   }
 
   /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICBalance} */
@@ -386,32 +386,32 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.borrowMoUSD}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.borrowMEUR}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  borrowMoUSD(
+  borrowMEUR(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
-    return this.send.borrowMoUSD(amount, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.borrowMEUR(amount, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.repayMoUSD}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.repayMEUR}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  repayMoUSD(
+  repayMEUR(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
-    return this.send.repayMoUSD(amount, overrides).then(waitForSuccess);
+    return this.send.repayMEUR(amount, overrides).then(waitForSuccess);
   }
 
   /** @internal */
@@ -448,32 +448,32 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.depositMoUSDInStabilityPool}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.depositMEURInStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  depositMoUSDInStabilityPool(
+  depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
     overrides?: EthersTransactionOverrides
   ): Promise<StabilityDepositChangeDetails> {
-    return this.send.depositMoUSDInStabilityPool(amount, frontendTag, overrides).then(waitForSuccess);
+    return this.send.depositMEURInStabilityPool(amount, frontendTag, overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawMoUSDFromStabilityPool}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.withdrawMEURFromStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  withdrawMoUSDFromStabilityPool(
+  withdrawMEURFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<StabilityDepositChangeDetails> {
-    return this.send.withdrawMoUSDFromStabilityPool(amount, overrides).then(waitForSuccess);
+    return this.send.withdrawMEURFromStabilityPool(amount, overrides).then(waitForSuccess);
   }
 
   /**
@@ -503,18 +503,18 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.sendMoUSD}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.sendMEUR}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  sendMoUSD(
+  sendMEUR(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<void> {
-    return this.send.sendMoUSD(toAddress, amount, overrides).then(waitForSuccess);
+    return this.send.sendMEUR(toAddress, amount, overrides).then(waitForSuccess);
   }
 
   /**
@@ -533,18 +533,18 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
   }
 
   /**
-   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.redeemMoUSD}
+   * {@inheritDoc @mosaic/lib-base#TransactableMosaic.redeemMEUR}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    * Throws {@link EthersTransactionCancelledError} if the transaction is cancelled or replaced.
    */
-  redeemMoUSD(
+  redeemMEUR(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<RedemptionDetails> {
-    return this.send.redeemMoUSD(amount, maxRedemptionRate, overrides).then(waitForSuccess);
+    return this.send.redeemMEUR(amount, maxRedemptionRate, overrides).then(waitForSuccess);
   }
 
   /**

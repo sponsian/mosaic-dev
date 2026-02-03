@@ -3,7 +3,7 @@ import fs from "fs";
 import {
   Decimal,
   Difference,
-  MoUSD_MINIMUM_DEBT,
+  MEUR_MINIMUM_DEBT,
   Trove,
   TroveWithPendingRedistribution
 } from "@mosaic/lib-base";
@@ -84,7 +84,7 @@ export const chaos = async ({
       } else if (x < 0.7) {
         const deposit = await mosaic.getStabilityDeposit();
 
-        if (deposit.initialMoUSD.isZero || x < 0.6) {
+        if (deposit.initialMEUR.isZero || x < 0.6) {
           await fixture.depositRandomAmountInStabilityPool(user.address, mosaic);
         } else {
           await fixture.withdrawRandomAmountFromStabilityPool(user.address, mosaic, deposit);
@@ -101,7 +101,7 @@ export const chaos = async ({
         await fixture.redeemRandomAmount(user.address, mosaic);
       }
 
-      // await fixture.sweepMoUSD(mosaic);
+      // await fixture.sweepMEUR(mosaic);
       await fixture.sweepMSIC(mosaic);
 
       const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerMosaic);
@@ -144,8 +144,8 @@ export const order = async () => {
 
     if (funderTrove.isEmpty) {
       const targetTrove = new Trove(
-        MoUSD_MINIMUM_DEBT.mulDiv(targetCollateralRatio, initialPrice),
-        MoUSD_MINIMUM_DEBT
+        MEUR_MINIMUM_DEBT.mulDiv(targetCollateralRatio, initialPrice),
+        MEUR_MINIMUM_DEBT
       );
 
       const fees = await funderMosaic.getFees();

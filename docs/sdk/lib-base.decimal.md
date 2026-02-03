@@ -14,7 +14,7 @@ export declare class Decimal
 
 ## Remarks
 
-Used by Mosaic libraries to precisely represent native currency (e.g. Ether), MoUSD and MSIC amounts, as well as derived metrics like collateral ratios.
+Used by Mosaic libraries to precisely represent native currency (e.g. Ether), MEUR and MSIC amounts, as well as derived metrics like collateral ratios.
 
 ## Properties
 

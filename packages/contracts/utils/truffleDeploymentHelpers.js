@@ -2,7 +2,7 @@
 const SortedTroves = artifacts.require("./SortedTroves.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol")
-const MoUSDToken = artifacts.require("./MoUSDToken.sol")
+const MEURToken = artifacts.require("./MEURToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const StabilityPool = artifacts.require("./StabilityPool.sol")
@@ -18,14 +18,14 @@ const deployMosaic = async () => {
   const defaultPool = await DefaultPool.new()
   const functionCaller = await FunctionCaller.new()
   const borrowerOperations = await BorrowerOperations.new()
-  const msicToken = await MoUSDToken.new(
+  const msicToken = await MEURToken.new(
     troveManager.address,
     stabilityPool.address,
     borrowerOperations.address
   )
   DefaultPool.setAsDeployed(defaultPool)
   PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
-  MoUSDToken.setAsDeployed(msicToken)
+  MEURToken.setAsDeployed(msicToken)
   SortedTroves.setAsDeployed(sortedTroves)
   TroveManager.setAsDeployed(troveManager)
   ActivePool.setAsDeployed(activePool)
@@ -51,7 +51,7 @@ const getAddresses = (contracts) => {
   return {
     BorrowerOperations: contracts.borrowerOperations.address,
     PriceFeedTestnet: contracts.priceFeedTestnet.address,
-    MoUSDToken: contracts.msicToken.address,
+    MEURToken: contracts.msicToken.address,
     SortedTroves: contracts.sortedTroves.address,
     TroveManager: contracts.troveManager.address,
     StabilityPool: contracts.stabilityPool.address,
@@ -74,7 +74,7 @@ const connectContracts = async (contracts, addresses) => {
   await contracts.priceFeedTestnet.setTroveManagerAddress(addresses.TroveManager)
 
   // set contracts in the Trove Manager
-  await contracts.troveManager.setMoUSDToken(addresses.MoUSDToken)
+  await contracts.troveManager.setMEURToken(addresses.MEURToken)
   await contracts.troveManager.setSortedTroves(addresses.SortedTroves)
   await contracts.troveManager.setPriceFeed(addresses.PriceFeedTestnet)
   await contracts.troveManager.setActivePool(addresses.ActivePool)

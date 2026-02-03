@@ -4,7 +4,7 @@
 
 ## BorrowingOperationOptionalParams interface
 
-Optional parameters of a transaction that borrows MoUSD.
+Optional parameters of a transaction that borrows MEUR.
 
 <b>Signature:</b>
 

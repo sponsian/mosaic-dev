@@ -49,7 +49,7 @@ export function handleETHGainWithdrawn(event: ETHGainWithdrawn): void {
     event,
     event.params._depositor,
     event.params._ETH,
-    event.params._MoUSDLoss
+    event.params._MEURLoss
   );
 
   if (depositUpdate != null) {

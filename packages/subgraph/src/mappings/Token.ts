@@ -1,4 +1,4 @@
-import { Transfer, Approval } from "../../generated/MoUSDToken/ERC20";
+import { Transfer, Approval } from "../../generated/MEURToken/ERC20";
 
 import { updateBalance } from "../entities/TokenBalance";
 import { updateAllowance } from "../entities/TokenAllowance";

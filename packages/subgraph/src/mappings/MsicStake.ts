@@ -7,5 +7,5 @@ export function handleStakeChanged(event: StakeChanged): void {
 }
 
 export function handleStakeGainsWithdrawn(event: StakingGainsWithdrawn): void {
-  withdrawStakeGains(event, event.params.staker, event.params.MoUSDGain, event.params.ETHGain);
+  withdrawStakeGains(event, event.params.staker, event.params.MEURGain, event.params.ETHGain);
 }

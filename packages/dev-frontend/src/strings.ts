@@ -1,4 +1,4 @@
-export const COIN = "MoUSD";
+export const COIN = "MEUR";
 export const GT = "MSIC";
 export const LP = "UNI LP";
-// export const LP = "REEF/MoUSD LP";
+// export const LP = "REEF/MEUR LP";

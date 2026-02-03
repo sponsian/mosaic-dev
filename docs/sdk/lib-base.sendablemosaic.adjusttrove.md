@@ -17,7 +17,7 @@ adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decima
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  params | [TroveAdjustmentParams](./lib-base.troveadjustmentparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; | Parameters of the adjustment. |
-|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md) if <code>params</code> includes <code>borrowMoUSD</code>. |
+|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md) if <code>params</code> includes <code>borrowMEUR</code>. |
 
 <b>Returns:</b>
 
@@ -25,7 +25,7 @@ Promise&lt;[SentMosaicTransaction](./lib-base.sentmosaictransaction.md)<!-- -->&
 
 ## Remarks
 
-The transaction will fail if the Trove's debt would fall below [MoUSD\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md)<!-- -->.
+The transaction will fail if the Trove's debt would fall below [MEUR\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md)<!-- -->.
 
 If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum acceptable rate.
 

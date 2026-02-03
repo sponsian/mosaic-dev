@@ -25,25 +25,25 @@ export interface MosaicStoreBaseState {
   /** User's native currency balance (e.g. Ether). */
   accountBalance: Decimal;
 
-  /** User's MoUSD token balance. */
+  /** User's MEUR token balance. */
   msicBalance: Decimal;
 
   /** User's MSIC token balance. */
   msicBalance: Decimal;
 
-  /** User's Uniswap REEF/MoUSD LP token balance. */
+  /** User's Uniswap REEF/MEUR LP token balance. */
   uniTokenBalance: Decimal;
 
-  /** The liquidity mining contract's allowance of user's Uniswap REEF/MoUSD LP tokens. */
+  /** The liquidity mining contract's allowance of user's Uniswap REEF/MEUR LP tokens. */
   uniTokenAllowance: Decimal;
 
   /** Remaining MSIC that will be collectively rewarded to liquidity miners. */
   remainingLiquidityMiningMSICReward: Decimal;
 
-  /** Amount of Uniswap REEF/MoUSD LP tokens the user has staked in liquidity mining. */
+  /** Amount of Uniswap REEF/MEUR LP tokens the user has staked in liquidity mining. */
   liquidityMiningStake: Decimal;
 
-  /** Total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. */
+  /** Total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining. */
   totalStakedUniTokens: Decimal;
 
   /** Amount of MSIC the user has earned through mining liquidity. */
@@ -61,7 +61,7 @@ export interface MosaicStoreBaseState {
   /** Current price of the native currency (e.g. Ether) in USD. */
   price: Decimal;
 
-  /** Total amount of MoUSD currently deposited in the Stability Pool. */
+  /** Total amount of MEUR currently deposited in the Stability Pool. */
   msicInStabilityPool: Decimal;
 
   /** Total collateral and debt in the Mosaic system. */
@@ -130,7 +130,7 @@ export interface MosaicStoreDerivedState {
    * Current redemption rate.
    *
    * @remarks
-   * Note that the actual rate paid by a redemption transaction will depend on the amount of MoUSD
+   * Note that the actual rate paid by a redemption transaction will depend on the amount of MEUR
    * being redeemed.
    *
    * Use {@link Fees.redemptionRate} to calculate a precise redemption rate.

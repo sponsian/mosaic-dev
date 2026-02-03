@@ -17,17 +17,17 @@ export declare class PopulatedEthersRedemption extends PopulatedEthersMosaicTran
 
 ## Remarks
 
-The Mosaic protocol fulfills redemptions by repaying the debt of Troves in ascending order of their collateralization ratio, and taking a portion of their collateral in exchange. Due to the [minimum debt](./lib-base.msic_minimum_debt.md) requirement that Troves must fulfill, some MoUSD amounts are not possible to redeem exactly.
+The Mosaic protocol fulfills redemptions by repaying the debt of Troves in ascending order of their collateralization ratio, and taking a portion of their collateral in exchange. Due to the [minimum debt](./lib-base.msic_minimum_debt.md) requirement that Troves must fulfill, some MEUR amounts are not possible to redeem exactly.
 
-When [redeemMoUSD()](./lib-base.populatablemosaic.redeemmsic.md) is called with an amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMoUSDAmount` property). When this happens, the redeemer can either redeem the truncated amount by sending the transaction unchanged, or prepare a new transaction by [increasing the amount](./lib-base.populatedredemption.increaseamountbyminimumnetdebt.md) to the next lowest possible value, which is the sum of the truncated amount and [MoUSD\_MINIMUM\_NET\_DEBT](./lib-base.msic_minimum_net_debt.md)<!-- -->.
+When [redeemMEUR()](./lib-base.populatablemosaic.redeemmsic.md) is called with an amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMEURAmount` property). When this happens, the redeemer can either redeem the truncated amount by sending the transaction unchanged, or prepare a new transaction by [increasing the amount](./lib-base.populatedredemption.increaseamountbyminimumnetdebt.md) to the next lowest possible value, which is the sum of the truncated amount and [MEUR\_MINIMUM\_NET\_DEBT](./lib-base.msic_minimum_net_debt.md)<!-- -->.
 
 ## Properties
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
-|  [attemptedMoUSDAmount](./lib-ethers.populatedethersredemption.attemptedmsicamount.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MoUSD the redeemer is trying to redeem. |
-|  [isTruncated](./lib-ethers.populatedethersredemption.istruncated.md) |  | boolean | Whether <code>redeemableMoUSDAmount</code> is less than <code>attemptedMoUSDAmount</code>. |
-|  [redeemableMoUSDAmount](./lib-ethers.populatedethersredemption.redeemablemsicamount.md) |  | [Decimal](./lib-base.decimal.md) | Maximum amount of MoUSD that is currently redeemable from <code>attemptedMoUSDAmount</code>. |
+|  [attemptedMEURAmount](./lib-ethers.populatedethersredemption.attemptedmsicamount.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR the redeemer is trying to redeem. |
+|  [isTruncated](./lib-ethers.populatedethersredemption.istruncated.md) |  | boolean | Whether <code>redeemableMEURAmount</code> is less than <code>attemptedMEURAmount</code>. |
+|  [redeemableMEURAmount](./lib-ethers.populatedethersredemption.redeemablemsicamount.md) |  | [Decimal](./lib-base.decimal.md) | Maximum amount of MEUR that is currently redeemable from <code>attemptedMEURAmount</code>. |
 
 ## Methods
 

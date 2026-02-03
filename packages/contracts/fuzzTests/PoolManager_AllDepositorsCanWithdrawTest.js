@@ -42,7 +42,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const randomDefaulterIndex = Math.floor(Math.random() * (remainingDefaulters.length))
     const randomDefaulter = remainingDefaulters[randomDefaulterIndex]
 
-    const liquidatedMoUSD = (await troveManager.Troves(randomDefaulter))[0]
+    const liquidatedMEUR = (await troveManager.Troves(randomDefaulter))[0]
     const liquidatedETH = (await troveManager.Troves(randomDefaulter))[1]
 
     const price = await priceFeed.getPrice()
@@ -50,9 +50,9 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const ICRPercent = ICR.slice(0, ICR.length - 16)
 
     console.log(`SP address: ${stabilityPool.address}`)
-    const MoUSDinPoolBefore = await stabilityPool.getTotalMoUSDDeposits()
+    const MEURinPoolBefore = await stabilityPool.getTotalMEURDeposits()
     const liquidatedTx = await troveManager.liquidate(randomDefaulter, { from: accounts[0] })
-    const MoUSDinPoolAfter = await stabilityPool.getTotalMoUSDDeposits()
+    const MEURinPoolAfter = await stabilityPool.getTotalMEURDeposits()
 
     assert.isTrue(liquidatedTx.receipt.status)
 
@@ -62,7 +62,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     }
     if (await troveManager.checkRecoveryMode(price)) { console.log("recovery mode: TRUE") }
 
-    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedETH} debt: ${liquidatedMoUSD} SP MoUSD before: ${MoUSDinPoolBefore} SP MoUSD after: ${MoUSDinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
+    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedETH} debt: ${liquidatedMEUR} SP MEUR before: ${MEURinPoolBefore} SP MEUR after: ${MEURinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
   }
 
   const performSPDeposit = async (depositorAccounts, currentDepositors, currentDepositorsDict) => {
@@ -70,11 +70,11 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const randomDepositor = depositorAccounts[randomIndex]
 
     const userBalance = (await msicToken.balanceOf(randomDepositor))
-    const maxMoUSDDeposit = userBalance.div(toBN(dec(1, 18)))
+    const maxMEURDeposit = userBalance.div(toBN(dec(1, 18)))
 
-    const randomMoUSDAmount = th.randAmountInWei(1, maxMoUSDDeposit)
+    const randomMEURAmount = th.randAmountInWei(1, maxMEURDeposit)
 
-    const depositTx = await stabilityPool.provideToSP(randomMoUSDAmount, ZERO_ADDRESS, { from: randomDepositor })
+    const depositTx = await stabilityPool.provideToSP(randomMEURAmount, ZERO_ADDRESS, { from: randomDepositor })
 
     assert.isTrue(depositTx.receipt.status)
 
@@ -83,7 +83,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       currentDepositors.push(randomDepositor)
     }
 
-    console.log(`SP deposit. addr: ${th.squeezeAddr(randomDepositor)} amount: ${randomMoUSDAmount} tx success: ${depositTx.receipt.status} `)
+    console.log(`SP deposit. addr: ${th.squeezeAddr(randomDepositor)} amount: ${randomMEURAmount} tx success: ${depositTx.receipt.status} `)
   }
 
   const randomOperation = async (depositorAccounts,
@@ -173,18 +173,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
     for (depositor of currentDepositors) {
       const initialDeposit = (await stabilityPool.deposits(depositor))[0]
-      const finalDeposit = await stabilityPool.getCompoundedMoUSDDeposit(depositor)
+      const finalDeposit = await stabilityPool.getCompoundedMEURDeposit(depositor)
       const ETHGain = await stabilityPool.getDepositorETHGain(depositor)
       const ETHinSP = (await stabilityPool.getETH()).toString()
-      const MoUSDinSP = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const MEURinSP = (await stabilityPool.getTotalMEURDeposits()).toString()
 
       // Attempt to withdraw
       const withdrawalTx = await stabilityPool.withdrawFromSP(dec(1, 36), { from: depositor })
 
       const ETHinSPAfter = (await stabilityPool.getETH()).toString()
-      const MoUSDinSPAfter = (await stabilityPool.getTotalMoUSDDeposits()).toString()
-      const MoUSDBalanceSPAfter = (await msicToken.balanceOf(stabilityPool.address))
-      const depositAfter = await stabilityPool.getCompoundedMoUSDDeposit(depositor)
+      const MEURinSPAfter = (await stabilityPool.getTotalMEURDeposits()).toString()
+      const MEURBalanceSPAfter = (await msicToken.balanceOf(stabilityPool.address))
+      const depositAfter = await stabilityPool.getCompoundedMEURDeposit(depositor)
 
       console.log(`--Before withdrawal--
                     withdrawer addr: ${th.squeezeAddr(depositor)}
@@ -192,14 +192,14 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
                      REEF gain: ${ETHGain}
                      REEF in SP: ${ETHinSP}
                      compounded deposit: ${finalDeposit} 
-                     MoUSD in SP: ${MoUSDinSP}
+                     MEUR in SP: ${MEURinSP}
                     
                     --After withdrawal--
                      Withdrawal tx success: ${withdrawalTx.receipt.status} 
                      Deposit after: ${depositAfter}
                      REEF remaining in SP: ${ETHinSPAfter}
-                     SP MoUSD deposits tracker after: ${MoUSDinSPAfter}
-                     SP MoUSD balance after: ${MoUSDBalanceSPAfter}
+                     SP MEUR deposits tracker after: ${MEURinSPAfter}
+                     SP MEUR balance after: ${MEURBalanceSPAfter}
                      `)
       // Check each deposit can be withdrawn
       assert.isTrue(withdrawalTx.receipt.status)
@@ -248,13 +248,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1
       const defaulterCollMax = 100000000
-      const defaulterMoUSDProportionMin = 91
-      const defaulterMoUSDProportionMax = 180
+      const defaulterMEURProportionMin = 91
+      const defaulterMEURProportionMax = 180
 
       const depositorCollMin = 1
       const depositorCollMax = 100000000
-      const depositorMoUSDProportionMin = 100
-      const depositorMoUSDProportionMax = 100
+      const depositorMEURProportionMin = 100
+      const depositorMEURProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -262,22 +262,22 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterMoUSDProportionMin,
-        defaulterMoUSDProportionMax,
+        defaulterMEURProportionMin,
+        defaulterMEURProportionMax,
         true)
 
-      // account set S all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
+      // account set S all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorMoUSDProportionMin,
-        depositorMoUSDProportionMax,
+        depositorMEURProportionMin,
+        depositorMEURProportionMax,
         true)
 
       // price drops, all L liquidateable
@@ -294,18 +294,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsBeforeWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsAfterWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MEUR deposits before any withdrawals: ${totalMEURDepositsBeforeWithdrawals}`)
       console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MEUR deposits after withdrawals: ${totalMEURDepositsAfterWithdrawals}`)
       console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -322,13 +322,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1
       const defaulterCollMax = 10
-      const defaulterMoUSDProportionMin = 91
-      const defaulterMoUSDProportionMax = 180
+      const defaulterMEURProportionMin = 91
+      const defaulterMEURProportionMax = 180
 
       const depositorCollMin = 1000000
       const depositorCollMax = 100000000
-      const depositorMoUSDProportionMin = 100
-      const depositorMoUSDProportionMax = 100
+      const depositorMEURProportionMin = 100
+      const depositorMEURProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -336,21 +336,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterMoUSDProportionMin,
-        defaulterMoUSDProportionMax)
+        defaulterMEURProportionMin,
+        defaulterMEURProportionMax)
 
-      // account set S all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
+      // account set S all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorMoUSDProportionMin,
-        depositorMoUSDProportionMax)
+        depositorMEURProportionMin,
+        depositorMEURProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -366,18 +366,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsBeforeWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsAfterWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MEUR deposits before any withdrawals: ${totalMEURDepositsBeforeWithdrawals}`)
       console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MEUR deposits after withdrawals: ${totalMEURDepositsAfterWithdrawals}`)
       console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -394,13 +394,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1000000
       const defaulterCollMax = 100000000
-      const defaulterMoUSDProportionMin = 91
-      const defaulterMoUSDProportionMax = 180
+      const defaulterMEURProportionMin = 91
+      const defaulterMEURProportionMax = 180
 
       const depositorCollMin = 1
       const depositorCollMax = 10
-      const depositorMoUSDProportionMin = 100
-      const depositorMoUSDProportionMax = 100
+      const depositorMEURProportionMin = 100
+      const depositorMEURProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -408,21 +408,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterMoUSDProportionMin,
-        defaulterMoUSDProportionMax)
+        defaulterMEURProportionMin,
+        defaulterMEURProportionMax)
 
-      // account set S all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
+      // account set S all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorMoUSDProportionMin,
-        depositorMoUSDProportionMax)
+        depositorMEURProportionMin,
+        depositorMEURProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -438,18 +438,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsBeforeWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsAfterWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MEUR deposits before any withdrawals: ${totalMEURDepositsBeforeWithdrawals}`)
       console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MEUR deposits after withdrawals: ${totalMEURDepositsAfterWithdrawals}`)
       console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
@@ -467,13 +467,13 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       const defaulterCollMin = 1000000
       const defaulterCollMax = 100000000
-      const defaulterMoUSDProportionMin = 91
-      const defaulterMoUSDProportionMax = 180
+      const defaulterMEURProportionMin = 91
+      const defaulterMEURProportionMax = 180
 
       const depositorCollMin = 1000000
       const depositorCollMax = 100000000
-      const depositorMoUSDProportionMin = 100
-      const depositorMoUSDProportionMax = 100
+      const depositorMEURProportionMin = 100
+      const depositorMEURProportionMax = 100
 
       const remainingDefaulters = [...defaulterAccounts]
       const currentDepositors = []
@@ -481,21 +481,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       const currentDepositorsDict = {}
 
       // setup:
-      // account set L all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(defaulterCollMin,
+      // account set L all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
-        defaulterMoUSDProportionMin,
-        defaulterMoUSDProportionMax)
+        defaulterMEURProportionMin,
+        defaulterMEURProportionMax)
 
-      // account set S all add coll and withdraw MoUSD
-      await th.openTrove_allAccounts_randomETH_randomMoUSD(depositorCollMin,
+      // account set S all add coll and withdraw MEUR
+      await th.openTrove_allAccounts_randomETH_randomMEUR(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
-        depositorMoUSDProportionMin,
-        depositorMoUSDProportionMax)
+        depositorMEURProportionMin,
+        depositorMEURProportionMax)
 
       // price drops, all L liquidateable
       await priceFeed.setPrice(dec(100, 18));
@@ -511,18 +511,18 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await skyrocketPriceAndCheckAllTrovesSafe()
 
-      const totalMoUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsBeforeWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
-      const totalMoUSDDepositsAfterWithdrawals = await stabilityPool.getTotalMoUSDDeposits()
+      const totalMEURDepositsAfterWithdrawals = await stabilityPool.getTotalMEURDeposits()
       const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
 
-      console.log(`Total MoUSD deposits before any withdrawals: ${totalMoUSDDepositsBeforeWithdrawals}`)
+      console.log(`Total MEUR deposits before any withdrawals: ${totalMEURDepositsBeforeWithdrawals}`)
       console.log(`Total REEF rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
 
-      console.log(`Remaining MoUSD deposits after withdrawals: ${totalMoUSDDepositsAfterWithdrawals}`)
+      console.log(`Remaining MEUR deposits after withdrawals: ${totalMEURDepositsAfterWithdrawals}`)
       console.log(`Remaining REEF rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)

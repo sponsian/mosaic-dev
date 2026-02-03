@@ -24,7 +24,7 @@ The constructor for this class is marked as internal. Third-party code should no
 |  --- | --- | --- | --- |
 |  [collateralGain](./lib-base.msicstake.collateralgain.md) |  | [Decimal](./lib-base.decimal.md) | Collateral gain available to withdraw. |
 |  [isEmpty](./lib-base.msicstake.isempty.md) |  | boolean |  |
-|  [msicGain](./lib-base.msicstake.msicgain.md) |  | [Decimal](./lib-base.decimal.md) | MoUSD gain available to withdraw. |
+|  [msicGain](./lib-base.msicstake.msicgain.md) |  | [Decimal](./lib-base.decimal.md) | MEUR gain available to withdraw. |
 |  [stakedMSIC](./lib-base.msicstake.stakedmsic.md) |  | [Decimal](./lib-base.decimal.md) | The amount of MSIC that's staked. |
 
 ## Methods

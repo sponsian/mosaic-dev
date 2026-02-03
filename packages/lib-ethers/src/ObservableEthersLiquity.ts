@@ -164,41 +164,41 @@ export class ObservableEthersMosaic implements ObservableMosaic {
     };
   }
 
-  watchMoUSDInStabilityPool(
-    onMoUSDInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
+  watchMEURInStabilityPool(
+    onMEURInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
   ): () => void {
     const { msicToken, stabilityPool } = _getContracts(this._readable.connection);
     const { Transfer } = msicToken.filters;
 
-    const transferMoUSDFromStabilityPool = Transfer(stabilityPool.address);
-    const transferMoUSDToStabilityPool = Transfer(null, stabilityPool.address);
+    const transferMEURFromStabilityPool = Transfer(stabilityPool.address);
+    const transferMEURToStabilityPool = Transfer(null, stabilityPool.address);
 
-    const stabilityPoolMoUSDFilters = [transferMoUSDFromStabilityPool, transferMoUSDToStabilityPool];
+    const stabilityPoolMEURFilters = [transferMEURFromStabilityPool, transferMEURToStabilityPool];
 
-    const stabilityPoolMoUSDListener = debounce((blockTag: number) => {
-      this._readable.getMoUSDInStabilityPool({ blockTag }).then(onMoUSDInStabilityPoolChanged);
+    const stabilityPoolMEURListener = debounce((blockTag: number) => {
+      this._readable.getMEURInStabilityPool({ blockTag }).then(onMEURInStabilityPoolChanged);
     });
 
-    stabilityPoolMoUSDFilters.forEach(filter => msicToken.on(filter, stabilityPoolMoUSDListener));
+    stabilityPoolMEURFilters.forEach(filter => msicToken.on(filter, stabilityPoolMEURListener));
 
     return () =>
-      stabilityPoolMoUSDFilters.forEach(filter =>
-        msicToken.removeListener(filter, stabilityPoolMoUSDListener)
+      stabilityPoolMEURFilters.forEach(filter =>
+        msicToken.removeListener(filter, stabilityPoolMEURListener)
       );
   }
 
-  watchMoUSDBalance(onMoUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
+  watchMEURBalance(onMEURBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
     address ??= _requireAddress(this._readable.connection);
 
     const { msicToken } = _getContracts(this._readable.connection);
     const { Transfer } = msicToken.filters;
-    const transferMoUSDFromUser = Transfer(address);
-    const transferMoUSDToUser = Transfer(null, address);
+    const transferMEURFromUser = Transfer(address);
+    const transferMEURToUser = Transfer(null, address);
 
-    const msicTransferFilters = [transferMoUSDFromUser, transferMoUSDToUser];
+    const msicTransferFilters = [transferMEURFromUser, transferMEURToUser];
 
     const msicTransferListener = debounce((blockTag: number) => {
-      this._readable.getMoUSDBalance(address, { blockTag }).then(onMoUSDBalanceChanged);
+      this._readable.getMEURBalance(address, { blockTag }).then(onMEURBalanceChanged);
     });
 
     msicTransferFilters.forEach(filter => msicToken.on(filter, msicTransferListener));

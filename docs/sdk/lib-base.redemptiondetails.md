@@ -4,7 +4,7 @@
 
 ## RedemptionDetails interface
 
-Details of a [redeemMoUSD()](./lib-base.transactablemosaic.redeemmsic.md) transaction.
+Details of a [redeemMEUR()](./lib-base.transactablemosaic.redeemmsic.md) transaction.
 
 <b>Signature:</b>
 
@@ -16,8 +16,8 @@ export interface RedemptionDetails
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [actualMoUSDAmount](./lib-base.redemptiondetails.actualmsicamount.md) | [Decimal](./lib-base.decimal.md) | Amount of MoUSD that was actually redeemed by the transaction. |
-|  [attemptedMoUSDAmount](./lib-base.redemptiondetails.attemptedmsicamount.md) | [Decimal](./lib-base.decimal.md) | Amount of MoUSD the redeemer tried to redeem. |
+|  [actualMEURAmount](./lib-base.redemptiondetails.actualmsicamount.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR that was actually redeemed by the transaction. |
+|  [attemptedMEURAmount](./lib-base.redemptiondetails.attemptedmsicamount.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR the redeemer tried to redeem. |
 |  [collateralTaken](./lib-base.redemptiondetails.collateraltaken.md) | [Decimal](./lib-base.decimal.md) | Amount of collateral (e.g. Ether) taken from Troves by the transaction. |
 |  [fee](./lib-base.redemptiondetails.fee.md) | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) deducted as fee from collateral taken. |
 

@@ -42,16 +42,16 @@ export interface PopulatedMosaicTransaction<
  * @remarks
  * The Mosaic protocol fulfills redemptions by repaying the debt of Troves in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
- * {@link @mosaic/lib-base#MoUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
- * some MoUSD amounts are not possible to redeem exactly.
+ * {@link @mosaic/lib-base#MEUR_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
+ * some MEUR amounts are not possible to redeem exactly.
  *
- * When {@link @mosaic/lib-base#PopulatableMosaic.redeemMoUSD | redeemMoUSD()} is called with an
- * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMoUSDAmount`
+ * When {@link @mosaic/lib-base#PopulatableMosaic.redeemMEUR | redeemMEUR()} is called with an
+ * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableMEURAmount`
  * property). When this happens, the redeemer can either redeem the truncated amount by sending the
  * transaction unchanged, or prepare a new transaction by
  * {@link @mosaic/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
  * to the next lowest possible value, which is the sum of the truncated amount and
- * {@link @mosaic/lib-base#MoUSD_MINIMUM_NET_DEBT}.
+ * {@link @mosaic/lib-base#MEUR_MINIMUM_NET_DEBT}.
  *
  * @public
  */
@@ -60,13 +60,13 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
     P,
     SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>
   > {
-  /** Amount of MoUSD the redeemer is trying to redeem. */
-  readonly attemptedMoUSDAmount: Decimal;
+  /** Amount of MEUR the redeemer is trying to redeem. */
+  readonly attemptedMEURAmount: Decimal;
 
-  /** Maximum amount of MoUSD that is currently redeemable from `attemptedMoUSDAmount`. */
-  readonly redeemableMoUSDAmount: Decimal;
+  /** Maximum amount of MEUR that is currently redeemable from `attemptedMEURAmount`. */
+  readonly redeemableMEURAmount: Decimal;
 
-  /** Whether `redeemableMoUSDAmount` is less than `attemptedMoUSDAmount`. */
+  /** Whether `redeemableMEURAmount` is less than `attemptedMEURAmount`. */
   readonly isTruncated: boolean;
 
   /**
@@ -158,8 +158,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     >
   >;
 
-  /** {@inheritDoc TransactableMosaic.borrowMoUSD} */
-  borrowMoUSD(
+  /** {@inheritDoc TransactableMosaic.borrowMEUR} */
+  borrowMEUR(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
   ): Promise<
@@ -169,8 +169,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     >
   >;
 
-  /** {@inheritDoc TransactableMosaic.repayMoUSD} */
-  repayMoUSD(
+  /** {@inheritDoc TransactableMosaic.repayMEUR} */
+  repayMEUR(
     amount: Decimalish
   ): Promise<
     PopulatedMosaicTransaction<
@@ -198,8 +198,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, LiquidationDetails>>>
   >;
 
-  /** {@inheritDoc TransactableMosaic.depositMoUSDInStabilityPool} */
-  depositMoUSDInStabilityPool(
+  /** {@inheritDoc TransactableMosaic.depositMEURInStabilityPool} */
+  depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
   ): Promise<
@@ -209,8 +209,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     >
   >;
 
-  /** {@inheritDoc TransactableMosaic.withdrawMoUSDFromStabilityPool} */
-  withdrawMoUSDFromStabilityPool(
+  /** {@inheritDoc TransactableMosaic.withdrawMEURFromStabilityPool} */
+  withdrawMEURFromStabilityPool(
     amount: Decimalish
   ): Promise<
     PopulatedMosaicTransaction<
@@ -235,8 +235,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     >
   >;
 
-  /** {@inheritDoc TransactableMosaic.sendMoUSD} */
-  sendMoUSD(
+  /** {@inheritDoc TransactableMosaic.sendMEUR} */
+  sendMEUR(
     toAddress: string,
     amount: Decimalish
   ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
@@ -247,8 +247,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown>
     amount: Decimalish
   ): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableMosaic.redeemMoUSD} */
-  redeemMoUSD(
+  /** {@inheritDoc TransactableMosaic.redeemMEUR} */
+  redeemMEUR(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedRedemption<P, S, R>>;

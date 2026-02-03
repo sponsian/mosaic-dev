@@ -26,7 +26,7 @@ export const ActiveDeposit: React.FC = () => {
   const { dispatchEvent } = useStabilityView();
   const { stabilityDeposit, trove, msicInStabilityPool } = useMosaicSelector(selector);
 
-  const poolShare = stabilityDeposit.currentMoUSD.mulDiv(100, msicInStabilityPool);
+  const poolShare = stabilityDeposit.currentMEUR.mulDiv(100, msicInStabilityPool);
 
   const handleAdjustDeposit = useCallback(() => {
     dispatchEvent("ADJUST_DEPOSIT_PRESSED");
@@ -63,7 +63,7 @@ export const ActiveDeposit: React.FC = () => {
           <DisabledEditableRow
             label="Deposit"
             inputId="deposit-msic"
-            amount={stabilityDeposit.currentMoUSD.prettify()}
+            amount={stabilityDeposit.currentMEUR.prettify()}
             unit={COIN}
           />
 

@@ -4,7 +4,7 @@
 
 ## MosaicStoreBaseState.totalStakedUniTokens property
 
-Total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining.
+Total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining.
 
 <b>Signature:</b>
 

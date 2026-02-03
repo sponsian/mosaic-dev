@@ -108,17 +108,17 @@ export class _CachedReadableMosaic<T extends unknown[]>
     );
   }
 
-  async getMoUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
+  async getMEURInStabilityPool(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getMoUSDInStabilityPool(...extraParams) ??
-      this._readable.getMoUSDInStabilityPool(...extraParams)
+      this._cache.getMEURInStabilityPool(...extraParams) ??
+      this._readable.getMEURInStabilityPool(...extraParams)
     );
   }
 
-  async getMoUSDBalance(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getMEURBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getMoUSDBalance(address, ...extraParams) ??
-      this._readable.getMoUSDBalance(address, ...extraParams)
+      this._cache.getMEURBalance(address, ...extraParams) ??
+      this._readable.getMEURBalance(address, ...extraParams)
     );
   }
 

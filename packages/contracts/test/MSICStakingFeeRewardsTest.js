@@ -17,10 +17,10 @@ const ZERO = th.toBN('0')
 
 const GAS_PRICE = 10000000
 
-/* NOTE: These tests do not test for specific REEF and MoUSD gain values. They only test that the 
+/* NOTE: These tests do not test for specific REEF and MEUR gain values. They only test that the 
  * gains are non-zero, occur when they should, and are in correct proportion to the user's stake. 
  *
- * Specific REEF/MoUSD gain values will depend on the final fee schedule used, and the final choices for
+ * Specific REEF/MEUR gain values will depend on the final fee schedule used, and the final choices for
  * parameters BETA and MINUTE_DECAY_FACTOR in the TroveManager, which are still TBD based on economic
  * modelling.
  * 
@@ -50,7 +50,7 @@ contract('MSICStaking revenue share tests', async accounts => {
   beforeEach(async () => {
     contracts = await deploymentHelper.deployMosaicCore()
     contracts.troveManager = await TroveManagerTester.new()
-    contracts = await deploymentHelper.deployMoUSDTokenTester(contracts)
+    contracts = await deploymentHelper.deployMEURTokenTester(contracts)
     const MSICContracts = await deploymentHelper.deployMSICTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
     
     await deploymentHelper.connectMSICContracts(MSICContracts)
@@ -87,10 +87,10 @@ contract('MSICStaking revenue share tests', async accounts => {
   })
 
   it("REEF fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -122,18 +122,18 @@ contract('MSICStaking revenue share tests', async accounts => {
     // Check REEF fee per unit staked has increased by correct amount
     const F_ETH_After = await msicStaking.F_ETH()
 
-    // Expect fee per unit staked = fee/100, since there is 100 MoUSD totalStaked
+    // Expect fee per unit staked = fee/100, since there is 100 MEUR totalStaked
     const expected_F_ETH_After = emittedETHFee.div(toBN('100')) 
 
     assert.isTrue(expected_F_ETH_After.eq(F_ETH_After))
   })
 
   it("REEF fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -161,12 +161,12 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.equal(F_ETH_After, '0')
   })
 
-  it("MoUSD fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+  it("MEUR fee per MSIC staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -178,9 +178,9 @@ contract('MSICStaking revenue share tests', async accounts => {
     await msicToken.approve(msicStaking.address, dec(100, 18), {from: A})
     await msicStaking.stake(dec(100, 18), {from: A})
 
-    // Check MoUSD fee per unit staked is zero
-    const F_MoUSD_Before = await msicStaking.F_ETH()
-    assert.equal(F_MoUSD_Before, '0')
+    // Check MEUR fee per unit staked is zero
+    const F_MEUR_Before = await msicStaking.F_ETH()
+    assert.equal(F_MEUR_Before, '0')
 
     const B_BalBeforeREdemption = await msicToken.balanceOf(B)
     // B redeems
@@ -194,27 +194,27 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isTrue(baseRate.gt(toBN('0')))
 
     // D draws debt
-    const tx = await borrowerOperations.withdrawMoUSD(th._100pct, dec(27, 18), D, D, {from: D})
+    const tx = await borrowerOperations.withdrawMEUR(th._100pct, dec(27, 18), D, D, {from: D})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(tx))
-    assert.isTrue(emittedMoUSDFee.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee = toBN(th.getMEURFeeFromMEURBorrowingEvent(tx))
+    assert.isTrue(emittedMEURFee.gt(toBN('0')))
     
-    // Check MoUSD fee per unit staked has increased by correct amount
-    const F_MoUSD_After = await msicStaking.F_MoUSD()
+    // Check MEUR fee per unit staked has increased by correct amount
+    const F_MEUR_After = await msicStaking.F_MEUR()
 
-    // Expect fee per unit staked = fee/100, since there is 100 MoUSD totalStaked
-    const expected_F_MoUSD_After = emittedMoUSDFee.div(toBN('100')) 
+    // Expect fee per unit staked = fee/100, since there is 100 MEUR totalStaked
+    const expected_F_MEUR_After = emittedMEURFee.div(toBN('100')) 
 
-    assert.isTrue(expected_F_MoUSD_After.eq(F_MoUSD_After))
+    assert.isTrue(expected_F_MEUR_After.eq(F_MEUR_After))
   })
 
-  it("MoUSD fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+  it("MEUR fee per MSIC staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -222,9 +222,9 @@ contract('MSICStaking revenue share tests', async accounts => {
     // multisig transfers MSIC to staker A
     await msicToken.transfer(A, dec(100, 18), {from: multisig})
 
-    // Check MoUSD fee per unit staked is zero
-    const F_MoUSD_Before = await msicStaking.F_ETH()
-    assert.equal(F_MoUSD_Before, '0')
+    // Check MEUR fee per unit staked is zero
+    const F_MEUR_Before = await msicStaking.F_ETH()
+    assert.equal(F_MEUR_Before, '0')
 
     const B_BalBeforeREdemption = await msicToken.balanceOf(B)
     // B redeems
@@ -238,23 +238,23 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isTrue(baseRate.gt(toBN('0')))
 
     // D draws debt
-    const tx = await borrowerOperations.withdrawMoUSD(th._100pct, dec(27, 18), D, D, {from: D})
+    const tx = await borrowerOperations.withdrawMEUR(th._100pct, dec(27, 18), D, D, {from: D})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(tx))
-    assert.isTrue(emittedMoUSDFee.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee = toBN(th.getMEURFeeFromMEURBorrowingEvent(tx))
+    assert.isTrue(emittedMEURFee.gt(toBN('0')))
     
-    // Check MoUSD fee per unit staked did not increase, is still zero
-    const F_MoUSD_After = await msicStaking.F_MoUSD()
-    assert.equal(F_MoUSD_After, '0')
+    // Check MEUR fee per unit staked did not increase, is still zero
+    const F_MEUR_After = await msicStaking.F_MEUR()
+    assert.equal(F_MEUR_After, '0')
   })
 
   it("MSIC Staking: A single staker earns all REEF and MSIC fees that occur", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -289,45 +289,45 @@ contract('MSICStaking revenue share tests', async accounts => {
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(104, 18), D, D, {from: D})
+    const borrowingTx_1 = await borrowerOperations.withdrawMEUR(th._100pct, dec(104, 18), D, D, {from: D})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_1 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_1))
-    assert.isTrue(emittedMoUSDFee_1.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_1 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_1))
+    assert.isTrue(emittedMEURFee_1.gt(toBN('0')))
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(17, 18), B, B, {from: B})
+    const borrowingTx_2 = await borrowerOperations.withdrawMEUR(th._100pct, dec(17, 18), B, B, {from: B})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_2 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_2))
-    assert.isTrue(emittedMoUSDFee_2.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_2 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_2))
+    assert.isTrue(emittedMEURFee_2.gt(toBN('0')))
 
     const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2)
-    const expectedTotalMoUSDGain = emittedMoUSDFee_1.add(emittedMoUSDFee_2)
+    const expectedTotalMEURGain = emittedMEURFee_1.add(emittedMEURFee_2)
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_Before = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_Before = toBN(await msicToken.balanceOf(A))
 
     // A un-stakes
     const GAS_Used = th.gasUsed(await msicStaking.unstake(dec(100, 18), {from: A, gasPrice: GAS_PRICE }))
 
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_After = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_After = toBN(await msicToken.balanceOf(A))
 
 
     const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(GAS_Used * GAS_PRICE))
-    const A_MoUSDGain = A_MoUSDBalance_After.sub(A_MoUSDBalance_Before)
+    const A_MEURGain = A_MEURBalance_After.sub(A_MEURBalance_Before)
 
     assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedTotalMoUSDGain, A_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedTotalMEURGain, A_MEURGain), 1000)
   })
 
-  it("stake(): Top-up sends out all accumulated REEF and MoUSD gains to the staker", async () => { 
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+  it("stake(): Top-up sends out all accumulated REEF and MEUR gains to the staker", async () => { 
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -362,44 +362,44 @@ contract('MSICStaking revenue share tests', async accounts => {
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(104, 18), D, D, {from: D})
+    const borrowingTx_1 = await borrowerOperations.withdrawMEUR(th._100pct, dec(104, 18), D, D, {from: D})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_1 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_1))
-    assert.isTrue(emittedMoUSDFee_1.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_1 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_1))
+    assert.isTrue(emittedMEURFee_1.gt(toBN('0')))
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(17, 18), B, B, {from: B})
+    const borrowingTx_2 = await borrowerOperations.withdrawMEUR(th._100pct, dec(17, 18), B, B, {from: B})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_2 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_2))
-    assert.isTrue(emittedMoUSDFee_2.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_2 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_2))
+    assert.isTrue(emittedMEURFee_2.gt(toBN('0')))
 
     const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2)
-    const expectedTotalMoUSDGain = emittedMoUSDFee_1.add(emittedMoUSDFee_2)
+    const expectedTotalMEURGain = emittedMEURFee_1.add(emittedMEURFee_2)
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_Before = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_Before = toBN(await msicToken.balanceOf(A))
 
     // A tops up
     const GAS_Used = th.gasUsed(await msicStaking.stake(dec(50, 18), {from: A, gasPrice: GAS_PRICE }))
 
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_After = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_After = toBN(await msicToken.balanceOf(A))
 
     const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(GAS_Used * GAS_PRICE))
-    const A_MoUSDGain = A_MoUSDBalance_After.sub(A_MoUSDBalance_Before)
+    const A_MEURGain = A_MEURBalance_After.sub(A_MEURBalance_Before)
 
     assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedTotalMoUSDGain, A_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedTotalMEURGain, A_MEURGain), 1000)
   })
 
   it("getPendingETHGain(): Returns the staker's correct pending REEF gain", async () => { 
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -440,12 +440,12 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
   })
 
-  it("getPendingMoUSDGain(): Returns the staker's correct pending MoUSD gain", async () => { 
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+  it("getPendingMEURGain(): Returns the staker's correct pending MEUR gain", async () => { 
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -480,35 +480,35 @@ contract('MSICStaking revenue share tests', async accounts => {
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(104, 18), D, D, {from: D})
+    const borrowingTx_1 = await borrowerOperations.withdrawMEUR(th._100pct, dec(104, 18), D, D, {from: D})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_1 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_1))
-    assert.isTrue(emittedMoUSDFee_1.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_1 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_1))
+    assert.isTrue(emittedMEURFee_1.gt(toBN('0')))
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(17, 18), B, B, {from: B})
+    const borrowingTx_2 = await borrowerOperations.withdrawMEUR(th._100pct, dec(17, 18), B, B, {from: B})
     
-    // Check MoUSD fee value in event is non-zero
-    const emittedMoUSDFee_2 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_2))
-    assert.isTrue(emittedMoUSDFee_2.gt(toBN('0')))
+    // Check MEUR fee value in event is non-zero
+    const emittedMEURFee_2 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_2))
+    assert.isTrue(emittedMEURFee_2.gt(toBN('0')))
 
-    const expectedTotalMoUSDGain = emittedMoUSDFee_1.add(emittedMoUSDFee_2)
-    const A_MoUSDGain = await msicStaking.getPendingMoUSDGain(A)
+    const expectedTotalMEURGain = emittedMEURFee_1.add(emittedMEURFee_2)
+    const A_MEURGain = await msicStaking.getPendingMEURGain(A)
 
-    assert.isAtMost(th.getDifference(expectedTotalMoUSDGain, A_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedTotalMEURGain, A_MEURGain), 1000)
   })
 
   // - multi depositors, several rewards
   it("MSIC Staking: Multiple stakers earn the correct share of all REEF and MSIC fees, based on their stake size", async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: G } })
+    await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: G } })
 
     // FF time one year so owner can transfer MSIC
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -542,14 +542,14 @@ contract('MSICStaking revenue share tests', async accounts => {
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
     // F draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(104, 18), F, F, {from: F})
-    const emittedMoUSDFee_1 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_1))
-    assert.isTrue(emittedMoUSDFee_1.gt(toBN('0')))
+    const borrowingTx_1 = await borrowerOperations.withdrawMEUR(th._100pct, dec(104, 18), F, F, {from: F})
+    const emittedMEURFee_1 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_1))
+    assert.isTrue(emittedMEURFee_1.gt(toBN('0')))
 
     // G draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(17, 18), G, G, {from: G})
-    const emittedMoUSDFee_2 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_2))
-    assert.isTrue(emittedMoUSDFee_2.gt(toBN('0')))
+    const borrowingTx_2 = await borrowerOperations.withdrawMEUR(th._100pct, dec(17, 18), G, G, {from: G})
+    const emittedMEURFee_2 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_2))
+    assert.isTrue(emittedMEURFee_2.gt(toBN('0')))
 
     // D obtains MSIC from owner and makes a stake
     await msicToken.transfer(D, dec(50, 18), {from: multisig})
@@ -566,9 +566,9 @@ contract('MSICStaking revenue share tests', async accounts => {
      assert.isTrue(emittedETHFee_3.gt(toBN('0')))
 
      // G draws debt
-    const borrowingTx_3 = await borrowerOperations.withdrawMoUSD(th._100pct, dec(17, 18), G, G, {from: G})
-    const emittedMoUSDFee_3 = toBN(th.getMoUSDFeeFromMoUSDBorrowingEvent(borrowingTx_3))
-    assert.isTrue(emittedMoUSDFee_3.gt(toBN('0')))
+    const borrowingTx_3 = await borrowerOperations.withdrawMEUR(th._100pct, dec(17, 18), G, G, {from: G})
+    const emittedMEURFee_3 = toBN(th.getMEURFeeFromMEURBorrowingEvent(borrowingTx_3))
+    assert.isTrue(emittedMEURFee_3.gt(toBN('0')))
      
     /*  
     Expected rewards:
@@ -578,10 +578,10 @@ contract('MSICStaking revenue share tests', async accounts => {
     C_ETH: (300* ETHFee_1)/600 + (300* ETHFee_2)/600 + (300*ETH_Fee_3)/650
     D_ETH:                                             (100*ETH_Fee_3)/650
 
-    A_MoUSD: (100*MoUSDFee_1 )/600 + (100* MoUSDFee_2)/600 + (100*MoUSDFee_3)/650
-    B_MoUSD: (200* MoUSDFee_1)/600 + (200* MoUSDFee_2)/600 + (200*MoUSDFee_3)/650
-    C_MoUSD: (300* MoUSDFee_1)/600 + (300* MoUSDFee_2)/600 + (300*MoUSDFee_3)/650
-    D_MoUSD:                                               (100*MoUSDFee_3)/650
+    A_MEUR: (100*MEURFee_1 )/600 + (100* MEURFee_2)/600 + (100*MEURFee_3)/650
+    B_MEUR: (200* MEURFee_1)/600 + (200* MEURFee_2)/600 + (200*MEURFee_3)/650
+    C_MEUR: (300* MEURFee_1)/600 + (300* MEURFee_2)/600 + (300*MEURFee_3)/650
+    D_MEUR:                                               (100*MEURFee_3)/650
     */
 
     // Expected REEF gains
@@ -599,30 +599,30 @@ contract('MSICStaking revenue share tests', async accounts => {
 
     const expectedETHGain_D = toBN('50').mul(emittedETHFee_3).div( toBN('650'))
 
-    // Expected MoUSD gains:
-    const expectedMoUSDGain_A = toBN('100').mul(emittedMoUSDFee_1).div( toBN('600'))
-                            .add(toBN('100').mul(emittedMoUSDFee_2).div( toBN('600')))
-                            .add(toBN('100').mul(emittedMoUSDFee_3).div( toBN('650')))
+    // Expected MEUR gains:
+    const expectedMEURGain_A = toBN('100').mul(emittedMEURFee_1).div( toBN('600'))
+                            .add(toBN('100').mul(emittedMEURFee_2).div( toBN('600')))
+                            .add(toBN('100').mul(emittedMEURFee_3).div( toBN('650')))
 
-    const expectedMoUSDGain_B = toBN('200').mul(emittedMoUSDFee_1).div( toBN('600'))
-                            .add(toBN('200').mul(emittedMoUSDFee_2).div( toBN('600')))
-                            .add(toBN('200').mul(emittedMoUSDFee_3).div( toBN('650')))
+    const expectedMEURGain_B = toBN('200').mul(emittedMEURFee_1).div( toBN('600'))
+                            .add(toBN('200').mul(emittedMEURFee_2).div( toBN('600')))
+                            .add(toBN('200').mul(emittedMEURFee_3).div( toBN('650')))
 
-    const expectedMoUSDGain_C = toBN('300').mul(emittedMoUSDFee_1).div( toBN('600'))
-                            .add(toBN('300').mul(emittedMoUSDFee_2).div( toBN('600')))
-                            .add(toBN('300').mul(emittedMoUSDFee_3).div( toBN('650')))
+    const expectedMEURGain_C = toBN('300').mul(emittedMEURFee_1).div( toBN('600'))
+                            .add(toBN('300').mul(emittedMEURFee_2).div( toBN('600')))
+                            .add(toBN('300').mul(emittedMEURFee_3).div( toBN('650')))
     
-    const expectedMoUSDGain_D = toBN('50').mul(emittedMoUSDFee_3).div( toBN('650'))
+    const expectedMEURGain_D = toBN('50').mul(emittedMEURFee_3).div( toBN('650'))
 
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_Before = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_Before = toBN(await msicToken.balanceOf(A))
     const B_ETHBalance_Before = toBN(await web3.eth.getBalance(B))
-    const B_MoUSDBalance_Before = toBN(await msicToken.balanceOf(B))
+    const B_MEURBalance_Before = toBN(await msicToken.balanceOf(B))
     const C_ETHBalance_Before = toBN(await web3.eth.getBalance(C))
-    const C_MoUSDBalance_Before = toBN(await msicToken.balanceOf(C))
+    const C_MEURBalance_Before = toBN(await msicToken.balanceOf(C))
     const D_ETHBalance_Before = toBN(await web3.eth.getBalance(D))
-    const D_MoUSDBalance_Before = toBN(await msicToken.balanceOf(D))
+    const D_MEURBalance_Before = toBN(await msicToken.balanceOf(D))
 
     // A-D un-stake
     const A_GAS_Used = th.gasUsed(await msicStaking.unstake(dec(100, 18), {from: A, gasPrice: GAS_PRICE }))
@@ -636,43 +636,43 @@ contract('MSICStaking revenue share tests', async accounts => {
     assert.equal((await msicToken.balanceOf(msicStaking.address)), '0')
     assert.equal((await msicStaking.totalMSICStaked()), '0')
 
-    // Get A-D REEF and MoUSD balances
+    // Get A-D REEF and MEUR balances
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
-    const A_MoUSDBalance_After = toBN(await msicToken.balanceOf(A))
+    const A_MEURBalance_After = toBN(await msicToken.balanceOf(A))
     const B_ETHBalance_After = toBN(await web3.eth.getBalance(B))
-    const B_MoUSDBalance_After = toBN(await msicToken.balanceOf(B))
+    const B_MEURBalance_After = toBN(await msicToken.balanceOf(B))
     const C_ETHBalance_After = toBN(await web3.eth.getBalance(C))
-    const C_MoUSDBalance_After = toBN(await msicToken.balanceOf(C))
+    const C_MEURBalance_After = toBN(await msicToken.balanceOf(C))
     const D_ETHBalance_After = toBN(await web3.eth.getBalance(D))
-    const D_MoUSDBalance_After = toBN(await msicToken.balanceOf(D))
+    const D_MEURBalance_After = toBN(await msicToken.balanceOf(D))
 
-    // Get REEF and MoUSD gains
+    // Get REEF and MEUR gains
     const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(A_GAS_Used * GAS_PRICE))
-    const A_MoUSDGain = A_MoUSDBalance_After.sub(A_MoUSDBalance_Before)
+    const A_MEURGain = A_MEURBalance_After.sub(A_MEURBalance_Before)
     const B_ETHGain = B_ETHBalance_After.sub(B_ETHBalance_Before).add(toBN(B_GAS_Used * GAS_PRICE))
-    const B_MoUSDGain = B_MoUSDBalance_After.sub(B_MoUSDBalance_Before)
+    const B_MEURGain = B_MEURBalance_After.sub(B_MEURBalance_Before)
     const C_ETHGain = C_ETHBalance_After.sub(C_ETHBalance_Before).add(toBN(C_GAS_Used * GAS_PRICE))
-    const C_MoUSDGain = C_MoUSDBalance_After.sub(C_MoUSDBalance_Before)
+    const C_MEURGain = C_MEURBalance_After.sub(C_MEURBalance_Before)
     const D_ETHGain = D_ETHBalance_After.sub(D_ETHBalance_Before).add(toBN(D_GAS_Used * GAS_PRICE))
-    const D_MoUSDGain = D_MoUSDBalance_After.sub(D_MoUSDBalance_Before)
+    const D_MEURGain = D_MEURBalance_After.sub(D_MEURBalance_Before)
 
     // Check gains match expected amounts
     assert.isAtMost(th.getDifference(expectedETHGain_A, A_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedMoUSDGain_A, A_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedMEURGain_A, A_MEURGain), 1000)
     assert.isAtMost(th.getDifference(expectedETHGain_B, B_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedMoUSDGain_B, B_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedMEURGain_B, B_MEURGain), 1000)
     assert.isAtMost(th.getDifference(expectedETHGain_C, C_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedMoUSDGain_C, C_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedMEURGain_C, C_MEURGain), 1000)
     assert.isAtMost(th.getDifference(expectedETHGain_D, D_ETHGain), 1000)
-    assert.isAtMost(th.getDifference(expectedMoUSDGain_D, D_MoUSDGain), 1000)
+    assert.isAtMost(th.getDifference(expectedMEURGain_D, D_MEURGain), 1000)
   })
  
   it("unstake(): reverts if caller has REEF gains and can't receive REEF",  async () => {
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
-    await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-    await openTrove({ extraMoUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
+    await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+    await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+    await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+    await openTrove({ extraMEURAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
 

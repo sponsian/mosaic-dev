@@ -12,8 +12,8 @@ import {
   Decimalish,
   LiquidationDetails,
   MosaicReceipt,
-  MoUSD_MINIMUM_DEBT,
-  MoUSD_MINIMUM_NET_DEBT,
+  MEUR_MINIMUM_DEBT,
+  MEUR_MINIMUM_NET_DEBT,
   MinedReceipt,
   PopulatableMosaic,
   PopulatedMosaicTransaction,
@@ -267,7 +267,7 @@ export class SentEthersMosaicTransaction<T = unknown>
 }
 
 /**
- * Optional parameters of a transaction that borrows MoUSD.
+ * Optional parameters of a transaction that borrows MEUR.
  *
  * @public
  */
@@ -282,7 +282,7 @@ export interface BorrowingOperationOptionalParams {
    * Control the amount of extra gas included attached to the transaction.
    *
    * @remarks
-   * Transactions that borrow MoUSD must pay a variable borrowing fee, which is added to the Trove's
+   * Transactions that borrow MEUR must pay a variable borrowing fee, which is added to the Trove's
    * debt. This fee increases whenever a redemption occurs, and otherwise decays exponentially.
    * Due to this decay, a Trove's collateral ratio can end up being higher than initially calculated
    * if the transaction is pending for a long time. When this happens, the backend has to iterate
@@ -407,11 +407,11 @@ export class PopulatedEthersRedemption
       EthersTransactionResponse,
       EthersTransactionReceipt
     > {
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.attemptedMoUSDAmount} */
-  readonly attemptedMoUSDAmount: Decimal;
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.attemptedMEURAmount} */
+  readonly attemptedMEURAmount: Decimal;
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.redeemableMoUSDAmount} */
-  readonly redeemableMoUSDAmount: Decimal;
+  /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.redeemableMEURAmount} */
+  readonly redeemableMEURAmount: Decimal;
 
   /** {@inheritDoc @mosaic/lib-base#PopulatedRedemption.isTruncated} */
   readonly isTruncated: boolean;
@@ -424,8 +424,8 @@ export class PopulatedEthersRedemption
   constructor(
     rawPopulatedTransaction: EthersPopulatedTransaction,
     connection: EthersMosaicConnection,
-    attemptedMoUSDAmount: Decimal,
-    redeemableMoUSDAmount: Decimal,
+    attemptedMEURAmount: Decimal,
+    redeemableMEURAmount: Decimal,
     increaseAmountByMinimumNetDebt?: (
       maxRedemptionRate?: Decimalish
     ) => Promise<PopulatedEthersRedemption>
@@ -439,17 +439,17 @@ export class PopulatedEthersRedemption
       ({ logs }) =>
         troveManager
           .extractEvents(logs, "Redemption")
-          .map(({ args: { _ETHSent, _ETHFee, _actualMoUSDAmount, _attemptedMoUSDAmount } }) => ({
-            attemptedMoUSDAmount: decimalify(_attemptedMoUSDAmount),
-            actualMoUSDAmount: decimalify(_actualMoUSDAmount),
+          .map(({ args: { _ETHSent, _ETHFee, _actualMEURAmount, _attemptedMEURAmount } }) => ({
+            attemptedMEURAmount: decimalify(_attemptedMEURAmount),
+            actualMEURAmount: decimalify(_actualMEURAmount),
             collateralTaken: decimalify(_ETHSent),
             fee: decimalify(_ETHFee)
           }))[0]
     );
 
-    this.attemptedMoUSDAmount = attemptedMoUSDAmount;
-    this.redeemableMoUSDAmount = redeemableMoUSDAmount;
-    this.isTruncated = redeemableMoUSDAmount.lt(attemptedMoUSDAmount);
+    this.attemptedMEURAmount = attemptedMEURAmount;
+    this.redeemableMEURAmount = redeemableMEURAmount;
+    this.isTruncated = redeemableMEURAmount.lt(attemptedMEURAmount);
     this._increaseAmountByMinimumNetDebt = increaseAmountByMinimumNetDebt;
   }
 
@@ -520,8 +520,8 @@ export class PopulatableEthersMosaic
           .map(({ args: { _coll, _debt } }) => new Trove(decimalify(_coll), decimalify(_debt)));
 
         const [fee] = borrowerOperations
-          .extractEvents(logs, "MoUSDBorrowingFeePaid")
-          .map(({ args: { _MoUSDFee } }) => decimalify(_MoUSDFee));
+          .extractEvents(logs, "MEURBorrowingFeePaid")
+          .map(({ args: { _MEURFee } }) => decimalify(_MEURFee));
 
         return {
           params,
@@ -544,7 +544,7 @@ export class PopulatableEthersMosaic
       this._readable.connection,
 
       ({ logs, from: userAddress }) => {
-        const [repayMoUSD] = msicToken
+        const [repayMEUR] = msicToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === userAddress && to === AddressZero)
           .map(({ args: { value } }) => decimalify(value));
@@ -555,7 +555,7 @@ export class PopulatableEthersMosaic
           .map(({ args: { _amount } }) => decimalify(_amount));
 
         return {
-          params: repayMoUSD.nonZero ? { withdrawCollateral, repayMoUSD } : { withdrawCollateral }
+          params: repayMEUR.nonZero ? { withdrawCollateral, repayMEUR } : { withdrawCollateral }
         };
       }
     );
@@ -579,10 +579,10 @@ export class PopulatableEthersMosaic
           .extractEvents(logs, "Liquidation")
           .map(
             ({
-              args: { _MoUSDGasCompensation, _collGasCompensation, _liquidatedColl, _liquidatedDebt }
+              args: { _MEURGasCompensation, _collGasCompensation, _liquidatedColl, _liquidatedDebt }
             }) => ({
               collateralGasCompensation: decimalify(_collGasCompensation),
-              msicGasCompensation: decimalify(_MoUSDGasCompensation),
+              msicGasCompensation: decimalify(_MEURGasCompensation),
               totalLiquidated: new Trove(decimalify(_liquidatedColl), decimalify(_liquidatedDebt))
             })
           );
@@ -600,13 +600,13 @@ export class PopulatableEthersMosaic
   ): StabilityPoolGainsWithdrawalDetails {
     const { stabilityPool } = _getContracts(this._readable.connection);
 
-    const [newMoUSDDeposit] = stabilityPool
+    const [newMEURDeposit] = stabilityPool
       .extractEvents(logs, "UserDepositChanged")
       .map(({ args: { _newDeposit } }) => decimalify(_newDeposit));
 
     const [[collateralGain, msicLoss]] = stabilityPool
       .extractEvents(logs, "ETHGainWithdrawn")
-      .map(({ args: { _ETH, _MoUSDLoss } }) => [decimalify(_ETH), decimalify(_MoUSDLoss)]);
+      .map(({ args: { _ETH, _MEURLoss } }) => [decimalify(_ETH), decimalify(_MEURLoss)]);
 
     const [msicReward] = stabilityPool
       .extractEvents(logs, "MSICPaidToDepositor")
@@ -614,7 +614,7 @@ export class PopulatableEthersMosaic
 
     return {
       msicLoss,
-      newMoUSDDeposit,
+      newMEURDeposit,
       collateralGain,
       msicReward
     };
@@ -631,7 +631,7 @@ export class PopulatableEthersMosaic
   }
 
   private _wrapStabilityDepositTopup(
-    change: { depositMoUSD: Decimal },
+    change: { depositMEUR: Decimal },
     rawPopulatedTransaction: EthersPopulatedTransaction
   ): PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails> {
     return new PopulatedEthersMosaicTransaction(
@@ -657,14 +657,14 @@ export class PopulatableEthersMosaic
       ({ logs, from: userAddress }) => {
         const gainsWithdrawalDetails = this._extractStabilityPoolGainsWithdrawalDetails(logs);
 
-        const [withdrawMoUSD] = msicToken
+        const [withdrawMEUR] = msicToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === stabilityPool.address && to === userAddress)
           .map(({ args: { value } }) => decimalify(value));
 
         return {
           ...gainsWithdrawalDetails,
-          change: { withdrawMoUSD, withdrawAllMoUSD: gainsWithdrawalDetails.newMoUSDDeposit.isZero }
+          change: { withdrawMEUR, withdrawAllMEUR: gainsWithdrawalDetails.newMEURDeposit.isZero }
         };
       }
     );
@@ -791,7 +791,7 @@ export class PopulatableEthersMosaic
     const {
       firstRedemptionHint,
       partialRedemptionHintNICR,
-      truncatedMoUSDamount
+      truncatedMEURamount
     } = await hintHelpers.getRedemptionHints(amount.hex, price.hex, _redeemMaxIterations);
 
     const [
@@ -805,7 +805,7 @@ export class PopulatableEthersMosaic
         );
 
     return [
-      decimalify(truncatedMoUSDamount),
+      decimalify(truncatedMEURamount),
       firstRedemptionHint,
       partialRedemptionUpperHint,
       partialRedemptionLowerHint,
@@ -823,7 +823,7 @@ export class PopulatableEthersMosaic
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalizedParams = _normalizeTroveCreation(params);
-    const { depositCollateral, borrowMoUSD } = normalizedParams;
+    const { depositCollateral, borrowMEUR } = normalizedParams;
 
     const [fees, blockTimestamp, total, price] = await Promise.all([
       this._readable._getFeesFactory(),
@@ -849,9 +849,9 @@ export class PopulatableEthersMosaic
       currentBorrowingRate
     );
 
-    const txParams = (borrowMoUSD: Decimal): Parameters<typeof borrowerOperations.openTrove> => [
+    const txParams = (borrowMEUR: Decimal): Parameters<typeof borrowerOperations.openTrove> => [
       maxBorrowingRate.hex,
-      borrowMoUSD.hex,
+      borrowMEUR.hex,
       ...hints,
       { value: depositCollateral.hex, ...overrides }
     ];
@@ -861,21 +861,21 @@ export class PopulatableEthersMosaic
     if (overrides?.gasLimit === undefined) {
       const decayedBorrowingRate = decayBorrowingRate(60 * borrowingFeeDecayToleranceMinutes);
       const decayedTrove = Trove.create(normalizedParams, decayedBorrowingRate);
-      const { borrowMoUSD: borrowMoUSDSimulatingDecay } = Trove.recreate(
+      const { borrowMEUR: borrowMEURSimulatingDecay } = Trove.recreate(
         decayedTrove,
         currentBorrowingRate
       );
 
-      if (decayedTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
+      if (decayedTrove.debt.lt(MEUR_MINIMUM_DEBT)) {
         throw new Error(
-          `Trove's debt might fall below ${MoUSD_MINIMUM_DEBT} ` +
+          `Trove's debt might fall below ${MEUR_MINIMUM_DEBT} ` +
             `within ${borrowingFeeDecayToleranceMinutes} minutes`
         );
       }
 
       const [gasNow, gasLater] = await Promise.all([
-        borrowerOperations.estimateGas.openTrove(...txParams(borrowMoUSD)),
-        borrowerOperations.estimateGas.openTrove(...txParams(borrowMoUSDSimulatingDecay))
+        borrowerOperations.estimateGas.openTrove(...txParams(borrowMEUR)),
+        borrowerOperations.estimateGas.openTrove(...txParams(borrowMEURSimulatingDecay))
       ]);
 
       const gasLimit = addGasForBaseRateUpdate(borrowingFeeDecayToleranceMinutes)(
@@ -888,7 +888,7 @@ export class PopulatableEthersMosaic
 
     return this._wrapTroveChangeWithFees(
       normalizedParams,
-      await borrowerOperations.populateTransaction.openTrove(...txParams(borrowMoUSD)),
+      await borrowerOperations.populateTransaction.openTrove(...txParams(borrowMEUR)),
       gasHeadroom
     );
   }
@@ -921,21 +921,21 @@ export class PopulatableEthersMosaic
     return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.borrowMoUSD} */
-  borrowMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.borrowMEUR} */
+  borrowMEUR(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ borrowMoUSD: amount }, maxBorrowingRate, overrides);
+    return this.adjustTrove({ borrowMEUR: amount }, maxBorrowingRate, overrides);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.repayMoUSD} */
-  repayMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.repayMEUR} */
+  repayMEUR(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ repayMoUSD: amount }, undefined, overrides);
+    return this.adjustTrove({ repayMEUR: amount }, undefined, overrides);
   }
 
   /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.adjustTrove} */
@@ -948,11 +948,11 @@ export class PopulatableEthersMosaic
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalizedParams = _normalizeTroveAdjustment(params);
-    const { depositCollateral, withdrawCollateral, borrowMoUSD, repayMoUSD } = normalizedParams;
+    const { depositCollateral, withdrawCollateral, borrowMEUR, repayMEUR } = normalizedParams;
 
     const [trove, feeVars] = await Promise.all([
       this._readable.getTrove(overrides.from),
-      borrowMoUSD &&
+      borrowMEUR &&
         promiseAllValues({
           fees: this._readable._getFeesFactory(),
           blockTimestamp: this._readable._getBlockTimestamp(),
@@ -981,11 +981,11 @@ export class PopulatableEthersMosaic
       currentBorrowingRate
     );
 
-    const txParams = (borrowMoUSD?: Decimal): Parameters<typeof borrowerOperations.adjustTrove> => [
+    const txParams = (borrowMEUR?: Decimal): Parameters<typeof borrowerOperations.adjustTrove> => [
       maxBorrowingRate.hex,
       (withdrawCollateral ?? Decimal.ZERO).hex,
-      (borrowMoUSD ?? repayMoUSD ?? Decimal.ZERO).hex,
-      !!borrowMoUSD,
+      (borrowMEUR ?? repayMEUR ?? Decimal.ZERO).hex,
+      !!borrowMEUR,
       ...hints,
       { value: depositCollateral?.hex, ...overrides }
     ];
@@ -995,27 +995,27 @@ export class PopulatableEthersMosaic
     if (overrides.gasLimit === undefined) {
       const decayedBorrowingRate = decayBorrowingRate(60 * borrowingFeeDecayToleranceMinutes);
       const decayedTrove = trove.adjust(normalizedParams, decayedBorrowingRate);
-      const { borrowMoUSD: borrowMoUSDSimulatingDecay } = trove.adjustTo(
+      const { borrowMEUR: borrowMEURSimulatingDecay } = trove.adjustTo(
         decayedTrove,
         currentBorrowingRate
       );
 
-      if (decayedTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
+      if (decayedTrove.debt.lt(MEUR_MINIMUM_DEBT)) {
         throw new Error(
-          `Trove's debt might fall below ${MoUSD_MINIMUM_DEBT} ` +
+          `Trove's debt might fall below ${MEUR_MINIMUM_DEBT} ` +
             `within ${borrowingFeeDecayToleranceMinutes} minutes`
         );
       }
 
       const [gasNow, gasLater] = await Promise.all([
-        borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMoUSD)),
-        borrowMoUSD &&
-          borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMoUSDSimulatingDecay))
+        borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMEUR)),
+        borrowMEUR &&
+          borrowerOperations.estimateGas.adjustTrove(...txParams(borrowMEURSimulatingDecay))
       ]);
 
       let gasLimit = bigNumberMax(addGasForPotentialListTraversal(gasNow), gasLater);
 
-      if (borrowMoUSD) {
+      if (borrowMEUR) {
         gasLimit = addGasForBaseRateUpdate(borrowingFeeDecayToleranceMinutes)(gasLimit);
       }
 
@@ -1025,7 +1025,7 @@ export class PopulatableEthersMosaic
 
     return this._wrapTroveChangeWithFees(
       normalizedParams,
-      await borrowerOperations.populateTransaction.adjustTrove(...txParams(borrowMoUSD)),
+      await borrowerOperations.populateTransaction.adjustTrove(...txParams(borrowMEUR)),
       gasHeadroom
     );
   }
@@ -1099,29 +1099,29 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositMoUSDInStabilityPool} */
-  async depositMoUSDInStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.depositMEURInStabilityPool} */
+  async depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
     overrides = this._prepareOverrides(overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
-    const depositMoUSD = Decimal.from(amount);
+    const depositMEUR = Decimal.from(amount);
 
     return this._wrapStabilityDepositTopup(
-      { depositMoUSD },
+      { depositMEUR },
       await stabilityPool.estimateAndPopulate.provideToSP(
         overrides,
         addGasForMSICIssuance,
-        depositMoUSD.hex,
+        depositMEUR.hex,
         frontendTag ?? this._readable.connection.frontendTag ?? AddressZero
       )
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMoUSDFromStabilityPool} */
-  async withdrawMoUSDFromStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.withdrawMEURFromStabilityPool} */
+  async withdrawMEURFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
@@ -1176,8 +1176,8 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMoUSD} */
-  async sendMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.sendMEUR} */
+  async sendMEUR(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1214,15 +1214,15 @@ export class PopulatableEthersMosaic
     );
   }
 
-  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.redeemMoUSD} */
-  async redeemMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.redeemMEUR} */
+  async redeemMEUR(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersRedemption> {
     const preparedOverrides = this._prepareOverrides(overrides);
     const { troveManager } = _getContracts(this._readable.connection);
-    const attemptedMoUSDAmount = Decimal.from(amount);
+    const attemptedMEURAmount = Decimal.from(amount);
 
     const [
       fees,
@@ -1231,12 +1231,12 @@ export class PopulatableEthersMosaic
     ] = await Promise.all([
       this._readable.getFees(),
       this._readable.getTotal(),
-      this._findRedemptionHints(attemptedMoUSDAmount)
+      this._findRedemptionHints(attemptedMEURAmount)
     ]);
 
     if (truncatedAmount.isZero) {
       throw new Error(
-        `redeemMoUSD: amount too low to redeem (try at least ${MoUSD_MINIMUM_NET_DEBT})`
+        `redeemMEUR: amount too low to redeem (try at least ${MEUR_MINIMUM_NET_DEBT})`
       );
     }
 
@@ -1247,9 +1247,9 @@ export class PopulatableEthersMosaic
       );
 
     const populateRedemption = async (
-      attemptedMoUSDAmount: Decimal,
+      attemptedMEURAmount: Decimal,
       maxRedemptionRate?: Decimalish,
-      truncatedAmount: Decimal = attemptedMoUSDAmount,
+      truncatedAmount: Decimal = attemptedMEURAmount,
       partialHints: [string, string, BigNumberish] = [AddressZero, AddressZero, 0]
     ): Promise<PopulatedEthersRedemption> => {
       const maxRedemptionRateOrDefault =
@@ -1269,20 +1269,20 @@ export class PopulatableEthersMosaic
         ),
 
         this._readable.connection,
-        attemptedMoUSDAmount,
+        attemptedMEURAmount,
         truncatedAmount,
 
-        truncatedAmount.lt(attemptedMoUSDAmount)
+        truncatedAmount.lt(attemptedMEURAmount)
           ? newMaxRedemptionRate =>
               populateRedemption(
-                truncatedAmount.add(MoUSD_MINIMUM_NET_DEBT),
+                truncatedAmount.add(MEUR_MINIMUM_NET_DEBT),
                 newMaxRedemptionRate ?? maxRedemptionRate
               )
           : undefined
       );
     };
 
-    return populateRedemption(attemptedMoUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
+    return populateRedemption(attemptedMEURAmount, maxRedemptionRate, truncatedAmount, partialHints);
   }
 
   /** {@inheritDoc @mosaic/lib-base#PopulatableMosaic.stakeMSIC} */

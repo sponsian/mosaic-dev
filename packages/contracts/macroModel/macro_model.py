@@ -69,7 +69,7 @@ delta = -20
 
 #close troves
 sd_closetroves=0.5
-#sensitivity to MoUSD price
+#sensitivity to MEUR price
 beta = 0.2
 
 #open troves
@@ -84,7 +84,7 @@ sd_opentroves=0.5
 n_steady=0.5
 initial_open=10
 
-#sensitivity to MoUSD price & issuance fee
+#sensitivity to MEUR price & issuance fee
 alpha = 0.3
 
 #number of runs in simulation
@@ -124,7 +124,7 @@ Liquidate Troves
 
 def liquidate_troves(troves, index, data):
   troves['CR_current'] = troves['Ether_Price']*troves['Ether_Quantity']/troves['Supply']
-  price_MoUSD_previous = data.loc[index-1,'Price_MoUSD']
+  price_MEUR_previous = data.loc[index-1,'Price_MEUR']
   price_MSIC_previous = data.loc[index-1,'price_MSIC']
   stability_pool_previous = data.loc[index-1, 'stability']
 
@@ -135,7 +135,7 @@ def liquidate_troves(troves, index, data):
   n_liquidate = troves_liquidated.shape[0]
   troves = troves.reset_index(drop = True)
 
-  liquidation_gain = ether_liquidated*price_ether_current - debt_liquidated*price_MoUSD_previous
+  liquidation_gain = ether_liquidated*price_ether_current - debt_liquidated*price_MEUR_previous
   airdrop_gain = price_MSIC_previous * quantity_MSIC_airdrop
   
   np.random.seed(2+index)
@@ -144,25 +144,25 @@ def liquidate_troves(troves, index, data):
    return_stability = initial_return*(1+shock_return)
   elif index<=month:
     #min function to rule out the large fluctuation caused by the large but temporary liquidation gain in a particular period
-    return_stability = min(0.5, 365*(data.loc[index-day:index, 'liquidation_gain'].sum()+data.loc[index-day:index, 'airdrop_gain'].sum())/(price_MoUSD_previous*stability_pool_previous))
+    return_stability = min(0.5, 365*(data.loc[index-day:index, 'liquidation_gain'].sum()+data.loc[index-day:index, 'airdrop_gain'].sum())/(price_MEUR_previous*stability_pool_previous))
   else:
-    return_stability = (365/30)*(data.loc[index-month:index, 'liquidation_gain'].sum()+data.loc[index-month:index, 'airdrop_gain'].sum())/(price_MoUSD_previous*stability_pool_previous)
+    return_stability = (365/30)*(data.loc[index-month:index, 'liquidation_gain'].sum()+data.loc[index-month:index, 'airdrop_gain'].sum())/(price_MEUR_previous*stability_pool_previous)
   
   return[troves, return_stability, debt_liquidated, ether_liquidated, liquidation_gain, airdrop_gain, n_liquidate]
 
 """Close Troves"""
 
-def close_troves(troves, index2, price_MoUSD_previous):
+def close_troves(troves, index2, price_MEUR_previous):
   np.random.seed(208+index2)
   shock_closetroves = np.random.normal(0,sd_closetroves)
   n_troves = troves.shape[0]
 
   if index2 <= 240:
     number_closetroves = np.random.uniform(0,1)
-  elif price_MoUSD_previous >=1:
+  elif price_MEUR_previous >=1:
     number_closetroves = max(0, n_steady * (1+shock_closetroves))
   else:
-    number_closetroves = max(0, n_steady * (1+shock_closetroves)) + beta*(1-price_MoUSD_previous)*n_troves
+    number_closetroves = max(0, n_steady * (1+shock_closetroves)) + beta*(1-price_MEUR_previous)*n_troves
   
   number_closetroves = int(round(number_closetroves))
   
@@ -178,7 +178,7 @@ def close_troves(troves, index2, price_MoUSD_previous):
 """Adjust Troves"""
 
 def adjust_troves(troves, index):
-  issuance_MoUSD_adjust = 0
+  issuance_MEUR_adjust = 0
   random.seed(57984-3*index)
   ratio = random.uniform(0,1)
   for i in range(0, troves.shape[0]):
@@ -193,29 +193,29 @@ def adjust_troves(troves, index):
         working_trove['Supply'] = working_trove['Ether_Price']*working_trove['Ether_Quantity']/working_trove['CR_initial']
       if check>2:
         supply_new = working_trove['Ether_Price']*working_trove['Ether_Quantity']/working_trove['CR_initial']
-        issuance_MoUSD_adjust = issuance_MoUSD_adjust + rate_issuance * (supply_new - working_trove['Supply'])
+        issuance_MEUR_adjust = issuance_MEUR_adjust + rate_issuance * (supply_new - working_trove['Supply'])
         working_trove['Supply'] = supply_new
   #Another part of the troves are adjusted by adjusting collaterals
     if p < ratio and (check < -1 or check > 2):
       working_trove['Ether_Quantity'] = working_trove['CR_initial']*working_trove['Supply']/working_trove['Ether_Price']
     
     troves.loc[i] = working_trove
-  return[troves, issuance_MoUSD_adjust]
+  return[troves, issuance_MEUR_adjust]
 
 """Open Troves"""
 
-def open_troves(troves, index1, price_MoUSD_previous):
+def open_troves(troves, index1, price_MEUR_previous):
   random.seed(2019*index1)  
-  issuance_MoUSD_open = 0
+  issuance_MEUR_open = 0
   shock_opentroves = random.normalvariate(0,sd_opentroves)
   n_troves = troves.shape[0]
 
   if index1<=0:
     number_opentroves = initial_open
-  elif price_MoUSD_previous <=1 + rate_issuance:
+  elif price_MEUR_previous <=1 + rate_issuance:
     number_opentroves = max(0, n_steady * (1+shock_opentroves))
   else:
-    number_opentroves = max(0, n_steady * (1+shock_opentroves)) + alpha*(price_MoUSD_previous-rate_issuance-1)*n_troves
+    number_opentroves = max(0, n_steady * (1+shock_opentroves)) + alpha*(price_MEUR_previous-rate_issuance-1)*n_troves
   
   number_opentroves = int(round(float(number_opentroves)))
 
@@ -232,16 +232,16 @@ def open_troves(troves, index1, price_MoUSD_previous):
     rational_inattention = np.random.gamma(distribution_parameter1_inattention, scale=distribution_parameter2_inattention)
     
     supply_trove = price_ether_current * quantity_ether / CR_ratio
-    issuance_MoUSD_open = issuance_MoUSD_open + rate_issuance * supply_trove
+    issuance_MEUR_open = issuance_MEUR_open + rate_issuance * supply_trove
 
     new_row = {"Ether_Price": price_ether_current, "Ether_Quantity": quantity_ether, 
                "CR_initial": CR_ratio, "Supply": supply_trove, 
                "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
     troves = troves.append(new_row, ignore_index=True)
 
-  return[troves, number_opentroves, issuance_MoUSD_open]
+  return[troves, number_opentroves, issuance_MEUR_open]
 
-"""# MoUSD Market
+"""# MEUR Market
 
 Stability Pool
 """
@@ -256,10 +256,10 @@ def stability_update(stability_pool_previous, return_previous, index):
     stability_pool = stability_pool_previous* (1+shock_stability)* (1+ return_previous- natural_rate_current)**theta
   return[stability_pool]
 
-"""MoUSD Price, liquidity pool, and redemption"""
+"""MEUR Price, liquidity pool, and redemption"""
 
 def price_stabilizer(troves, index, data, stability_pool, n_open):
-  issuance_MoUSD_stabilizer = 0
+  issuance_MEUR_stabilizer = 0
   redemption_fee = 0
   n_redempt = 0
   redempted = 0
@@ -269,8 +269,8 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
   np.random.seed(20*index)
   shock_liquidity = np.random.normal(0,sd_liquidity)
   liquidity_pool_previous = float(data['liquidity'][index-1])
-  price_MoUSD_previous = float(data['Price_MoUSD'][index-1])
-  price_MoUSD_current= price_MoUSD_previous*((supply-stability_pool)/(liquidity_pool_previous*(drift_liquidity+shock_liquidity)))**(1/delta)
+  price_MEUR_previous = float(data['Price_MEUR'][index-1])
+  price_MEUR_current= price_MEUR_previous*((supply-stability_pool)/(liquidity_pool_previous*(drift_liquidity+shock_liquidity)))**(1/delta)
   
 
 #Liquidity Pool
@@ -278,42 +278,42 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
 
 #Stabilizer
   #Ceiling Arbitrageurs
-  if price_MoUSD_current > 1.1 + rate_issuance:
+  if price_MEUR_current > 1.1 + rate_issuance:
     #supply_current = sum(troves['Supply'])
-    supply_wanted=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1.1+rate_issuance)/price_MoUSD_previous)**delta
+    supply_wanted=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1.1+rate_issuance)/price_MEUR_previous)**delta
     supply_trove = supply_wanted - supply
 
     CR_ratio = 1.1
     rational_inattention = 0.1
     quantity_ether = supply_trove * CR_ratio / price_ether_current
-    issuance_MoUSD_stabilizer = rate_issuance * supply_trove
+    issuance_MEUR_stabilizer = rate_issuance * supply_trove
 
     new_row = {"Ether_Price": price_ether_current, "Ether_Quantity": quantity_ether, "CR_initial": CR_ratio,
                "Supply": supply_trove, "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
     troves = troves.append(new_row, ignore_index=True)
-    price_MoUSD_current = 1.1 + rate_issuance
+    price_MEUR_current = 1.1 + rate_issuance
     #missing in the previous version  
     liquidity_pool = supply_wanted-stability_pool
     n_open=n_open+1
     
 
   #Floor Arbitrageurs
-  if price_MoUSD_current < 1 - rate_redemption:
+  if price_MEUR_current < 1 - rate_redemption:
     np.random.seed(30*index)
     shock_redemption = np.random.normal(0,sd_redemption)
     redemption_ratio = redemption_star * (1+shock_redemption)
 
     #supply_current = sum(troves['Supply'])
-    supply_target=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1-rate_redemption)/price_MoUSD_previous)**delta
+    supply_target=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1-rate_redemption)/price_MEUR_previous)**delta
     supply_diff = supply - supply_target
     if supply_diff < redemption_ratio * liquidity_pool:
       redemption_pool=supply_diff
       #liquidity_pool = liquidity_pool - redemption_pool
-      price_MoUSD_current = 1 - rate_redemption
+      price_MEUR_current = 1 - rate_redemption
     else:
       redemption_pool=redemption_ratio * liquidity_pool
       #liquidity_pool = (1-redemption_ratio)*liquidity_pool
-      price_MoUSD_current= price_MoUSD_previous * (liquidity_pool/(liquidity_pool_previous*(drift_liquidity+shock_liquidity)))**(1/delta)
+      price_MEUR_current= price_MEUR_previous * (liquidity_pool/(liquidity_pool_previous*(drift_liquidity+shock_liquidity)))**(1/delta)
     
     #Shutting down the riskiest troves
     troves = troves.sort_values(by='CR_current', ascending = True)
@@ -338,7 +338,7 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
     
 
   troves = troves.reset_index(drop=True)
-  return[price_MoUSD_current, liquidity_pool, troves, issuance_MoUSD_stabilizer, redemption_fee, n_redempt, redemption_pool, n_open]
+  return[price_MEUR_current, liquidity_pool, troves, issuance_MEUR_stabilizer, redemption_fee, n_redempt, redemption_pool, n_open]
 
 """# MSIC Market"""
 
@@ -364,18 +364,18 @@ def MSIC_market(index, data):
 """# Simulation Program"""
 
 #Defining Initials
-initials = {"Price_MoUSD":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
+initials = {"Price_MEUR":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
             "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
-            "supply_MoUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
+            "supply_MEUR":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_MSIC":[price_MSIC_initial], "MC_MSIC":[0], "annualized_earning":[0]}
 data = pd.DataFrame(initials)
 troves= pd.DataFrame({"Ether_Price":[], "Ether_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
-result_open = open_troves(troves, 0, data['Price_MoUSD'][0])
+result_open = open_troves(troves, 0, data['Price_MEUR'][0])
 troves = result_open[0]
-issuance_MoUSD_open = result_open[2]
-data.loc[0,'issuance_fee'] = issuance_MoUSD_open * initials["Price_MoUSD"][0]
-data.loc[0,'supply_MoUSD'] = troves["Supply"].sum()
+issuance_MEUR_open = result_open[2]
+data.loc[0,'issuance_fee'] = issuance_MEUR_open * initials["Price_MEUR"][0]
+data.loc[0,'supply_MEUR'] = troves["Supply"].sum()
 data.loc[0,'liquidity'] = 0.5*troves["Supply"].sum()
 data.loc[0,'stability'] = 0.5*troves["Supply"].sum()
 
@@ -384,7 +384,7 @@ for index in range(1, n_sim):
 #exogenous ether price input
   price_ether_current = price_ether[index]
   troves['Ether_Price'] = price_ether_current
-  price_MoUSD_previous = data.loc[index-1,'Price_MoUSD']
+  price_MEUR_previous = data.loc[index-1,'Price_MEUR']
   price_MSIC_previous = data.loc[index-1,'price_MSIC']
 
 #trove liquidation & return of stability pool
@@ -398,7 +398,7 @@ for index in range(1, n_sim):
   n_liquidate = result_liquidation[6]
 
 #close troves
-  result_close = close_troves(troves, index, price_MoUSD_previous)
+  result_close = close_troves(troves, index, price_MEUR_previous)
   troves = result_close[0]
   n_close = result_close[1]
   #if n_close<0:
@@ -407,23 +407,23 @@ for index in range(1, n_sim):
 #adjust troves
   result_adjustment = adjust_troves(troves, index)
   troves = result_adjustment[0]
-  issuance_MoUSD_adjust = result_adjustment[1]
+  issuance_MEUR_adjust = result_adjustment[1]
 
 #open troves
-  result_open = open_troves(troves, index, price_MoUSD_previous)
+  result_open = open_troves(troves, index, price_MEUR_previous)
   troves = result_open[0]
   n_open = result_open[1]  
-  issuance_MoUSD_open = result_open[2]
+  issuance_MEUR_open = result_open[2]
 
 #Stability Pool
   stability_pool = stability_update(data.loc[index-1,'stability'], return_stability, index)[0]
 
 #Calculating Price, Liquidity Pool, and Redemption
   result_price = price_stabilizer(troves, index, data, stability_pool, n_open)
-  price_MoUSD_current = result_price[0]
+  price_MEUR_current = result_price[0]
   liquidity_pool = result_price[1]
   troves = result_price[2]
-  issuance_MoUSD_stabilizer = result_price[3]
+  issuance_MEUR_stabilizer = result_price[3]
   redemption_fee = result_price[4]
   n_redempt = result_price[5]
   redemption_pool = result_price[6]
@@ -438,21 +438,21 @@ for index in range(1, n_sim):
   MC_MSIC_current = result_MSIC[2]
 
 #Summary
-  issuance_fee = price_MoUSD_current * (issuance_MoUSD_adjust + issuance_MoUSD_open + issuance_MoUSD_stabilizer)
+  issuance_fee = price_MEUR_current * (issuance_MEUR_adjust + issuance_MEUR_open + issuance_MEUR_stabilizer)
   n_troves = troves.shape[0]
-  supply_MoUSD = troves['Supply'].sum()
+  supply_MEUR = troves['Supply'].sum()
   if index >= month:
     price_MSIC.append(price_MSIC_current)
 
-  new_row = {"Price_MoUSD":float(price_MoUSD_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
+  new_row = {"Price_MEUR":float(price_MEUR_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
              "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
-              "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_MoUSD":float(supply_MoUSD),
+              "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_MEUR":float(supply_MEUR),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
              "airdrop_gain":float(airdrop_gain), "liquidation_gain":float(liquidation_gain), "return_stability":float(return_stability), 
              "annualized_earning":float(annualized_earning), "MC_MSIC":float(MC_MSIC_current), "price_MSIC":float(price_MSIC_current)
              }
   data = data.append(new_row, ignore_index=True)
-  if price_MoUSD_current < 0:
+  if price_MEUR_current < 0:
     break
 
 """#**Exhibition**"""
@@ -465,7 +465,7 @@ def linevis(data, measure):
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['Price_MoUSD'], name="MoUSD Price"),
+    go.Scatter(x=data.index/720, y=data['Price_MEUR'], name="MEUR Price"),
     secondary_y=False,
 )
 fig.add_trace(
@@ -473,10 +473,10 @@ fig.add_trace(
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Price Dynamics of MoUSD and Ether"
+    title_text="Price Dynamics of MEUR and Ether"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="MoUSD Price", secondary_y=False)
+fig.update_yaxes(title_text="MEUR Price", secondary_y=False)
 fig.update_yaxes(title_text="Ether Price", secondary_y=True)
 fig.show()
 
@@ -486,15 +486,15 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['supply_MoUSD'], name="MoUSD Supply"),
+    go.Scatter(x=data.index/720, y=data['supply_MEUR'], name="MEUR Supply"),
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Dynamics of Trove Numbers and MoUSD Supply"
+    title_text="Dynamics of Trove Numbers and MEUR Supply"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
 fig.update_yaxes(title_text="Number of Troves", secondary_y=False)
-fig.update_yaxes(title_text="MoUSD Supply", secondary_y=True)
+fig.update_yaxes(title_text="MEUR Supply", secondary_y=True)
 fig.show()
 
 fig = make_subplots(rows=2, cols=1)
@@ -644,18 +644,18 @@ issuance fee = redemption fee = base rate
 """
 
 #Defining Initials
-initials = {"Price_MoUSD":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
+initials = {"Price_MEUR":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
             "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
-            "supply_MoUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
+            "supply_MEUR":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_MSIC":[price_MSIC_initial], "MC_MSIC":[0], "annualized_earning":[0], "base_rate":[base_rate_initial]}
 data2 = pd.DataFrame(initials)
 troves2= pd.DataFrame({"Ether_Price":[], "Ether_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
-result_open = open_troves(troves2, 0, data2['Price_MoUSD'][0])
+result_open = open_troves(troves2, 0, data2['Price_MEUR'][0])
 troves2 = result_open[0]
-issuance_MoUSD_open = result_open[2]
-data2.loc[0,'issuance_fee'] = issuance_MoUSD_open * initials["Price_MoUSD"][0]
-data2.loc[0,'supply_MoUSD'] = troves2["Supply"].sum()
+issuance_MEUR_open = result_open[2]
+data2.loc[0,'issuance_fee'] = issuance_MEUR_open * initials["Price_MEUR"][0]
+data2.loc[0,'supply_MEUR'] = troves2["Supply"].sum()
 data2.loc[0,'liquidity'] = 0.5*troves2["Supply"].sum()
 data2.loc[0,'stability'] = 0.5*troves2["Supply"].sum()
 
@@ -664,7 +664,7 @@ for index in range(1, n_sim):
 #exogenous ether price input
   price_ether_current = price_ether[index]
   troves2['Ether_Price'] = price_ether_current
-  price_MoUSD_previous = data2.loc[index-1,'Price_MoUSD']
+  price_MEUR_previous = data2.loc[index-1,'Price_MEUR']
   price_MSIC_previous = data2.loc[index-1,'price_MSIC']
 
 #policy function determines base rate
@@ -683,7 +683,7 @@ for index in range(1, n_sim):
   n_liquidate = result_liquidation[6]
 
 #close troves
-  result_close = close_troves(troves2, index, price_MoUSD_previous)
+  result_close = close_troves(troves2, index, price_MEUR_previous)
   troves2 = result_close[0]
   n_close = result_close[1]
   #if n_close<0:
@@ -692,23 +692,23 @@ for index in range(1, n_sim):
 #adjust troves
   result_adjustment = adjust_troves(troves2, index)
   troves2 = result_adjustment[0]
-  issuance_MoUSD_adjust = result_adjustment[1]
+  issuance_MEUR_adjust = result_adjustment[1]
 
 #open troves
-  result_open = open_troves(troves2, index, price_MoUSD_previous)
+  result_open = open_troves(troves2, index, price_MEUR_previous)
   troves2 = result_open[0]
   n_open = result_open[1]  
-  issuance_MoUSD_open = result_open[2]
+  issuance_MEUR_open = result_open[2]
 
 #Stability Pool
   stability_pool = stability_update(data2.loc[index-1,'stability'], return_stability, index)[0]
 
 #Calculating Price, Liquidity Pool, and Redemption
   result_price = price_stabilizer(troves2, index, data2, stability_pool, n_open)
-  price_MoUSD_current = result_price[0]
+  price_MEUR_current = result_price[0]
   liquidity_pool = result_price[1]
   troves2 = result_price[2]
-  issuance_MoUSD_stabilizer = result_price[3]
+  issuance_MEUR_stabilizer = result_price[3]
   redemption_fee = result_price[4]
   n_redempt = result_price[5]
   redemption_pool = result_price[6]
@@ -723,21 +723,21 @@ for index in range(1, n_sim):
   MC_MSIC_current = result_MSIC[2]
 
 #Summary
-  issuance_fee = price_MoUSD_current * (issuance_MoUSD_adjust + issuance_MoUSD_open + issuance_MoUSD_stabilizer)
+  issuance_fee = price_MEUR_current * (issuance_MEUR_adjust + issuance_MEUR_open + issuance_MEUR_stabilizer)
   n_troves = troves2.shape[0]
-  supply_MoUSD = troves2['Supply'].sum()
+  supply_MEUR = troves2['Supply'].sum()
   if index >= month:
     price_MSIC.append(price_MSIC_current)
 
-  new_row = {"Price_MoUSD":float(price_MoUSD_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
+  new_row = {"Price_MEUR":float(price_MEUR_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
              "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
-              "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_MoUSD":float(supply_MoUSD),
+              "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_MEUR":float(supply_MEUR),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
              "airdrop_gain":float(airdrop_gain), "liquidation_gain":float(liquidation_gain), "return_stability":float(return_stability), 
              "annualized_earning":float(annualized_earning), "MC_MSIC":float(MC_MSIC_current), "price_MSIC":float(price_MSIC_current), 
              "base_rate":float(base_rate_current)}
   data2 = data2.append(new_row, ignore_index=True)
-  if price_MoUSD_current < 0:
+  if price_MEUR_current < 0:
     break
 
 data2
@@ -746,7 +746,7 @@ data2
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['Price_MoUSD'], name="MoUSD Price"),
+    go.Scatter(x=data.index/720, y=data['Price_MEUR'], name="MEUR Price"),
     secondary_y=False,
 )
 fig.add_trace(
@@ -754,14 +754,14 @@ fig.add_trace(
     secondary_y=True,
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['Price_MoUSD'], name="MoUSD Price New", line = dict(dash='dot')),
+    go.Scatter(x=data2.index/720, y=data2['Price_MEUR'], name="MEUR Price New", line = dict(dash='dot')),
     secondary_y=False,
 )
 fig.update_layout(
-    title_text="Price Dynamics of MoUSD and Ether"
+    title_text="Price Dynamics of MEUR and Ether"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="MoUSD Price", secondary_y=False)
+fig.update_yaxes(title_text="MEUR Price", secondary_y=False)
 fig.update_yaxes(title_text="Ether Price", secondary_y=True)
 fig.show()
 
@@ -771,7 +771,7 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['supply_MoUSD'], name="MoUSD Supply"),
+    go.Scatter(x=data.index/720, y=data['supply_MEUR'], name="MEUR Supply"),
     secondary_y=True,
 )
 fig.add_trace(
@@ -779,15 +779,15 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['supply_MoUSD'], name="MoUSD Supply New", line = dict(dash='dot')),
+    go.Scatter(x=data2.index/720, y=data2['supply_MEUR'], name="MEUR Supply New", line = dict(dash='dot')),
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Dynamics of Trove Numbers and MoUSD Supply"
+    title_text="Dynamics of Trove Numbers and MEUR Supply"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
 fig.update_yaxes(title_text="Number of Troves", secondary_y=False)
-fig.update_yaxes(title_text="MoUSD Supply", secondary_y=True)
+fig.update_yaxes(title_text="MEUR Supply", secondary_y=True)
 fig.show()
 
 fig = make_subplots(rows=2, cols=2)

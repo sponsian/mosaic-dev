@@ -4,7 +4,7 @@
 
 ## TroveCreationDetails.fee property
 
-Amount of MoUSD added to the Trove's debt as borrowing fee.
+Amount of MEUR added to the Trove's debt as borrowing fee.
 
 <b>Signature:</b>
 

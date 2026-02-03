@@ -25,7 +25,7 @@ async function example() {
 
   const { newTrove } = await mosaic.openTrove({
     depositCollateral: 5, // REEF
-    borrowMoUSD: 2000
+    borrowMEUR: 2000
   });
 
   console.log(`Successfully opened a Mosaic Trove (${newTrove})!`);

@@ -24,7 +24,7 @@ export class MSICStake {
   /** Collateral gain available to withdraw. */
   readonly collateralGain: Decimal;
 
-  /** MoUSD gain available to withdraw. */
+  /** MEUR gain available to withdraw. */
   readonly msicGain: Decimal;
 
   /** @internal */

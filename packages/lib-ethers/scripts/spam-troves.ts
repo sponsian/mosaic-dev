@@ -3,7 +3,7 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 
-import { Decimal, MoUSD_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
+import { Decimal, MEUR_MINIMUM_DEBT, Trove } from "@mosaic/lib-base";
 import { EthersMosaic, EthersMosaicWithStore, BlockPolledMosaicStore } from "@mosaic/lib-ethers";
 
 import {
@@ -37,7 +37,7 @@ const waitForSuccess = (tx: TransactionResponse) =>
 const createTrove = async (nominalCollateralRatio: Decimal) => {
   const randomWallet = Wallet.createRandom().connect(provider);
 
-  const debt = MoUSD_MINIMUM_DEBT.mul(2);
+  const debt = MEUR_MINIMUM_DEBT.mul(2);
   const collateral = debt.mul(nominalCollateralRatio);
 
   await funder

@@ -108,10 +108,10 @@ export function updateStake(event: ethereum.Event, address: Address, newStake: B
 export function withdrawStakeGains(
   event: ethereum.Event,
   address: Address,
-  MoUSDGain: BigInt,
+  MEURGain: BigInt,
   ETHGain: BigInt
 ): void {
-  if (MoUSDGain == BIGINT_ZERO && ETHGain == BIGINT_ZERO) {
+  if (MEURGain == BIGINT_ZERO && ETHGain == BIGINT_ZERO) {
     return;
   }
 
@@ -119,7 +119,7 @@ export function withdrawStakeGains(
   let stakeChange: MsicStakeChange = startMSICStakeChange(event);
   stakeChange.stake = stake.id;
   stakeChange.stakeOperation = "gainsWithdrawn";
-  stakeChange.issuanceGain = decimalize(MoUSDGain);
+  stakeChange.issuanceGain = decimalize(MEURGain);
   stakeChange.redemptionGain = decimalize(ETHGain);
   stakeChange.stakedAmountBefore = stake.amount;
   stakeChange.stakedAmountChange = DECIMAL_ZERO;

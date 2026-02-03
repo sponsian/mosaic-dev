@@ -8,7 +8,7 @@ import {
   Decimal,
   Trove,
   MosaicStoreState,
-  MoUSD_LIQUIDATION_RESERVE
+  MEUR_LIQUIDATION_RESERVE
 } from "@mosaic/lib-base";
 import { useMosaicSelector } from "@mosaic/lib-react";
 
@@ -66,7 +66,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
           <StaticRow
             label="Liquidation Reserve"
             inputId="trove-liquidation-reserve"
-            amount={`${MoUSD_LIQUIDATION_RESERVE}`}
+            amount={`${MEUR_LIQUIDATION_RESERVE}`}
             unit={COIN}
             infoIcon={
               <InfoIcon

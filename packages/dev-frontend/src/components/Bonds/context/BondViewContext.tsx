@@ -45,7 +45,7 @@ export type BondViewContextType = {
   isBMousdApprovedWithAmmZapper: boolean;
   isBMousdLpApprovedWithAmmZapper: boolean;
   isBMousdLpApprovedWithGauge: boolean;
-  inputToken: BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD;
+  inputToken: BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR;
   isInputTokenApprovedWithBMousdAmm: boolean;
   getExpectedSwapOutput: (inputToken: BMousdAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
   getExpectedLpTokens: (bMousdAmount: Decimal, msicAmount: Decimal) => Promise<Decimal>;

@@ -17,17 +17,17 @@ import {
 import { useBondView } from "../../context/BondViewContext";
 import { BMousdAmmTokenIndex } from "../../context/transitions";
 
-const tokenSymbol: Record<BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD, string> = {
-  [BMousdAmmTokenIndex.BMoUSD]: "bMoUSD",
-  [BMousdAmmTokenIndex.MoUSD]: "MoUSD"
+const tokenSymbol: Record<BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR, string> = {
+  [BMousdAmmTokenIndex.BMEUR]: "bMEUR",
+  [BMousdAmmTokenIndex.MEUR]: "MEUR"
 };
 
 const outputToken: Record<
-  BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD,
-  BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD
+  BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR,
+  BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR
 > = {
-  [BMousdAmmTokenIndex.BMoUSD]: BMousdAmmTokenIndex.MoUSD,
-  [BMousdAmmTokenIndex.MoUSD]: BMousdAmmTokenIndex.BMoUSD
+  [BMousdAmmTokenIndex.BMEUR]: BMousdAmmTokenIndex.MEUR,
+  [BMousdAmmTokenIndex.MEUR]: BMousdAmmTokenIndex.BMEUR
 };
 
 const marginalAmount = Decimal.ONE.div(1000);
@@ -56,7 +56,7 @@ export const SwapPane: React.FC = () => {
   } = useBondView();
   const editingState = useState<string>();
   const inputTokenBalance =
-    (inputToken === BMousdAmmTokenIndex.BMoUSD ? bMousdBalance : msicBalance) ?? Decimal.ZERO;
+    (inputToken === BMousdAmmTokenIndex.BMEUR ? bMousdBalance : msicBalance) ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
   const [exchangeRate, setExchangeRate] = useState<Decimal>();
@@ -160,7 +160,7 @@ export const SwapPane: React.FC = () => {
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
         <Flex sx={{ justifyContent: "center" }}>
-          {inputToken === BMousdAmmTokenIndex.BMoUSD ? <>Sell</> : <>Buy</>} bMoUSD
+          {inputToken === BMousdAmmTokenIndex.BMEUR ? <>Sell</> : <>Buy</>} bMEUR
         </Flex>
         <Close
           onClick={handleDismiss}

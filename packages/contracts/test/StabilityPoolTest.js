@@ -7,7 +7,7 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
-const MoUSDToken = artifacts.require("MoUSDToken")
+const MEURToken = artifacts.require("MEURToken")
 const NonPayable = artifacts.require('NonPayable.sol')
 
 const ZERO = toBN('0')
@@ -47,7 +47,7 @@ contract('StabilityPool', async accounts => {
 
   let gasPriceInWei
 
-  const getOpenTroveMoUSDAmount = async (totalDebt) => th.getOpenTroveMoUSDAmount(contracts, totalDebt)
+  const getOpenTroveMEURAmount = async (totalDebt) => th.getOpenTroveMEURAmount(contracts, totalDebt)
   const openTrove = async (params) => th.openTrove(contracts, params)
   const assertRevert = th.assertRevert
 
@@ -60,7 +60,7 @@ contract('StabilityPool', async accounts => {
     beforeEach(async () => {
       contracts = await deploymentHelper.deployMosaicCore()
       contracts.troveManager = await TroveManagerTester.new()
-      contracts.msicToken = await MoUSDToken.new(
+      contracts.msicToken = await MEURToken.new(
         contracts.troveManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
@@ -89,24 +89,24 @@ contract('StabilityPool', async accounts => {
     })
 
     // --- provideToSP() ---
-    // increases recorded MoUSD at Stability Pool
-    it("provideToSP(): increases the Stability Pool MoUSD balance", async () => {
+    // increases recorded MEUR at Stability Pool
+    it("provideToSP(): increases the Stability Pool MEUR balance", async () => {
       // --- SETUP --- Give Alice a least 200
-      await openTrove({ extraMoUSDAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
       // --- TEST ---
 
       // provideToSP()
       await stabilityPool.provideToSP(200, ZERO_ADDRESS, { from: alice })
 
-      // check MoUSD balances after
-      const stabilityPool_MoUSD_After = await stabilityPool.getTotalMoUSDDeposits()
-      assert.equal(stabilityPool_MoUSD_After, 200)
+      // check MEUR balances after
+      const stabilityPool_MEUR_After = await stabilityPool.getTotalMEURDeposits()
+      assert.equal(stabilityPool_MEUR_After, 200)
     })
 
     it("provideToSP(): updates the user's deposit record in StabilityPool", async () => {
       // --- SETUP --- Give Alice a least 200
-      await openTrove({ extraMoUSDAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
       // --- TEST ---
       // check user's deposit record before
@@ -121,53 +121,53 @@ contract('StabilityPool', async accounts => {
       assert.equal(alice_depositRecord_After, 200)
     })
 
-    it("provideToSP(): reduces the user's MoUSD balance by the correct amount", async () => {
+    it("provideToSP(): reduces the user's MEUR balance by the correct amount", async () => {
       // --- SETUP --- Give Alice a least 200
-      await openTrove({ extraMoUSDAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(200), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
       // --- TEST ---
       // get user's deposit record before
-      const alice_MoUSDBalance_Before = await msicToken.balanceOf(alice)
+      const alice_MEURBalance_Before = await msicToken.balanceOf(alice)
 
       // provideToSP()
       await stabilityPool.provideToSP(200, frontEnd_1, { from: alice })
 
-      // check user's MoUSD balance change
-      const alice_MoUSDBalance_After = await msicToken.balanceOf(alice)
-      assert.equal(alice_MoUSDBalance_Before.sub(alice_MoUSDBalance_After), '200')
+      // check user's MEUR balance change
+      const alice_MEURBalance_After = await msicToken.balanceOf(alice)
+      assert.equal(alice_MEURBalance_Before.sub(alice_MEURBalance_After), '200')
     })
 
-    it("provideToSP(): increases totalMoUSDDeposits by correct amount", async () => {
+    it("provideToSP(): increases totalMEURDeposits by correct amount", async () => {
       // --- SETUP ---
 
-      // Whale opens Trove with 50 REEF, adds 2000 MoUSD to StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
+      // Whale opens Trove with 50 REEF, adds 2000 MEUR to StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(2000, 18), frontEnd_1, { from: whale })
 
-      const totalMoUSDDeposits = await stabilityPool.getTotalMoUSDDeposits()
-      assert.equal(totalMoUSDDeposits, dec(2000, 18))
+      const totalMEURDeposits = await stabilityPool.getTotalMEURDeposits()
+      assert.equal(totalMEURDeposits, dec(2000, 18))
     })
 
     it('provideToSP(): Correctly updates user snapshots of accumulated rewards per unit staked', async () => {
       // --- SETUP ---
 
       // Whale opens Trove and deposits to SP
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
-      const whaleMoUSD = await msicToken.balanceOf(whale)
-      await stabilityPool.provideToSP(whaleMoUSD, frontEnd_1, { from: whale })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      const whaleMEUR = await msicToken.balanceOf(whale)
+      await stabilityPool.provideToSP(whaleMEUR, frontEnd_1, { from: whale })
 
       // 2 Troves opened, each withdraws minimum debt
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1, } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2, } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1, } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2, } })
 
-      // Alice makes Trove and withdraws 100 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(5, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
+      // Alice makes Trove and withdraws 100 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(5, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
 
 
       // price drops: defaulter's Troves fall below MCR, whale doesn't
       await priceFeed.setPrice(dec(105, 18));
 
-      const SPMoUSD_Before = await stabilityPool.getTotalMoUSDDeposits()
+      const SPMEUR_Before = await stabilityPool.getTotalMEURDeposits()
 
       // Troves are closed
       await troveManager.liquidate(defaulter_1, { from: owner })
@@ -176,8 +176,8 @@ contract('StabilityPool', async accounts => {
       assert.isFalse(await sortedTroves.contains(defaulter_2))
 
       // Confirm SP has decreased
-      const SPMoUSD_After = await stabilityPool.getTotalMoUSDDeposits()
-      assert.isTrue(SPMoUSD_After.lt(SPMoUSD_Before))
+      const SPMEUR_After = await stabilityPool.getTotalMEURDeposits()
+      assert.isTrue(SPMEUR_After.lt(SPMEUR_Before))
 
       // --- TEST ---
       const P_Before = (await stabilityPool.P())
@@ -212,19 +212,19 @@ contract('StabilityPool', async accounts => {
     it("provideToSP(), multiple deposits: updates user's deposit and snapshots", async () => {
       // --- SETUP ---
       // Whale opens Trove and deposits to SP
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
-      const whaleMoUSD = await msicToken.balanceOf(whale)
-      await stabilityPool.provideToSP(whaleMoUSD, frontEnd_1, { from: whale })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      const whaleMEUR = await msicToken.balanceOf(whale)
+      await stabilityPool.provideToSP(whaleMEUR, frontEnd_1, { from: whale })
 
-      // 3 Troves opened. Two users withdraw 160 MoUSD each
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1, value: dec(50, 'ether') } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2, value: dec(50, 'ether') } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_3, value: dec(50, 'ether') } })
+      // 3 Troves opened. Two users withdraw 160 MEUR each
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_3, value: dec(50, 'ether') } })
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 150 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(250, 18)), ICR: toBN(dec(3, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 150 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(250, 18)), ICR: toBN(dec(3, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(150, 18), frontEnd_1, { from: alice })
 
       const alice_Snapshot_0 = await stabilityPool.depositSnapshots(alice)
@@ -236,11 +236,11 @@ contract('StabilityPool', async accounts => {
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
       await priceFeed.setPrice(dec(105, 18));
 
-      // 2 users with Trove with 180 MoUSD drawn are closed
-      await troveManager.liquidate(defaulter_1, { from: owner })  // 180 MoUSD closed
-      await troveManager.liquidate(defaulter_2, { from: owner }) // 180 MoUSD closed
+      // 2 users with Trove with 180 MEUR drawn are closed
+      await troveManager.liquidate(defaulter_1, { from: owner })  // 180 MEUR closed
+      await troveManager.liquidate(defaulter_2, { from: owner }) // 180 MEUR closed
 
-      const alice_compoundedDeposit_1 = await stabilityPool.getCompoundedMoUSDDeposit(alice)
+      const alice_compoundedDeposit_1 = await stabilityPool.getCompoundedMEURDeposit(alice)
 
       // Alice makes deposit #2
       const alice_topUp_1 = toBN(dec(100, 18))
@@ -262,21 +262,21 @@ contract('StabilityPool', async accounts => {
       assert.isTrue(alice_Snapshot_S_1.eq(S_1))
       assert.isTrue(alice_Snapshot_P_1.eq(P_1))
 
-      // Bob withdraws MoUSD and deposits to StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      // Bob withdraws MEUR and deposits to StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
       await stabilityPool.provideToSP(dec(427, 18), frontEnd_1, { from: alice })
 
       // Defaulter 3 Trove is closed
       await troveManager.liquidate(defaulter_3, { from: owner })
 
-      const alice_compoundedDeposit_2 = await stabilityPool.getCompoundedMoUSDDeposit(alice)
+      const alice_compoundedDeposit_2 = await stabilityPool.getCompoundedMEURDeposit(alice)
 
       const P_2 = await stabilityPool.P()
       const S_2 = await stabilityPool.epochToScaleToSum(0, 0)
       assert.isTrue(P_2.lt(P_1))
       assert.isTrue(S_2.gt(S_1))
 
-      // Alice makes deposit #3:  100MoUSD
+      // Alice makes deposit #3:  100MEUR
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
 
       // check Alice's new snapshot is correct
@@ -287,33 +287,33 @@ contract('StabilityPool', async accounts => {
       assert.isTrue(alice_Snapshot_P_2.eq(P_2))
     })
 
-    it("provideToSP(): reverts if user tries to provide more than their MoUSD balance", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+    it("provideToSP(): reverts if user tries to provide more than their MEUR balance", async () => {
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob, value: dec(50, 'ether') } })
-      const aliceMoUSDbal = await msicToken.balanceOf(alice)
-      const bobMoUSDbal = await msicToken.balanceOf(bob)
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob, value: dec(50, 'ether') } })
+      const aliceMEURbal = await msicToken.balanceOf(alice)
+      const bobMEURbal = await msicToken.balanceOf(bob)
 
       // Alice, attempts to deposit 1 wei more than her balance
 
-      const aliceTxPromise = stabilityPool.provideToSP(aliceMoUSDbal.add(toBN(1)), frontEnd_1, { from: alice })
+      const aliceTxPromise = stabilityPool.provideToSP(aliceMEURbal.add(toBN(1)), frontEnd_1, { from: alice })
       await assertRevert(aliceTxPromise, "revert")
 
       // Bob, attempts to deposit 235534 more than his balance
 
-      const bobTxPromise = stabilityPool.provideToSP(bobMoUSDbal.add(toBN(dec(235534, 18))), frontEnd_1, { from: bob })
+      const bobTxPromise = stabilityPool.provideToSP(bobMEURbal.add(toBN(dec(235534, 18))), frontEnd_1, { from: bob })
       await assertRevert(bobTxPromise, "revert")
     })
 
-    it("provideToSP(): reverts if user tries to provide 2^256-1 MoUSD, which exceeds their balance", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob, value: dec(50, 'ether') } })
+    it("provideToSP(): reverts if user tries to provide 2^256-1 MEUR, which exceeds their balance", async () => {
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob, value: dec(50, 'ether') } })
 
       const maxBytes32 = web3.utils.toBN("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
 
-      // Alice attempts to deposit 2^256-1 MoUSD
+      // Alice attempts to deposit 2^256-1 MEUR
       try {
         aliceTx = await stabilityPool.provideToSP(maxBytes32, frontEnd_1, { from: alice })
         assert.isFalse(tx.receipt.status)
@@ -324,20 +324,20 @@ contract('StabilityPool', async accounts => {
 
     it("provideToSP(): reverts if cannot receive REEF Gain", async () => {
       // --- SETUP ---
-      // Whale deposits 1850 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      // Whale deposits 1850 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
       await stabilityPool.provideToSP(dec(1850, 18), frontEnd_1, { from: whale })
 
       // Defaulter Troves opened
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
 
       // --- TEST ---
 
       const nonPayable = await NonPayable.new()
       await msicToken.transfer(nonPayable.address, dec(250, 18), { from: whale })
 
-      // NonPayable makes deposit #1: 150 MoUSD
+      // NonPayable makes deposit #1: 150 MEUR
       const txData1 = th.getTransactionData('provideToSP(uint256,address)', [web3.utils.toHex(dec(150, 18)), frontEnd_1])
       const tx1 = await nonPayable.forward(stabilityPool.address, txData1)
 
@@ -354,29 +354,29 @@ contract('StabilityPool', async accounts => {
       const gain_1 = await stabilityPool.getDepositorETHGain(nonPayable.address)
       assert.isTrue(gain_1.gt(toBN(0)), 'NonPayable should have some accumulated gains')
 
-      // NonPayable tries to make deposit #2: 100MoUSD (which also attempts to withdraw REEF gain)
+      // NonPayable tries to make deposit #2: 100MEUR (which also attempts to withdraw REEF gain)
       const txData2 = th.getTransactionData('provideToSP(uint256,address)', [web3.utils.toHex(dec(100, 18)), frontEnd_1])
       await th.assertRevert(nonPayable.forward(stabilityPool.address, txData2), 'StabilityPool: sending REEF failed')
     })
 
     it("provideToSP(): doesn't impact other users' deposits or REEF gains", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(2000, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(3000, 18), frontEnd_1, { from: carol })
 
       // D opens a trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
 
       // Would-be defaulters open troves
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
 
       // Price drops
       await priceFeed.setPrice(dec(105, 18))
@@ -387,36 +387,36 @@ contract('StabilityPool', async accounts => {
       assert.isFalse(await sortedTroves.contains(defaulter_1))
       assert.isFalse(await sortedTroves.contains(defaulter_2))
 
-      const alice_MoUSDDeposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
-      const bob_MoUSDDeposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
-      const carol_MoUSDDeposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(carol)).toString()
+      const alice_MEURDeposit_Before = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
+      const bob_MEURDeposit_Before = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
+      const carol_MEURDeposit_Before = (await stabilityPool.getCompoundedMEURDeposit(carol)).toString()
 
       const alice_ETHGain_Before = (await stabilityPool.getDepositorETHGain(alice)).toString()
       const bob_ETHGain_Before = (await stabilityPool.getDepositorETHGain(bob)).toString()
       const carol_ETHGain_Before = (await stabilityPool.getDepositorETHGain(carol)).toString()
 
-      //check non-zero MoUSD and ETHGain in the Stability Pool
-      const MoUSDinSP = await stabilityPool.getTotalMoUSDDeposits()
+      //check non-zero MEUR and ETHGain in the Stability Pool
+      const MEURinSP = await stabilityPool.getTotalMEURDeposits()
       const ETHinSP = await stabilityPool.getETH()
-      assert.isTrue(MoUSDinSP.gt(mv._zeroBN))
+      assert.isTrue(MEURinSP.gt(mv._zeroBN))
       assert.isTrue(ETHinSP.gt(mv._zeroBN))
 
       // D makes an SP deposit
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: dennis })
-      assert.equal((await stabilityPool.getCompoundedMoUSDDeposit(dennis)).toString(), dec(1000, 18))
+      assert.equal((await stabilityPool.getCompoundedMEURDeposit(dennis)).toString(), dec(1000, 18))
 
-      const alice_MoUSDDeposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
-      const bob_MoUSDDeposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
-      const carol_MoUSDDeposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(carol)).toString()
+      const alice_MEURDeposit_After = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
+      const bob_MEURDeposit_After = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
+      const carol_MEURDeposit_After = (await stabilityPool.getCompoundedMEURDeposit(carol)).toString()
 
       const alice_ETHGain_After = (await stabilityPool.getDepositorETHGain(alice)).toString()
       const bob_ETHGain_After = (await stabilityPool.getDepositorETHGain(bob)).toString()
       const carol_ETHGain_After = (await stabilityPool.getDepositorETHGain(carol)).toString()
 
       // Check compounded deposits and REEF gains for A, B and C have not changed
-      assert.equal(alice_MoUSDDeposit_Before, alice_MoUSDDeposit_After)
-      assert.equal(bob_MoUSDDeposit_Before, bob_MoUSDDeposit_After)
-      assert.equal(carol_MoUSDDeposit_Before, carol_MoUSDDeposit_After)
+      assert.equal(alice_MEURDeposit_Before, alice_MEURDeposit_After)
+      assert.equal(bob_MEURDeposit_Before, bob_MEURDeposit_After)
+      assert.equal(carol_MEURDeposit_Before, carol_MEURDeposit_After)
 
       assert.equal(alice_ETHGain_Before, alice_ETHGain_After)
       assert.equal(bob_ETHGain_Before, bob_ETHGain_After)
@@ -424,23 +424,23 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(): doesn't impact system debt, collateral or TCR", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(2000, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(3000, 18), frontEnd_1, { from: carol })
 
       // D opens a trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
 
       // Would-be defaulters open troves
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
-      await openTrove({ extraMoUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
 
       // Price drops
       await priceFeed.setPrice(dec(105, 18))
@@ -451,18 +451,18 @@ contract('StabilityPool', async accounts => {
       assert.isFalse(await sortedTroves.contains(defaulter_1))
       assert.isFalse(await sortedTroves.contains(defaulter_2))
 
-      const activeDebt_Before = (await activePool.getMoUSDDebt()).toString()
-      const defaultedDebt_Before = (await defaultPool.getMoUSDDebt()).toString()
+      const activeDebt_Before = (await activePool.getMEURDebt()).toString()
+      const defaultedDebt_Before = (await defaultPool.getMEURDebt()).toString()
       const activeColl_Before = (await activePool.getETH()).toString()
       const defaultedColl_Before = (await defaultPool.getETH()).toString()
       const TCR_Before = (await th.getTCR(contracts)).toString()
 
       // D makes an SP deposit
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: dennis })
-      assert.equal((await stabilityPool.getCompoundedMoUSDDeposit(dennis)).toString(), dec(1000, 18))
+      assert.equal((await stabilityPool.getCompoundedMEURDeposit(dennis)).toString(), dec(1000, 18))
 
-      const activeDebt_After = (await activePool.getMoUSDDebt()).toString()
-      const defaultedDebt_After = (await defaultPool.getMoUSDDebt()).toString()
+      const activeDebt_After = (await activePool.getMEURDebt()).toString()
+      const defaultedDebt_After = (await defaultPool.getMEURDebt()).toString()
       const activeColl_After = (await activePool.getETH()).toString()
       const defaultedColl_After = (await defaultPool.getETH()).toString()
       const TCR_After = (await th.getTCR(contracts)).toString()
@@ -476,19 +476,19 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(): doesn't impact any troves, including the caller's trove", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       // A and B provide to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(2000, 18), frontEnd_1, { from: bob })
 
       // D opens a trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
 
       // Price drops
       await priceFeed.setPrice(dec(105, 18))
@@ -515,7 +515,7 @@ contract('StabilityPool', async accounts => {
 
       // D makes an SP deposit
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: dennis })
-      assert.equal((await stabilityPool.getCompoundedMoUSDDeposit(dennis)).toString(), dec(1000, 18))
+      assert.equal((await stabilityPool.getCompoundedMEURDeposit(dennis)).toString(), dec(1000, 18))
 
       const whale_Debt_After = (await troveManager.Troves(whale))[0].toString()
       const alice_Debt_After = (await troveManager.Troves(alice))[0].toString()
@@ -555,14 +555,14 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(): doesn't protect the depositor's trove from liquidation", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
-      // A, B provide 100 MoUSD to SP
+      // A, B provide 100 MEUR to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: bob })
 
@@ -571,7 +571,7 @@ contract('StabilityPool', async accounts => {
       assert.equal((await troveManager.getTroveStatus(bob)).toString(), '1')  // Confirm Bob's trove status is active
 
       // Confirm Bob has a Stability deposit
-      assert.equal((await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString(), dec(1000, 18))
+      assert.equal((await stabilityPool.getCompoundedMEURDeposit(bob)).toString(), dec(1000, 18))
 
       // Price drops
       await priceFeed.setPrice(dec(105, 18))
@@ -585,38 +585,38 @@ contract('StabilityPool', async accounts => {
       assert.equal((await troveManager.getTroveStatus(bob)).toString(), '3')  // check Bob's trove status was closed by liquidation
     })
 
-    it("provideToSP(): providing 0 MoUSD reverts", async () => {
+    it("provideToSP(): providing 0 MEUR reverts", async () => {
       // --- SETUP ---
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
-      // A, B, C provides 100, 50, 30 MoUSD to SP
+      // A, B, C provides 100, 50, 30 MEUR to SP
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(50, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(30, 18), frontEnd_1, { from: carol })
 
-      const bob_Deposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
-      const MoUSDinSP_Before = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const bob_Deposit_Before = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
+      const MEURinSP_Before = (await stabilityPool.getTotalMEURDeposits()).toString()
 
-      assert.equal(MoUSDinSP_Before, dec(180, 18))
+      assert.equal(MEURinSP_Before, dec(180, 18))
 
-      // Bob provides 0 MoUSD to the Stability Pool 
+      // Bob provides 0 MEUR to the Stability Pool 
       const txPromise_B = stabilityPool.provideToSP(0, frontEnd_1, { from: bob })
       await th.assertRevert(txPromise_B)
     })
 
     // --- MSIC functionality ---
     it("provideToSP(), new deposit: when SP > 0, triggers MSIC reward event - increases the sum G", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A provides to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: A })
@@ -639,12 +639,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit: when SP is empty, doesn't update G", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A provides to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: A })
@@ -655,7 +655,7 @@ contract('StabilityPool', async accounts => {
       await stabilityPool.withdrawFromSP(dec(1000, 18), { from: A })
 
       // Check SP is empty
-      assert.equal((await stabilityPool.getTotalMoUSDDeposits()), '0')
+      assert.equal((await stabilityPool.getTotalMEURDeposits()), '0')
 
       // Check G is non-zero
       let currentEpoch = await stabilityPool.currentEpoch()
@@ -678,13 +678,13 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit: sets the correct front end tag", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, C, D open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       // Check A, B, C D have no front end tags
       const A_tagBefore = await getFrontEndTag(stabilityPool, A)
@@ -717,11 +717,11 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit: depositor does not receive any MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale, value: dec(50, 'ether') } })
 
       // A, B, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
 
       // Get A, B, C MSIC balances before and confirm they're zero
       const A_MSICBalance_Before = await msicToken.balanceOf(A)
@@ -745,13 +745,13 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit after past full withdrawal: depositor does not receive any MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
@@ -805,15 +805,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new eligible deposit: tagged front end receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
 
       // D, E, F provide to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: D })
@@ -855,12 +855,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new eligible deposit: tagged front end's stake increases", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // Get front ends' stakes before
       const F1_Stake_Before = await stabilityPool.frontEndStakes(frontEnd_1)
@@ -892,15 +892,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new eligible deposit: tagged front end's snapshots update", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // D opens trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
@@ -978,15 +978,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit: depositor does not receive REEF gains", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      // Whale transfers MoUSD to A, B
+      // Whale transfers MEUR to A, B
       await msicToken.transfer(A, dec(100, 18), { from: whale })
       await msicToken.transfer(B, dec(200, 18), { from: whale })
 
       // C, D open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       // --- TEST ---
 
@@ -1024,15 +1024,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), new deposit after past full withdrawal: depositor does not receive REEF gains", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      // Whale transfers MoUSD to A, B
+      // Whale transfers MEUR to A, B
       await msicToken.transfer(A, dec(1000, 18), { from: whale })
       await msicToken.transfer(B, dec(1000, 18), { from: whale })
 
       // C, D open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(5000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(5000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
@@ -1098,12 +1098,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup: triggers MSIC reward event - increases the sum G", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C provide to SP
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: A })
@@ -1126,16 +1126,16 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup from different front end: doesn't change the front end tag", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // whale transfer to troves D and E
       await msicToken.transfer(D, dec(100, 18), { from: whale })
       await msicToken.transfer(E, dec(200, 18), { from: whale })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
 
       // A, B, C, D, E provide to SP
@@ -1169,12 +1169,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup: depositor receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -1205,12 +1205,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup: tagged front end receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -1241,15 +1241,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup: tagged front end's stake increases", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, D, E, F open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
 
       // A, B, C, D, E, F provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -1283,15 +1283,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(), topup: tagged front end's snapshots update", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(400, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(600, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(400, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(600, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // D opens trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
@@ -1374,12 +1374,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(): reverts when amount is zero", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
 
-      // Whale transfers MoUSD to C, D
+      // Whale transfers MEUR to C, D
       await msicToken.transfer(C, dec(100, 18), { from: whale })
       await msicToken.transfer(D, dec(100, 18), { from: whale })
 
@@ -1396,10 +1396,10 @@ contract('StabilityPool', async accounts => {
 
     it("provideToSP(): reverts if user is a registered front end", async () => {
       // C, D, E, F open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
 
       // C, E, F registers as front end
       await stabilityPool.registerFrontEnd(dec(1, 18), { from: C })
@@ -1418,9 +1418,9 @@ contract('StabilityPool', async accounts => {
     })
 
     it("provideToSP(): reverts if provided tag is not a registered front end", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(30, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
 
       const txPromise_C = stabilityPool.provideToSP(dec(10, 18), A, { from: C })  // passes another EOA
       const txPromise_D = stabilityPool.provideToSP(dec(10, 18), troveManager.address, { from: D })
@@ -1436,8 +1436,8 @@ contract('StabilityPool', async accounts => {
     // --- withdrawFromSP ---
 
     it("withdrawFromSP(): reverts when user has no active deposit", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
 
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
 
@@ -1463,7 +1463,7 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(): reverts when amount > 0 and system has an undercollateralized trove", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
 
@@ -1479,10 +1479,10 @@ contract('StabilityPool', async accounts => {
       await th.assertRevert(stabilityPool.withdrawFromSP(dec(100, 18), { from: alice }))
     })
 
-    it("withdrawFromSP(): partial retrieval - retrieves correct MoUSD amount and the entire REEF Gain, and updates deposit", async () => {
+    it("withdrawFromSP(): partial retrieval - retrieves correct MEUR amount and the entire REEF Gain, and updates deposit", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // 2 Troves opened
@@ -1491,33 +1491,33 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
       await priceFeed.setPrice(dec(105, 18));
 
-      // 2 users with Trove with 170 MoUSD drawn are closed
-      const liquidationTX_1 = await troveManager.liquidate(defaulter_1, { from: owner })  // 170 MoUSD closed
-      const liquidationTX_2 = await troveManager.liquidate(defaulter_2, { from: owner }) // 170 MoUSD closed
+      // 2 users with Trove with 170 MEUR drawn are closed
+      const liquidationTX_1 = await troveManager.liquidate(defaulter_1, { from: owner })  // 170 MEUR closed
+      const liquidationTX_2 = await troveManager.liquidate(defaulter_2, { from: owner }) // 170 MEUR closed
 
       const [liquidatedDebt_1] = await th.getEmittedLiquidationValues(liquidationTX_1)
       const [liquidatedDebt_2] = await th.getEmittedLiquidationValues(liquidationTX_2)
 
-      // Alice MoUSDLoss is ((15000/200000) * liquidatedDebt), for each liquidation
-      const expectedMoUSDLoss_A = (liquidatedDebt_1.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
+      // Alice MEURLoss is ((15000/200000) * liquidatedDebt), for each liquidation
+      const expectedMEURLoss_A = (liquidatedDebt_1.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
         .add(liquidatedDebt_2.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
 
-      const expectedCompoundedMoUSDDeposit_A = toBN(dec(15000, 18)).sub(expectedMoUSDLoss_A)
-      const compoundedMoUSDDeposit_A = await stabilityPool.getCompoundedMoUSDDeposit(alice)
+      const expectedCompoundedMEURDeposit_A = toBN(dec(15000, 18)).sub(expectedMEURLoss_A)
+      const compoundedMEURDeposit_A = await stabilityPool.getCompoundedMEURDeposit(alice)
 
-      assert.isAtMost(th.getDifference(expectedCompoundedMoUSDDeposit_A, compoundedMoUSDDeposit_A), 100000)
+      assert.isAtMost(th.getDifference(expectedCompoundedMEURDeposit_A, compoundedMEURDeposit_A), 100000)
 
-      // Alice retrieves part of her entitled MoUSD: 9000 MoUSD
+      // Alice retrieves part of her entitled MEUR: 9000 MEUR
       await stabilityPool.withdrawFromSP(dec(9000, 18), { from: alice })
 
-      const expectedNewDeposit_A = (compoundedMoUSDDeposit_A.sub(toBN(dec(9000, 18))))
+      const expectedNewDeposit_A = (compoundedMEURDeposit_A.sub(toBN(dec(9000, 18))))
 
       // check Alice's deposit has been updated to equal her compounded deposit minus her withdrawal */
       const newDeposit = ((await stabilityPool.deposits(alice))[0]).toString()
@@ -1528,10 +1528,10 @@ contract('StabilityPool', async accounts => {
       assert.equal(alice_pendingETHGain, 0)
     })
 
-    it("withdrawFromSP(): partial retrieval - leaves the correct amount of MoUSD in the Stability Pool", async () => {
+    it("withdrawFromSP(): partial retrieval - leaves the correct amount of MEUR in the Stability Pool", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // 2 Troves opened
@@ -1539,12 +1539,12 @@ contract('StabilityPool', async accounts => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
-      const SP_MoUSD_Before = await stabilityPool.getTotalMoUSDDeposits()
-      assert.equal(SP_MoUSD_Before, dec(200000, 18))
+      const SP_MEUR_Before = await stabilityPool.getTotalMEURDeposits()
+      assert.equal(SP_MEUR_Before, dec(200000, 18))
 
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
       await priceFeed.setPrice(dec(105, 18));
@@ -1556,25 +1556,25 @@ contract('StabilityPool', async accounts => {
       const [liquidatedDebt_1] = await th.getEmittedLiquidationValues(liquidationTX_1)
       const [liquidatedDebt_2] = await th.getEmittedLiquidationValues(liquidationTX_2)
 
-      // Alice retrieves part of her entitled MoUSD: 9000 MoUSD
+      // Alice retrieves part of her entitled MEUR: 9000 MEUR
       await stabilityPool.withdrawFromSP(dec(9000, 18), { from: alice })
 
       /* Check SP has reduced from 2 liquidations and Alice's withdrawal
-      Expect MoUSD in SP = (200000 - liquidatedDebt_1 - liquidatedDebt_2 - 9000) */
-      const expectedSPMoUSD = toBN(dec(200000, 18))
+      Expect MEUR in SP = (200000 - liquidatedDebt_1 - liquidatedDebt_2 - 9000) */
+      const expectedSPMEUR = toBN(dec(200000, 18))
         .sub(toBN(liquidatedDebt_1))
         .sub(toBN(liquidatedDebt_2))
         .sub(toBN(dec(9000, 18)))
 
-      const SP_MoUSD_After = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const SP_MEUR_After = (await stabilityPool.getTotalMEURDeposits()).toString()
 
-      th.assertIsApproximatelyEqual(SP_MoUSD_After, expectedSPMoUSD)
+      th.assertIsApproximatelyEqual(SP_MEUR_After, expectedSPMEUR)
     })
 
-    it("withdrawFromSP(): full retrieval - leaves the correct amount of MoUSD in the Stability Pool", async () => {
+    it("withdrawFromSP(): full retrieval - leaves the correct amount of MEUR in the Stability Pool", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // 2 Troves opened
@@ -1584,11 +1584,11 @@ contract('StabilityPool', async accounts => {
       // --- TEST ---
 
       // Alice makes deposit #1
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
-      const SP_MoUSD_Before = await stabilityPool.getTotalMoUSDDeposits()
-      assert.equal(SP_MoUSD_Before, dec(200000, 18))
+      const SP_MEUR_Before = await stabilityPool.getTotalMEURDeposits()
+      assert.equal(SP_MEUR_Before, dec(200000, 18))
 
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
       await priceFeed.setPrice(dec(105, 18));
@@ -1600,30 +1600,30 @@ contract('StabilityPool', async accounts => {
       const [liquidatedDebt_1] = await th.getEmittedLiquidationValues(liquidationTX_1)
       const [liquidatedDebt_2] = await th.getEmittedLiquidationValues(liquidationTX_2)
 
-      // Alice MoUSDLoss is ((15000/200000) * liquidatedDebt), for each liquidation
-      const expectedMoUSDLoss_A = (liquidatedDebt_1.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
+      // Alice MEURLoss is ((15000/200000) * liquidatedDebt), for each liquidation
+      const expectedMEURLoss_A = (liquidatedDebt_1.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
         .add(liquidatedDebt_2.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18))))
 
-      const expectedCompoundedMoUSDDeposit_A = toBN(dec(15000, 18)).sub(expectedMoUSDLoss_A)
-      const compoundedMoUSDDeposit_A = await stabilityPool.getCompoundedMoUSDDeposit(alice)
+      const expectedCompoundedMEURDeposit_A = toBN(dec(15000, 18)).sub(expectedMEURLoss_A)
+      const compoundedMEURDeposit_A = await stabilityPool.getCompoundedMEURDeposit(alice)
 
-      assert.isAtMost(th.getDifference(expectedCompoundedMoUSDDeposit_A, compoundedMoUSDDeposit_A), 100000)
+      assert.isAtMost(th.getDifference(expectedCompoundedMEURDeposit_A, compoundedMEURDeposit_A), 100000)
 
-      const MoUSDinSPBefore = await stabilityPool.getTotalMoUSDDeposits()
+      const MEURinSPBefore = await stabilityPool.getTotalMEURDeposits()
 
-      // Alice retrieves all of her entitled MoUSD:
+      // Alice retrieves all of her entitled MEUR:
       await stabilityPool.withdrawFromSP(dec(15000, 18), { from: alice })
 
-      const expectedMoUSDinSPAfter = MoUSDinSPBefore.sub(compoundedMoUSDDeposit_A)
+      const expectedMEURinSPAfter = MEURinSPBefore.sub(compoundedMEURDeposit_A)
 
-      const MoUSDinSPAfter = await stabilityPool.getTotalMoUSDDeposits()
-      assert.isAtMost(th.getDifference(expectedMoUSDinSPAfter, MoUSDinSPAfter), 100000)
+      const MEURinSPAfter = await stabilityPool.getTotalMEURDeposits()
+      assert.isAtMost(th.getDifference(expectedMEURinSPAfter, MEURinSPAfter), 100000)
     })
 
     it("withdrawFromSP(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF", async () => {
       // --- SETUP ---
-      // Whale deposits 1850 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 1850 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(18500, 18), frontEnd_1, { from: whale })
 
       // 2 defaulters open
@@ -1632,8 +1632,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -1643,7 +1643,7 @@ contract('StabilityPool', async accounts => {
       await troveManager.liquidate(defaulter_1, { from: owner })
       await troveManager.liquidate(defaulter_2, { from: owner })
 
-      // Alice retrieves all of her entitled MoUSD:
+      // Alice retrieves all of her entitled MEUR:
       await stabilityPool.withdrawFromSP(dec(15000, 18), { from: alice })
       assert.equal(await stabilityPool.getDepositorETHGain(alice), 0)
 
@@ -1670,10 +1670,10 @@ contract('StabilityPool', async accounts => {
       await th.assertRevert(txPromise_A)
     })
 
-    it("withdrawFromSP(): it correctly updates the user's MoUSD and REEF snapshots of entitled reward per unit staked", async () => {
+    it("withdrawFromSP(): it correctly updates the user's MEUR and REEF snapshots of entitled reward per unit staked", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // 2 defaulters open
@@ -1682,8 +1682,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // check 'Before' snapshots
@@ -1700,7 +1700,7 @@ contract('StabilityPool', async accounts => {
       await troveManager.liquidate(defaulter_1, { from: owner })
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Alice retrieves part of her entitled MoUSD: 9000 MoUSD
+      // Alice retrieves part of her entitled MEUR: 9000 MEUR
       await stabilityPool.withdrawFromSP(dec(9000, 18), { from: alice })
 
       const P = (await stabilityPool.P()).toString()
@@ -1715,8 +1715,8 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawFromSP(): decreases StabilityPool REEF", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // 1 defaulter opens
@@ -1724,15 +1724,15 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // price drops: defaulter's Trove falls below MCR, alice and whale Trove remain active
       await priceFeed.setPrice('100000000000000000000');
 
       // defaulter's Trove is closed.
-      const liquidationTx_1 = await troveManager.liquidate(defaulter_1, { from: owner })  // 180 MoUSD closed
+      const liquidationTx_1 = await troveManager.liquidate(defaulter_1, { from: owner })  // 180 MEUR closed
       const [, liquidatedColl,] = th.getEmittedLiquidationValues(liquidationTx_1)
 
       //Get ActivePool and StabilityPool Ether before retrieval:
@@ -1769,7 +1769,7 @@ contract('StabilityPool', async accounts => {
       // 6 Accounts open troves and provide to SP
       const depositors = [alice, bob, carol, dennis, erin, flyn]
       for (account of depositors) {
-        await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+        await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
         await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: account })
       }
 
@@ -1792,24 +1792,24 @@ contract('StabilityPool', async accounts => {
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: flyn })
       assert.equal(((await stabilityPool.deposits(alice))[0]).toString(), '0')
 
-      const totalDeposits = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const totalDeposits = (await stabilityPool.getTotalMEURDeposits()).toString()
 
       assert.isAtMost(th.getDifference(totalDeposits, '0'), 100000)
     })
 
-    it("withdrawFromSP(): increases depositor's MoUSD token balance by the expected amount", async () => {
+    it("withdrawFromSP(): increases depositor's MEUR token balance by the expected amount", async () => {
       // Whale opens trove 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // 1 defaulter opens trove
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
       const defaulterDebt = (await troveManager.getEntireDebtAndColl(defaulter_1))[0]
 
       // 6 Accounts open troves and provide to SP
       const depositors = [alice, bob, carol, dennis, erin, flyn]
       for (account of depositors) {
-        await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+        await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
         await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: account })
       }
 
@@ -1819,37 +1819,37 @@ contract('StabilityPool', async accounts => {
       const aliceBalBefore = await msicToken.balanceOf(alice)
       const bobBalBefore = await msicToken.balanceOf(bob)
 
-      /* From an offset of 10000 MoUSD, each depositor receives
-      MoUSDLoss = 1666.6666666666666666 MoUSD
+      /* From an offset of 10000 MEUR, each depositor receives
+      MEURLoss = 1666.6666666666666666 MEUR
 
-      and thus with a deposit of 10000 MoUSD, each should withdraw 8333.3333333333333333 MoUSD (in practice, slightly less due to rounding error)
+      and thus with a deposit of 10000 MEUR, each should withdraw 8333.3333333333333333 MEUR (in practice, slightly less due to rounding error)
       */
 
       // Price bounces back to $200 per REEF
       await priceFeed.setPrice(dec(200, 18))
 
-      // Bob issues a further 5000 MoUSD from his trove 
-      await borrowerOperations.withdrawMoUSD(th._100pct, dec(5000, 18), bob, bob, { from: bob })
+      // Bob issues a further 5000 MEUR from his trove 
+      await borrowerOperations.withdrawMEUR(th._100pct, dec(5000, 18), bob, bob, { from: bob })
 
-      // Expect Alice's MoUSD balance increase be very close to 8333.3333333333333333 MoUSD
+      // Expect Alice's MEUR balance increase be very close to 8333.3333333333333333 MEUR
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const aliceBalance = (await msicToken.balanceOf(alice))
 
       assert.isAtMost(th.getDifference(aliceBalance.sub(aliceBalBefore), '8333333333333333333333'), 100000)
 
-      // expect Bob's MoUSD balance increase to be very close to  13333.33333333333333333 MoUSD
+      // expect Bob's MEUR balance increase to be very close to  13333.33333333333333333 MEUR
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const bobBalance = (await msicToken.balanceOf(bob))
       assert.isAtMost(th.getDifference(bobBalance.sub(bobBalBefore), '13333333333333333333333'), 100000)
     })
 
     it("withdrawFromSP(): doesn't impact other users Stability deposits or REEF gains", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(20000, 18), frontEnd_1, { from: bob })
@@ -1868,16 +1868,16 @@ contract('StabilityPool', async accounts => {
       assert.isFalse(await sortedTroves.contains(defaulter_1))
       assert.isFalse(await sortedTroves.contains(defaulter_2))
 
-      const alice_MoUSDDeposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
-      const bob_MoUSDDeposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
+      const alice_MEURDeposit_Before = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
+      const bob_MEURDeposit_Before = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
 
       const alice_ETHGain_Before = (await stabilityPool.getDepositorETHGain(alice)).toString()
       const bob_ETHGain_Before = (await stabilityPool.getDepositorETHGain(bob)).toString()
 
-      //check non-zero MoUSD and ETHGain in the Stability Pool
-      const MoUSDinSP = await stabilityPool.getTotalMoUSDDeposits()
+      //check non-zero MEUR and ETHGain in the Stability Pool
+      const MEURinSP = await stabilityPool.getTotalMEURDeposits()
       const ETHinSP = await stabilityPool.getETH()
-      assert.isTrue(MoUSDinSP.gt(mv._zeroBN))
+      assert.isTrue(MEURinSP.gt(mv._zeroBN))
       assert.isTrue(ETHinSP.gt(mv._zeroBN))
 
       // Price rises
@@ -1888,27 +1888,27 @@ contract('StabilityPool', async accounts => {
       await stabilityPool.withdrawFromSP(dec(30000, 18), { from: carol })
       assert.equal(((await stabilityPool.deposits(carol))[0]).toString(), '0')
 
-      const alice_MoUSDDeposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
-      const bob_MoUSDDeposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
+      const alice_MEURDeposit_After = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
+      const bob_MEURDeposit_After = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
 
       const alice_ETHGain_After = (await stabilityPool.getDepositorETHGain(alice)).toString()
       const bob_ETHGain_After = (await stabilityPool.getDepositorETHGain(bob)).toString()
 
       // Check compounded deposits and REEF gains for A and B have not changed
-      assert.equal(alice_MoUSDDeposit_Before, alice_MoUSDDeposit_After)
-      assert.equal(bob_MoUSDDeposit_Before, bob_MoUSDDeposit_After)
+      assert.equal(alice_MEURDeposit_Before, alice_MEURDeposit_After)
+      assert.equal(bob_MEURDeposit_Before, bob_MEURDeposit_After)
 
       assert.equal(alice_ETHGain_Before, alice_ETHGain_After)
       assert.equal(bob_ETHGain_Before, bob_ETHGain_After)
     })
 
     it("withdrawFromSP(): doesn't impact system debt, collateral or TCR ", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(20000, 18), frontEnd_1, { from: bob })
@@ -1930,8 +1930,8 @@ contract('StabilityPool', async accounts => {
       // Price rises
       await priceFeed.setPrice(dec(200, 18))
 
-      const activeDebt_Before = (await activePool.getMoUSDDebt()).toString()
-      const defaultedDebt_Before = (await defaultPool.getMoUSDDebt()).toString()
+      const activeDebt_Before = (await activePool.getMEURDebt()).toString()
+      const defaultedDebt_Before = (await defaultPool.getMEURDebt()).toString()
       const activeColl_Before = (await activePool.getETH()).toString()
       const defaultedColl_Before = (await defaultPool.getETH()).toString()
       const TCR_Before = (await th.getTCR(contracts)).toString()
@@ -1941,8 +1941,8 @@ contract('StabilityPool', async accounts => {
       await stabilityPool.withdrawFromSP(dec(30000, 18), { from: carol })
       assert.equal(((await stabilityPool.deposits(carol))[0]).toString(), '0')
 
-      const activeDebt_After = (await activePool.getMoUSDDebt()).toString()
-      const defaultedDebt_After = (await defaultPool.getMoUSDDebt()).toString()
+      const activeDebt_After = (await activePool.getMEURDebt()).toString()
+      const defaultedDebt_After = (await defaultPool.getMEURDebt()).toString()
       const activeColl_After = (await activePool.getETH()).toString()
       const defaultedColl_After = (await defaultPool.getETH()).toString()
       const TCR_After = (await th.getTCR(contracts)).toString()
@@ -1956,12 +1956,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(): doesn't impact any troves, including the caller's trove", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       // A, B and C provide to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
@@ -2029,7 +2029,7 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
 
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: A })
 
@@ -2080,46 +2080,46 @@ contract('StabilityPool', async accounts => {
       assert.isAtMost(th.getDifference(A_MSICBalDiff, A_pendingMSICGain), 1000)
     })
 
-    it("withdrawFromSP(): withdrawing 0 MoUSD doesn't alter the caller's deposit or the total MoUSD in the Stability Pool", async () => {
+    it("withdrawFromSP(): withdrawing 0 MEUR doesn't alter the caller's deposit or the total MEUR in the Stability Pool", async () => {
       // --- SETUP ---
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
-      // A, B, C provides 100, 50, 30 MoUSD to SP
+      // A, B, C provides 100, 50, 30 MEUR to SP
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(50, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(30, 18), frontEnd_1, { from: carol })
 
-      const bob_Deposit_Before = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
-      const MoUSDinSP_Before = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      const bob_Deposit_Before = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
+      const MEURinSP_Before = (await stabilityPool.getTotalMEURDeposits()).toString()
 
-      assert.equal(MoUSDinSP_Before, dec(180, 18))
+      assert.equal(MEURinSP_Before, dec(180, 18))
 
-      // Bob withdraws 0 MoUSD from the Stability Pool 
+      // Bob withdraws 0 MEUR from the Stability Pool 
       await stabilityPool.withdrawFromSP(0, { from: bob })
 
-      // check Bob's deposit and total MoUSD in Stability Pool has not changed
-      const bob_Deposit_After = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
-      const MoUSDinSP_After = (await stabilityPool.getTotalMoUSDDeposits()).toString()
+      // check Bob's deposit and total MEUR in Stability Pool has not changed
+      const bob_Deposit_After = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
+      const MEURinSP_After = (await stabilityPool.getTotalMEURDeposits()).toString()
 
       assert.equal(bob_Deposit_Before, bob_Deposit_After)
-      assert.equal(MoUSDinSP_Before, MoUSDinSP_After)
+      assert.equal(MEURinSP_Before, MEURinSP_After)
     })
 
     it("withdrawFromSP(): withdrawing 0 REEF Gain does not alter the caller's REEF balance, their trove collateral, or the REEF  in the Stability Pool", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       // Would-be defaulter open trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
       // Price drops
       await priceFeed.setPrice(dec(105, 18))
@@ -2130,7 +2130,7 @@ contract('StabilityPool', async accounts => {
       await troveManager.liquidate(defaulter_1)
 
       // Dennis opens trove and deposits to Stability Pool
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: dennis })
 
       // Check Dennis has 0 ETHGain
@@ -2160,16 +2160,16 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawFromSP(): Request to withdraw > caller's deposit only withdraws the caller's compounded deposit", async () => {
       // --- SETUP ---
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
-      // A, B, C provide MoUSD to SP
+      // A, B, C provide MEUR to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(20000, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(30000, 18), frontEnd_1, { from: carol })
@@ -2180,41 +2180,41 @@ contract('StabilityPool', async accounts => {
       // Liquidate defaulter 1
       await troveManager.liquidate(defaulter_1)
 
-      const alice_MoUSD_Balance_Before = await msicToken.balanceOf(alice)
-      const bob_MoUSD_Balance_Before = await msicToken.balanceOf(bob)
+      const alice_MEUR_Balance_Before = await msicToken.balanceOf(alice)
+      const bob_MEUR_Balance_Before = await msicToken.balanceOf(bob)
 
-      const alice_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(alice)
-      const bob_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(bob)
+      const alice_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(alice)
+      const bob_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(bob)
 
-      const MoUSDinSP_Before = await stabilityPool.getTotalMoUSDDeposits()
+      const MEURinSP_Before = await stabilityPool.getTotalMEURDeposits()
 
       await priceFeed.setPrice(dec(200, 18))
 
       // Bob attempts to withdraws 1 wei more than his compounded deposit from the Stability Pool
       await stabilityPool.withdrawFromSP(bob_Deposit_Before.add(toBN(1)), { from: bob })
 
-      // Check Bob's MoUSD balance has risen by only the value of his compounded deposit
-      const bob_expectedMoUSDBalance = (bob_MoUSD_Balance_Before.add(bob_Deposit_Before)).toString()
-      const bob_MoUSD_Balance_After = (await msicToken.balanceOf(bob)).toString()
-      assert.equal(bob_MoUSD_Balance_After, bob_expectedMoUSDBalance)
+      // Check Bob's MEUR balance has risen by only the value of his compounded deposit
+      const bob_expectedMEURBalance = (bob_MEUR_Balance_Before.add(bob_Deposit_Before)).toString()
+      const bob_MEUR_Balance_After = (await msicToken.balanceOf(bob)).toString()
+      assert.equal(bob_MEUR_Balance_After, bob_expectedMEURBalance)
 
-      // Alice attempts to withdraws 2309842309.000000000000000000 MoUSD from the Stability Pool 
+      // Alice attempts to withdraws 2309842309.000000000000000000 MEUR from the Stability Pool 
       await stabilityPool.withdrawFromSP('2309842309000000000000000000', { from: alice })
 
-      // Check Alice's MoUSD balance has risen by only the value of her compounded deposit
-      const alice_expectedMoUSDBalance = (alice_MoUSD_Balance_Before.add(alice_Deposit_Before)).toString()
-      const alice_MoUSD_Balance_After = (await msicToken.balanceOf(alice)).toString()
-      assert.equal(alice_MoUSD_Balance_After, alice_expectedMoUSDBalance)
+      // Check Alice's MEUR balance has risen by only the value of her compounded deposit
+      const alice_expectedMEURBalance = (alice_MEUR_Balance_Before.add(alice_Deposit_Before)).toString()
+      const alice_MEUR_Balance_After = (await msicToken.balanceOf(alice)).toString()
+      assert.equal(alice_MEUR_Balance_After, alice_expectedMEURBalance)
 
-      // Check MoUSD in Stability Pool has been reduced by only Alice's compounded deposit and Bob's compounded deposit
-      const expectedMoUSDinSP = (MoUSDinSP_Before.sub(alice_Deposit_Before).sub(bob_Deposit_Before)).toString()
-      const MoUSDinSP_After = (await stabilityPool.getTotalMoUSDDeposits()).toString()
-      assert.equal(MoUSDinSP_After, expectedMoUSDinSP)
+      // Check MEUR in Stability Pool has been reduced by only Alice's compounded deposit and Bob's compounded deposit
+      const expectedMEURinSP = (MEURinSP_Before.sub(alice_Deposit_Before).sub(bob_Deposit_Before)).toString()
+      const MEURinSP_After = (await stabilityPool.getTotalMEURDeposits()).toString()
+      assert.equal(MEURinSP_After, expectedMEURinSP)
     })
 
-    it("withdrawFromSP(): Request to withdraw 2^256-1 MoUSD only withdraws the caller's compounded deposit", async () => {
+    it("withdrawFromSP(): Request to withdraw 2^256-1 MEUR only withdraws the caller's compounded deposit", async () => {
       // --- SETUP ---
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
       // A, B, C open troves 
@@ -2223,13 +2223,13 @@ contract('StabilityPool', async accounts => {
       // A, B, C open troves 
       // A, B, C open troves 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
-      // A, B, C provides 100, 50, 30 MoUSD to SP
+      // A, B, C provides 100, 50, 30 MEUR to SP
       await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(50, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(30, 18), frontEnd_1, { from: carol })
@@ -2240,29 +2240,29 @@ contract('StabilityPool', async accounts => {
       // Liquidate defaulter 1
       await troveManager.liquidate(defaulter_1)
 
-      const bob_MoUSD_Balance_Before = await msicToken.balanceOf(bob)
+      const bob_MEUR_Balance_Before = await msicToken.balanceOf(bob)
 
-      const bob_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(bob)
+      const bob_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(bob)
 
-      const MoUSDinSP_Before = await stabilityPool.getTotalMoUSDDeposits()
+      const MEURinSP_Before = await stabilityPool.getTotalMEURDeposits()
 
       const maxBytes32 = web3.utils.toBN("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
 
       // Price drops
       await priceFeed.setPrice(dec(200, 18))
 
-      // Bob attempts to withdraws maxBytes32 MoUSD from the Stability Pool
+      // Bob attempts to withdraws maxBytes32 MEUR from the Stability Pool
       await stabilityPool.withdrawFromSP(maxBytes32, { from: bob })
 
-      // Check Bob's MoUSD balance has risen by only the value of his compounded deposit
-      const bob_expectedMoUSDBalance = (bob_MoUSD_Balance_Before.add(bob_Deposit_Before)).toString()
-      const bob_MoUSD_Balance_After = (await msicToken.balanceOf(bob)).toString()
-      assert.equal(bob_MoUSD_Balance_After, bob_expectedMoUSDBalance)
+      // Check Bob's MEUR balance has risen by only the value of his compounded deposit
+      const bob_expectedMEURBalance = (bob_MEUR_Balance_Before.add(bob_Deposit_Before)).toString()
+      const bob_MEUR_Balance_After = (await msicToken.balanceOf(bob)).toString()
+      assert.equal(bob_MEUR_Balance_After, bob_expectedMEURBalance)
 
-      // Check MoUSD in Stability Pool has been reduced by only  Bob's compounded deposit
-      const expectedMoUSDinSP = (MoUSDinSP_Before.sub(bob_Deposit_Before)).toString()
-      const MoUSDinSP_After = (await stabilityPool.getTotalMoUSDDeposits()).toString()
-      assert.equal(MoUSDinSP_After, expectedMoUSDinSP)
+      // Check MEUR in Stability Pool has been reduced by only  Bob's compounded deposit
+      const expectedMEURinSP = (MEURinSP_Before.sub(bob_Deposit_Before)).toString()
+      const MEURinSP_After = (await stabilityPool.getTotalMEURDeposits()).toString()
+      assert.equal(MEURinSP_After, expectedMEURinSP)
     })
 
     it("withdrawFromSP(): caller can withdraw full deposit and REEF gain during Recovery Mode", async () => {
@@ -2270,18 +2270,18 @@ contract('StabilityPool', async accounts => {
 
       // Price doubles
       await priceFeed.setPrice(dec(400, 18))
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
       // Price halves
       await priceFeed.setPrice(dec(200, 18))
 
       // A, B, C open troves and make Stability Pool deposits
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(4, 18)), extraParams: { from: carol } })
 
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
-      // A, B, C provides 10000, 5000, 3000 MoUSD to SP
+      // A, B, C provides 10000, 5000, 3000 MEUR to SP
       const A_GAS_Used = th.gasUsed(await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice, gasPrice: GAS_PRICE }))
       const B_GAS_Used = th.gasUsed(await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: bob, gasPrice: GAS_PRICE }))
       const C_GAS_Used = th.gasUsed(await stabilityPool.provideToSP(dec(3000, 18), frontEnd_1, { from: carol, gasPrice: GAS_PRICE }))
@@ -2296,23 +2296,23 @@ contract('StabilityPool', async accounts => {
       await troveManager.liquidate(defaulter_1)
       assert.isFalse(await sortedTroves.contains(defaulter_1))
 
-      const alice_MoUSD_Balance_Before = await msicToken.balanceOf(alice)
-      const bob_MoUSD_Balance_Before = await msicToken.balanceOf(bob)
-      const carol_MoUSD_Balance_Before = await msicToken.balanceOf(carol)
+      const alice_MEUR_Balance_Before = await msicToken.balanceOf(alice)
+      const bob_MEUR_Balance_Before = await msicToken.balanceOf(bob)
+      const carol_MEUR_Balance_Before = await msicToken.balanceOf(carol)
 
       const alice_ETH_Balance_Before = web3.utils.toBN(await web3.eth.getBalance(alice))
       const bob_ETH_Balance_Before = web3.utils.toBN(await web3.eth.getBalance(bob))
       const carol_ETH_Balance_Before = web3.utils.toBN(await web3.eth.getBalance(carol))
 
-      const alice_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(alice)
-      const bob_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(bob)
-      const carol_Deposit_Before = await stabilityPool.getCompoundedMoUSDDeposit(carol)
+      const alice_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(alice)
+      const bob_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(bob)
+      const carol_Deposit_Before = await stabilityPool.getCompoundedMEURDeposit(carol)
 
       const alice_ETHGain_Before = await stabilityPool.getDepositorETHGain(alice)
       const bob_ETHGain_Before = await stabilityPool.getDepositorETHGain(bob)
       const carol_ETHGain_Before = await stabilityPool.getDepositorETHGain(carol)
 
-      const MoUSDinSP_Before = await stabilityPool.getTotalMoUSDDeposits()
+      const MEURinSP_Before = await stabilityPool.getTotalMEURDeposits()
 
       // Price rises
       await priceFeed.setPrice(dec(220, 18))
@@ -2324,22 +2324,22 @@ contract('StabilityPool', async accounts => {
       const B_GAS_Deposit = th.gasUsed(await stabilityPool.withdrawFromSP(dec(5000, 18), { from: bob, gasPrice: GAS_PRICE  }))
       const C_GAS_Deposit = th.gasUsed(await stabilityPool.withdrawFromSP(dec(3000, 18), { from: carol, gasPrice: GAS_PRICE  }))
 
-      // Check MoUSD balances of A, B, C have risen by the value of their compounded deposits, respectively
-      const alice_expectedMoUSDBalance = (alice_MoUSD_Balance_Before.add(alice_Deposit_Before)).toString()
+      // Check MEUR balances of A, B, C have risen by the value of their compounded deposits, respectively
+      const alice_expectedMEURBalance = (alice_MEUR_Balance_Before.add(alice_Deposit_Before)).toString()
 
-      const bob_expectedMoUSDBalance = (bob_MoUSD_Balance_Before.add(bob_Deposit_Before)).toString()
-      const carol_expectedMoUSDBalance = (carol_MoUSD_Balance_Before.add(carol_Deposit_Before)).toString()
+      const bob_expectedMEURBalance = (bob_MEUR_Balance_Before.add(bob_Deposit_Before)).toString()
+      const carol_expectedMEURBalance = (carol_MEUR_Balance_Before.add(carol_Deposit_Before)).toString()
 
-      const alice_MoUSD_Balance_After = (await msicToken.balanceOf(alice)).toString()
+      const alice_MEUR_Balance_After = (await msicToken.balanceOf(alice)).toString()
  
-      const bob_MoUSD_Balance_After = (await msicToken.balanceOf(bob)).toString()
-      const carol_MoUSD_Balance_After = (await msicToken.balanceOf(carol)).toString()
+      const bob_MEUR_Balance_After = (await msicToken.balanceOf(bob)).toString()
+      const carol_MEUR_Balance_After = (await msicToken.balanceOf(carol)).toString()
 
 
 
-      assert.equal(alice_MoUSD_Balance_After, alice_expectedMoUSDBalance)
-      assert.equal(bob_MoUSD_Balance_After, bob_expectedMoUSDBalance)
-      assert.equal(carol_MoUSD_Balance_After, carol_expectedMoUSDBalance)
+      assert.equal(alice_MEUR_Balance_After, alice_expectedMEURBalance)
+      assert.equal(bob_MEUR_Balance_After, bob_expectedMEURBalance)
+      assert.equal(carol_MEUR_Balance_After, carol_expectedMEURBalance)
 
       // Check REEF balances of A, B, C have increased by the value of their REEF gain from liquidations, respectively
       const alice_expectedETHBalance = (alice_ETH_Balance_Before.add(alice_ETHGain_Before)).toString()
@@ -2359,14 +2359,14 @@ contract('StabilityPool', async accounts => {
       assert.equal(bob_expectedETHBalance, bob_ETHBalance_After_Gas)
       assert.equal(carol_expectedETHBalance, carol_ETHBalance_After_Gas)
 
-      // Check MoUSD in Stability Pool has been reduced by A, B and C's compounded deposit
-      const expectedMoUSDinSP = (MoUSDinSP_Before
+      // Check MEUR in Stability Pool has been reduced by A, B and C's compounded deposit
+      const expectedMEURinSP = (MEURinSP_Before
         .sub(alice_Deposit_Before)
         .sub(bob_Deposit_Before)
         .sub(carol_Deposit_Before))
         .toString()
-      const MoUSDinSP_After = (await stabilityPool.getTotalMoUSDDeposits()).toString()
-      assert.equal(MoUSDinSP_After, expectedMoUSDinSP)
+      const MEURinSP_After = (await stabilityPool.getTotalMEURDeposits()).toString()
+      assert.equal(MEURinSP_After, expectedMEURinSP)
 
       // Check REEF in SP has reduced to zero
       const ETHinSP_After = (await stabilityPool.getETH()).toString()
@@ -2374,19 +2374,19 @@ contract('StabilityPool', async accounts => {
     })
 
     it("getDepositorETHGain(): depositor does not earn further REEF gains from liquidations while their compounded deposit == 0: ", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
 
       // defaulters open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_2 } })
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_3 } })
 
-      // A, B, provide 10000, 5000 MoUSD to SP
+      // A, B, provide 10000, 5000 MEUR to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: bob })
 
@@ -2397,12 +2397,12 @@ contract('StabilityPool', async accounts => {
       await troveManager.liquidate(defaulter_1)
       assert.isFalse(await sortedTroves.contains(defaulter_1))
 
-      const MoUSDinSP = (await stabilityPool.getTotalMoUSDDeposits()).toString()
-      assert.equal(MoUSDinSP, '0')
+      const MEURinSP = (await stabilityPool.getTotalMEURDeposits()).toString()
+      assert.equal(MEURinSP, '0')
 
       // Check Stability deposits have been fully cancelled with debt, and are now all zero
-      const alice_Deposit = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
-      const bob_Deposit = (await stabilityPool.getCompoundedMoUSDDeposit(bob)).toString()
+      const alice_Deposit = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
+      const bob_Deposit = (await stabilityPool.getCompoundedMEURDeposit(bob)).toString()
 
       assert.equal(alice_Deposit, '0')
       assert.equal(bob_Deposit, '0')
@@ -2411,7 +2411,7 @@ contract('StabilityPool', async accounts => {
       const alice_ETHGain_1 = (await stabilityPool.getDepositorETHGain(alice)).toString()
       const bob_ETHGain_1 = (await stabilityPool.getDepositorETHGain(bob)).toString()
 
-      // Whale deposits 10000 MoUSD to Stability Pool
+      // Whale deposits 10000 MEUR to Stability Pool
       await stabilityPool.provideToSP(dec(1, 24), frontEnd_1, { from: whale })
 
       // Liquidation 2
@@ -2439,12 +2439,12 @@ contract('StabilityPool', async accounts => {
 
     // --- MSIC functionality ---
     it("withdrawFromSP(): triggers MSIC reward event - increases the sum G", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(1, 24)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A and B provide to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -2474,16 +2474,16 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), partial withdrawal: doesn't change the front end tag", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // whale transfer to troves D and E
       await msicToken.transfer(D, dec(100, 18), { from: whale })
       await msicToken.transfer(E, dec(200, 18), { from: whale })
 
       // A, B, C open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C, D, E provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -2516,12 +2516,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), partial withdrawal: depositor receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -2552,12 +2552,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), partial withdrawal: tagged front end receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -2588,15 +2588,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), partial withdrawal: tagged front end's stake decreases", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, D, E, F open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
 
       // A, B, C, D, E, F provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -2630,15 +2630,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), partial withdrawal: tagged front end's snapshots update", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(60000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(60000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
 
       // D opens trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
@@ -2723,15 +2723,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), full withdrawal: removes deposit's front end tag", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // Whale transfers to A, B 
       await msicToken.transfer(A, dec(10000, 18), { from: whale })
       await msicToken.transfer(B, dec(20000, 18), { from: whale })
 
       //C, D open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       // A, B, C, D make their initial deposits
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -2769,14 +2769,14 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), full withdrawal: zero's depositor's snapshots", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       await openTrove({  ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
       //  SETUP: Execute a series of operations to make G, S > 0 and P < 1  
 
       // E opens trove and makes a deposit
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: E } })
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_3, { from: E })
 
       // Fast-forward time and make a second deposit, to trigger MSIC reward and make G > 0
@@ -2811,8 +2811,8 @@ contract('StabilityPool', async accounts => {
       await priceFeed.setPrice(dec(200, 18))
 
       // C, D open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: D } })
 
       // A, B, C, D make their initial deposits
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -2854,14 +2854,14 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), full withdrawal that reduces front end stake to 0: zero’s the front end’s snapshots", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
       //  SETUP: Execute a series of operations to make G, S > 0 and P < 1  
 
       // E opens trove and makes a deposit
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_3, { from: E })
 
       // Fast-forward time and make a second deposit, to trigger MSIC reward and make G > 0
@@ -2890,8 +2890,8 @@ contract('StabilityPool', async accounts => {
       // --- TEST ---
 
       // A, B open troves
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
 
       // A, B, make their initial deposits
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -2930,10 +2930,10 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawFromSP(), reverts when initial deposit value is 0", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A opens trove and join the Stability Pool
-      await openTrove({ extraMoUSDAmount: toBN(dec(10100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(10100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
 
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
@@ -2975,10 +2975,10 @@ contract('StabilityPool', async accounts => {
     // --- withdrawETHGainToTrove ---
 
     it("withdrawETHGainToTrove(): reverts when user has no active deposit", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
 
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
 
@@ -3002,10 +3002,10 @@ contract('StabilityPool', async accounts => {
       await th.assertRevert(txPromise_B)
     })
 
-    it("withdrawETHGainToTrove(): Applies MoUSDLoss to user's deposit, and redirects REEF reward to user's Trove", async () => {
+    it("withdrawETHGainToTrove(): Applies MEURLoss to user's deposit, and redirects REEF reward to user's Trove", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // Defaulter opens trove
@@ -3013,8 +3013,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // check Alice's Trove recorded REEF Before:
@@ -3030,19 +3030,19 @@ contract('StabilityPool', async accounts => {
       const [liquidatedDebt, liquidatedColl, ,] = th.getEmittedLiquidationValues(liquidationTx_1)
 
       const ETHGain_A = await stabilityPool.getDepositorETHGain(alice)
-      const compoundedDeposit_A = await stabilityPool.getCompoundedMoUSDDeposit(alice)
+      const compoundedDeposit_A = await stabilityPool.getCompoundedMEURDeposit(alice)
 
       // Alice should receive rewards proportional to her deposit as share of total deposits
       const expectedETHGain_A = liquidatedColl.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18)))
-      const expectedMoUSDLoss_A = liquidatedDebt.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18)))
-      const expectedCompoundedDeposit_A = toBN(dec(15000, 18)).sub(expectedMoUSDLoss_A)
+      const expectedMEURLoss_A = liquidatedDebt.mul(toBN(dec(15000, 18))).div(toBN(dec(200000, 18)))
+      const expectedCompoundedDeposit_A = toBN(dec(15000, 18)).sub(expectedMEURLoss_A)
 
       assert.isAtMost(th.getDifference(expectedCompoundedDeposit_A, compoundedDeposit_A), 100000)
 
       // Alice sends her REEF Gains to her Trove
       await stabilityPool.withdrawETHGainToTrove(alice, alice, { from: alice })
 
-      // check Alice's MoUSDLoss has been applied to her deposit expectedCompoundedDeposit_A
+      // check Alice's MEURLoss has been applied to her deposit expectedCompoundedDeposit_A
       alice_deposit_afterDefault = ((await stabilityPool.deposits(alice))[0])
       assert.isAtMost(th.getDifference(alice_deposit_afterDefault, expectedCompoundedDeposit_A), 100000)
 
@@ -3057,8 +3057,8 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawETHGainToTrove(): reverts if it would leave trove with ICR < MCR", async () => {
       // --- SETUP ---
-      // Whale deposits 1850 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 1850 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // defaulter opened
@@ -3066,8 +3066,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // check alice's Trove recorded REEF Before:
@@ -3088,8 +3088,8 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawETHGainToTrove(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero REEF", async () => {
       // --- SETUP ---
-      // Whale deposits 1850 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 1850 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // defaulter opened
@@ -3097,8 +3097,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // check alice's Trove recorded REEF Before:
@@ -3142,8 +3142,8 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawETHGainToTrove(): decreases StabilityPool REEF and increases activePool REEF", async () => {
       // --- SETUP ---
-      // Whale deposits 185000 MoUSD in StabilityPool
-      await openTrove({ extraMoUSDAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      // Whale deposits 185000 MEUR in StabilityPool
+      await openTrove({ extraMEURAmount: toBN(dec(1000000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await stabilityPool.provideToSP(dec(185000, 18), frontEnd_1, { from: whale })
 
       // defaulter opened
@@ -3151,8 +3151,8 @@ contract('StabilityPool', async accounts => {
 
       // --- TEST ---
 
-      // Alice makes deposit #1: 15000 MoUSD
-      await openTrove({ extraMoUSDAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      // Alice makes deposit #1: 15000 MEUR
+      await openTrove({ extraMEURAmount: toBN(dec(15000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(15000, 18), frontEnd_1, { from: alice })
 
       // price drops: defaulter's Trove falls below MCR
@@ -3190,7 +3190,7 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawETHGainToTrove(): All depositors are able to withdraw their REEF gain from the SP to their Trove", async () => {
       // Whale opens trove 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // Defaulter opens trove
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
@@ -3198,7 +3198,7 @@ contract('StabilityPool', async accounts => {
       // 6 Accounts open troves and provide to SP
       const depositors = [alice, bob, carol, dennis, erin, flyn]
       for (account of depositors) {
-        await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+        await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
         await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: account })
       }
 
@@ -3225,7 +3225,7 @@ contract('StabilityPool', async accounts => {
 
     it("withdrawETHGainToTrove(): All depositors withdraw, each withdraw their correct REEF gain", async () => {
       // Whale opens trove 
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // defaulter opened
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
@@ -3233,7 +3233,7 @@ contract('StabilityPool', async accounts => {
       // 6 Accounts open troves and provide to SP
       const depositors = [alice, bob, carol, dennis, erin, flyn]
       for (account of depositors) {
-        await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+        await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
         await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: account })
       }
       const collBefore = (await troveManager.Troves(alice))[1] // all troves have same coll before
@@ -3286,11 +3286,11 @@ contract('StabilityPool', async accounts => {
      await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
       
-      // A, B, C provides 10000, 5000, 3000 MoUSD to SP
+      // A, B, C provides 10000, 5000, 3000 MEUR to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
       await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: bob })
       await stabilityPool.provideToSP(dec(3000, 18), frontEnd_1, { from: carol })
@@ -3343,17 +3343,17 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(): reverts if user has no trove", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: carol } })
       
      // Defaulter opens
      await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
-      // A transfers MoUSD to D
+      // A transfers MEUR to D
       await msicToken.transfer(dennis, dec(10000, 18), { from: alice })
 
       // D deposits to Stability Pool
@@ -3373,12 +3373,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(): triggers MSIC reward event - increases the sum G", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
       
       // A and B provide to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -3420,12 +3420,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(), partial withdrawal: doesn't change the front end tag", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
       
       // A, B, C, D, E provide to SP
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: A })
@@ -3464,12 +3464,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(), eligible deposit: depositor receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
        // A, B, C open troves 
-       await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-       await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-       await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+       await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+       await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+       await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
        
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: A })
@@ -3514,12 +3514,12 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(), eligible deposit: tagged front end receives MSIC rewards", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
      // A, B, C open troves 
-     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+     await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+     await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+     await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
      
       // A, B, C, provide to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: A })
@@ -3564,15 +3564,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(), eligible deposit: tagged front end's stake decreases", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, D, E, F open troves 
-     await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+     await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+     await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+     await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
       
       // A, B, C, D, E, F provide to SP
       await stabilityPool.provideToSP(dec(1000, 18), frontEnd_1, { from: A })
@@ -3620,15 +3620,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(), eligible deposit: tagged front end's snapshots update", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
       // A, B, C, open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-     await openTrove({ extraMoUSDAmount: toBN(dec(60000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+     await openTrove({ extraMEURAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+     await openTrove({ extraMEURAmount: toBN(dec(60000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
      
       // D opens trove
-      await openTrove({ extraMoUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
      
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
      
@@ -3718,15 +3718,15 @@ contract('StabilityPool', async accounts => {
     })
 
     it("withdrawETHGainToTrove(): reverts when depositor has no REEF gain", async () => {
-      await openTrove({ extraMoUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openTrove({ extraMEURAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      // Whale transfers MoUSD to A, B
+      // Whale transfers MEUR to A, B
       await msicToken.transfer(A, dec(10000, 18), { from: whale })
       await msicToken.transfer(B, dec(20000, 18), { from: whale })
 
       // C, D open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
       
       // A, B, C, D provide to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A })
@@ -3736,7 +3736,7 @@ contract('StabilityPool', async accounts => {
 
       // fastforward time, and E makes a deposit, creating MSIC rewards for all
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
-      await openTrove({ extraMoUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
       await stabilityPool.provideToSP(dec(3000, 18), ZERO_ADDRESS, { from: E })
 
       // Confirm A, B, C have zero REEF gain
@@ -3817,9 +3817,9 @@ contract('StabilityPool', async accounts => {
 
     it("registerFrontEnd(): reverts if address has a non-zero deposit already", async () => {
       // C, D, E open troves 
-      await openTrove({ extraMoUSDAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraMoUSDAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openTrove({ extraMEURAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openTrove({ extraMEURAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraMEURAmount: toBN(dec(10, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
       
       // C, E provides to SP
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: C })

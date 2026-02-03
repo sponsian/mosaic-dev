@@ -77,7 +77,7 @@ Community Issuance balance: 31951373.982475769951532035
 PRICEFEED CHECKS
 PriceFeed first stored price: 2071.640000000000000000
 PriceFeed initial status: 0
-Unipool's stored MoUSD-REEF Uniswap Pair address: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
+Unipool's stored MEUR-REEF Uniswap Pair address: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 SYSTEM GLOBAL VARS CHECKS
 system liquidation reserve: 200.000000000000000000
 system min net debt      : 1800.000000000000000000
@@ -87,19 +87,19 @@ deployer debt: 3215.000000000000000000
 deployer coll: 3.000000000000000000
 deployer stake: 3.000000000000000000
 deployer's trove status: 1
-deployer's MoUSD balance: 2311.224204161781052791
-MoUSD-REEF Pair token 0: 0xaa05...87A5,
-        MoUSDToken contract addr: 0xaa05...87A5
-MoUSD-REEF Pair token 1: 0xC02a...6Cc2,
+deployer's MEUR balance: 2311.224204161781052791
+MEUR-REEF Pair token 0: 0xaa05...87A5,
+        MEURToken contract addr: 0xaa05...87A5
+MEUR-REEF Pair token 1: 0xC02a...6Cc2,
         WETH ERC20 contract addr: 0xc02a...6cc2
-MoUSD-REEF Pair's MoUSD reserves before provision: 40.036378355965833891
-MoUSD-REEF Pair's REEF reserves before provision: .188993756164807541
+MEUR-REEF Pair's MEUR reserves before provision: 40.036378355965833891
+MEUR-REEF Pair's REEF reserves before provision: .188993756164807541
 Liquidity already provided to Uniswap
-MoUSD-REEF Pair's MoUSD reserves after provision: 40.036378355965833891
-MoUSD-REEF Pair's REEF reserves after provision: .188993756164807541
+MEUR-REEF Pair's MEUR reserves after provision: 40.036378355965833891
+MEUR-REEF Pair's REEF reserves after provision: .188993756164807541
 CHECK LP STAKING EARNS MSIC
 deployer's LP token balance: 2.194601866876996844
-MoUSDETHPair addr: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
+MEURETHPair addr: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 Pair addr stored in Unipool: 0x01365a50da15e38e9Fcc5Ee193E67D4845ff118E
 deployer's farmed MSIC before staking LP tokens: .000000000000074273
 Already staked in Unipool
@@ -108,7 +108,7 @@ deployer's farmed MSIC from Unipool after waiting ~1.5mins: .000000000000074376
 deployer MSIC Balance Before SP deposit: 1398.375771175734140867
 CHECK DEPLOYER MAKING DEPOSIT AND EARNING MSIC
 deployer SP deposit before making deposit: .000000000000000000
-deployer SP deposit after depositing 15 MoUSD: 15.000000000000000000
+deployer SP deposit after depositing 15 MEUR: 15.000000000000000000
 wait 90 seconds before withdrawing...
 deployer SP deposit after full withdrawal: .000000000000000000
 deployer MSIC Balance after SP deposit withdrawal: 1423.940289013143416702
@@ -122,33 +122,33 @@ deployer MSIC bal before staking: 1413.940289013143416702
 deployer stake before staking: 65.000000000000000000
 deployer MSIC bal after staking: 1400.940289013143416702
 deployer stake after staking: 78.000000000000000000
-deployer pending MoUSD revenue share: .000000000000000000
+deployer pending MEUR revenue share: .000000000000000000
 Acct 2 already has an active trove
 acct2 debt: 2210.000000000000000000
 acct2 coll: 1.500000000000000000
 acct2 stake: 1.500000000000000000
 acct2 trove status: 1
-deployer pending MoUSD revenue share from staking, after acct 2 opened trove: .000000000000000000
+deployer pending MEUR revenue share from staking, after acct 2 opened trove: .000000000000000000
 CHECK DEPLOYER WITHDRAWING STAKING GAINS
-deployer MoUSD bal before withdrawing staking gains: 2312.174204161781052766
-deployer MoUSD bal after withdrawing staking gains: 2312.174204161781052766
-MoUSD-REEF Pair's current MoUSD reserves: 40.036378355965833891
-MoUSD-REEF Pair's current REEF reserves: .188993756164807541
+deployer MEUR bal before withdrawing staking gains: 2312.174204161781052766
+deployer MEUR bal after withdrawing staking gains: 2312.174204161781052766
+MEUR-REEF Pair's current MEUR reserves: 40.036378355965833891
+MEUR-REEF Pair's current REEF reserves: .188993756164807541
 number of troves: 3 
 Trove list size: 3 
 Entire system debt: 7615.950000000000000000
 Entire system coll: 6.000000000000000000
 Base rate: .000000000000000000
 Current borrowing rate: .005000000000000000
-Total MoUSD SP deposits: 34.160000000000000000
+Total MEUR SP deposits: 34.160000000000000000
 Total MSIC staked: 78.000000000000000000
-Total LP (MoUSD-REEF) tokens staked in unipool: .552691887045032822
+Total LP (MEUR-REEF) tokens staked in unipool: .552691887045032822
 TroveManager state variables:
 Total trove stakes: 6.000000000000000000
 Snapshot of total trove stakes before last liq. : .000000000000000000
 Snapshot of total trove collateral before last liq. : .000000000000000000
 L_ETH: .000000000000000000
-L_MoUSDDebt: .000000000000000000
+L_MEURDebt: .000000000000000000
 StabilityPool state variables:
 Product P: 1.000000000000000000
 Current epoch: .000000000000000000
@@ -156,7 +156,7 @@ Current scale: .000000000000000000
 Sum S, at current epoch and scale: .000000000000000000
 Sum G, at current epoch and scale: 4750380241679283576465.000000000000000000
 MSICStaking state variables:
-F_MoUSD: .881913509376195942
+F_MEUR: .881913509376195942
 F_ETH: .000000000000000000
 CommunityIssuance state variables:
 Total MSIC issued to depositors / front ends: 234364.490152675424000000

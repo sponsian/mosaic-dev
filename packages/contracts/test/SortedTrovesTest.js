@@ -4,7 +4,7 @@ const testHelpers = require("../utils/testHelpers.js")
 const SortedTroves = artifacts.require("SortedTroves")
 const SortedTrovesTester = artifacts.require("SortedTrovesTester")
 const TroveManagerTester = artifacts.require("TroveManagerTester")
-const MoUSDToken = artifacts.require("MoUSDToken")
+const MEURToken = artifacts.require("MEURToken")
 
 const th = testHelpers.TestHelper
 const dec = th.dec
@@ -53,14 +53,14 @@ contract('SortedTroves', async accounts => {
 
   let contracts
 
-  const getOpenTroveMoUSDAmount = async (totalDebt) => th.getOpenTroveMoUSDAmount(contracts, totalDebt)
+  const getOpenTroveMEURAmount = async (totalDebt) => th.getOpenTroveMEURAmount(contracts, totalDebt)
   const openTrove = async (params) => th.openTrove(contracts, params)
 
   describe('SortedTroves', () => {
     beforeEach(async () => {
       contracts = await deploymentHelper.deployMosaicCore()
       contracts.troveManager = await TroveManagerTester.new()
-      contracts.msicToken = await MoUSDToken.new(
+      contracts.msicToken = await MEURToken.new(
         contracts.troveManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
@@ -109,7 +109,7 @@ contract('SortedTroves', async accounts => {
     })
 
     it('contains(): returns false for addresses that opened and then closed a trove', async () => {
-      await openTrove({ ICR: toBN(dec(1000, 18)), extraMoUSDAmount: toBN(dec(3000, 18)), extraParams: { from: whale } })
+      await openTrove({ ICR: toBN(dec(1000, 18)), extraMEURAmount: toBN(dec(3000, 18)), extraParams: { from: whale } })
 
       await openTrove({ ICR: toBN(dec(150, 16)), extraParams: { from: alice } })
       await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: bob } })
@@ -138,7 +138,7 @@ contract('SortedTroves', async accounts => {
 
     // true for addresses that opened -> closed -> opened a trove
     it('contains(): returns true for addresses that opened, closed and then re-opened a trove', async () => {
-      await openTrove({ ICR: toBN(dec(1000, 18)), extraMoUSDAmount: toBN(dec(3000, 18)), extraParams: { from: whale } })
+      await openTrove({ ICR: toBN(dec(1000, 18)), extraMEURAmount: toBN(dec(3000, 18)), extraParams: { from: whale } })
 
       await openTrove({ ICR: toBN(dec(150, 16)), extraParams: { from: alice } })
       await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: bob } })

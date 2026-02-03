@@ -49,7 +49,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS
 
-  const getOpenTroveMoUSDAmount = async (totalDebt) => th.getOpenTroveMoUSDAmount(contracts, totalDebt)
+  const getOpenTroveMEURAmount = async (totalDebt) => th.getOpenTroveMEURAmount(contracts, totalDebt)
 
   describe("Stability Pool Withdrawal", async () => {
 
@@ -61,7 +61,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       contracts = await deploymentHelper.deployMosaicCore()
       const MSICContracts = await deploymentHelper.deployMSICContracts(bountyAddress, lpRewardsAddress, multisig)
       contracts.troveManager = await TroveManagerTester.new()
-      contracts = await deploymentHelper.deployMoUSDToken(contracts)
+      contracts = await deploymentHelper.deployMEURToken(contracts)
 
       priceFeed = contracts.priceFeedTestnet
       msicToken = contracts.msicToken
@@ -84,17 +84,17 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // --- Identical deposits, identical liquidation amounts---
     it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter opens trove with 200% ICR and 10k MoUSD net debt
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      // Defaulter opens trove with 200% ICR and 10k MEUR net debt
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -102,7 +102,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       // Defaulter liquidated
       await troveManager.liquidate(defaulter_1, { from: owner });
 
-      // Check depositors' compounded deposit is 6666.66 MoUSD and REEF Gain is 33.16 REEF
+      // Check depositors' compounded deposit is 6666.66 MEUR and REEF Gain is 33.16 REEF
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
@@ -123,9 +123,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two identical liquidations", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -133,8 +133,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -143,7 +143,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_1, { from: owner });
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Check depositors' compounded deposit is 3333.33 MoUSD and REEF Gain is 66.33 REEF
+      // Check depositors' compounded deposit is 3333.33 MEUR and REEF Gain is 66.33 REEF
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
@@ -163,9 +163,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three identical liquidations", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -173,9 +173,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -185,7 +185,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_2, { from: owner });
       await troveManager.liquidate(defaulter_3, { from: owner });
 
-      // Check depositors' compounded deposit is 0 MoUSD and REEF Gain is 99.5 REEF 
+      // Check depositors' compounded deposit is 0 MEUR and REEF Gain is 99.5 REEF 
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
@@ -205,11 +205,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     })
 
     // --- Identical deposits, increasing liquidation amounts ---
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MoUSD", async () => {
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after two liquidations of increasing MEUR", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -217,8 +217,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '50000000000000000000' })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(7000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '70000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '50000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(7000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '70000000000000000000' })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -247,11 +247,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(398, 17)), 10000)
     })
 
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MoUSD", async () => {
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and REEF Gain after three liquidations of increasing MEUR", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -259,9 +259,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '50000000000000000000' })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(6000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '60000000000000000000' })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(7000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: '70000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '50000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(6000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '60000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(7000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: '70000000000000000000' })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -294,9 +294,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // --- Increasing deposits, identical liquidation amounts ---
     it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after two identical liquidations", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k, 20k, 30k MoUSD to A, B and C respectively who then deposit it to the SP
+      // Whale transfers 10k, 20k, 30k MEUR to A, B and C respectively who then deposit it to the SP
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
       await msicToken.transfer(bob, dec(20000, 18), { from: whale })
@@ -305,8 +305,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await stabilityPool.provideToSP(dec(30000, 18), ZERO_ADDRESS, { from: carol })
 
       // 2 Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -336,9 +336,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three identical liquidations", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k, 20k, 30k MoUSD to A, B and C respectively who then deposit it to the SP
+      // Whale transfers 10k, 20k, 30k MEUR to A, B and C respectively who then deposit it to the SP
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
       await msicToken.transfer(bob, dec(20000, 18), { from: whale })
@@ -347,9 +347,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await stabilityPool.provideToSP(dec(30000, 18), ZERO_ADDRESS, { from: carol })
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -381,13 +381,13 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // --- Varied deposits and varied liquidation amount ---
     it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and REEF Gain after three varying liquidations", async () => {
       // Whale opens Trove with 1m REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
 
       /* Depositors provide:-
-      Alice:  2000 MoUSD
-      Bob:  456000 MoUSD
-      Carol: 13100 MoUSD */
-      // Whale transfers MoUSD to  A, B and C respectively who then deposit it to the SP
+      Alice:  2000 MEUR
+      Bob:  456000 MEUR
+      Carol: 13100 MEUR */
+      // Whale transfers MEUR to  A, B and C respectively who then deposit it to the SP
       await msicToken.transfer(alice, dec(2000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(2000, 18), ZERO_ADDRESS, { from: alice })
       await msicToken.transfer(bob, dec(456000, 18), { from: whale })
@@ -397,13 +397,13 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       /* Defaulters open troves
      
-      Defaulter 1: 207000 MoUSD & 2160 REEF
-      Defaulter 2: 5000 MoUSD & 50 REEF
-      Defaulter 3: 46700 MoUSD & 500 REEF
+      Defaulter 1: 207000 MEUR & 2160 REEF
+      Defaulter 2: 5000 MEUR & 50 REEF
+      Defaulter 3: 46700 MEUR & 500 REEF
       */
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('207000000000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(2160, 18) })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5, 21)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(50, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('46700000000000000000000'), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(500, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('207000000000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(2160, 18) })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5, 21)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(50, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('46700000000000000000000'), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(500, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -436,11 +436,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     // --- Deposit enters at t > 0
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -448,9 +448,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -491,11 +491,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '49750000000000000000'), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -503,10 +503,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -545,16 +545,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 1m REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
 
       /* Depositors open troves and make SP deposit:
-      Alice: 60000 MoUSD
-      Bob: 20000 MoUSD
-      Carol: 15000 MoUSD
+      Alice: 60000 MEUR
+      Bob: 20000 MEUR
+      Carol: 15000 MEUR
       */
-      // Whale transfers MoUSD to  A, B and C respectively who then deposit it to the SP
+      // Whale transfers MEUR to  A, B and C respectively who then deposit it to the SP
       await msicToken.transfer(alice, dec(60000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(60000, 18), ZERO_ADDRESS, { from: alice })
       await msicToken.transfer(bob, dec(20000, 18), { from: whale })
@@ -563,15 +563,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await stabilityPool.provideToSP(dec(15000, 18), ZERO_ADDRESS, { from: carol })
 
       /* Defaulters open troves:
-      Defaulter 1:  10000 MoUSD, 100 REEF
-      Defaulter 2:  25000 MoUSD, 250 REEF
-      Defaulter 3:  5000 MoUSD, 50 REEF
-      Defaulter 4:  40000 MoUSD, 400 REEF
+      Defaulter 1:  10000 MEUR, 100 REEF
+      Defaulter 2:  25000 MEUR, 250 REEF
+      Defaulter 3:  5000 MEUR, 50 REEF
+      Defaulter 4:  40000 MEUR, 400 REEF
       */
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(25000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '250000000000000000000' })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: '50000000000000000000' })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(40000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(400, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(25000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '250000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: '50000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(40000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(400, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -580,7 +580,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_1, { from: owner });
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Dennis provides 25000 MoUSD
+      // Dennis provides 25000 MEUR
       await msicToken.transfer(dennis, dec(25000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(25000, 18), ZERO_ADDRESS, { from: dennis })
 
@@ -614,11 +614,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     // --- Depositor leaves ---
 
-    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MoUSD.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 MEUR.  A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and C who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and C who then deposit it to the SP
       const depositors = [alice, bob, carol, dennis]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -626,10 +626,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -670,17 +670,17 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       /* Initial deposits:
-      Alice: 20000 MoUSD
-      Bob: 25000 MoUSD
-      Carol: 12500 MoUSD
-      Dennis: 40000 MoUSD
+      Alice: 20000 MEUR
+      Bob: 25000 MEUR
+      Carol: 12500 MEUR
+      Dennis: 40000 MEUR
       */
-      // Whale transfers MoUSD to  A, B,C and D respectively who then deposit it to the SP
+      // Whale transfers MEUR to  A, B,C and D respectively who then deposit it to the SP
       await msicToken.transfer(alice, dec(20000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(20000, 18), ZERO_ADDRESS, { from: alice })
       await msicToken.transfer(bob, dec(25000, 18), { from: whale })
@@ -691,15 +691,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await stabilityPool.provideToSP(dec(40000, 18), ZERO_ADDRESS, { from: dennis })
 
       /* Defaulters open troves:
-      Defaulter 1: 10000 MoUSD
-      Defaulter 2: 20000 MoUSD
-      Defaulter 3: 30000 MoUSD
-      Defaulter 4: 5000 MoUSD
+      Defaulter 1: 10000 MEUR
+      Defaulter 2: 20000 MEUR
+      Defaulter 3: 30000 MEUR
+      Defaulter 4: 5000 MEUR
       */
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(30000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(300, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: '50000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(30000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(300, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: '50000000000000000000' })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -743,11 +743,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     })
 
     // --- One deposit enters at t > 0, and another leaves later ---
-    it("withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MoUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MoUSD deposit and REEF Gain", async () => {
+    it("withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 MEUR. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct MEUR deposit and REEF Gain", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B and D who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B and D who then deposit it to the SP
       const depositors = [alice, bob, dennis]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -755,10 +755,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulters open troves
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: '50000000000000000000' })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: '50000000000000000000' })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -810,13 +810,13 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // C, D deposit 10000
     // L2 cancels 10000,100
 
-    // A, B withdraw 0MoUSD & 100e
-    // C, D withdraw 5000MoUSD  & 500e
+    // A, B withdraw 0MEUR & 100e
+    // C, D withdraw 5000MEUR  & 500e
     it("withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B who then deposit it to the SP
       const depositors = [alice, bob]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -824,23 +824,23 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // 2 Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
 
-      // Defaulter 1 liquidated. 20000 MoUSD fully offset with pool.
+      // Defaulter 1 liquidated. 20000 MEUR fully offset with pool.
       await troveManager.liquidate(defaulter_1, { from: owner });
 
-      // Carol, Dennis each deposit 10000 MoUSD
+      // Carol, Dennis each deposit 10000 MEUR
       const depositors_2 = [carol, dennis]
       for (account of depositors_2) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 2 liquidated. 10000 MoUSD offset
+      // Defaulter 2 liquidated. 10000 MEUR offset
       await troveManager.liquidate(defaulter_2, { from: owner });
 
       // await borrowerOperations.openTrove(th._100pct, dec(1, 18), account, account, { from: erin, value: dec(2, 'ether') })
@@ -856,7 +856,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
       const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect Alice And Bob's compounded deposit to be 0 MoUSD
+      // Expect Alice And Bob's compounded deposit to be 0 MEUR
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(alice)).toString(), '0'), 10000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), '0'), 10000)
 
@@ -864,7 +864,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
       assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
 
-      // Expect Carol And Dennis' compounded deposit to be 50 MoUSD
+      // Expect Carol And Dennis' compounded deposit to be 50 MEUR
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(carol)).toString(), '5000000000000000000000'), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(dennis)).toString(), '5000000000000000000000'), 100000)
 
@@ -881,9 +881,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L2 20000, 200 empties Pool
     it("withdrawFromSP(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B who then deposit it to the SP
       const depositors = [alice, bob]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -891,10 +891,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // 4 Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -907,7 +907,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(scale_0, '0')
       assert.equal(P_0, dec(1, 18))
 
-      // Defaulter 1 liquidated. 10--0 MoUSD fully offset, Pool remains non-zero
+      // Defaulter 1 liquidated. 10--0 MEUR fully offset, Pool remains non-zero
       await troveManager.liquidate(defaulter_1, { from: owner });
 
       //Check epoch, scale and sum
@@ -919,7 +919,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(scale_1, '0')
       assert.isAtMost(th.getDifference(P_1, dec(5, 17)), 1000)
 
-      // Defaulter 2 liquidated. 1--00 MoUSD, empties pool
+      // Defaulter 2 liquidated. 1--00 MEUR, empties pool
       await troveManager.liquidate(defaulter_2, { from: owner });
 
       //Check epoch, scale and sum
@@ -931,14 +931,14 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(scale_2, '0')
       assert.equal(P_2, dec(1, 18))
 
-      // Carol, Dennis each deposit 10000 MoUSD
+      // Carol, Dennis each deposit 10000 MEUR
       const depositors_2 = [carol, dennis]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 3 liquidated. 10000 MoUSD fully offset, Pool remains non-zero
+      // Defaulter 3 liquidated. 10000 MEUR fully offset, Pool remains non-zero
       await troveManager.liquidate(defaulter_3, { from: owner });
 
       //Check epoch, scale and sum
@@ -950,7 +950,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(scale_3, '0')
       assert.isAtMost(th.getDifference(P_3, dec(5, 17)), 1000)
 
-      // Defaulter 4 liquidated. 10000 MoUSD, empties pool
+      // Defaulter 4 liquidated. 10000 MEUR, empties pool
       await troveManager.liquidate(defaulter_4, { from: owner });
 
       //Check epoch, scale and sum
@@ -969,13 +969,13 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // C, D, E deposit 10000, 20000, 30000
     // L2 cancels 10000,100 
 
-    // A, B withdraw 0 MoUSD & 100e
-    // C, D withdraw 5000 MoUSD  & 50e
+    // A, B withdraw 0 MEUR & 100e
+    // C, D withdraw 5000 MEUR  & 50e
     it("withdrawFromSP(): Depositors withdraw correct compounded deposit after liquidation empties the pool", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Whale transfers 10k MoUSD to A, B who then deposit it to the SP
+      // Whale transfers 10k MEUR to A, B who then deposit it to the SP
       const depositors = [alice, bob]
       for (account of depositors) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
@@ -983,16 +983,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // 2 Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
 
-      // Defaulter 1 liquidated. 20000 MoUSD fully offset with pool.
+      // Defaulter 1 liquidated. 20000 MEUR fully offset with pool.
       await troveManager.liquidate(defaulter_1, { from: owner });
 
-      // Carol, Dennis, Erin each deposit 10000, 20000, 30000 MoUSD respectively
+      // Carol, Dennis, Erin each deposit 10000, 20000, 30000 MEUR respectively
       await msicToken.transfer(carol, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: carol })
 
@@ -1002,7 +1002,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await msicToken.transfer(erin, dec(30000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(30000, 18), ZERO_ADDRESS, { from: erin })
 
-      // Defaulter 2 liquidated. 10000 MoUSD offset
+      // Defaulter 2 liquidated. 10000 MEUR offset
       await troveManager.liquidate(defaulter_2, { from: owner });
 
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
@@ -1017,7 +1017,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
       const erin_ETHWithdrawn = th.getEventArgByName(txE, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect Alice And Bob's compounded deposit to be 0 MoUSD
+      // Expect Alice And Bob's compounded deposit to be 0 MEUR
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(alice)).toString(), '0'), 10000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), '0'), 10000)
 
@@ -1035,20 +1035,20 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     })
 
     // A deposits 10000
-    // L1, L2, L3 liquidated with 10000 MoUSD each
+    // L1, L2, L3 liquidated with 10000 MEUR each
     // A withdraws all
     // Expect A to withdraw 0 deposit and ether only from reward L1
     it("withdrawFromSP(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the REEF Gain from one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
 
-      // Defaulter 1,2,3 withdraw 10000 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      // Defaulter 1,2,3 withdraw 10000 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1069,68 +1069,68 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     //--- Serial full offsets ---
 
-    // A,B deposit 10000 MoUSD
-    // L1 cancels 20000 MoUSD, 2E
-    // B,C deposits 10000 MoUSD
-    // L2 cancels 20000 MoUSD, 2E
-    // E,F deposit 10000 MoUSD
+    // A,B deposit 10000 MEUR
+    // L1 cancels 20000 MEUR, 2E
+    // B,C deposits 10000 MEUR
+    // L2 cancels 20000 MEUR, 2E
+    // E,F deposit 10000 MEUR
     // L3 cancels 20000, 200E
     // G,H deposits 10000
     // L4 cancels 20000, 200E
 
-    // Expect all depositors withdraw 0 MoUSD and 100 REEF
+    // Expect all depositors withdraw 0 MEUR and 100 REEF
 
     it("withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // 4 Defaulters open trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(20000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(20000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(200, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
 
-      // Alice, Bob each deposit 10k MoUSD
+      // Alice, Bob each deposit 10k MEUR
       const depositors_1 = [alice, bob]
       for (account of depositors_1) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 1 liquidated. 20k MoUSD fully offset with pool.
+      // Defaulter 1 liquidated. 20k MEUR fully offset with pool.
       await troveManager.liquidate(defaulter_1, { from: owner });
 
-      // Carol, Dennis each deposit 10000 MoUSD
+      // Carol, Dennis each deposit 10000 MEUR
       const depositors_2 = [carol, dennis]
       for (account of depositors_2) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 2 liquidated. 10000 MoUSD offset
+      // Defaulter 2 liquidated. 10000 MEUR offset
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Erin, Flyn each deposit 10000 MoUSD
+      // Erin, Flyn each deposit 10000 MEUR
       const depositors_3 = [erin, flyn]
       for (account of depositors_3) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 3 liquidated. 10000 MoUSD offset
+      // Defaulter 3 liquidated. 10000 MEUR offset
       await troveManager.liquidate(defaulter_3, { from: owner });
 
-      // Graham, Harriet each deposit 10000 MoUSD
+      // Graham, Harriet each deposit 10000 MEUR
       const depositors_4 = [graham, harriet]
       for (account of depositors_4) {
         await msicToken.transfer(account, dec(10000, 18), { from: whale })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter 4 liquidated. 10k MoUSD offset
+      // Defaulter 4 liquidated. 10k MEUR offset
       await troveManager.liquidate(defaulter_4, { from: owner });
 
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
@@ -1151,7 +1151,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const graham_ETHWithdrawn = th.getEventArgByName(txG, 'ETHGainWithdrawn', '_ETH').toString()
       const harriet_ETHWithdrawn = th.getEventArgByName(txH, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect all deposits to be 0 MoUSD
+      // Expect all deposits to be 0 MEUR
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(alice)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(carol)).toString(), '0'), 100000)
@@ -1182,24 +1182,24 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L1 brings P close to boundary, i.e. 9e-9: liquidate 9999.99991
     // A withdraws all
     // B deposits 10000
-    // L2 of 9900 MoUSD, should bring P slightly past boundary i.e. 1e-9 -> 1e-10
+    // L2 of 9900 MEUR, should bring P slightly past boundary i.e. 1e-9 -> 1e-10
 
     // expect d(B) = d0(B)/100
     // expect correct REEF gain, i.e. all of the reward
     it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
 
-      // Defaulter 1 withdraws 'almost' 10000 MoUSD:  9999.99991 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999999910000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      // Defaulter 1 withdraws 'almost' 10000 MEUR:  9999.99991 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999999910000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
       assert.equal(await stabilityPool.currentScale(), '0')
 
-      // Defaulter 2 withdraws 9900 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(9900, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(60, 'ether') })
+      // Defaulter 2 withdraws 9900 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(9900, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(60, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1219,7 +1219,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await msicToken.transfer(bob, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: bob })
 
-      // Defaulter 2 liquidated.  9900 MoUSD liquidated. P altered by a factor of 1-(9900/10000) = 0.01.  Scale changed.
+      // Defaulter 2 liquidated.  9900 MEUR liquidated. P altered by a factor of 1-(9900/10000) = 0.01.  Scale changed.
       await troveManager.liquidate(defaulter_2, { from: owner });
 
       assert.equal(await stabilityPool.currentScale(), '1')
@@ -1227,13 +1227,13 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect Bob to withdraw 1% of initial deposit (100 MoUSD) and all the liquidated REEF (60 ether)
+      // Expect Bob to withdraw 1% of initial deposit (100 MEUR) and all the liquidated REEF (60 ether)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), '100000000000000000000'), 100000)
       assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '59700000000000000000'), 100000)
     })
 
     // A deposits 10000
-    // L1 brings P close to boundary, i.e. 9e-9: liquidate 9999.99991 MoUSD
+    // L1 brings P close to boundary, i.e. 9e-9: liquidate 9999.99991 MEUR
     // A withdraws all
     // B, C, D deposit 10000, 20000, 30000
     // L2 of 59400, should bring P slightly past boundary i.e. 1e-9 -> 1e-10
@@ -1242,16 +1242,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // expect correct REEF gain, i.e. all of the reward
     it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
 
-      // Defaulter 1 withdraws 'almost' 10k MoUSD.
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999999910000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      // Defaulter 1 withdraws 'almost' 10k MEUR.
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999999910000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
-      // Defaulter 2 withdraws 59400 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('59400000000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(330, 'ether') })
+      // Defaulter 2 withdraws 59400 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('59400000000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(330, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1277,7 +1277,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await msicToken.transfer(dennis, dec(30000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(30000, 18), ZERO_ADDRESS, { from: dennis })
 
-      // 54000 MoUSD liquidated.  P altered by a factor of 1-(59400/60000) = 0.01. Scale changed.
+      // 54000 MEUR liquidated.  P altered by a factor of 1-(59400/60000) = 0.01. Scale changed.
       const txL2 = await troveManager.liquidate(defaulter_2, { from: owner });
       assert.isTrue(txL2.receipt.status)
 
@@ -1290,11 +1290,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       /* Expect depositors to withdraw 1% of their initial deposit, and an REEF gain 
       in proportion to their initial deposit:
      
-      Bob:  1000 MoUSD, 55 Ether
-      Carol:  2000 MoUSD, 110 Ether
-      Dennis:  3000 MoUSD, 165 Ether
+      Bob:  1000 MEUR, 55 Ether
+      Carol:  2000 MEUR, 110 Ether
+      Dennis:  3000 MEUR, 165 Ether
      
-      Total: 6000 MoUSD, 300 Ether
+      Total: 6000 MEUR, 300 Ether
       */
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), dec(100, 18)), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(carol)).toString(), dec(200, 18)), 100000)
@@ -1311,24 +1311,24 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     // Deposit's REEF reward spans one scale change - deposit reduced by correct amount
 
-    // A make deposit 10000 MoUSD
-    // L1 brings P to 1e-5*P. L1:  9999.9000000000000000 MoUSD
+    // A make deposit 10000 MEUR
+    // L1 brings P to 1e-5*P. L1:  9999.9000000000000000 MEUR
     // A withdraws
-    // B makes deposit 10000 MoUSD
-    // L2 decreases P again by 1e-5, over the scale boundary: 9999.9000000000000000 (near to the 10000 MoUSD total deposits)
+    // B makes deposit 10000 MEUR
+    // L2 decreases P again by 1e-5, over the scale boundary: 9999.9000000000000000 (near to the 10000 MEUR total deposits)
     // B withdraws
     // expect d(B) = d0(B) * 1e-5
     // expect B gets entire REEF gain from L2
     it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
 
-      // Defaulter 1 and default 2 each withdraw 9999.999999999 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      // Defaulter 1 and default 2 each withdraw 9999.999999999 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
 
       // price drops by 50%: defaulter 1 ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -1345,7 +1345,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       await priceFeed.setPrice(dec(100, 18))
 
-      // Bob deposits 10k MoUSD
+      // Bob deposits 10k MEUR
       await msicToken.transfer(bob, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: bob })
 
@@ -1358,29 +1358,29 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Bob should withdraw 1e-5 of initial deposit: 0.1 MoUSD and the full REEF gain of 100 ether
+      // Bob should withdraw 1e-5 of initial deposit: 0.1 MEUR and the full REEF gain of 100 ether
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), dec(1, 17)), 100000)
       assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000000000)
     })
 
-    // A make deposit 10000 MoUSD
-    // L1 brings P to 1e-5*P. L1:  9999.9000000000000000 MoUSD
+    // A make deposit 10000 MEUR
+    // L1 brings P to 1e-5*P. L1:  9999.9000000000000000 MEUR
     // A withdraws
     // B,C D make deposit 10000, 20000, 30000
-    // L2 decreases P again by 1e-5, over boundary. L2: 59999.4000000000000000  (near to the 60000 MoUSD total deposits)
+    // L2 decreases P again by 1e-5, over boundary. L2: 59999.4000000000000000  (near to the 60000 MEUR total deposits)
     // B withdraws
     // expect d(B) = d0(B) * 1e-5
     // expect B gets entire REEF gain from L2
     it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await msicToken.transfer(alice, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: alice })
 
-      // Defaulter 1 and default 2 withdraw up to debt of 9999.9 MoUSD and 59999.4 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999900000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('59999400000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(600, 'ether') })
+      // Defaulter 1 and default 2 withdraw up to debt of 9999.9 MEUR and 59999.4 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999900000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('59999400000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(600, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1396,7 +1396,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txA = await stabilityPool.withdrawFromSP(dec(100, 18), { from: alice })
       await priceFeed.setPrice(dec(100, 18))
 
-      // B, C, D deposit 10000, 20000, 30000 MoUSD
+      // B, C, D deposit 10000, 20000, 30000 MEUR
       await msicToken.transfer(bob, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: bob })
 
@@ -1421,7 +1421,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txD = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: dennis })
       const dennis_ETHWithdrawn = await th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // {B, C, D} should have a compounded deposit of {0.1, 0.2, 0.3} MoUSD
+      // {B, C, D} should have a compounded deposit of {0.1, 0.2, 0.3} MEUR
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(bob)).toString(), dec(1, 17)), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(carol)).toString(), dec(2, 17)), 100000)
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(dennis)).toString(), dec(3, 17)), 100000)
@@ -1431,15 +1431,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, dec(2985, 17)), 100000000000)
     })
 
-    // A make deposit 10000 MoUSD
-    // L1 brings P to (~1e-10)*P. L1: 9999.9999999000000000 MoUSD
+    // A make deposit 10000 MEUR
+    // L1 brings P to (~1e-10)*P. L1: 9999.9999999000000000 MEUR
     // Expect A to withdraw 0 deposit
     it("withdrawFromSP(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Defaulters 1 withdraws 9999.9999999 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999999999900000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      // Defaulters 1 withdraws 9999.9999999 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999999999900000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
       // Price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1451,32 +1451,32 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txL1 = await troveManager.liquidate(defaulter_1, { from: owner });
       assert.isTrue(txL1.receipt.status)
 
-      const aliceDeposit = (await stabilityPool.getCompoundedMoUSDDeposit(alice)).toString()
+      const aliceDeposit = (await stabilityPool.getCompoundedMEURDeposit(alice)).toString()
       console.log(`alice deposit: ${aliceDeposit}`)
       assert.equal(aliceDeposit, 0)
     })
 
     // --- Serial scale changes ---
 
-    /* A make deposit 10000 MoUSD
-    L1 brings P to 0.0001P. L1:  9999.900000000000000000 MoUSD, 1 REEF
+    /* A make deposit 10000 MEUR
+    L1 brings P to 0.0001P. L1:  9999.900000000000000000 MEUR, 1 REEF
     B makes deposit 9999.9, brings SP to 10k
-    L2 decreases P by(~1e-5)P. L2:  9999.900000000000000000 MoUSD, 1 REEF
+    L2 decreases P by(~1e-5)P. L2:  9999.900000000000000000 MEUR, 1 REEF
     C makes deposit 9999.9, brings SP to 10k
-    L3 decreases P by(~1e-5)P. L3:  9999.900000000000000000 MoUSD, 1 REEF
+    L3 decreases P by(~1e-5)P. L3:  9999.900000000000000000 MEUR, 1 REEF
     D makes deposit 9999.9, brings SP to 10k
-    L4 decreases P by(~1e-5)P. L4:  9999.900000000000000000 MoUSD, 1 REEF
+    L4 decreases P by(~1e-5)P. L4:  9999.900000000000000000 MEUR, 1 REEF
     expect A, B, C, D each withdraw ~100 Ether
     */
-    it("withdrawFromSP(): Several deposits of 10000 MoUSD span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation", async () => {
+    it("withdrawFromSP(): Several deposits of 10000 MEUR span one scale factor change. Depositors withdraws correct compounded deposit and REEF Gain after one liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Defaulters 1-4 each withdraw 9999.9 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999900000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999900000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999900000000000000000'), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount('9999900000000000000000'), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
+      // Defaulters 1-4 each withdraw 9999.9 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999900000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999900000000000000000'), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999900000000000000000'), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount('9999900000000000000000'), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1490,7 +1490,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 13)) // P decreases to 1e(18-5) = 1e13
       assert.equal(await stabilityPool.currentScale(), '0')
 
-      // B deposits 9999.9 MoUSD
+      // B deposits 9999.9 MEUR
       await msicToken.transfer(bob, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: bob })
 
@@ -1500,7 +1500,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 17)) // Scale changes and P changes to 1e(13-5+9) = 1e17
       assert.equal(await stabilityPool.currentScale(), '1')
 
-      // C deposits 9999.9 MoUSD
+      // C deposits 9999.9 MEUR
       await msicToken.transfer(carol, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: carol })
 
@@ -1510,7 +1510,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 12)) // P decreases to 1e(17-5) = 1e12
       assert.equal(await stabilityPool.currentScale(), '1')
 
-      // D deposits 9999.9 MoUSD
+      // D deposits 9999.9 MEUR
       await msicToken.transfer(dennis, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: dennis })
 
@@ -1534,7 +1534,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await msicToken.balanceOf(alice), '0')
       assert.equal(await msicToken.balanceOf(alice), '0')
       assert.equal(await msicToken.balanceOf(alice), '0')
-      // D should withdraw around 0.9999 MoUSD, since his deposit of 9999.9 was reduced by a factor of 1e-5
+      // D should withdraw around 0.9999 MEUR, since his deposit of 9999.9 was reduced by a factor of 1e-5
       assert.isAtMost(th.getDifference((await msicToken.balanceOf(dennis)).toString(), dec(99999, 12)), 100000)
 
       // 99.5 REEF is offset at each L, 0.5 goes to gas comp
@@ -1547,17 +1547,17 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Defaulters 1-3 each withdraw 24100, 24300, 24500 MoUSD (inc gas comp)
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(24100, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(24300, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(24500, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
+      // Defaulters 1-3 each withdraw 24100, 24300, 24500 MEUR (inc gas comp)
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(24100, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(24300, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(24500, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
 
-      // A, B provide 10k MoUSD 
+      // A, B provide 10k MEUR 
       await msicToken.transfer(A, dec(10000, 18), { from: whale })
       await msicToken.transfer(B, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: A })
@@ -1568,22 +1568,22 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isTrue(txL1.receipt.status)
 
       // Check compounded deposits
-      const A_deposit = await stabilityPool.getCompoundedMoUSDDeposit(A)
-      const B_deposit = await stabilityPool.getCompoundedMoUSDDeposit(B)
+      const A_deposit = await stabilityPool.getCompoundedMEURDeposit(A)
+      const B_deposit = await stabilityPool.getCompoundedMEURDeposit(B)
       // console.log(`A_deposit: ${A_deposit}`)
       // console.log(`B_deposit: ${B_deposit}`)
       assert.equal(A_deposit, '0')
       assert.equal(B_deposit, '0')
 
       // Check SP tracker is zero
-      const MoUSDinSP_1 = await stabilityPool.getTotalMoUSDDeposits()
-      // console.log(`MoUSDinSP_1: ${MoUSDinSP_1}`)
-      assert.equal(MoUSDinSP_1, '0')
+      const MEURinSP_1 = await stabilityPool.getTotalMEURDeposits()
+      // console.log(`MEURinSP_1: ${MEURinSP_1}`)
+      assert.equal(MEURinSP_1, '0')
 
-      // Check SP MoUSD balance is zero
-      const SPMoUSDBalance_1 = await msicToken.balanceOf(stabilityPool.address)
-      // console.log(`SPMoUSDBalance_1: ${SPMoUSDBalance_1}`)
-      assert.equal(SPMoUSDBalance_1, '0')
+      // Check SP MEUR balance is zero
+      const SPMEURBalance_1 = await msicToken.balanceOf(stabilityPool.address)
+      // console.log(`SPMEURBalance_1: ${SPMEURBalance_1}`)
+      assert.equal(SPMEURBalance_1, '0')
 
       // Attempt withdrawals
       // Increasing the price for a moment to avoid pending liquidations to block withdrawal
@@ -1597,7 +1597,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       // ==========
 
-      // C, D provide 10k MoUSD 
+      // C, D provide 10k MEUR 
       await msicToken.transfer(C, dec(10000, 18), { from: whale })
       await msicToken.transfer(D, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: C })
@@ -1608,22 +1608,22 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isTrue(txL2.receipt.status)
 
       // Check compounded deposits
-      const C_deposit = await stabilityPool.getCompoundedMoUSDDeposit(C)
-      const D_deposit = await stabilityPool.getCompoundedMoUSDDeposit(D)
+      const C_deposit = await stabilityPool.getCompoundedMEURDeposit(C)
+      const D_deposit = await stabilityPool.getCompoundedMEURDeposit(D)
       // console.log(`A_deposit: ${C_deposit}`)
       // console.log(`B_deposit: ${D_deposit}`)
       assert.equal(C_deposit, '0')
       assert.equal(D_deposit, '0')
 
       // Check SP tracker is zero
-      const MoUSDinSP_2 = await stabilityPool.getTotalMoUSDDeposits()
-      // console.log(`MoUSDinSP_2: ${MoUSDinSP_2}`)
-      assert.equal(MoUSDinSP_2, '0')
+      const MEURinSP_2 = await stabilityPool.getTotalMEURDeposits()
+      // console.log(`MEURinSP_2: ${MEURinSP_2}`)
+      assert.equal(MEURinSP_2, '0')
 
-      // Check SP MoUSD balance is zero
-      const SPMoUSDBalance_2 = await msicToken.balanceOf(stabilityPool.address)
-      // console.log(`SPMoUSDBalance_2: ${SPMoUSDBalance_2}`)
-      assert.equal(SPMoUSDBalance_2, '0')
+      // Check SP MEUR balance is zero
+      const SPMEURBalance_2 = await msicToken.balanceOf(stabilityPool.address)
+      // console.log(`SPMEURBalance_2: ${SPMEURBalance_2}`)
+      assert.equal(SPMEURBalance_2, '0')
 
       // Attempt withdrawals
       // Increasing the price for a moment to avoid pending liquidations to block withdrawal
@@ -1637,7 +1637,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       // ============
 
-      // E, F provide 10k MoUSD 
+      // E, F provide 10k MEUR 
       await msicToken.transfer(E, dec(10000, 18), { from: whale })
       await msicToken.transfer(F, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: E })
@@ -1648,21 +1648,21 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isTrue(txL3.receipt.status)
 
       // Check compounded deposits
-      const E_deposit = await stabilityPool.getCompoundedMoUSDDeposit(E)
-      const F_deposit = await stabilityPool.getCompoundedMoUSDDeposit(F)
+      const E_deposit = await stabilityPool.getCompoundedMEURDeposit(E)
+      const F_deposit = await stabilityPool.getCompoundedMEURDeposit(F)
       // console.log(`E_deposit: ${E_deposit}`)
       // console.log(`F_deposit: ${F_deposit}`)
       assert.equal(E_deposit, '0')
       assert.equal(F_deposit, '0')
 
       // Check SP tracker is zero
-      const MoUSDinSP_3 = await stabilityPool.getTotalMoUSDDeposits()
-      assert.equal(MoUSDinSP_3, '0')
+      const MEURinSP_3 = await stabilityPool.getTotalMEURDeposits()
+      assert.equal(MEURinSP_3, '0')
 
-      // Check SP MoUSD balance is zero
-      const SPMoUSDBalance_3 = await msicToken.balanceOf(stabilityPool.address)
-      // console.log(`SPMoUSDBalance_3: ${SPMoUSDBalance_3}`)
-      assert.equal(SPMoUSDBalance_3, '0')
+      // Check SP MEUR balance is zero
+      const SPMEURBalance_3 = await msicToken.balanceOf(stabilityPool.address)
+      // console.log(`SPMEURBalance_3: ${SPMEURBalance_3}`)
+      assert.equal(SPMEURBalance_3, '0')
 
       // Attempt withdrawals
       const txE = await stabilityPool.withdrawFromSP(dec(1000, 18), { from: E })
@@ -1673,14 +1673,14 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): Depositor's REEF gain stops increasing after two scale changes", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // Defaulters 1-5 each withdraw up to debt of 9999.9999999 MoUSD
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(99999, 17)), defaulter_5, defaulter_5, { from: defaulter_5, value: dec(100, 'ether') })
+      // Defaulters 1-5 each withdraw up to debt of 9999.9999999 MEUR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(100, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(99999, 17)), defaulter_5, defaulter_5, { from: defaulter_5, value: dec(100, 'ether') })
 
       // price drops by 50%
       await priceFeed.setPrice(dec(100, 18));
@@ -1694,7 +1694,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 13)) // P decreases to 1e(18-5) = 1e13
       assert.equal(await stabilityPool.currentScale(), '0')
 
-      // B deposits 9999.9 MoUSD
+      // B deposits 9999.9 MEUR
       await msicToken.transfer(bob, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: bob })
 
@@ -1704,7 +1704,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 17)) // Scale changes and P changes to 1e(13-5+9) = 1e17
       assert.equal(await stabilityPool.currentScale(), '1')
 
-      // C deposits 9999.9 MoUSD
+      // C deposits 9999.9 MEUR
       await msicToken.transfer(carol, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: carol })
 
@@ -1714,7 +1714,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 12)) // P decreases to 1e(17-5) = 1e12
       assert.equal(await stabilityPool.currentScale(), '1')
 
-      // D deposits 9999.9 MoUSD
+      // D deposits 9999.9 MEUR
       await msicToken.transfer(dennis, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: dennis })
 
@@ -1726,7 +1726,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       const alice_ETHGainAt2ndScaleChange = (await stabilityPool.getDepositorETHGain(alice)).toString()
 
-      // E deposits 9999.9 MoUSD
+      // E deposits 9999.9 MEUR
       await msicToken.transfer(erin, dec(99999, 17), { from: whale })
       await stabilityPool.provideToSP(dec(99999, 17), ZERO_ADDRESS, { from: erin })
   
@@ -1748,7 +1748,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): Large liquidated coll/debt, deposits and REEF price", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // REEF:USD price is $2 billion per REEF
       await priceFeed.setPrice(dec(2, 27));
@@ -1760,7 +1760,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       }
 
       // Defaulter opens trove with 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(1, 36)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(1, 27) })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(1, 36)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(1, 27) })
 
       // REEF:USD price drops to $1 billion per REEF
       await priceFeed.setPrice(dec(1, 27));
@@ -1775,18 +1775,18 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH')
       const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH')
 
-      // Check MoUSD balances
-      const aliceMoUSDBalance = await msicToken.balanceOf(alice)
-      const aliceExpectedMoUSDBalance = web3.utils.toBN(dec(5, 35))
-      const aliceMoUSDBalDiff = aliceMoUSDBalance.sub(aliceExpectedMoUSDBalance).abs()
+      // Check MEUR balances
+      const aliceMEURBalance = await msicToken.balanceOf(alice)
+      const aliceExpectedMEURBalance = web3.utils.toBN(dec(5, 35))
+      const aliceMEURBalDiff = aliceMEURBalance.sub(aliceExpectedMEURBalance).abs()
 
-      assert.isTrue(aliceMoUSDBalDiff.lte(toBN(dec(1, 18)))) // error tolerance of 1e18
+      assert.isTrue(aliceMEURBalDiff.lte(toBN(dec(1, 18)))) // error tolerance of 1e18
 
-      const bobMoUSDBalance = await msicToken.balanceOf(bob)
-      const bobExpectedMoUSDBalance = toBN(dec(5, 35))
-      const bobMoUSDBalDiff = bobMoUSDBalance.sub(bobExpectedMoUSDBalance).abs()
+      const bobMEURBalance = await msicToken.balanceOf(bob)
+      const bobExpectedMEURBalance = toBN(dec(5, 35))
+      const bobMEURBalDiff = bobMEURBalance.sub(bobExpectedMEURBalance).abs()
 
-      assert.isTrue(bobMoUSDBalDiff.lte(toBN(dec(1, 18))))
+      assert.isTrue(bobMEURBalDiff.lte(toBN(dec(1, 18))))
 
       // Check REEF gains
       const aliceExpectedETHGain = toBN(dec(4975, 23))
@@ -1802,7 +1802,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     it("withdrawFromSP(): Small liquidated coll/debt, large deposits and REEF price", async () => {
       // Whale opens Trove with 100k REEF
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // REEF:USD price is $2 billion per REEF
       await priceFeed.setPrice(dec(2, 27));
@@ -1814,8 +1814,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
         await stabilityPool.provideToSP(dec(1, 38), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter opens trove with 50e-7 REEF and  5000 MoUSD. 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMoUSDAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '5000000000000' })
+      // Defaulter opens trove with 50e-7 REEF and  5000 MEUR. 200% ICR
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveMEURAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '5000000000000' })
 
       // REEF:USD price drops to $1 billion per REEF
       await priceFeed.setPrice(dec(1, 27));
@@ -1829,17 +1829,17 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH')
       const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH')
 
-      const aliceMoUSDBalance = await msicToken.balanceOf(alice)
-      const aliceExpectedMoUSDBalance = toBN('99999999999999997500000000000000000000')
-      const aliceMoUSDBalDiff = aliceMoUSDBalance.sub(aliceExpectedMoUSDBalance).abs()
+      const aliceMEURBalance = await msicToken.balanceOf(alice)
+      const aliceExpectedMEURBalance = toBN('99999999999999997500000000000000000000')
+      const aliceMEURBalDiff = aliceMEURBalance.sub(aliceExpectedMEURBalance).abs()
 
-      assert.isTrue(aliceMoUSDBalDiff.lte(toBN(dec(1, 18))))
+      assert.isTrue(aliceMEURBalDiff.lte(toBN(dec(1, 18))))
 
-      const bobMoUSDBalance = await msicToken.balanceOf(bob)
-      const bobExpectedMoUSDBalance = toBN('99999999999999997500000000000000000000')
-      const bobMoUSDBalDiff = bobMoUSDBalance.sub(bobExpectedMoUSDBalance).abs()
+      const bobMEURBalance = await msicToken.balanceOf(bob)
+      const bobExpectedMEURBalance = toBN('99999999999999997500000000000000000000')
+      const bobMEURBalDiff = bobMEURBalance.sub(bobExpectedMEURBalance).abs()
 
-      assert.isTrue(bobMoUSDBalDiff.lte(toBN('100000000000000000000')))
+      assert.isTrue(bobMEURBalDiff.lte(toBN('100000000000000000000')))
 
       // Expect REEF gain per depositor of ~1e11 wei to be rounded to 0 by the ETHGainedPerUnitStaked calculation (e / D), where D is ~1e36.
       assert.equal(alice_ETHWithdrawn.toString(), '0')

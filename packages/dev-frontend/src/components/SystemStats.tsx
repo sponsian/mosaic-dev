@@ -21,7 +21,7 @@ const Balances: React.FC = () => {
     <Box sx={{ mb: 3 }}>
       <Heading>My Account Balances</Heading>
       <Statistic lexicon={l.REEF}>{accountBalance.prettify(4)}</Statistic>
-      <Statistic lexicon={l.MoUSD}>{msicBalance.prettify()}</Statistic>
+      <Statistic lexicon={l.MEUR}>{msicBalance.prettify()}</Statistic>
       <Statistic lexicon={l.MSIC}>{msicBalance.prettify()}</Statistic>
     </Box>
   );
@@ -101,9 +101,9 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
         </Text>
       </Statistic>
       <Statistic lexicon={l.TROVES}>{Decimal.from(numberOfTroves).prettify(0)}</Statistic>
-      <Statistic lexicon={l.MoUSD_SUPPLY}>{total.debt.shorten()}</Statistic>
+      <Statistic lexicon={l.MEUR_SUPPLY}>{total.debt.shorten()}</Statistic>
       {msicInStabilityPoolPct && (
-        <Statistic lexicon={l.STABILITY_POOL_MoUSD}>
+        <Statistic lexicon={l.STABILITY_POOL_MEUR}>
           {msicInStabilityPool.shorten()}
           <Text sx={{ fontSize: 1 }}>&nbsp;({msicInStabilityPoolPct.toString(1)})</Text>
         </Statistic>

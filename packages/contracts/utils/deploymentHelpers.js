@@ -1,7 +1,7 @@
 const SortedTroves = artifacts.require("./SortedTroves.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol")
-const MoUSDToken = artifacts.require("./MoUSDToken.sol")
+const MEURToken = artifacts.require("./MEURToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const StabilityPool = artifacts.require("./StabilityPool.sol")
@@ -26,7 +26,7 @@ const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
 const MosaicMathTester = artifacts.require("./MosaicMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const MoUSDTokenTester = artifacts.require("./MoUSDTokenTester.sol")
+const MEURTokenTester = artifacts.require("./MEURTokenTester.sol")
 
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript')
@@ -97,12 +97,12 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const msicToken = await MoUSDToken.new(
+    const msicToken = await MEURToken.new(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
     )
-    MoUSDToken.setAsDeployed(msicToken)
+    MEURToken.setAsDeployed(msicToken)
     DefaultPool.setAsDeployed(defaultPool)
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
     SortedTroves.setAsDeployed(sortedTroves)
@@ -150,7 +150,7 @@ class DeploymentHelper {
     testerContracts.troveManager = await TroveManagerTester.new()
     testerContracts.functionCaller = await FunctionCaller.new()
     testerContracts.hintHelpers = await HintHelpers.new()
-    testerContracts.msicToken =  await MoUSDTokenTester.new(
+    testerContracts.msicToken =  await MEURTokenTester.new(
       testerContracts.troveManager.address,
       testerContracts.stabilityPool.address,
       testerContracts.borrowerOperations.address
@@ -228,7 +228,7 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const msicToken = await MoUSDToken.new(
+    const msicToken = await MEURToken.new(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
@@ -275,8 +275,8 @@ class DeploymentHelper {
     return MSICContracts
   }
 
-  static async deployMoUSDToken(contracts) {
-    contracts.msicToken = await MoUSDToken.new(
+  static async deployMEURToken(contracts) {
+    contracts.msicToken = await MEURToken.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
@@ -284,8 +284,8 @@ class DeploymentHelper {
     return contracts
   }
 
-  static async deployMoUSDTokenTester(contracts) {
-    contracts.msicToken = await MoUSDTokenTester.new(
+  static async deployMEURTokenTester(contracts) {
+    contracts.msicToken = await MEURTokenTester.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address

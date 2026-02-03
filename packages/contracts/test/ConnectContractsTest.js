@@ -51,7 +51,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     assert.equal(priceFeedAddress, recordedPriceFeedAddress)
   })
 
-  it('Sets the correct MoUSDToken address in TroveManager', async () => {
+  it('Sets the correct MEURToken address in TroveManager', async () => {
     const msicTokenAddress = msicToken.address
 
     const recordedClvTokenAddress = await troveManager.msicToken()
@@ -160,7 +160,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     assert.equal(borrowerOperationsAddress, recordedBorrowerOperationsAddress)
   })
 
-  it('Sets the correct MoUSDToken address in StabilityPool', async () => {
+  it('Sets the correct MEURToken address in StabilityPool', async () => {
     const msicTokenAddress = msicToken.address
 
     const recordedClvTokenAddress = await stabilityPool.msicToken()
@@ -274,12 +274,12 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     assert.equal(activePoolAddress, recordedActivePoolAddress)
   })
 
-  // Sets MoUSDToken in MSICStaking
+  // Sets MEURToken in MSICStaking
   it('Sets the correct ActivePool address in MSICStaking', async () => {
     const msicTokenAddress = msicToken.address
 
-    const recordedMoUSDTokenAddress = await msicStaking.msicToken()
-    assert.equal(msicTokenAddress, recordedMoUSDTokenAddress)
+    const recordedMEURTokenAddress = await msicStaking.msicToken()
+    assert.equal(msicTokenAddress, recordedMEURTokenAddress)
   })
 
   // Sets TroveManager in MSICStaking

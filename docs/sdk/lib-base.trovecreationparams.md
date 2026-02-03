@@ -9,7 +9,7 @@ Parameters of an [openTrove()](./lib-base.transactablemosaic.opentrove.md) trans
 <b>Signature:</b>
 
 ```typescript
-export declare type TroveCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _MoUSDBorrowing<T> & _NoMoUSDRepayment;
+export declare type TroveCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _MEURBorrowing<T> & _NoMEURRepayment;
 ```
 
 ## Remarks
@@ -24,7 +24,7 @@ The type parameter `T` specifies the allowed value type(s) of the particular `Tr
 
 <tr> <td> depositCollateral </td> <td> T </td> <td> The amount of collateral that's deposited. </td> </tr>
 
-<tr> <td> borrowMoUSD </td> <td> T </td> <td> The amount of MoUSD that's borrowed. </td> </tr>
+<tr> <td> borrowMEUR </td> <td> T </td> <td> The amount of MEUR that's borrowed. </td> </tr>
 
 </table>
 

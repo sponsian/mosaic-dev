@@ -6,13 +6,13 @@ import goerli from "@mosaic/chicken-bonds/msic/addresses/goerli.json";
 import { Addresses } from "./transitions";
 
 const nullAddresses: Addresses = {
-  BMoUSD_AMM_ADDRESS: null,
-  BMoUSD_AMM_STAKING_ADDRESS: null,
-  BMoUSD_TOKEN_ADDRESS: null,
+  BMEUR_AMM_ADDRESS: null,
+  BMEUR_AMM_STAKING_ADDRESS: null,
+  BMEUR_TOKEN_ADDRESS: null,
   BOND_NFT_ADDRESS: null,
   CHICKEN_BOND_MANAGER_ADDRESS: null,
-  MoUSD_OVERRIDE_ADDRESS: null,
-  BMoUSD_LP_ZAP_ADDRESS: null
+  MEUR_OVERRIDE_ADDRESS: null,
+  BMEUR_LP_ZAP_ADDRESS: null
 };
 
 export const chainIdAddressesMap: Partial<Record<number, Addresses>> = {

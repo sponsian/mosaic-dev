@@ -4,7 +4,7 @@
 
 ## Trove.debt property
 
-Amount of MoUSD owed.
+Amount of MEUR owed.
 
 <b>Signature:</b>
 

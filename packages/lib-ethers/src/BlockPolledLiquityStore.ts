@@ -105,7 +105,7 @@ export class BlockPolledMosaicStore extends MosaicStore<BlockPolledMosaicStoreEx
       numberOfTroves: this._readable.getNumberOfTroves({ blockTag }),
       totalRedistributed: this._readable.getTotalRedistributed({ blockTag }),
       total: this._readable.getTotal({ blockTag }),
-      msicInStabilityPool: this._readable.getMoUSDInStabilityPool({ blockTag }),
+      msicInStabilityPool: this._readable.getMEURInStabilityPool({ blockTag }),
       totalStakedMSIC: this._readable.getTotalStakedMSIC({ blockTag }),
       _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
       totalStakedUniTokens: this._readable.getTotalStakedUniTokens({ blockTag }),
@@ -120,7 +120,7 @@ export class BlockPolledMosaicStore extends MosaicStore<BlockPolledMosaicStoreEx
       ...(userAddress
         ? {
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
-            msicBalance: this._readable.getMoUSDBalance(userAddress, { blockTag }),
+            msicBalance: this._readable.getMEURBalance(userAddress, { blockTag }),
             msicBalance: this._readable.getMSICBalance(userAddress, { blockTag }),
             uniTokenBalance: this._readable.getUniTokenBalance(userAddress, { blockTag }),
             uniTokenAllowance: this._readable.getUniTokenAllowance(userAddress, { blockTag }),

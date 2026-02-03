@@ -4,7 +4,7 @@
 
 ## Trove.netDebt property
 
-Amount of MoUSD that must be repaid to close this Trove.
+Amount of MEUR that must be repaid to close this Trove.
 
 <b>Signature:</b>
 

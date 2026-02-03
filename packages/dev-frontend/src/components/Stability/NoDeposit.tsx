@@ -21,8 +21,8 @@ export const NoDeposit: React.FC = () => {
         </Flex>
       </Heading>
       <Box sx={{ p: [2, 3] }}>
-        <InfoMessage title="You have no MoUSD in the Stability Pool.">
-          You can earn REEF and MSIC rewards by depositing MoUSD.
+        <InfoMessage title="You have no MEUR in the Stability Pool.">
+          You can earn REEF and MSIC rewards by depositing MEUR.
         </InfoMessage>
 
         <Flex variant="layout.actions">

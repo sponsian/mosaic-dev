@@ -2,7 +2,7 @@
 const SortedTroves = artifacts.require("./SortedTroves.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
-const MoUSDToken = artifacts.require("./MoUSDToken.sol")
+const MEURToken = artifacts.require("./MEURToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const StabilityPool = artifacts.require("./StabilityPool.sol")
@@ -21,7 +21,7 @@ const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
 const MosaicMathTester = artifacts.require("./MosaicMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const MoUSDTokenTester = artifacts.require("./MoUSDTokenTester.sol")
+const MEURTokenTester = artifacts.require("./MEURTokenTester.sol")
 
 const { TestHelper: th } = require("../utils/testHelpers.js")
 
@@ -31,7 +31,7 @@ const ARBITRARY_ADDRESS = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"   // plac
 const coreContractABIs = [
   BorrowerOperations,
   PriceFeed,
-  MoUSDToken,
+  MEURToken,
   SortedTroves,
   TroveManager,
   ActivePool,
@@ -55,7 +55,7 @@ const TesterContractABIs  = [
   MosaicMathTester,
   BorrowerOperationsTester,
   TroveManagerTester,
-  MoUSDTokenTester,
+  MEURTokenTester,
 ]
 
 const getGasFromContractDeployment = async (contractObject, name) => {

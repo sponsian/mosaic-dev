@@ -26,7 +26,7 @@ Promise&lt;[PopulatedEthersMosaicTransaction](./lib-ethers.populatedethersmosaic
 
 ## Remarks
 
-The transaction will fail if the Trove's debt would fall below [MoUSD\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md)<!-- -->.
+The transaction will fail if the Trove's debt would fall below [MEUR\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md)<!-- -->.
 
 If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum acceptable rate.
 

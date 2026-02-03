@@ -100,7 +100,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_MoUSDLoss",
+        "name": "_MEURLoss",
         "type": "uint256"
       }
     ],
@@ -296,11 +296,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newMoUSDTokenAddress",
+        "name": "_newMEURTokenAddress",
         "type": "address"
       }
     ],
-    "name": "MoUSDTokenAddressChanged",
+    "name": "MEURTokenAddressChanged",
     "type": "event"
   },
   {
@@ -422,7 +422,7 @@
         "type": "uint256"
       }
     ],
-    "name": "StabilityPoolMoUSDBalanceUpdated",
+    "name": "StabilityPoolMEURBalanceUpdated",
     "type": "event"
   },
   {
@@ -498,7 +498,7 @@
   },
   {
     "inputs": [],
-    "name": "MoUSD_GAS_COMPENSATION",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -898,7 +898,7 @@
         "type": "address"
       }
     ],
-    "name": "getCompoundedMoUSDDeposit",
+    "name": "getCompoundedMEURDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1007,7 +1007,7 @@
   },
   {
     "inputs": [],
-    "name": "getTotalMoUSDDeposits",
+    "name": "getTotalMEURDeposits",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1059,7 +1059,7 @@
   },
   {
     "inputs": [],
-    "name": "lastMoUSDLossError_Offset",
+    "name": "lastMEURLossError_Offset",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1075,7 +1075,7 @@
     "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract IMoUSDToken",
+        "internalType": "contract IMEURToken",
         "name": "",
         "type": "address"
       }

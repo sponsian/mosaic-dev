@@ -86,21 +86,21 @@ export class SendableEthersMosaic
     return this._populate.withdrawCollateral(amount, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.borrowMoUSD} */
-  borrowMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.borrowMEUR} */
+  borrowMEUR(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<TroveAdjustmentDetails>> {
-    return this._populate.borrowMoUSD(amount, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.borrowMEUR(amount, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.repayMoUSD} */
-  repayMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.repayMEUR} */
+  repayMEUR(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<TroveAdjustmentDetails>> {
-    return this._populate.repayMoUSD(amount, overrides).then(sendTransaction);
+    return this._populate.repayMEUR(amount, overrides).then(sendTransaction);
   }
 
   /** @internal */
@@ -129,23 +129,23 @@ export class SendableEthersMosaic
       .then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.depositMoUSDInStabilityPool} */
-  depositMoUSDInStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.depositMEURInStabilityPool} */
+  depositMEURInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<StabilityDepositChangeDetails>> {
     return this._populate
-      .depositMoUSDInStabilityPool(amount, frontendTag, overrides)
+      .depositMEURInStabilityPool(amount, frontendTag, overrides)
       .then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.withdrawMoUSDFromStabilityPool} */
-  withdrawMoUSDFromStabilityPool(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.withdrawMEURFromStabilityPool} */
+  withdrawMEURFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<StabilityDepositChangeDetails>> {
-    return this._populate.withdrawMoUSDFromStabilityPool(amount, overrides).then(sendTransaction);
+    return this._populate.withdrawMEURFromStabilityPool(amount, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @mosaic/lib-base#SendableMosaic.withdrawGainsFromStabilityPool} */
@@ -162,13 +162,13 @@ export class SendableEthersMosaic
     return this._populate.transferCollateralGainToTrove(overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.sendMoUSD} */
-  sendMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.sendMEUR} */
+  sendMEUR(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<void>> {
-    return this._populate.sendMoUSD(toAddress, amount, overrides).then(sendTransaction);
+    return this._populate.sendMEUR(toAddress, amount, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @mosaic/lib-base#SendableMosaic.sendMSIC} */
@@ -180,13 +180,13 @@ export class SendableEthersMosaic
     return this._populate.sendMSIC(toAddress, amount, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.redeemMoUSD} */
-  redeemMoUSD(
+  /** {@inheritDoc @mosaic/lib-base#SendableMosaic.redeemMEUR} */
+  redeemMEUR(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersMosaicTransaction<RedemptionDetails>> {
-    return this._populate.redeemMoUSD(amount, maxRedemptionRate, overrides).then(sendTransaction);
+    return this._populate.redeemMEUR(amount, maxRedemptionRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @mosaic/lib-base#SendableMosaic.claimCollateralSurplus} */

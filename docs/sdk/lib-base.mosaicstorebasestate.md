@@ -20,11 +20,11 @@ export interface MosaicStoreBaseState
 |  [collateralSurplusBalance](./lib-base.mosaicstorebasestate.collateralsurplusbalance.md) | [Decimal](./lib-base.decimal.md) | Amount of leftover collateral available for withdrawal to the user. |
 |  [frontend](./lib-base.mosaicstorebasestate.frontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of currently used frontend. |
 |  [liquidityMiningMSICReward](./lib-base.mosaicstorebasestate.liquidityminingmsicreward.md) | [Decimal](./lib-base.decimal.md) | Amount of MSIC the user has earned through mining liquidity. |
-|  [liquidityMiningStake](./lib-base.mosaicstorebasestate.liquidityminingstake.md) | [Decimal](./lib-base.decimal.md) | Amount of Uniswap REEF/MoUSD LP tokens the user has staked in liquidity mining. |
+|  [liquidityMiningStake](./lib-base.mosaicstorebasestate.liquidityminingstake.md) | [Decimal](./lib-base.decimal.md) | Amount of Uniswap REEF/MEUR LP tokens the user has staked in liquidity mining. |
 |  [msicBalance](./lib-base.mosaicstorebasestate.msicbalance.md) | [Decimal](./lib-base.decimal.md) | User's MSIC token balance. |
 |  [msicStake](./lib-base.mosaicstorebasestate.msicstake.md) | [MSICStake](./lib-base.msicstake.md) | User's MSIC stake. |
-|  [msicBalance](./lib-base.mosaicstorebasestate.msicbalance.md) | [Decimal](./lib-base.decimal.md) | User's MoUSD token balance. |
-|  [msicInStabilityPool](./lib-base.mosaicstorebasestate.msicinstabilitypool.md) | [Decimal](./lib-base.decimal.md) | Total amount of MoUSD currently deposited in the Stability Pool. |
+|  [msicBalance](./lib-base.mosaicstorebasestate.msicbalance.md) | [Decimal](./lib-base.decimal.md) | User's MEUR token balance. |
+|  [msicInStabilityPool](./lib-base.mosaicstorebasestate.msicinstabilitypool.md) | [Decimal](./lib-base.decimal.md) | Total amount of MEUR currently deposited in the Stability Pool. |
 |  [numberOfTroves](./lib-base.mosaicstorebasestate.numberoftroves.md) | number | Number of Troves that are currently open. |
 |  [ownFrontend](./lib-base.mosaicstorebasestate.ownfrontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of user's own frontend. |
 |  [price](./lib-base.mosaicstorebasestate.price.md) | [Decimal](./lib-base.decimal.md) | Current price of the native currency (e.g. Ether) in USD. |
@@ -34,8 +34,8 @@ export interface MosaicStoreBaseState
 |  [total](./lib-base.mosaicstorebasestate.total.md) | [Trove](./lib-base.trove.md) | Total collateral and debt in the Mosaic system. |
 |  [totalRedistributed](./lib-base.mosaicstorebasestate.totalredistributed.md) | [Trove](./lib-base.trove.md) | Total collateral and debt per stake that has been liquidated through redistribution. |
 |  [totalStakedMSIC](./lib-base.mosaicstorebasestate.totalstakedmsic.md) | [Decimal](./lib-base.decimal.md) | Total amount of MSIC currently staked. |
-|  [totalStakedUniTokens](./lib-base.mosaicstorebasestate.totalstakedunitokens.md) | [Decimal](./lib-base.decimal.md) | Total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. |
+|  [totalStakedUniTokens](./lib-base.mosaicstorebasestate.totalstakedunitokens.md) | [Decimal](./lib-base.decimal.md) | Total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining. |
 |  [troveBeforeRedistribution](./lib-base.mosaicstorebasestate.trovebeforeredistribution.md) | [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md) | User's Trove in its state after the last direct modification. |
-|  [uniTokenAllowance](./lib-base.mosaicstorebasestate.unitokenallowance.md) | [Decimal](./lib-base.decimal.md) | The liquidity mining contract's allowance of user's Uniswap REEF/MoUSD LP tokens. |
-|  [uniTokenBalance](./lib-base.mosaicstorebasestate.unitokenbalance.md) | [Decimal](./lib-base.decimal.md) | User's Uniswap REEF/MoUSD LP token balance. |
+|  [uniTokenAllowance](./lib-base.mosaicstorebasestate.unitokenallowance.md) | [Decimal](./lib-base.decimal.md) | The liquidity mining contract's allowance of user's Uniswap REEF/MEUR LP tokens. |
+|  [uniTokenBalance](./lib-base.mosaicstorebasestate.unitokenbalance.md) | [Decimal](./lib-base.decimal.md) | User's Uniswap REEF/MEUR LP token balance. |
 

@@ -40,7 +40,7 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
   before(async () => {
     coreContracts = await deploymentHelper.deployMosaicCore()
     coreContracts.troveManager = await TroveManagerTester.new()
-    coreContracts = await deploymentHelper.deployMoUSDTokenTester(coreContracts)
+    coreContracts = await deploymentHelper.deployMEURTokenTester(coreContracts)
     const MSICContracts = await deploymentHelper.deployMSICTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
     
     priceFeed = coreContracts.priceFeed
@@ -64,7 +64,7 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
     await deploymentHelper.connectMSICContractsToCore(MSICContracts, coreContracts)
 
     for (account of accounts.slice(0, 10)) {
-      await th.openTrove(coreContracts, { extraMoUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+      await th.openTrove(coreContracts, { extraMEURAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
     }
 
     const expectedCISupplyCap = '32000000000000000000000000' // 32mil
@@ -233,11 +233,11 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
       }
     })
 
-    // increaseMoUSD	
-    it("increaseMoUSDDebt(): reverts when called by an account that is not BO nor TroveM", async () => {
+    // increaseMEUR	
+    it("increaseMEURDebt(): reverts when called by an account that is not BO nor TroveM", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await activePool.increaseMoUSDDebt(100, { from: alice })
+        const txAlice = await activePool.increaseMEURDebt(100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")
@@ -245,11 +245,11 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
       }
     })
 
-    // decreaseMoUSD
-    it("decreaseMoUSDDebt(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+    // decreaseMEUR
+    it("decreaseMEURDebt(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await activePool.decreaseMoUSDDebt(100, { from: alice })
+        const txAlice = await activePool.decreaseMEURDebt(100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")
@@ -283,11 +283,11 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
       }
     })
 
-    // increaseMoUSD	
-    it("increaseMoUSDDebt(): reverts when called by an account that is not TroveManager", async () => {
+    // increaseMEUR	
+    it("increaseMEURDebt(): reverts when called by an account that is not TroveManager", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await defaultPool.increaseMoUSDDebt(100, { from: alice })
+        const txAlice = await defaultPool.increaseMEURDebt(100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")
@@ -295,11 +295,11 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
       }
     })
 
-    // decreaseMoUSD	
-    it("decreaseMoUSD(): reverts when called by an account that is not TroveManager", async () => {
+    // decreaseMEUR	
+    it("decreaseMEUR(): reverts when called by an account that is not TroveManager", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await defaultPool.decreaseMoUSDDebt(100, { from: alice })
+        const txAlice = await defaultPool.decreaseMEURDebt(100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")
@@ -350,7 +350,7 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
     })
   })
 
-  describe('MoUSDToken', async accounts => {
+  describe('MEURToken', async accounts => {
 
     //    mint
     it("mint(): reverts when called by an account that is not BorrowerOperations", async () => {
@@ -469,9 +469,9 @@ contract('Access Control: Mosaic functions with the caller restricted to Mosaic 
   })
 
   describe('MSICStaking', async accounts => {
-    it("increaseF_MoUSD(): reverts when caller is not TroveManager", async () => {
+    it("increaseF_MEUR(): reverts when caller is not TroveManager", async () => {
       try {
-        const txAlice = await msicStaking.increaseF_MoUSD(dec(1, 18), { from: alice })
+        const txAlice = await msicStaking.increaseF_MEUR(dec(1, 18), { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")

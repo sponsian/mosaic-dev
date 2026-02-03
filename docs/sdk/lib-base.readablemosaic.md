@@ -24,11 +24,11 @@ Implemented by [EthersMosaic](./lib-ethers.ethersmosaic.md)<!-- -->.
 |  [getFees()](./lib-base.readablemosaic.getfees.md) | Get a calculator for current fees. |
 |  [getFrontendStatus(address)](./lib-base.readablemosaic.getfrontendstatus.md) | Check whether an address is registered as a Mosaic frontend, and what its kickback rate is. |
 |  [getLiquidityMiningMSICReward(address)](./lib-base.readablemosaic.getliquidityminingmsicreward.md) | Get the amount of MSIC earned by an address through mining liquidity. |
-|  [getLiquidityMiningStake(address)](./lib-base.readablemosaic.getliquidityminingstake.md) | Get the amount of Uniswap REEF/MoUSD LP tokens currently staked by an address in liquidity mining. |
+|  [getLiquidityMiningStake(address)](./lib-base.readablemosaic.getliquidityminingstake.md) | Get the amount of Uniswap REEF/MEUR LP tokens currently staked by an address in liquidity mining. |
 |  [getMSICBalance(address)](./lib-base.readablemosaic.getmsicbalance.md) | Get the amount of MSIC held by an address. |
 |  [getMSICStake(address)](./lib-base.readablemosaic.getmsicstake.md) | Get the current state of an MSIC Stake. |
-|  [getMoUSDBalance(address)](./lib-base.readablemosaic.getmsicbalance.md) | Get the amount of MoUSD held by an address. |
-|  [getMoUSDInStabilityPool()](./lib-base.readablemosaic.getmsicinstabilitypool.md) | Get the total amount of MoUSD currently deposited in the Stability Pool. |
+|  [getMEURBalance(address)](./lib-base.readablemosaic.getmsicbalance.md) | Get the amount of MEUR held by an address. |
+|  [getMEURInStabilityPool()](./lib-base.readablemosaic.getmsicinstabilitypool.md) | Get the total amount of MEUR currently deposited in the Stability Pool. |
 |  [getNumberOfTroves()](./lib-base.readablemosaic.getnumberoftroves.md) | Get number of Troves that are currently open. |
 |  [getPrice()](./lib-base.readablemosaic.getprice.md) | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingLiquidityMiningMSICReward()](./lib-base.readablemosaic.getremainingliquidityminingmsicreward.md) | Get the remaining MSIC that will be collectively rewarded to liquidity miners. |
@@ -37,10 +37,10 @@ Implemented by [EthersMosaic](./lib-ethers.ethersmosaic.md)<!-- -->.
 |  [getTotal()](./lib-base.readablemosaic.gettotal.md) | Get the total amount of collateral and debt in the Mosaic system. |
 |  [getTotalRedistributed()](./lib-base.readablemosaic.gettotalredistributed.md) | Get the total collateral and debt per stake that has been liquidated through redistribution. |
 |  [getTotalStakedMSIC()](./lib-base.readablemosaic.gettotalstakedmsic.md) | Get the total amount of MSIC currently staked. |
-|  [getTotalStakedUniTokens()](./lib-base.readablemosaic.gettotalstakedunitokens.md) | Get the total amount of Uniswap REEF/MoUSD LP tokens currently staked in liquidity mining. |
+|  [getTotalStakedUniTokens()](./lib-base.readablemosaic.gettotalstakedunitokens.md) | Get the total amount of Uniswap REEF/MEUR LP tokens currently staked in liquidity mining. |
 |  [getTrove(address)](./lib-base.readablemosaic.gettrove.md) | Get the current state of a Trove. |
 |  [getTroveBeforeRedistribution(address)](./lib-base.readablemosaic.gettrovebeforeredistribution.md) | Get a Trove in its state after the last direct modification. |
 |  [getTroves(params)](./lib-base.readablemosaic.gettroves_1.md) | Get a slice from the list of Troves. |
-|  [getUniTokenAllowance(address)](./lib-base.readablemosaic.getunitokenallowance.md) | Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MoUSD LP tokens. |
-|  [getUniTokenBalance(address)](./lib-base.readablemosaic.getunitokenbalance.md) | Get the amount of Uniswap REEF/MoUSD LP tokens held by an address. |
+|  [getUniTokenAllowance(address)](./lib-base.readablemosaic.getunitokenallowance.md) | Get the liquidity mining contract's allowance of a holder's Uniswap REEF/MEUR LP tokens. |
+|  [getUniTokenBalance(address)](./lib-base.readablemosaic.getunitokenbalance.md) | Get the amount of Uniswap REEF/MEUR LP tokens held by an address. |
 

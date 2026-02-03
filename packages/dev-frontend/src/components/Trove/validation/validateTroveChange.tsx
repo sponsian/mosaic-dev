@@ -1,7 +1,7 @@
 import {
   Decimal,
-  MoUSD_MINIMUM_DEBT,
-  MoUSD_MINIMUM_NET_DEBT,
+  MEUR_MINIMUM_DEBT,
+  MEUR_MINIMUM_NET_DEBT,
   Trove,
   TroveAdjustmentParams,
   TroveChange,
@@ -27,33 +27,33 @@ type TroveAdjustmentDescriptionParams = {
 
 const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ params }) => (
   <ActionDescription>
-    {params.depositCollateral && params.borrowMoUSD ? (
+    {params.depositCollateral && params.borrowMEUR ? (
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} REEF</Amount> and receive{" "}
         <Amount>
-          {params.borrowMoUSD.prettify()} {COIN}
+          {params.borrowMEUR.prettify()} {COIN}
         </Amount>
       </>
-    ) : params.repayMoUSD && params.withdrawCollateral ? (
+    ) : params.repayMEUR && params.withdrawCollateral ? (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayMoUSD.prettify()} {COIN}
+          {params.repayMEUR.prettify()} {COIN}
         </Amount>{" "}
         and receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount>
       </>
-    ) : params.depositCollateral && params.repayMoUSD ? (
+    ) : params.depositCollateral && params.repayMEUR ? (
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} REEF</Amount> and pay{" "}
         <Amount>
-          {params.repayMoUSD.prettify()} {COIN}
+          {params.repayMEUR.prettify()} {COIN}
         </Amount>
       </>
-    ) : params.borrowMoUSD && params.withdrawCollateral ? (
+    ) : params.borrowMEUR && params.withdrawCollateral ? (
       <>
         You will receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount> and{" "}
         <Amount>
-          {params.borrowMoUSD.prettify()} {COIN}
+          {params.borrowMEUR.prettify()} {COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
@@ -64,18 +64,18 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
       <>
         You will receive <Amount>{params.withdrawCollateral.prettify()} REEF</Amount>
       </>
-    ) : params.borrowMoUSD ? (
+    ) : params.borrowMEUR ? (
       <>
         You will receive{" "}
         <Amount>
-          {params.borrowMoUSD.prettify()} {COIN}
+          {params.borrowMEUR.prettify()} {COIN}
         </Amount>
       </>
     ) : (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayMoUSD.prettify()} {COIN}
+          {params.repayMEUR.prettify()} {COIN}
         </Amount>
       </>
     )}
@@ -140,7 +140,7 @@ export const validateTroveChange = (
       <ErrorDescription>
         Total debt must be at least{" "}
         <Amount>
-          {MoUSD_MINIMUM_DEBT.toString()} {COIN}
+          {MEUR_MINIMUM_DEBT.toString()} {COIN}
         </Amount>
         .
       </ErrorDescription>
@@ -162,7 +162,7 @@ export const validateTroveChange = (
 };
 
 const validateTroveCreation = (
-  { depositCollateral, borrowMoUSD }: TroveCreationParams<Decimal>,
+  { depositCollateral, borrowMEUR }: TroveCreationParams<Decimal>,
   {
     resultingTrove,
     recoveryMode,
@@ -171,12 +171,12 @@ const validateTroveCreation = (
     price
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
-  if (borrowMoUSD.lt(MoUSD_MINIMUM_NET_DEBT)) {
+  if (borrowMEUR.lt(MEUR_MINIMUM_NET_DEBT)) {
     return (
       <ErrorDescription>
         You must borrow at least{" "}
         <Amount>
-          {MoUSD_MINIMUM_NET_DEBT.toString()} {COIN}
+          {MEUR_MINIMUM_NET_DEBT.toString()} {COIN}
         </Amount>
         .
       </ErrorDescription>
@@ -224,7 +224,7 @@ const validateTroveCreation = (
 };
 
 const validateTroveAdjustment = (
-  { depositCollateral, withdrawCollateral, borrowMoUSD, repayMoUSD }: TroveAdjustmentParams<Decimal>,
+  { depositCollateral, withdrawCollateral, borrowMEUR, repayMEUR }: TroveAdjustmentParams<Decimal>,
   {
     originalTrove,
     resultingTrove,
@@ -244,7 +244,7 @@ const validateTroveAdjustment = (
       );
     }
 
-    if (borrowMoUSD) {
+    if (borrowMEUR) {
       if (resultingTrove.collateralRatioIsBelowCritical(price)) {
         return (
           <ErrorDescription>
@@ -281,25 +281,25 @@ const validateTroveAdjustment = (
     }
   }
 
-  if (repayMoUSD) {
-    if (resultingTrove.debt.lt(MoUSD_MINIMUM_DEBT)) {
+  if (repayMEUR) {
+    if (resultingTrove.debt.lt(MEUR_MINIMUM_DEBT)) {
       return (
         <ErrorDescription>
           Total debt must be at least{" "}
           <Amount>
-            {MoUSD_MINIMUM_DEBT.toString()} {COIN}
+            {MEUR_MINIMUM_DEBT.toString()} {COIN}
           </Amount>
           .
         </ErrorDescription>
       );
     }
 
-    if (repayMoUSD.gt(msicBalance)) {
+    if (repayMEUR.gt(msicBalance)) {
       return (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
           <Amount>
-            {repayMoUSD.sub(msicBalance).prettify()} {COIN}
+            {repayMEUR.sub(msicBalance).prettify()} {COIN}
           </Amount>
           .
         </ErrorDescription>
@@ -320,7 +320,7 @@ const validateTroveAdjustment = (
 };
 
 const validateTroveClosure = (
-  { repayMoUSD }: TroveClosureParams<Decimal>,
+  { repayMEUR }: TroveClosureParams<Decimal>,
   {
     recoveryMode,
     wouldTriggerRecoveryMode,
@@ -344,12 +344,12 @@ const validateTroveClosure = (
     );
   }
 
-  if (repayMoUSD?.gt(msicBalance)) {
+  if (repayMEUR?.gt(msicBalance)) {
     return (
       <ErrorDescription>
         You need{" "}
         <Amount>
-          {repayMoUSD.sub(msicBalance).prettify()} {COIN}
+          {repayMEUR.sub(msicBalance).prettify()} {COIN}
         </Amount>{" "}
         more to close your Trove.
       </ErrorDescription>

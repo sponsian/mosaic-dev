@@ -10,7 +10,7 @@ import {
   Trove,
   TroveWithPendingRedistribution,
   ReadableMosaic,
-  MoUSD_LIQUIDATION_RESERVE
+  MEUR_LIQUIDATION_RESERVE
 } from "@mosaic/lib-base";
 import { EthersMosaic, ReadableEthersMosaic } from "@mosaic/lib-ethers";
 import { SubgraphMosaic } from "@mosaic/lib-subgraph";
@@ -38,11 +38,11 @@ export const createRandomTrove = (price: Decimal) => {
   if (Math.random() < 0.5) {
     const collateral = Decimal.from(randomValue);
     const maxDebt = parseInt(price.mul(collateral).toString(0));
-    const debt = MoUSD_LIQUIDATION_RESERVE.add(truncateLastDigits(maxDebt - benford(maxDebt)));
+    const debt = MEUR_LIQUIDATION_RESERVE.add(truncateLastDigits(maxDebt - benford(maxDebt)));
 
     return new Trove(collateral, debt);
   } else {
-    const debt = MoUSD_LIQUIDATION_RESERVE.add(100 * randomValue);
+    const debt = MEUR_LIQUIDATION_RESERVE.add(100 * randomValue);
 
     const collateral = Decimal.from(
       debt
@@ -63,8 +63,8 @@ export const randomCollateralChange = ({ collateral }: Trove) =>
 
 export const randomDebtChange = ({ debt }: Trove) =>
   Math.random() < 0.5
-    ? { repayMoUSD: debt.mul(1.1 * Math.random()) }
-    : { borrowMoUSD: debt.mul(0.5 * Math.random()) };
+    ? { repayMEUR: debt.mul(1.1 * Math.random()) }
+    : { borrowMEUR: debt.mul(0.5 * Math.random()) };
 
 export const getListOfTroves = async (mosaic: ReadableMosaic) =>
   mosaic.getTroves({
@@ -239,7 +239,7 @@ const checks = [
   new EqualityCheck("price", l => l.getPrice(), decimalsEqual),
   new EqualityCheck("total", l => l.getTotal(), trovesRoughlyEqual),
   new EqualityCheck("totalRedistributed", l => l.getTotalRedistributed(), trovesEqual),
-  new EqualityCheck("tokensInStabilityPool", l => l.getMoUSDInStabilityPool(), decimalsEqual)
+  new EqualityCheck("tokensInStabilityPool", l => l.getMEURInStabilityPool(), decimalsEqual)
 ];
 
 export const checkSubgraph = async (subgraph: SubgraphMosaic, l1Mosaic: ReadableMosaic) => {

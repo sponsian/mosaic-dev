@@ -13,10 +13,10 @@ const getBondEvents = (bond: OptimisticBondType): EventType[] => {
       date: new Date(bond.startTime),
       label: (
         <>
-          <Label description="bMoUSD accrual starts off at 0 and increases over time.">
+          <Label description="bMEUR accrual starts off at 0 and increases over time.">
             {l.BOND_CREATED.term}
           </Label>
-          <SubLabel>{`0.00 bMoUSD`}</SubLabel>
+          <SubLabel>{`0.00 bMEUR`}</SubLabel>
         </>
       )
     },
@@ -36,7 +36,7 @@ const getBondEvents = (bond: OptimisticBondType): EventType[] => {
       date: UNKNOWN_DATE,
       label: (
         <>
-          <Label description="How many bMoUSD are required to break-even at the current market price.">
+          <Label description="How many bMEUR are required to break-even at the current market price.">
             {l.BREAK_EVEN_TIME.term}
           </Label>
           <SubLabel style={{ fontWeight: 400 }}></SubLabel>
@@ -48,7 +48,7 @@ const getBondEvents = (bond: OptimisticBondType): EventType[] => {
       date: UNKNOWN_DATE,
       label: (
         <>
-          <Label description="How many bMoUSD are recommended before claiming the bond, selling the bMoUSD for MoUSD, and then opening another bond.">
+          <Label description="How many bMEUR are recommended before claiming the bond, selling the bMEUR for MEUR, and then opening another bond.">
             {l.OPTIMUM_REBOND_TIME.term}
           </Label>
           <SubLabel style={{ fontWeight: 400 }}></SubLabel>
@@ -94,9 +94,9 @@ export const OptimisticBond: React.FC<BondProps> = ({ bond, style }) => {
                 fontSize: "14.5px"
               }}
             >
-              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MoUSD" />
+              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="MEUR" />
 
-              <Record lexicon={l.MARKET_VALUE} type="MoUSD" />
+              <Record lexicon={l.MARKET_VALUE} type="MEUR" />
             </Flex>
             <Actions bondId={bond.id} disabled />
           </Flex>

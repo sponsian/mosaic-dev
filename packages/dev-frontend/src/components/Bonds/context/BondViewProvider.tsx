@@ -60,8 +60,8 @@ export const BondViewProvider: React.FC = props => {
   const [isBMousdLpApprovedWithAmmZapper, setIsBMousdLpApprovedWithAmmZapper] = useState(false);
   const [isBMousdLpApprovedWithGauge, setIsBMousdLpApprovedWithGauge] = useState(false);
   const [isSynchronizing, setIsSynchronizing] = useState(false);
-  const [inputToken, setInputToken] = useState<BMousdAmmTokenIndex.BMoUSD | BMousdAmmTokenIndex.MoUSD>(
-    BMousdAmmTokenIndex.BMoUSD
+  const [inputToken, setInputToken] = useState<BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR>(
+    BMousdAmmTokenIndex.BMEUR
   );
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({
     APPROVE: "IDLE",
@@ -84,10 +84,10 @@ export const BondViewProvider: React.FC = props => {
   const [isBootstrapPeriodActive, setIsBootstrapPeriodActive] = useState<boolean>();
   const { account, mosaic } = useMosaic();
   const {
-    MoUSD_OVERRIDE_ADDRESS,
-    BMoUSD_AMM_ADDRESS,
-    BMoUSD_LP_ZAP_ADDRESS,
-    BMoUSD_AMM_STAKING_ADDRESS
+    MEUR_OVERRIDE_ADDRESS,
+    BMEUR_AMM_ADDRESS,
+    BMEUR_LP_ZAP_ADDRESS,
+    BMEUR_AMM_STAKING_ADDRESS
   } = useBondAddresses();
   const contracts = useBondContracts();
   const chainId = useChainId();
@@ -146,7 +146,7 @@ export const BondViewProvider: React.FC = props => {
     if (contracts.msicToken === undefined || mosaic.connection.signer === undefined) return;
 
     if (
-      MoUSD_OVERRIDE_ADDRESS !== null &&
+      MEUR_OVERRIDE_ADDRESS !== null &&
       (await contracts.msicToken.balanceOf(account)).eq(0) &&
       "tap" in contracts.msicToken
     ) {
@@ -157,7 +157,7 @@ export const BondViewProvider: React.FC = props => {
       ).wait();
       setShouldSynchronize(true);
     }
-  }, [contracts.msicToken, account, MoUSD_OVERRIDE_ADDRESS, mosaic.connection.signer]);
+  }, [contracts.msicToken, account, MEUR_OVERRIDE_ADDRESS, mosaic.connection.signer]);
 
   useEffect(() => {
     (async () => {
@@ -180,7 +180,7 @@ export const BondViewProvider: React.FC = props => {
   useEffect(() => {
     (async () => {
       if (
-        BMoUSD_AMM_ADDRESS === null ||
+        BMEUR_AMM_ADDRESS === null ||
         contracts.msicToken === undefined ||
         isMousdApprovedWithBmsicAmm
       ) {
@@ -188,16 +188,16 @@ export const BondViewProvider: React.FC = props => {
       }
       const isApproved = await (isMainnet
         ? api.isTokenApprovedWithBMousdAmmMainnet(account, contracts.msicToken)
-        : api.isTokenApprovedWithBMousdAmm(account, contracts.msicToken, BMoUSD_AMM_ADDRESS));
+        : api.isTokenApprovedWithBMousdAmm(account, contracts.msicToken, BMEUR_AMM_ADDRESS));
 
       setIsMousdApprovedWithBmsicAmm(isApproved);
     })();
-  }, [contracts.msicToken, account, isMousdApprovedWithBmsicAmm, isMainnet, BMoUSD_AMM_ADDRESS]);
+  }, [contracts.msicToken, account, isMousdApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
-        BMoUSD_AMM_ADDRESS === null ||
+        BMEUR_AMM_ADDRESS === null ||
         contracts.bMousdToken === undefined ||
         isBMousdApprovedWithBmsicAmm
       ) {
@@ -206,16 +206,16 @@ export const BondViewProvider: React.FC = props => {
 
       const isApproved = await (isMainnet
         ? api.isTokenApprovedWithBMousdAmmMainnet(account, contracts.bMousdToken)
-        : api.isTokenApprovedWithBMousdAmm(account, contracts.bMousdToken, BMoUSD_AMM_ADDRESS));
+        : api.isTokenApprovedWithBMousdAmm(account, contracts.bMousdToken, BMEUR_AMM_ADDRESS));
 
       setIsBMousdApprovedWithBmsicAmm(isApproved);
     })();
-  }, [contracts.bMousdToken, account, isBMousdApprovedWithBmsicAmm, isMainnet, BMoUSD_AMM_ADDRESS]);
+  }, [contracts.bMousdToken, account, isBMousdApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
-        BMoUSD_LP_ZAP_ADDRESS === null ||
+        BMEUR_LP_ZAP_ADDRESS === null ||
         contracts.msicToken === undefined ||
         isMousdApprovedWithAmmZapper
       ) {
@@ -225,12 +225,12 @@ export const BondViewProvider: React.FC = props => {
       const isMousdApproved = await api.isTokenApprovedWithAmmZapper(
         account,
         contracts.msicToken,
-        BMoUSD_LP_ZAP_ADDRESS
+        BMEUR_LP_ZAP_ADDRESS
       );
 
       setIsMousdApprovedWithAmmZapper(isMousdApproved);
     })();
-  }, [contracts.msicToken, account, isMousdApprovedWithAmmZapper, BMoUSD_LP_ZAP_ADDRESS]);
+  }, [contracts.msicToken, account, isMousdApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     (async () => {
@@ -239,17 +239,17 @@ export const BondViewProvider: React.FC = props => {
       const isLpApproved = await api.isTokenApprovedWithAmmZapper(
         account,
         lpToken,
-        BMoUSD_LP_ZAP_ADDRESS
+        BMEUR_LP_ZAP_ADDRESS
       );
 
       setIsBMousdLpApprovedWithAmmZapper(isLpApproved);
     })();
-  }, [contracts.bMousdAmm, account, isBMousdLpApprovedWithAmmZapper, BMoUSD_LP_ZAP_ADDRESS]);
+  }, [contracts.bMousdAmm, account, isBMousdLpApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
-        BMoUSD_LP_ZAP_ADDRESS === null ||
+        BMEUR_LP_ZAP_ADDRESS === null ||
         contracts.bMousdToken === undefined ||
         isBMousdApprovedWithAmmZapper
       ) {
@@ -259,12 +259,12 @@ export const BondViewProvider: React.FC = props => {
       const isBMousdApproved = await api.isTokenApprovedWithAmmZapper(
         account,
         contracts.bMousdToken,
-        BMoUSD_LP_ZAP_ADDRESS
+        BMEUR_LP_ZAP_ADDRESS
       );
 
       setIsMousdApprovedWithAmmZapper(isBMousdApproved);
     })();
-  }, [contracts.bMousdToken, account, isBMousdApprovedWithAmmZapper, BMoUSD_LP_ZAP_ADDRESS]);
+  }, [contracts.bMousdToken, account, isBMousdApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     if (isSynchronizing) return;
@@ -361,12 +361,12 @@ export const BondViewProvider: React.FC = props => {
   const [approveAmm, approveAmmStatus] = useTransaction(
     async (tokensNeedingApproval: BMousdAmmTokenIndex[]) => {
       for (const token of tokensNeedingApproval) {
-        if (token === BMousdAmmTokenIndex.BMoUSD) {
+        if (token === BMousdAmmTokenIndex.BMEUR) {
           await (isMainnet
             ? api.approveTokenWithBMousdAmmMainnet(contracts.bMousdToken, mosaic.connection.signer)
             : api.approveTokenWithBMousdAmm(
                 contracts.bMousdToken,
-                BMoUSD_AMM_ADDRESS,
+                BMEUR_AMM_ADDRESS,
                 mosaic.connection.signer
               ));
 
@@ -376,7 +376,7 @@ export const BondViewProvider: React.FC = props => {
             ? api.approveTokenWithBMousdAmmMainnet(contracts.msicToken, mosaic.connection.signer)
             : api.approveTokenWithBMousdAmm(
                 contracts.msicToken,
-                BMoUSD_AMM_ADDRESS,
+                BMEUR_AMM_ADDRESS,
                 mosaic.connection.signer
               ));
 
@@ -388,7 +388,7 @@ export const BondViewProvider: React.FC = props => {
       contracts.bMousdToken,
       contracts.msicToken,
       isMainnet,
-      BMoUSD_AMM_ADDRESS,
+      BMEUR_AMM_ADDRESS,
       mosaic.connection.signer
     ]
   );
@@ -397,30 +397,30 @@ export const BondViewProvider: React.FC = props => {
     async ({ tokensNeedingApproval }: ApprovePressedPayload) => {
       if (contracts.bMousdAmm === undefined) return;
       for (const [token, spender] of Array.from(tokensNeedingApproval)) {
-        if (token === BMousdAmmTokenIndex.BMoUSD) {
+        if (token === BMousdAmmTokenIndex.BMEUR) {
           await api.approveToken(contracts.bMousdToken, spender, mosaic.connection.signer);
-          if (spender === BMoUSD_AMM_ADDRESS) {
+          if (spender === BMEUR_AMM_ADDRESS) {
             setIsBMousdApprovedWithBmsicAmm(true);
-          } else if (spender === BMoUSD_LP_ZAP_ADDRESS) {
+          } else if (spender === BMEUR_LP_ZAP_ADDRESS) {
             setIsBMousdApprovedWithAmmZapper(true);
           }
-        } else if (token === BMousdAmmTokenIndex.MoUSD) {
+        } else if (token === BMousdAmmTokenIndex.MEUR) {
           await api.approveToken(
             contracts.msicToken,
-            BMoUSD_LP_ZAP_ADDRESS,
+            BMEUR_LP_ZAP_ADDRESS,
             mosaic.connection.signer
           );
           setIsMousdApprovedWithAmmZapper(true);
-        } else if (token === BMousdAmmTokenIndex.BMoUSD_MoUSD_LP && spender === undefined) {
+        } else if (token === BMousdAmmTokenIndex.BMEUR_MEUR_LP && spender === undefined) {
           const lpToken = await api.getLpToken(contracts.bMousdAmm);
-          await api.approveToken(lpToken, BMoUSD_LP_ZAP_ADDRESS, mosaic.connection.signer);
+          await api.approveToken(lpToken, BMEUR_LP_ZAP_ADDRESS, mosaic.connection.signer);
           setIsBMousdLpApprovedWithAmmZapper(true);
-        } else if (token === BMousdAmmTokenIndex.BMoUSD_MoUSD_LP) {
+        } else if (token === BMousdAmmTokenIndex.BMEUR_MEUR_LP) {
           const lpToken = await api.getLpToken(contracts.bMousdAmm);
           await api.approveToken(lpToken, spender, mosaic.connection.signer);
-          if (spender === BMoUSD_LP_ZAP_ADDRESS) {
+          if (spender === BMEUR_LP_ZAP_ADDRESS) {
             setIsBMousdLpApprovedWithAmmZapper(true);
-          } else if (spender === BMoUSD_AMM_STAKING_ADDRESS) {
+          } else if (spender === BMEUR_AMM_STAKING_ADDRESS) {
             setIsBMousdLpApprovedWithGauge(true);
           }
         }
@@ -430,9 +430,9 @@ export const BondViewProvider: React.FC = props => {
       contracts.bMousdAmm,
       contracts.bMousdToken,
       contracts.msicToken,
-      BMoUSD_LP_ZAP_ADDRESS,
-      BMoUSD_AMM_STAKING_ADDRESS,
-      BMoUSD_AMM_ADDRESS,
+      BMEUR_LP_ZAP_ADDRESS,
+      BMEUR_AMM_STAKING_ADDRESS,
+      BMEUR_AMM_ADDRESS,
       mosaic.connection.signer
     ]
   );
@@ -580,8 +580,8 @@ export const BondViewProvider: React.FC = props => {
     ): Promise<Map<BMousdAmmTokenIndex, Decimal>> => {
       if (contracts.bMousdAmm === undefined)
         return new Map([
-          [BMousdAmmTokenIndex.MoUSD, Decimal.ZERO],
-          [BMousdAmmTokenIndex.BMoUSD, Decimal.ZERO]
+          [BMousdAmmTokenIndex.MEUR, Decimal.ZERO],
+          [BMousdAmmTokenIndex.BMEUR, Decimal.ZERO]
         ]);
 
       return contracts.bMousdAmmZapper
@@ -755,7 +755,7 @@ export const BondViewProvider: React.FC = props => {
     isBMousdLpApprovedWithGauge,
     inputToken,
     isInputTokenApprovedWithBMousdAmm:
-      inputToken === BMousdAmmTokenIndex.BMoUSD
+      inputToken === BMousdAmmTokenIndex.BMEUR
         ? isBMousdApprovedWithBmsicAmm
         : isMousdApprovedWithBmsicAmm,
     getExpectedSwapOutput,

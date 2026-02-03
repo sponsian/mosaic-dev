@@ -9,7 +9,7 @@ Parameters of a [closeTrove()](./lib-base.transactablemosaic.closetrove.md) tran
 <b>Signature:</b>
 
 ```typescript
-export declare type TroveClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_MoUSDRepayment<T>> & _NoMoUSDBorrowing;
+export declare type TroveClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_MEURRepayment<T>> & _NoMEURBorrowing;
 ```
 
 ## Remarks
@@ -24,7 +24,7 @@ The type parameter `T` specifies the allowed value type(s) of the particular `Tr
 
 <tr> <td> withdrawCollateral </td> <td> T </td> <td> The amount of collateral that's withdrawn. </td> </tr>
 
-<tr> <td> repayMoUSD? </td> <td> T </td> <td> <i>(Optional)</i> The amount of MoUSD that's repaid. </td> </tr>
+<tr> <td> repayMEUR? </td> <td> T </td> <td> <i>(Optional)</i> The amount of MEUR that's repaid. </td> </tr>
 
 </table>
 

@@ -21,9 +21,9 @@ export const Claim: React.FC = () => {
   return (
     <>
       <ActionDescription>
-        You will receive <Text sx={{ fontWeight: "bold" }}>{bond.accrued.prettify(2)} bMoUSD</Text>{" "}
+        You will receive <Text sx={{ fontWeight: "bold" }}>{bond.accrued.prettify(2)} bMEUR</Text>{" "}
         and forgo your bonded{" "}
-        <Text sx={{ fontWeight: "bold" }}>{bond.deposit.prettify(2)} MoUSD</Text>
+        <Text sx={{ fontWeight: "bold" }}>{bond.deposit.prettify(2)} MEUR</Text>
       </ActionDescription>
 
       <Flex variant="layout.actions">

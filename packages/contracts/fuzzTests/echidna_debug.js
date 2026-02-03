@@ -2,7 +2,7 @@ const { TestHelper: { dec } } = require("../utils/testHelpers.js")
 
 const EchidnaTester = artifacts.require('EchidnaTester')
 const TroveManager = artifacts.require('TroveManager')
-const MoUSDToken = artifacts.require('MoUSDToken')
+const MEURToken = artifacts.require('MEURToken')
 const ActivePool = artifacts.require('ActivePool')
 const DefaultPool = artifacts.require('DefaultPool')
 const StabilityPool = artifacts.require('StabilityPool')
@@ -22,7 +22,7 @@ contract('Echidna debugger', async accounts => {
   before(async () => {
     echidnaTester = await EchidnaTester.new({ value: dec(11, 25) })
     troveManager = await TroveManager.at(await echidnaTester.troveManager())
-    msicToken = await MoUSDToken.at(await echidnaTester.msicToken())
+    msicToken = await MEURToken.at(await echidnaTester.msicToken())
     activePool = await ActivePool.at(await echidnaTester.activePool())
     defaultPool = await DefaultPool.at(await echidnaTester.defaultPool())
     stabilityPool = await StabilityPool.at(await echidnaTester.stabilityPool())
@@ -65,14 +65,14 @@ contract('Echidna debugger', async accounts => {
     console.log('Trove 2', icr2_after_price, icr2_after_price.toString())
   })
 
-  it.only('MoUSD balance', async () => {
+  it.only('MEUR balance', async () => {
     await echidnaTester.openTroveExt('0', '0', '4210965169908805439447313562489173090')
 
     const totalSupply = await msicToken.totalSupply();
     const gasPoolBalance = await msicToken.balanceOf(GAS_POOL_ADDRESS);
-    const activePoolBalance = await activePool.getMoUSDDebt();
-    const defaultPoolBalance = await defaultPool.getMoUSDDebt();
-    const stabilityPoolBalance = await stabilityPool.getTotalMoUSDDeposits();
+    const activePoolBalance = await activePool.getMEURDebt();
+    const defaultPoolBalance = await defaultPool.getMEURDebt();
+    const stabilityPoolBalance = await stabilityPool.getTotalMEURDeposits();
     const currentTrove = await echidnaTester.echidnaProxies(0);
     const troveBalance = msicToken.balanceOf(currentTrove);
 
