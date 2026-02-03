@@ -62,7 +62,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         msicStaking = msicStakingCached;
     }
 
-    function claimCollateralAndOpenTrove(uint _maxFee, uint _MoUSDAmount, address _upperHint, address _lowerHint) external payable {
+    function claimCollateralAndOpenTrove(uint _maxFee, uint _MEURAmount, address _upperHint, address _lowerHint) external payable {
         uint balanceBefore = address(this).balance;
 
         // Claim collateral
@@ -76,7 +76,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint totalCollateral = balanceAfter.sub(balanceBefore).add(msg.value);
 
         // Open trove with obtained collateral, plus collateral sent by user
-        borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _MoUSDAmount, _upperHint, _lowerHint);
+        borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _MEURAmount, _upperHint, _lowerHint);
     }
 
     function claimSPRewardsAndRecycle(uint _maxFee, address _upperHint, address _lowerHint) external {
@@ -90,14 +90,14 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint msicBalanceAfter = msicToken.balanceOf(address(this));
         uint claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
 
-        // Add claimed REEF to trove, get more MoUSD and stake it into the Stability Pool
+        // Add claimed REEF to trove, get more MEUR and stake it into the Stability Pool
         if (claimedCollateral > 0) {
             _requireUserHasTrove(address(this));
-            uint MoUSDAmount = _getNetMoUSDAmount(claimedCollateral);
-            borrowerOperations.adjustTrove{ value: claimedCollateral }(_maxFee, 0, MoUSDAmount, true, _upperHint, _lowerHint);
-            // Provide withdrawn MoUSD to Stability Pool
-            if (MoUSDAmount > 0) {
-                stabilityPool.provideToSP(MoUSDAmount, address(0));
+            uint MEURAmount = _getNetMEURAmount(claimedCollateral);
+            borrowerOperations.adjustTrove{ value: claimedCollateral }(_maxFee, 0, MEURAmount, true, _upperHint, _lowerHint);
+            // Provide withdrawn MEUR to Stability Pool
+            if (MEURAmount > 0) {
+                stabilityPool.provideToSP(MEURAmount, address(0));
             }
         }
 
@@ -117,19 +117,19 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         msicStaking.unstake(0);
 
         uint gainedCollateral = address(this).balance.sub(collBalanceBefore); // stack too deep issues :'(
-        uint gainedMoUSD = msicToken.balanceOf(address(this)).sub(msicBalanceBefore);
+        uint gainedMEUR = msicToken.balanceOf(address(this)).sub(msicBalanceBefore);
 
-        uint netMoUSDAmount;
-        // Top up trove and get more MoUSD, keeping ICR constant
+        uint netMEURAmount;
+        // Top up trove and get more MEUR, keeping ICR constant
         if (gainedCollateral > 0) {
             _requireUserHasTrove(address(this));
-            netMoUSDAmount = _getNetMoUSDAmount(gainedCollateral);
-            borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netMoUSDAmount, true, _upperHint, _lowerHint);
+            netMEURAmount = _getNetMEURAmount(gainedCollateral);
+            borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netMEURAmount, true, _upperHint, _lowerHint);
         }
 
-        uint totalMoUSD = gainedMoUSD.add(netMoUSDAmount);
-        if (totalMoUSD > 0) {
-            stabilityPool.provideToSP(totalMoUSD, address(0));
+        uint totalMEUR = gainedMEUR.add(netMEURAmount);
+        if (totalMEUR > 0) {
+            stabilityPool.provideToSP(totalMEUR, address(0));
 
             // Providing to Stability Pool also triggers MSIC claim, so stake it if any
             uint msicBalanceAfter = msicToken.balanceOf(address(this));
@@ -141,13 +141,13 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
 
     }
 
-    function _getNetMoUSDAmount(uint _collateral) internal returns (uint) {
+    function _getNetMEURAmount(uint _collateral) internal returns (uint) {
         uint price = priceFeed.fetchPrice();
         uint ICR = troveManager.getCurrentICR(address(this), price);
 
-        uint MoUSDAmount = _collateral.mul(price).div(ICR);
+        uint MEURAmount = _collateral.mul(price).div(ICR);
         uint borrowingRate = troveManager.getBorrowingRateWithDecay();
-        uint netDebt = MoUSDAmount.mul(MosaicMath.DECIMAL_PRECISION).div(MosaicMath.DECIMAL_PRECISION.add(borrowingRate));
+        uint netDebt = MEURAmount.mul(MosaicMath.DECIMAL_PRECISION).div(MosaicMath.DECIMAL_PRECISION.add(borrowingRate));
 
         return netDebt;
     }

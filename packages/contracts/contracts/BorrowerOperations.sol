@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
-import "./Interfaces/IMoUSDToken.sol";
+import "./Interfaces/IMEURToken.sol";
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IMSICStaking.sol";
@@ -29,7 +29,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     IMSICStaking public msicStaking;
     address public msicStakingAddress;
 
-    IMoUSDToken public mousdToken;
+    IMEURToken public msicToken;
 
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
@@ -49,7 +49,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         uint oldICR;
         uint newICR;
         uint newTCR;
-        uint MoUSDFee;
+        uint MEURFee;
         uint newDebt;
         uint newColl;
         uint stake;
@@ -57,7 +57,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
     struct LocalVariables_openTrove {
         uint price;
-        uint MoUSDFee;
+        uint MEURFee;
         uint netDebt;
         uint compositeDebt;
         uint ICR;
@@ -69,7 +69,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     struct ContractsCache {
         ITroveManager troveManager;
         IActivePool activePool;
-        IMoUSDToken msicToken;
+        IMEURToken msicToken;
     }
 
     enum BorrowerOperation {
@@ -86,12 +86,12 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
     event PriceFeedAddressChanged(address  _newPriceFeedAddress);
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event MoUSDTokenAddressChanged(address _msicTokenAddress);
+    event MEURTokenAddressChanged(address _msicTokenAddress);
     event MSICStakingAddressChanged(address _msicStakingAddress);
 
     event TroveCreated(address indexed _borrower, uint arrayIndex);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, BorrowerOperation operation);
-    event MoUSDBorrowingFeePaid(address indexed _borrower, uint _MoUSDFee);
+    event MEURBorrowingFeePaid(address indexed _borrower, uint _MEURFee);
     
     // --- Dependency setters ---
 
@@ -111,7 +111,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         override
         onlyOwner
     {
-        // This makes impossible to open a trove with zero withdrawn MoUSD
+        // This makes impossible to open a trove with zero withdrawn MEUR
         assert(MIN_NET_DEBT > 0);
 
         checkContract(_troveManagerAddress);
@@ -133,7 +133,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
-        msicToken = IMoUSDToken(_msicTokenAddress);
+        msicToken = IMEURToken(_msicTokenAddress);
         msicStakingAddress = _msicStakingAddress;
         msicStaking = IMSICStaking(_msicStakingAddress);
 
@@ -145,7 +145,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         emit CollSurplusPoolAddressChanged(_collSurplusPoolAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
-        emit MoUSDTokenAddressChanged(_msicTokenAddress);
+        emit MEURTokenAddressChanged(_msicTokenAddress);
         emit MSICStakingAddressChanged(_msicStakingAddress);
 
         _renounceOwnership();
@@ -153,7 +153,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
     // --- Borrower Trove Operations ---
 
-    function openTrove(uint _maxFeePercentage, uint _MoUSDAmount, address _upperHint, address _lowerHint) external payable override {
+    function openTrove(uint _maxFeePercentage, uint _MEURAmount, address _upperHint, address _lowerHint) external payable override {
         ContractsCache memory contractsCache = ContractsCache(troveManager, activePool, msicToken);
         LocalVariables_openTrove memory vars;
 
@@ -163,16 +163,16 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
         _requireTroveisNotActive(contractsCache.troveManager, msg.sender);
 
-        vars.MoUSDFee;
-        vars.netDebt = _MoUSDAmount;
+        vars.MEURFee;
+        vars.netDebt = _MEURAmount;
 
         if (!isRecoveryMode) {
-            vars.MoUSDFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.msicToken, _MoUSDAmount, _maxFeePercentage);
-            vars.netDebt = vars.netDebt.add(vars.MoUSDFee);
+            vars.MEURFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.msicToken, _MEURAmount, _maxFeePercentage);
+            vars.netDebt = vars.netDebt.add(vars.MEURFee);
         }
         _requireAtLeastMinNetDebt(vars.netDebt);
 
-        // ICR is based on the composite debt, i.e. the requested MoUSD amount + MoUSD borrowing fee + MoUSD gas comp.
+        // ICR is based on the composite debt, i.e. the requested MEUR amount + MEUR borrowing fee + MEUR gas comp.
         vars.compositeDebt = _getCompositeDebt(vars.netDebt);
         assert(vars.compositeDebt > 0);
         
@@ -199,14 +199,14 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
         emit TroveCreated(msg.sender, vars.arrayIndex);
 
-        // Move the ether to the Active Pool, and mint the MoUSDAmount to the borrower
+        // Move the ether to the Active Pool, and mint the MEURAmount to the borrower
         _activePoolAddColl(contractsCache.activePool, msg.value);
-        _withdrawMoUSD(contractsCache.activePool, contractsCache.msicToken, msg.sender, _MoUSDAmount, vars.netDebt);
-        // Move the MoUSD gas compensation to the Gas Pool
-        _withdrawMoUSD(contractsCache.activePool, contractsCache.msicToken, gasPoolAddress, MoUSD_GAS_COMPENSATION, MoUSD_GAS_COMPENSATION);
+        _withdrawMEUR(contractsCache.activePool, contractsCache.msicToken, msg.sender, _MEURAmount, vars.netDebt);
+        // Move the MEUR gas compensation to the Gas Pool
+        _withdrawMEUR(contractsCache.activePool, contractsCache.msicToken, gasPoolAddress, MEUR_GAS_COMPENSATION, MEUR_GAS_COMPENSATION);
 
         emit TroveUpdated(msg.sender, vars.compositeDebt, msg.value, vars.stake, BorrowerOperation.openTrove);
-        emit MoUSDBorrowingFeePaid(msg.sender, vars.MoUSDFee);
+        emit MEURBorrowingFeePaid(msg.sender, vars.MEURFee);
     }
 
     // Send REEF as collateral to a trove
@@ -225,18 +225,18 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         _adjustTrove(msg.sender, _collWithdrawal, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Withdraw MoUSD tokens from a trove: mint new MoUSD tokens to the owner, and increase the trove's debt accordingly
-    function withdrawMoUSD(uint _maxFeePercentage, uint _MoUSDAmount, address _upperHint, address _lowerHint) external override {
-        _adjustTrove(msg.sender, 0, _MoUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
+    // Withdraw MEUR tokens from a trove: mint new MEUR tokens to the owner, and increase the trove's debt accordingly
+    function withdrawMEUR(uint _maxFeePercentage, uint _MEURAmount, address _upperHint, address _lowerHint) external override {
+        _adjustTrove(msg.sender, 0, _MEURAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
-    // Repay MoUSD tokens to a Trove: Burn the repaid MoUSD tokens, and reduce the trove's debt accordingly
-    function repayMoUSD(uint _MoUSDAmount, address _upperHint, address _lowerHint) external override {
-        _adjustTrove(msg.sender, 0, _MoUSDAmount, false, _upperHint, _lowerHint, 0);
+    // Repay MEUR tokens to a Trove: Burn the repaid MEUR tokens, and reduce the trove's debt accordingly
+    function repayMEUR(uint _MEURAmount, address _upperHint, address _lowerHint) external override {
+        _adjustTrove(msg.sender, 0, _MEURAmount, false, _upperHint, _lowerHint, 0);
     }
 
-    function adjustTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _MoUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable override {
-        _adjustTrove(msg.sender, _collWithdrawal, _MoUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
+    function adjustTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _MEURChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable override {
+        _adjustTrove(msg.sender, _collWithdrawal, _MEURChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
     /*
@@ -246,7 +246,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     *
     * If both are positive, it will revert.
     */
-    function _adjustTrove(address _borrower, uint _collWithdrawal, uint _MoUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage) internal {
+    function _adjustTrove(address _borrower, uint _collWithdrawal, uint _MEURChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage) internal {
         ContractsCache memory contractsCache = ContractsCache(troveManager, activePool, msicToken);
         LocalVariables_adjustTrove memory vars;
 
@@ -255,26 +255,26 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
         if (_isDebtIncrease) {
             _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
-            _requireNonZeroDebtChange(_MoUSDChange);
+            _requireNonZeroDebtChange(_MEURChange);
         }
         _requireSingularCollChange(_collWithdrawal);
-        _requireNonZeroAdjustment(_collWithdrawal, _MoUSDChange);
+        _requireNonZeroAdjustment(_collWithdrawal, _MEURChange);
         _requireTroveisActive(contractsCache.troveManager, _borrower);
 
         // Confirm the operation is either a borrower adjusting their own trove, or a pure REEF transfer from the Stability Pool to a trove
-        assert(msg.sender == _borrower || (msg.sender == stabilityPoolAddress && msg.value > 0 && _MoUSDChange == 0));
+        assert(msg.sender == _borrower || (msg.sender == stabilityPoolAddress && msg.value > 0 && _MEURChange == 0));
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
         // Get the collChange based on whether or not REEF was sent in the transaction
         (vars.collChange, vars.isCollIncrease) = _getCollChange(msg.value, _collWithdrawal);
 
-        vars.netDebtChange = _MoUSDChange;
+        vars.netDebtChange = _MEURChange;
 
         // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a borrowing fee
         if (_isDebtIncrease && !isRecoveryMode) { 
-            vars.MoUSDFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.msicToken, _MoUSDChange, _maxFeePercentage);
-            vars.netDebtChange = vars.netDebtChange.add(vars.MoUSDFee); // The raw debt change includes the fee
+            vars.MEURFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.msicToken, _MEURChange, _maxFeePercentage);
+            vars.netDebtChange = vars.netDebtChange.add(vars.MEURFee); // The raw debt change includes the fee
         }
 
         vars.debt = contractsCache.troveManager.getTroveDebt(_borrower);
@@ -288,11 +288,11 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         // Check the adjustment satisfies all conditions for the current system mode
         _requireValidAdjustmentInCurrentMode(isRecoveryMode, _collWithdrawal, _isDebtIncrease, vars);
             
-        // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough MoUSD
-        if (!_isDebtIncrease && _MoUSDChange > 0) {
+        // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough MEUR
+        if (!_isDebtIncrease && _MEURChange > 0) {
             _requireAtLeastMinNetDebt(_getNetDebt(vars.debt).sub(vars.netDebtChange));
-            _requireValidMoUSDRepayment(vars.debt, vars.netDebtChange);
-            _requireSufficientMoUSDBalance(contractsCache.msicToken, _borrower, vars.netDebtChange);
+            _requireValidMEURRepayment(vars.debt, vars.netDebtChange);
+            _requireSufficientMEURBalance(contractsCache.msicToken, _borrower, vars.netDebtChange);
         }
 
         (vars.newColl, vars.newDebt) = _updateTroveFromAdjustment(contractsCache.troveManager, _borrower, vars.collChange, vars.isCollIncrease, vars.netDebtChange, _isDebtIncrease);
@@ -303,16 +303,16 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         sortedTroves.reInsert(_borrower, newNICR, _upperHint, _lowerHint);
 
         emit TroveUpdated(_borrower, vars.newDebt, vars.newColl, vars.stake, BorrowerOperation.adjustTrove);
-        emit MoUSDBorrowingFeePaid(msg.sender,  vars.MoUSDFee);
+        emit MEURBorrowingFeePaid(msg.sender,  vars.MEURFee);
 
-        // Use the unmodified _MoUSDChange here, as we don't send the fee to the user
+        // Use the unmodified _MEURChange here, as we don't send the fee to the user
         _moveTokensAndETHfromAdjustment(
             contractsCache.activePool,
             contractsCache.msicToken,
             msg.sender,
             vars.collChange,
             vars.isCollIncrease,
-            _MoUSDChange,
+            _MEURChange,
             _isDebtIncrease,
             vars.netDebtChange
         );
@@ -321,7 +321,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     function closeTrove() external override {
         ITroveManager troveManagerCached = troveManager;
         IActivePool activePoolCached = activePool;
-        IMoUSDToken msicTokenCached = msicToken;
+        IMEURToken msicTokenCached = msicToken;
 
         _requireTroveisActive(troveManagerCached, msg.sender);
         uint price = priceFeed.fetchPrice();
@@ -332,7 +332,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         uint coll = troveManagerCached.getTroveColl(msg.sender);
         uint debt = troveManagerCached.getTroveDebt(msg.sender);
 
-        _requireSufficientMoUSDBalance(msicTokenCached, msg.sender, debt.sub(MoUSD_GAS_COMPENSATION));
+        _requireSufficientMEURBalance(msicTokenCached, msg.sender, debt.sub(MEUR_GAS_COMPENSATION));
 
         uint newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
         _requireNewTCRisAboveCCR(newTCR);
@@ -342,9 +342,9 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
         emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
 
-        // Burn the repaid MoUSD from the user's balance and the gas compensation from the Gas Pool
-        _repayMoUSD(activePoolCached, msicTokenCached, msg.sender, debt.sub(MoUSD_GAS_COMPENSATION));
-        _repayMoUSD(activePoolCached, msicTokenCached, gasPoolAddress, MoUSD_GAS_COMPENSATION);
+        // Burn the repaid MEUR from the user's balance and the gas compensation from the Gas Pool
+        _repayMEUR(activePoolCached, msicTokenCached, msg.sender, debt.sub(MEUR_GAS_COMPENSATION));
+        _repayMEUR(activePoolCached, msicTokenCached, gasPoolAddress, MEUR_GAS_COMPENSATION);
 
         // Send the collateral back to the user
         activePoolCached.sendETH(msg.sender, coll);
@@ -360,17 +360,17 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
     // --- Helper functions ---
 
-    function _triggerBorrowingFee(ITroveManager _troveManager, IMoUSDToken _msicToken, uint _MoUSDAmount, uint _maxFeePercentage) internal returns (uint) {
+    function _triggerBorrowingFee(ITroveManager _troveManager, IMEURToken _msicToken, uint _MEURAmount, uint _maxFeePercentage) internal returns (uint) {
         _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
-        uint MoUSDFee = _troveManager.getBorrowingFee(_MoUSDAmount);
+        uint MEURFee = _troveManager.getBorrowingFee(_MEURAmount);
 
-        _requireUserAcceptsFee(MoUSDFee, _MoUSDAmount, _maxFeePercentage);
+        _requireUserAcceptsFee(MEURFee, _MEURAmount, _maxFeePercentage);
         
         // Send fee to MSIC staking contract
-        msicStaking.increaseF_MoUSD(MoUSDFee);
-        _msicToken.mint(msicStakingAddress, MoUSDFee);
+        msicStaking.increaseF_MEUR(MEURFee);
+        _msicToken.mint(msicStakingAddress, MEURFee);
 
-        return MoUSDFee;
+        return MEURFee;
     }
 
     function _getUSDValue(uint _coll, uint _price) internal pure returns (uint) {
@@ -419,20 +419,20 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     function _moveTokensAndETHfromAdjustment
     (
         IActivePool _activePool,
-        IMoUSDToken _msicToken,
+        IMEURToken _msicToken,
         address _borrower,
         uint _collChange,
         bool _isCollIncrease,
-        uint _MoUSDChange,
+        uint _MEURChange,
         bool _isDebtIncrease,
         uint _netDebtChange
     )
         internal
     {
         if (_isDebtIncrease) {
-            _withdrawMoUSD(_activePool, _msicToken, _borrower, _MoUSDChange, _netDebtChange);
+            _withdrawMEUR(_activePool, _msicToken, _borrower, _MEURChange, _netDebtChange);
         } else {
-            _repayMoUSD(_activePool, _msicToken, _borrower, _MoUSDChange);
+            _repayMEUR(_activePool, _msicToken, _borrower, _MEURChange);
         }
 
         if (_isCollIncrease) {
@@ -448,16 +448,16 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         require(success, "BorrowerOps: Sending REEF to ActivePool failed");
     }
 
-    // Issue the specified amount of MoUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a MoUSDFee)
-    function _withdrawMoUSD(IActivePool _activePool, IMoUSDToken _msicToken, address _account, uint _MoUSDAmount, uint _netDebtIncrease) internal {
-        _activePool.increaseMoUSDDebt(_netDebtIncrease);
-        _msicToken.mint(_account, _MoUSDAmount);
+    // Issue the specified amount of MEUR to _account and increases the total active debt (_netDebtIncrease potentially includes a MEURFee)
+    function _withdrawMEUR(IActivePool _activePool, IMEURToken _msicToken, address _account, uint _MEURAmount, uint _netDebtIncrease) internal {
+        _activePool.increaseMEURDebt(_netDebtIncrease);
+        _msicToken.mint(_account, _MEURAmount);
     }
 
-    // Burn the specified amount of MoUSD from _account and decreases the total active debt
-    function _repayMoUSD(IActivePool _activePool, IMoUSDToken _msicToken, address _account, uint _MoUSD) internal {
-        _activePool.decreaseMoUSDDebt(_MoUSD);
-        _msicToken.burn(_account, _MoUSD);
+    // Burn the specified amount of MEUR from _account and decreases the total active debt
+    function _repayMEUR(IActivePool _activePool, IMEURToken _msicToken, address _account, uint _MEUR) internal {
+        _activePool.decreaseMEURDebt(_MEUR);
+        _msicToken.burn(_account, _MEUR);
     }
 
     // --- 'Require' wrapper functions ---
@@ -470,8 +470,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         require(msg.sender == _borrower, "BorrowerOps: Caller must be the borrower for a withdrawal");
     }
 
-    function _requireNonZeroAdjustment(uint _collWithdrawal, uint _MoUSDChange) internal view {
-        require(msg.value != 0 || _collWithdrawal != 0 || _MoUSDChange != 0, "BorrowerOps: There must be either a collateral change or a debt change");
+    function _requireNonZeroAdjustment(uint _collWithdrawal, uint _MEURChange) internal view {
+        require(msg.value != 0 || _collWithdrawal != 0 || _MEURChange != 0, "BorrowerOps: There must be either a collateral change or a debt change");
     }
 
     function _requireTroveisActive(ITroveManager _troveManager, address _borrower) internal view {
@@ -484,8 +484,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         require(status != 1, "BorrowerOps: Trove is active");
     }
 
-    function _requireNonZeroDebtChange(uint _MoUSDChange) internal pure {
-        require(_MoUSDChange > 0, "BorrowerOps: Debt increase requires non-zero debtChange");
+    function _requireNonZeroDebtChange(uint _MEURChange) internal pure {
+        require(_MEURChange > 0, "BorrowerOps: Debt increase requires non-zero debtChange");
     }
    
     function _requireNotInRecoveryMode(uint _price) internal view {
@@ -552,16 +552,16 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         require (_netDebt >= MIN_NET_DEBT, "BorrowerOps: Trove's net debt must be greater than minimum");
     }
 
-    function _requireValidMoUSDRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
-        require(_debtRepayment <= _currentDebt.sub(MoUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
+    function _requireValidMEURRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
+        require(_debtRepayment <= _currentDebt.sub(MEUR_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
     }
 
     function _requireCallerIsStabilityPool() internal view {
         require(msg.sender == stabilityPoolAddress, "BorrowerOps: Caller is not Stability Pool");
     }
 
-     function _requireSufficientMoUSDBalance(IMoUSDToken _msicToken, address _borrower, uint _debtRepayment) internal view {
-        require(_msicToken.balanceOf(_borrower) >= _debtRepayment, "BorrowerOps: Caller doesnt have enough MoUSD to make repayment");
+     function _requireSufficientMEURBalance(IMEURToken _msicToken, address _borrower, uint _debtRepayment) internal view {
+        require(_msicToken.balanceOf(_borrower) >= _debtRepayment, "BorrowerOps: Caller doesnt have enough MEUR to make repayment");
     }
 
     function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isRecoveryMode) internal pure {

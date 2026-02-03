@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IStabilityPool.sol";
 import "./Interfaces/ICollSurplusPool.sol";
-import "./Interfaces/IMoUSDToken.sol";
+import "./Interfaces/IMEURToken.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IMSICToken.sol";
 import "./Interfaces/IMSICStaking.sol";
@@ -27,7 +27,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     ICollSurplusPool collSurplusPool;
 
-    IMoUSDToken public override mousdToken;
+    IMEURToken public override msicToken;
 
     IMSICToken public override msicToken;
 
@@ -58,7 +58,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     uint public baseRate;
 
-    // The timestamp of the latest fee operation (redemption or new MoUSD issuance)
+    // The timestamp of the latest fee operation (redemption or new MEUR issuance)
     uint public lastFeeOperationTime;
 
     enum Status {
@@ -89,28 +89,28 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     uint public totalCollateralSnapshot;
 
     /*
-    * L_ETH and L_MoUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
+    * L_ETH and L_MEURDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
     *
     * An REEF gain of ( stake * [L_ETH - L_ETH(0)] )
-    * A MoUSDDebt increase  of ( stake * [L_MoUSDDebt - L_MoUSDDebt(0)] )
+    * A MEURDebt increase  of ( stake * [L_MEURDebt - L_MEURDebt(0)] )
     *
-    * Where L_ETH(0) and L_MoUSDDebt(0) are snapshots of L_ETH and L_MoUSDDebt for the active Trove taken at the instant the stake was made
+    * Where L_ETH(0) and L_MEURDebt(0) are snapshots of L_ETH and L_MEURDebt for the active Trove taken at the instant the stake was made
     */
     uint public L_ETH;
-    uint public L_MoUSDDebt;
+    uint public L_MEURDebt;
 
     // Map addresses with active troves to their RewardSnapshot
     mapping (address => RewardSnapshot) public rewardSnapshots;
 
-    // Object containing the REEF and MoUSD snapshots for a given active trove
-    struct RewardSnapshot { uint REEF; uint MoUSDDebt;}
+    // Object containing the REEF and MEUR snapshots for a given active trove
+    struct RewardSnapshot { uint REEF; uint MEURDebt;}
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] public TroveOwners;
 
     // Error trackers for the trove redistribution calculation
     uint public lastETHError_Redistribution;
-    uint public lastMoUSDDebtError_Redistribution;
+    uint public lastMEURDebtError_Redistribution;
 
     /*
     * --- Variable container structs for liquidations ---
@@ -121,7 +121,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     struct LocalVariables_OuterLiquidationFunction {
         uint price;
-        uint MoUSDInStabPool;
+        uint MEURInStabPool;
         bool recoveryModeAtStart;
         uint liquidatedDebt;
         uint liquidatedColl;
@@ -134,7 +134,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     }
 
     struct LocalVariables_LiquidationSequence {
-        uint remainingMoUSDInStabPool;
+        uint remainingMEURInStabPool;
         uint i;
         uint ICR;
         address user;
@@ -147,7 +147,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         uint entireTroveDebt;
         uint entireTroveColl;
         uint collGasCompensation;
-        uint MoUSDGasCompensation;
+        uint MEURGasCompensation;
         uint debtToOffset;
         uint collToSendToSP;
         uint debtToRedistribute;
@@ -159,7 +159,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         uint totalCollInSequence;
         uint totalDebtInSequence;
         uint totalCollGasCompensation;
-        uint totalMoUSDGasCompensation;
+        uint totalMEURGasCompensation;
         uint totalDebtToOffset;
         uint totalCollToSendToSP;
         uint totalDebtToRedistribute;
@@ -170,7 +170,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     struct ContractsCache {
         IActivePool activePool;
         IDefaultPool defaultPool;
-        IMoUSDToken msicToken;
+        IMEURToken msicToken;
         IMSICStaking msicStaking;
         ISortedTroves sortedTroves;
         ICollSurplusPool collSurplusPool;
@@ -179,18 +179,18 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     // --- Variable container structs for redemptions ---
 
     struct RedemptionTotals {
-        uint remainingMoUSD;
-        uint totalMoUSDToRedeem;
+        uint remainingMEUR;
+        uint totalMEURToRedeem;
         uint totalETHDrawn;
         uint ETHFee;
         uint ETHToSendToRedeemer;
         uint decayedBaseRate;
         uint price;
-        uint totalMoUSDSupplyAtStart;
+        uint totalMEURSupplyAtStart;
     }
 
     struct SingleRedemptionValues {
-        uint MoUSDLot;
+        uint MEURLot;
         uint ETHLot;
         bool cancelledPartial;
     }
@@ -199,7 +199,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event MoUSDTokenAddressChanged(address _newMoUSDTokenAddress);
+    event MEURTokenAddressChanged(address _newMEURTokenAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
     event StabilityPoolAddressChanged(address _stabilityPoolAddress);
@@ -209,16 +209,16 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     event MSICTokenAddressChanged(address _msicTokenAddress);
     event MSICStakingAddressChanged(address _msicStakingAddress);
 
-    event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _MoUSDGasCompensation);
-    event Redemption(uint _attemptedMoUSDAmount, uint _actualMoUSDAmount, uint _ETHSent, uint _ETHFee);
+    event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _MEURGasCompensation);
+    event Redemption(uint _attemptedMEURAmount, uint _actualMEURAmount, uint _ETHSent, uint _ETHFee);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint _stake, TroveManagerOperation _operation);
     event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, TroveManagerOperation _operation);
     event BaseRateUpdated(uint _baseRate);
     event LastFeeOpTimeUpdated(uint _lastFeeOpTime);
     event TotalStakesUpdated(uint _newTotalStakes);
     event SystemSnapshotsUpdated(uint _totalStakesSnapshot, uint _totalCollateralSnapshot);
-    event LTermsUpdated(uint _L_ETH, uint _L_MoUSDDebt);
-    event TroveSnapshotsUpdated(uint _L_ETH, uint _L_MoUSDDebt);
+    event LTermsUpdated(uint _L_ETH, uint _L_MEURDebt);
+    event TroveSnapshotsUpdated(uint _L_ETH, uint _L_MEURDebt);
     event TroveIndexUpdated(address _borrower, uint _newIndex);
 
      enum TroveManagerOperation {
@@ -267,7 +267,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         gasPoolAddress = _gasPoolAddress;
         collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
-        mousdToken = IMoUSDToken(_msicTokenAddress);
+        msicToken = IMEURToken(_msicTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         msicToken = IMSICToken(_msicTokenAddress);
         msicStaking = IMSICStaking(_msicStakingAddress);
@@ -279,7 +279,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         emit GasPoolAddressChanged(_gasPoolAddress);
         emit CollSurplusPoolAddressChanged(_collSurplusPoolAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
-        emit MoUSDTokenAddressChanged(_msicTokenAddress);
+        emit MEURTokenAddressChanged(_msicTokenAddress);
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit MSICTokenAddressChanged(_msicTokenAddress);
         emit MSICStakingAddressChanged(_msicStakingAddress);
@@ -315,7 +315,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         address _borrower,
-        uint _MoUSDInStabPool
+        uint _MEURInStabPool
     )
         internal
         returns (LiquidationValues memory singleLiquidation)
@@ -331,13 +331,13 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         _removeStake(_borrower);
 
         singleLiquidation.collGasCompensation = _getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.MoUSDGasCompensation = MoUSD_GAS_COMPENSATION;
+        singleLiquidation.MEURGasCompensation = MEUR_GAS_COMPENSATION;
         uint collToLiquidate = singleLiquidation.entireTroveColl.sub(singleLiquidation.collGasCompensation);
 
         (singleLiquidation.debtToOffset,
         singleLiquidation.collToSendToSP,
         singleLiquidation.debtToRedistribute,
-        singleLiquidation.collToRedistribute) = _getOffsetAndRedistributionVals(singleLiquidation.entireTroveDebt, collToLiquidate, _MoUSDInStabPool);
+        singleLiquidation.collToRedistribute) = _getOffsetAndRedistributionVals(singleLiquidation.entireTroveDebt, collToLiquidate, _MEURInStabPool);
 
         _closeTrove(_borrower, Status.closedByLiquidation);
         emit TroveLiquidated(_borrower, singleLiquidation.entireTroveDebt, singleLiquidation.entireTroveColl, TroveManagerOperation.liquidateInNormalMode);
@@ -351,7 +351,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         IDefaultPool _defaultPool,
         address _borrower,
         uint _ICR,
-        uint _MoUSDInStabPool,
+        uint _MEURInStabPool,
         uint _TCR,
         uint _price
     )
@@ -366,7 +366,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         vars.pendingCollReward) = getEntireDebtAndColl(_borrower);
 
         singleLiquidation.collGasCompensation = _getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.MoUSDGasCompensation = MoUSD_GAS_COMPENSATION;
+        singleLiquidation.MEURGasCompensation = MEUR_GAS_COMPENSATION;
         vars.collToLiquidate = singleLiquidation.entireTroveColl.sub(singleLiquidation.collGasCompensation);
 
         // If ICR <= 100%, purely redistribute the Trove across all active Troves
@@ -391,20 +391,20 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             (singleLiquidation.debtToOffset,
             singleLiquidation.collToSendToSP,
             singleLiquidation.debtToRedistribute,
-            singleLiquidation.collToRedistribute) = _getOffsetAndRedistributionVals(singleLiquidation.entireTroveDebt, vars.collToLiquidate, _MoUSDInStabPool);
+            singleLiquidation.collToRedistribute) = _getOffsetAndRedistributionVals(singleLiquidation.entireTroveDebt, vars.collToLiquidate, _MEURInStabPool);
 
             _closeTrove(_borrower, Status.closedByLiquidation);
             emit TroveLiquidated(_borrower, singleLiquidation.entireTroveDebt, singleLiquidation.entireTroveColl, TroveManagerOperation.liquidateInRecoveryMode);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
         /*
         * If 110% <= ICR < current TCR (accounting for the preceding liquidations in the current sequence)
-        * and there is MoUSD in the Stability Pool, only offset, with no redistribution,
+        * and there is MEUR in the Stability Pool, only offset, with no redistribution,
         * but at a capped rate of 1.1 and only if the whole debt can be liquidated.
         * The remainder due to the capped rate will be claimable as collateral surplus.
         */
-        } else if ((_ICR >= MCR) && (_ICR < _TCR) && (singleLiquidation.entireTroveDebt <= _MoUSDInStabPool)) {
+        } else if ((_ICR >= MCR) && (_ICR < _TCR) && (singleLiquidation.entireTroveDebt <= _MEURInStabPool)) {
             _movePendingTroveRewardsToActivePool(_activePool, _defaultPool, vars.pendingDebtReward, vars.pendingCollReward);
-            assert(_MoUSDInStabPool != 0);
+            assert(_MEURInStabPool != 0);
 
             _removeStake(_borrower);
             singleLiquidation = _getCappedOffsetVals(singleLiquidation.entireTroveDebt, singleLiquidation.entireTroveColl, _price);
@@ -417,7 +417,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             emit TroveLiquidated(_borrower, singleLiquidation.entireTroveDebt, singleLiquidation.collToSendToSP, TroveManagerOperation.liquidateInRecoveryMode);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
 
-        } else { // if (_ICR >= MCR && ( _ICR >= _TCR || singleLiquidation.entireTroveDebt > _MoUSDInStabPool))
+        } else { // if (_ICR >= MCR && ( _ICR >= _TCR || singleLiquidation.entireTroveDebt > _MEURInStabPool))
             LiquidationValues memory zeroVals;
             return zeroVals;
         }
@@ -432,24 +432,24 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     (
         uint _debt,
         uint _coll,
-        uint _MoUSDInStabPool
+        uint _MEURInStabPool
     )
         internal
         pure
         returns (uint debtToOffset, uint collToSendToSP, uint debtToRedistribute, uint collToRedistribute)
     {
-        if (_MoUSDInStabPool > 0) {
+        if (_MEURInStabPool > 0) {
         /*
         * Offset as much debt & collateral as possible against the Stability Pool, and redistribute the remainder
         * between all active troves.
         *
-        *  If the trove's debt is larger than the deposited MoUSD in the Stability Pool:
+        *  If the trove's debt is larger than the deposited MEUR in the Stability Pool:
         *
-        *  - Offset an amount of the trove's debt equal to the MoUSD in the Stability Pool
+        *  - Offset an amount of the trove's debt equal to the MEUR in the Stability Pool
         *  - Send a fraction of the trove's collateral to the Stability Pool, equal to the fraction of its offset debt
         *
         */
-            debtToOffset = MosaicMath._min(_debt, _MoUSDInStabPool);
+            debtToOffset = MosaicMath._min(_debt, _MEURInStabPool);
             collToSendToSP = _coll.mul(debtToOffset).div(_debt);
             debtToRedistribute = _debt.sub(debtToOffset);
             collToRedistribute = _coll.sub(collToSendToSP);
@@ -479,7 +479,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         uint cappedCollPortion = _entireTroveDebt.mul(MCR).div(_price);
 
         singleLiquidation.collGasCompensation = _getCollGasCompensation(cappedCollPortion);
-        singleLiquidation.MoUSDGasCompensation = MoUSD_GAS_COMPENSATION;
+        singleLiquidation.MEURGasCompensation = MEUR_GAS_COMPENSATION;
 
         singleLiquidation.debtToOffset = _entireTroveDebt;
         singleLiquidation.collToSendToSP = cappedCollPortion.sub(singleLiquidation.collGasCompensation);
@@ -496,7 +496,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         ContractsCache memory contractsCache = ContractsCache(
             activePool,
             defaultPool,
-            IMoUSDToken(address(0)),
+            IMEURToken(address(0)),
             IMSICStaking(address(0)),
             sortedTroves,
             ICollSurplusPool(address(0)),
@@ -509,19 +509,19 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LiquidationTotals memory totals;
 
         vars.price = priceFeed.fetchPrice();
-        vars.MoUSDInStabPool = stabilityPoolCached.getTotalMoUSDDeposits();
+        vars.MEURInStabPool = stabilityPoolCached.getTotalMEURDeposits();
         vars.recoveryModeAtStart = _checkRecoveryMode(vars.price);
 
         // Perform the appropriate liquidation sequence - tally the values, and obtain their totals
         if (vars.recoveryModeAtStart) {
-            totals = _getTotalsFromLiquidateTrovesSequence_RecoveryMode(contractsCache, vars.price, vars.MoUSDInStabPool, _n);
+            totals = _getTotalsFromLiquidateTrovesSequence_RecoveryMode(contractsCache, vars.price, vars.MEURInStabPool, _n);
         } else { // if !vars.recoveryModeAtStart
-            totals = _getTotalsFromLiquidateTrovesSequence_NormalMode(contractsCache.activePool, contractsCache.defaultPool, vars.price, vars.MoUSDInStabPool, _n);
+            totals = _getTotalsFromLiquidateTrovesSequence_NormalMode(contractsCache.activePool, contractsCache.defaultPool, vars.price, vars.MEURInStabPool, _n);
         }
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated REEF and MoUSD to the appropriate pools
+        // Move liquidated REEF and MEUR to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(contractsCache.activePool, contractsCache.defaultPool, totals.totalDebtToRedistribute, totals.totalCollToRedistribute);
         if (totals.totalCollSurplus > 0) {
@@ -533,10 +533,10 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         vars.liquidatedDebt = totals.totalDebtInSequence;
         vars.liquidatedColl = totals.totalCollInSequence.sub(totals.totalCollGasCompensation).sub(totals.totalCollSurplus);
-        emit Liquidation(vars.liquidatedDebt, vars.liquidatedColl, totals.totalCollGasCompensation, totals.totalMoUSDGasCompensation);
+        emit Liquidation(vars.liquidatedDebt, vars.liquidatedColl, totals.totalCollGasCompensation, totals.totalMEURGasCompensation);
 
         // Send gas compensation to caller
-        _sendGasCompensation(contractsCache.activePool, msg.sender, totals.totalMoUSDGasCompensation, totals.totalCollGasCompensation);
+        _sendGasCompensation(contractsCache.activePool, msg.sender, totals.totalMEURGasCompensation, totals.totalCollGasCompensation);
     }
 
     /*
@@ -547,7 +547,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     (
         ContractsCache memory _contractsCache,
         uint _price,
-        uint _MoUSDInStabPool,
+        uint _MEURInStabPool,
         uint _n
     )
         internal
@@ -556,7 +556,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LocalVariables_LiquidationSequence memory vars;
         LiquidationValues memory singleLiquidation;
 
-        vars.remainingMoUSDInStabPool = _MoUSDInStabPool;
+        vars.remainingMEURInStabPool = _MEURInStabPool;
         vars.backToNormalMode = false;
         vars.entireSystemDebt = getEntireSystemDebt();
         vars.entireSystemColl = getEntireSystemColl();
@@ -571,14 +571,14 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
             if (!vars.backToNormalMode) {
                 // Break the loop if ICR is greater than MCR and Stability Pool is empty
-                if (vars.ICR >= MCR && vars.remainingMoUSDInStabPool == 0) { break; }
+                if (vars.ICR >= MCR && vars.remainingMEURInStabPool == 0) { break; }
 
                 uint TCR = MosaicMath._computeCR(vars.entireSystemColl, vars.entireSystemDebt, _price);
 
-                singleLiquidation = _liquidateRecoveryMode(_contractsCache.activePool, _contractsCache.defaultPool, vars.user, vars.ICR, vars.remainingMoUSDInStabPool, TCR, _price);
+                singleLiquidation = _liquidateRecoveryMode(_contractsCache.activePool, _contractsCache.defaultPool, vars.user, vars.ICR, vars.remainingMEURInStabPool, TCR, _price);
 
                 // Update aggregate trackers
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
                 vars.entireSystemDebt = vars.entireSystemDebt.sub(singleLiquidation.debtToOffset);
                 vars.entireSystemColl = vars.entireSystemColl.
                     sub(singleLiquidation.collToSendToSP).
@@ -591,9 +591,9 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
                 vars.backToNormalMode = !_checkPotentialRecoveryMode(vars.entireSystemColl, vars.entireSystemDebt, _price);
             }
             else if (vars.backToNormalMode && vars.ICR < MCR) {
-                singleLiquidation = _liquidateNormalMode(_contractsCache.activePool, _contractsCache.defaultPool, vars.user, vars.remainingMoUSDInStabPool);
+                singleLiquidation = _liquidateNormalMode(_contractsCache.activePool, _contractsCache.defaultPool, vars.user, vars.remainingMEURInStabPool);
 
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -609,7 +609,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         uint _price,
-        uint _MoUSDInStabPool,
+        uint _MEURInStabPool,
         uint _n
     )
         internal
@@ -619,16 +619,16 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LiquidationValues memory singleLiquidation;
         ISortedTroves sortedTrovesCached = sortedTroves;
 
-        vars.remainingMoUSDInStabPool = _MoUSDInStabPool;
+        vars.remainingMEURInStabPool = _MEURInStabPool;
 
         for (vars.i = 0; vars.i < _n; vars.i++) {
             vars.user = sortedTrovesCached.getLast();
             vars.ICR = getCurrentICR(vars.user, _price);
 
             if (vars.ICR < MCR) {
-                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMoUSDInStabPool);
+                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMEURInStabPool);
 
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -651,19 +651,19 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LiquidationTotals memory totals;
 
         vars.price = priceFeed.fetchPrice();
-        vars.MoUSDInStabPool = stabilityPoolCached.getTotalMoUSDDeposits();
+        vars.MEURInStabPool = stabilityPoolCached.getTotalMEURDeposits();
         vars.recoveryModeAtStart = _checkRecoveryMode(vars.price);
 
         // Perform the appropriate liquidation sequence - tally values and obtain their totals.
         if (vars.recoveryModeAtStart) {
-            totals = _getTotalFromBatchLiquidate_RecoveryMode(activePoolCached, defaultPoolCached, vars.price, vars.MoUSDInStabPool, _troveArray);
+            totals = _getTotalFromBatchLiquidate_RecoveryMode(activePoolCached, defaultPoolCached, vars.price, vars.MEURInStabPool, _troveArray);
         } else {  //  if !vars.recoveryModeAtStart
-            totals = _getTotalsFromBatchLiquidate_NormalMode(activePoolCached, defaultPoolCached, vars.price, vars.MoUSDInStabPool, _troveArray);
+            totals = _getTotalsFromBatchLiquidate_NormalMode(activePoolCached, defaultPoolCached, vars.price, vars.MEURInStabPool, _troveArray);
         }
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated REEF and MoUSD to the appropriate pools
+        // Move liquidated REEF and MEUR to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(activePoolCached, defaultPoolCached, totals.totalDebtToRedistribute, totals.totalCollToRedistribute);
         if (totals.totalCollSurplus > 0) {
@@ -675,10 +675,10 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         vars.liquidatedDebt = totals.totalDebtInSequence;
         vars.liquidatedColl = totals.totalCollInSequence.sub(totals.totalCollGasCompensation).sub(totals.totalCollSurplus);
-        emit Liquidation(vars.liquidatedDebt, vars.liquidatedColl, totals.totalCollGasCompensation, totals.totalMoUSDGasCompensation);
+        emit Liquidation(vars.liquidatedDebt, vars.liquidatedColl, totals.totalCollGasCompensation, totals.totalMEURGasCompensation);
 
         // Send gas compensation to caller
-        _sendGasCompensation(activePoolCached, msg.sender, totals.totalMoUSDGasCompensation, totals.totalCollGasCompensation);
+        _sendGasCompensation(activePoolCached, msg.sender, totals.totalMEURGasCompensation, totals.totalCollGasCompensation);
     }
 
     /*
@@ -690,7 +690,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         uint _price,
-        uint _MoUSDInStabPool,
+        uint _MEURInStabPool,
         address[] memory _troveArray
     )
         internal
@@ -699,7 +699,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LocalVariables_LiquidationSequence memory vars;
         LiquidationValues memory singleLiquidation;
 
-        vars.remainingMoUSDInStabPool = _MoUSDInStabPool;
+        vars.remainingMEURInStabPool = _MEURInStabPool;
         vars.backToNormalMode = false;
         vars.entireSystemDebt = getEntireSystemDebt();
         vars.entireSystemColl = getEntireSystemColl();
@@ -713,14 +713,14 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             if (!vars.backToNormalMode) {
 
                 // Skip this trove if ICR is greater than MCR and Stability Pool is empty
-                if (vars.ICR >= MCR && vars.remainingMoUSDInStabPool == 0) { continue; }
+                if (vars.ICR >= MCR && vars.remainingMEURInStabPool == 0) { continue; }
 
                 uint TCR = MosaicMath._computeCR(vars.entireSystemColl, vars.entireSystemDebt, _price);
 
-                singleLiquidation = _liquidateRecoveryMode(_activePool, _defaultPool, vars.user, vars.ICR, vars.remainingMoUSDInStabPool, TCR, _price);
+                singleLiquidation = _liquidateRecoveryMode(_activePool, _defaultPool, vars.user, vars.ICR, vars.remainingMEURInStabPool, TCR, _price);
 
                 // Update aggregate trackers
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
                 vars.entireSystemDebt = vars.entireSystemDebt.sub(singleLiquidation.debtToOffset);
                 vars.entireSystemColl = vars.entireSystemColl.
                     sub(singleLiquidation.collToSendToSP).
@@ -734,8 +734,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             }
 
             else if (vars.backToNormalMode && vars.ICR < MCR) {
-                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMoUSDInStabPool);
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMEURInStabPool);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -749,7 +749,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         uint _price,
-        uint _MoUSDInStabPool,
+        uint _MEURInStabPool,
         address[] memory _troveArray
     )
         internal
@@ -758,15 +758,15 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         LocalVariables_LiquidationSequence memory vars;
         LiquidationValues memory singleLiquidation;
 
-        vars.remainingMoUSDInStabPool = _MoUSDInStabPool;
+        vars.remainingMEURInStabPool = _MEURInStabPool;
 
         for (vars.i = 0; vars.i < _troveArray.length; vars.i++) {
             vars.user = _troveArray[vars.i];
             vars.ICR = getCurrentICR(vars.user, _price);
 
             if (vars.ICR < MCR) {
-                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMoUSDInStabPool);
-                vars.remainingMoUSDInStabPool = vars.remainingMoUSDInStabPool.sub(singleLiquidation.debtToOffset);
+                singleLiquidation = _liquidateNormalMode(_activePool, _defaultPool, vars.user, vars.remainingMEURInStabPool);
+                vars.remainingMEURInStabPool = vars.remainingMEURInStabPool.sub(singleLiquidation.debtToOffset);
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -781,7 +781,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         // Tally all the values with their respective running totals
         newTotals.totalCollGasCompensation = oldTotals.totalCollGasCompensation.add(singleLiquidation.collGasCompensation);
-        newTotals.totalMoUSDGasCompensation = oldTotals.totalMoUSDGasCompensation.add(singleLiquidation.MoUSDGasCompensation);
+        newTotals.totalMEURGasCompensation = oldTotals.totalMEURGasCompensation.add(singleLiquidation.MEURGasCompensation);
         newTotals.totalDebtInSequence = oldTotals.totalDebtInSequence.add(singleLiquidation.entireTroveDebt);
         newTotals.totalCollInSequence = oldTotals.totalCollInSequence.add(singleLiquidation.entireTroveColl);
         newTotals.totalDebtToOffset = oldTotals.totalDebtToOffset.add(singleLiquidation.debtToOffset);
@@ -793,9 +793,9 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         return newTotals;
     }
 
-    function _sendGasCompensation(IActivePool _activePool, address _liquidator, uint _MoUSD, uint _ETH) internal {
-        if (_MoUSD > 0) {
-            msicToken.returnFromPool(gasPoolAddress, _liquidator, _MoUSD);
+    function _sendGasCompensation(IActivePool _activePool, address _liquidator, uint _MEUR, uint _ETH) internal {
+        if (_MEUR > 0) {
+            msicToken.returnFromPool(gasPoolAddress, _liquidator, _MEUR);
         }
 
         if (_ETH > 0) {
@@ -804,19 +804,19 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     }
 
     // Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
-    function _movePendingTroveRewardsToActivePool(IActivePool _activePool, IDefaultPool _defaultPool, uint _MoUSD, uint _ETH) internal {
-        _defaultPool.decreaseMoUSDDebt(_MoUSD);
-        _activePool.increaseMoUSDDebt(_MoUSD);
+    function _movePendingTroveRewardsToActivePool(IActivePool _activePool, IDefaultPool _defaultPool, uint _MEUR, uint _ETH) internal {
+        _defaultPool.decreaseMEURDebt(_MEUR);
+        _activePool.increaseMEURDebt(_MEUR);
         _defaultPool.sendETHToActivePool(_ETH);
     }
 
     // --- Redemption functions ---
 
-    // Redeem as much collateral as possible from _borrower's Trove in exchange for MoUSD up to _maxMoUSDamount
+    // Redeem as much collateral as possible from _borrower's Trove in exchange for MEUR up to _maxMEURamount
     function _redeemCollateralFromTrove(
         ContractsCache memory _contractsCache,
         address _borrower,
-        uint _maxMoUSDamount,
+        uint _maxMEURamount,
         uint _price,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
@@ -825,20 +825,20 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         internal returns (SingleRedemptionValues memory singleRedemption)
     {
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-        singleRedemption.MoUSDLot = MosaicMath._min(_maxMoUSDamount, Troves[_borrower].debt.sub(MoUSD_GAS_COMPENSATION));
+        singleRedemption.MEURLot = MosaicMath._min(_maxMEURamount, Troves[_borrower].debt.sub(MEUR_GAS_COMPENSATION));
 
-        // Get the ETHLot of equivalent value in USD
-        singleRedemption.ETHLot = singleRedemption.MoUSDLot.mul(DECIMAL_PRECISION).div(_price);
+        // Get the ETHLot of equivalent value in EUR
+        singleRedemption.ETHLot = singleRedemption.MEURLot.mul(DECIMAL_PRECISION).div(_price);
 
-        // Decrease the debt and collateral of the current Trove according to the MoUSD lot and corresponding REEF to send
-        uint newDebt = (Troves[_borrower].debt).sub(singleRedemption.MoUSDLot);
+        // Decrease the debt and collateral of the current Trove according to the MEUR lot and corresponding REEF to send
+        uint newDebt = (Troves[_borrower].debt).sub(singleRedemption.MEURLot);
         uint newColl = (Troves[_borrower].coll).sub(singleRedemption.ETHLot);
 
-        if (newDebt == MoUSD_GAS_COMPENSATION) {
+        if (newDebt == MEUR_GAS_COMPENSATION) {
             // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
             _removeStake(_borrower);
             _closeTrove(_borrower, Status.closedByRedemption);
-            _redeemCloseTrove(_contractsCache, _borrower, MoUSD_GAS_COMPENSATION, newColl);
+            _redeemCloseTrove(_contractsCache, _borrower, MEUR_GAS_COMPENSATION, newColl);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
 
         } else {
@@ -874,15 +874,15 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     /*
     * Called when a full redemption occurs, and closes the trove.
-    * The redeemer swaps (debt - liquidation reserve) MoUSD for (debt - liquidation reserve) worth of REEF, so the MoUSD liquidation reserve left corresponds to the remaining debt.
-    * In order to close the trove, the MoUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
+    * The redeemer swaps (debt - liquidation reserve) MEUR for (debt - liquidation reserve) worth of REEF, so the MEUR liquidation reserve left corresponds to the remaining debt.
+    * In order to close the trove, the MEUR liquidation reserve is burned, and the corresponding debt is removed from the active pool.
     * The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
     * Any surplus REEF left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
     */
-    function _redeemCloseTrove(ContractsCache memory _contractsCache, address _borrower, uint _MoUSD, uint _ETH) internal {
-        _contractsCache.msicToken.burn(gasPoolAddress, _MoUSD);
-        // Update Active Pool MoUSD, and send REEF to account
-        _contractsCache.activePool.decreaseMoUSDDebt(_MoUSD);
+    function _redeemCloseTrove(ContractsCache memory _contractsCache, address _borrower, uint _MEUR, uint _ETH) internal {
+        _contractsCache.msicToken.burn(gasPoolAddress, _MEUR);
+        // Update Active Pool MEUR, and send REEF to account
+        _contractsCache.activePool.decreaseMEURDebt(_MEUR);
 
         // send REEF from Active Pool to CollSurplus Pool
         _contractsCache.collSurplusPool.accountSurplus(_borrower, _ETH);
@@ -901,7 +901,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         return nextTrove == address(0) || getCurrentICR(nextTrove, _price) < MCR;
     }
 
-    /* Send _MoUSDamount MoUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
+    /* Send _MEURamount MEUR to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
     * request.  Applies pending rewards to a Trove before reducing its debt and coll.
     *
     * Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
@@ -919,11 +919,11 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     *
     * If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
     * is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
-    * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining MoUSD amount, which they can attempt
+    * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining MEUR amount, which they can attempt
     * to redeem later.
     */
     function redeemCollateral(
-        uint _MoUSDamount,
+        uint _MEURamount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
@@ -949,14 +949,14 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         _requireAfterBootstrapPeriod();
         totals.price = priceFeed.fetchPrice();
         _requireTCRoverMCR(totals.price);
-        _requireAmountGreaterThanZero(_MoUSDamount);
-        _requireMoUSDBalanceCoversRedemption(contractsCache.msicToken, msg.sender, _MoUSDamount);
+        _requireAmountGreaterThanZero(_MEURamount);
+        _requireMEURBalanceCoversRedemption(contractsCache.msicToken, msg.sender, _MEURamount);
 
-        totals.totalMoUSDSupplyAtStart = getEntireSystemDebt();
-        // Confirm redeemer's balance is less than total MoUSD supply
-        assert(contractsCache.msicToken.balanceOf(msg.sender) <= totals.totalMoUSDSupplyAtStart);
+        totals.totalMEURSupplyAtStart = getEntireSystemDebt();
+        // Confirm redeemer's balance is less than total MEUR supply
+        assert(contractsCache.msicToken.balanceOf(msg.sender) <= totals.totalMEURSupplyAtStart);
 
-        totals.remainingMoUSD = _MoUSDamount;
+        totals.remainingMEUR = _MEURamount;
         address currentBorrower;
 
         if (_isValidFirstRedemptionHint(contractsCache.sortedTroves, _firstRedemptionHint, totals.price)) {
@@ -969,9 +969,9 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             }
         }
 
-        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of MoUSD is exchanged for collateral
+        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of MEUR is exchanged for collateral
         if (_maxIterations == 0) { _maxIterations = uint(-1); }
-        while (currentBorrower != address(0) && totals.remainingMoUSD > 0 && _maxIterations > 0) {
+        while (currentBorrower != address(0) && totals.remainingMEUR > 0 && _maxIterations > 0) {
             _maxIterations--;
             // Save the address of the Trove preceding the current one, before potentially modifying the list
             address nextUserToCheck = contractsCache.sortedTroves.getPrev(currentBorrower);
@@ -981,7 +981,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
             SingleRedemptionValues memory singleRedemption = _redeemCollateralFromTrove(
                 contractsCache,
                 currentBorrower,
-                totals.remainingMoUSD,
+                totals.remainingMEUR,
                 totals.price,
                 _upperPartialRedemptionHint,
                 _lowerPartialRedemptionHint,
@@ -990,17 +990,17 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
             if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
 
-            totals.totalMoUSDToRedeem  = totals.totalMoUSDToRedeem.add(singleRedemption.MoUSDLot);
+            totals.totalMEURToRedeem  = totals.totalMEURToRedeem.add(singleRedemption.MEURLot);
             totals.totalETHDrawn = totals.totalETHDrawn.add(singleRedemption.ETHLot);
 
-            totals.remainingMoUSD = totals.remainingMoUSD.sub(singleRedemption.MoUSDLot);
+            totals.remainingMEUR = totals.remainingMEUR.sub(singleRedemption.MEURLot);
             currentBorrower = nextUserToCheck;
         }
         require(totals.totalETHDrawn > 0, "TroveManager: Unable to redeem any amount");
 
         // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
-        // Use the saved total MoUSD supply value, from before it was reduced by the redemption.
-        _updateBaseRateFromRedemption(totals.totalETHDrawn, totals.price, totals.totalMoUSDSupplyAtStart);
+        // Use the saved total MEUR supply value, from before it was reduced by the redemption.
+        _updateBaseRateFromRedemption(totals.totalETHDrawn, totals.price, totals.totalMEURSupplyAtStart);
 
         // Calculate the REEF fee
         totals.ETHFee = _getRedemptionFee(totals.totalETHDrawn);
@@ -1013,12 +1013,12 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
 
-        emit Redemption(_MoUSDamount, totals.totalMoUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
+        emit Redemption(_MEURamount, totals.totalMEURToRedeem, totals.totalETHDrawn, totals.ETHFee);
 
-        // Burn the total MoUSD that is cancelled with debt, and send the redeemed REEF to msg.sender
-        contractsCache.msicToken.burn(msg.sender, totals.totalMoUSDToRedeem);
-        // Update Active Pool MoUSD, and send REEF to account
-        contractsCache.activePool.decreaseMoUSDDebt(totals.totalMoUSDToRedeem);
+        // Burn the total MEUR that is cancelled with debt, and send the redeemed REEF to msg.sender
+        contractsCache.msicToken.burn(msg.sender, totals.totalMEURToRedeem);
+        // Update Active Pool MEUR, and send REEF to account
+        contractsCache.activePool.decreaseMEURDebt(totals.totalMEURToRedeem);
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
 
@@ -1026,28 +1026,28 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getNominalICR(address _borrower) public view override returns (uint) {
-        (uint currentETH, uint currentMoUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint currentETH, uint currentMEURDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint NICR = MosaicMath._computeNominalCR(currentETH, currentMoUSDDebt);
+        uint NICR = MosaicMath._computeNominalCR(currentETH, currentMEURDebt);
         return NICR;
     }
 
     // Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getCurrentICR(address _borrower, uint _price) public view override returns (uint) {
-        (uint currentETH, uint currentMoUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint currentETH, uint currentMEURDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint ICR = MosaicMath._computeCR(currentETH, currentMoUSDDebt, _price);
+        uint ICR = MosaicMath._computeCR(currentETH, currentMEURDebt, _price);
         return ICR;
     }
 
     function _getCurrentTroveAmounts(address _borrower) internal view returns (uint, uint) {
         uint pendingETHReward = getPendingETHReward(_borrower);
-        uint pendingMoUSDDebtReward = getPendingMoUSDDebtReward(_borrower);
+        uint pendingMEURDebtReward = getPendingMEURDebtReward(_borrower);
 
         uint currentETH = Troves[_borrower].coll.add(pendingETHReward);
-        uint currentMoUSDDebt = Troves[_borrower].debt.add(pendingMoUSDDebtReward);
+        uint currentMEURDebt = Troves[_borrower].debt.add(pendingMEURDebtReward);
 
-        return (currentETH, currentMoUSDDebt);
+        return (currentETH, currentMEURDebt);
     }
 
     function applyPendingRewards(address _borrower) external override {
@@ -1062,16 +1062,16 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
             // Compute pending rewards
             uint pendingETHReward = getPendingETHReward(_borrower);
-            uint pendingMoUSDDebtReward = getPendingMoUSDDebtReward(_borrower);
+            uint pendingMEURDebtReward = getPendingMEURDebtReward(_borrower);
 
             // Apply pending rewards to trove's state
             Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
-            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingMoUSDDebtReward);
+            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingMEURDebtReward);
 
             _updateTroveRewardSnapshots(_borrower);
 
             // Transfer from DefaultPool to ActivePool
-            _movePendingTroveRewardsToActivePool(_activePool, _defaultPool, pendingMoUSDDebtReward, pendingETHReward);
+            _movePendingTroveRewardsToActivePool(_activePool, _defaultPool, pendingMEURDebtReward, pendingETHReward);
 
             emit TroveUpdated(
                 _borrower,
@@ -1083,7 +1083,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         }
     }
 
-    // Update borrower's snapshots of L_ETH and L_MoUSDDebt to reflect the current values
+    // Update borrower's snapshots of L_ETH and L_MEURDebt to reflect the current values
     function updateTroveRewardSnapshots(address _borrower) external override {
         _requireCallerIsBorrowerOperations();
        return _updateTroveRewardSnapshots(_borrower);
@@ -1091,8 +1091,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     function _updateTroveRewardSnapshots(address _borrower) internal {
         rewardSnapshots[_borrower].REEF = L_ETH;
-        rewardSnapshots[_borrower].MoUSDDebt = L_MoUSDDebt;
-        emit TroveSnapshotsUpdated(L_ETH, L_MoUSDDebt);
+        rewardSnapshots[_borrower].MEURDebt = L_MEURDebt;
+        emit TroveSnapshotsUpdated(L_ETH, L_MEURDebt);
     }
 
     // Get the borrower's pending accumulated REEF reward, earned by their stake
@@ -1109,18 +1109,18 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         return pendingETHReward;
     }
     
-    // Get the borrower's pending accumulated MoUSD reward, earned by their stake
-    function getPendingMoUSDDebtReward(address _borrower) public view override returns (uint) {
-        uint snapshotMoUSDDebt = rewardSnapshots[_borrower].MoUSDDebt;
-        uint rewardPerUnitStaked = L_MoUSDDebt.sub(snapshotMoUSDDebt);
+    // Get the borrower's pending accumulated MEUR reward, earned by their stake
+    function getPendingMEURDebtReward(address _borrower) public view override returns (uint) {
+        uint snapshotMEURDebt = rewardSnapshots[_borrower].MEURDebt;
+        uint rewardPerUnitStaked = L_MEURDebt.sub(snapshotMEURDebt);
 
         if ( rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) { return 0; }
 
         uint stake =  Troves[_borrower].stake;
 
-        uint pendingMoUSDDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
+        uint pendingMEURDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
 
-        return pendingMoUSDDebtReward;
+        return pendingMEURDebtReward;
     }
 
     function hasPendingRewards(address _borrower) public view override returns (bool) {
@@ -1141,15 +1141,15 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         public
         view
         override
-        returns (uint debt, uint coll, uint pendingMoUSDDebtReward, uint pendingETHReward)
+        returns (uint debt, uint coll, uint pendingMEURDebtReward, uint pendingETHReward)
     {
         debt = Troves[_borrower].debt;
         coll = Troves[_borrower].coll;
 
-        pendingMoUSDDebtReward = getPendingMoUSDDebtReward(_borrower);
+        pendingMEURDebtReward = getPendingMEURDebtReward(_borrower);
         pendingETHReward = getPendingETHReward(_borrower);
 
-        debt = debt.add(pendingMoUSDDebtReward);
+        debt = debt.add(pendingMEURDebtReward);
         coll = coll.add(pendingETHReward);
     }
 
@@ -1205,7 +1205,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
         /*
         * Add distributed coll and debt rewards-per-unit-staked to the running totals. Division uses a "feedback"
-        * error correction, to keep the cumulative error low in the running totals L_ETH and L_MoUSDDebt:
+        * error correction, to keep the cumulative error low in the running totals L_ETH and L_MEURDebt:
         *
         * 1) Form numerators which compensate for the floor division errors that occurred the last time this
         * function was called.
@@ -1215,24 +1215,24 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
         uint ETHNumerator = _coll.mul(DECIMAL_PRECISION).add(lastETHError_Redistribution);
-        uint MoUSDDebtNumerator = _debt.mul(DECIMAL_PRECISION).add(lastMoUSDDebtError_Redistribution);
+        uint MEURDebtNumerator = _debt.mul(DECIMAL_PRECISION).add(lastMEURDebtError_Redistribution);
 
         // Get the per-unit-staked terms
         uint ETHRewardPerUnitStaked = ETHNumerator.div(totalStakes);
-        uint MoUSDDebtRewardPerUnitStaked = MoUSDDebtNumerator.div(totalStakes);
+        uint MEURDebtRewardPerUnitStaked = MEURDebtNumerator.div(totalStakes);
 
         lastETHError_Redistribution = ETHNumerator.sub(ETHRewardPerUnitStaked.mul(totalStakes));
-        lastMoUSDDebtError_Redistribution = MoUSDDebtNumerator.sub(MoUSDDebtRewardPerUnitStaked.mul(totalStakes));
+        lastMEURDebtError_Redistribution = MEURDebtNumerator.sub(MEURDebtRewardPerUnitStaked.mul(totalStakes));
 
         // Add per-unit-staked terms to the running totals
         L_ETH = L_ETH.add(ETHRewardPerUnitStaked);
-        L_MoUSDDebt = L_MoUSDDebt.add(MoUSDDebtRewardPerUnitStaked);
+        L_MEURDebt = L_MEURDebt.add(MEURDebtRewardPerUnitStaked);
 
-        emit LTermsUpdated(L_ETH, L_MoUSDDebt);
+        emit LTermsUpdated(L_ETH, L_MEURDebt);
 
         // Transfer coll and debt from ActivePool to DefaultPool
-        _activePool.decreaseMoUSDDebt(_debt);
-        _defaultPool.increaseMoUSDDebt(_debt);
+        _activePool.decreaseMEURDebt(_debt);
+        _defaultPool.increaseMEURDebt(_debt);
         _activePool.sendETH(address(_defaultPool), _coll);
     }
 
@@ -1252,7 +1252,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         Troves[_borrower].debt = 0;
 
         rewardSnapshots[_borrower].REEF = 0;
-        rewardSnapshots[_borrower].MoUSDDebt = 0;
+        rewardSnapshots[_borrower].MEURDebt = 0;
 
         _removeTroveOwner(_borrower, TroveOwnersArrayLength);
         sortedTroves.remove(_borrower);
@@ -1285,8 +1285,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     }
 
     function _addTroveOwnerToArray(address _borrower) internal returns (uint128 index) {
-        /* Max array size is 2**128 - 1, i.e. ~3e30 troves. No risk of overflow, since troves have minimum MoUSD
-        debt of liquidation reserve plus MIN_NET_DEBT. 3e30 MoUSD dwarfs the value of all wealth in the world ( which is < 1e15 USD). */
+        /* Max array size is 2**128 - 1, i.e. ~3e30 troves. No risk of overflow, since troves have minimum MEUR
+        debt of liquidation reserve plus MIN_NET_DEBT. 3e30 MEUR dwarfs the value of all wealth in the world ( which is < 1e15 EUR). */
 
         // Push the Troveowner to the array
         TroveOwners.push(_borrower);
@@ -1332,7 +1332,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         return _checkRecoveryMode(_price);
     }
 
-    // Check whether or not the system *would be* in Recovery Mode, given an REEF:USD price, and the entire system coll and debt.
+    // Check whether or not the system *would be* in Recovery Mode, given an REEF:EUR price, and the entire system coll and debt.
     function _checkPotentialRecoveryMode(
         uint _entireSystemColl,
         uint _entireSystemDebt,
@@ -1351,18 +1351,18 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     /*
     * This function has two impacts on the baseRate state variable:
-    * 1) decays the baseRate based on time passed since last redemption or MoUSD borrowing operation.
+    * 1) decays the baseRate based on time passed since last redemption or MEUR borrowing operation.
     * then,
     * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
     */
-    function _updateBaseRateFromRedemption(uint _ETHDrawn,  uint _price, uint _totalMoUSDSupply) internal returns (uint) {
+    function _updateBaseRateFromRedemption(uint _ETHDrawn,  uint _price, uint _totalMEURSupply) internal returns (uint) {
         uint decayedBaseRate = _calcDecayedBaseRate();
 
-        /* Convert the drawn REEF back to MoUSD at face value rate (1 MoUSD:1 USD), in order to get
+        /* Convert the drawn REEF back to MEUR at face value rate (1 MEUR:1 EUR), in order to get
         * the fraction of total supply that was redeemed at face value. */
-        uint redeemedMoUSDFraction = _ETHDrawn.mul(_price).div(_totalMoUSDSupply);
+        uint redeemedMEURFraction = _ETHDrawn.mul(_price).div(_totalMEURSupply);
 
-        uint newBaseRate = decayedBaseRate.add(redeemedMoUSDFraction.div(BETA));
+        uint newBaseRate = decayedBaseRate.add(redeemedMEURFraction.div(BETA));
         newBaseRate = MosaicMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
         //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
         assert(newBaseRate > 0); // Base rate is always non-zero after redemption
@@ -1422,20 +1422,20 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         );
     }
 
-    function getBorrowingFee(uint _MoUSDDebt) external view override returns (uint) {
-        return _calcBorrowingFee(getBorrowingRate(), _MoUSDDebt);
+    function getBorrowingFee(uint _MEURDebt) external view override returns (uint) {
+        return _calcBorrowingFee(getBorrowingRate(), _MEURDebt);
     }
 
-    function getBorrowingFeeWithDecay(uint _MoUSDDebt) external view override returns (uint) {
-        return _calcBorrowingFee(getBorrowingRateWithDecay(), _MoUSDDebt);
+    function getBorrowingFeeWithDecay(uint _MEURDebt) external view override returns (uint) {
+        return _calcBorrowingFee(getBorrowingRateWithDecay(), _MEURDebt);
     }
 
-    function _calcBorrowingFee(uint _borrowingRate, uint _MoUSDDebt) internal pure returns (uint) {
-        return _borrowingRate.mul(_MoUSDDebt).div(DECIMAL_PRECISION);
+    function _calcBorrowingFee(uint _borrowingRate, uint _MEURDebt) internal pure returns (uint) {
+        return _borrowingRate.mul(_MEURDebt).div(DECIMAL_PRECISION);
     }
 
 
-    // Updates the baseRate state variable based on time elapsed since the last redemption or MoUSD borrowing operation.
+    // Updates the baseRate state variable based on time elapsed since the last redemption or MEUR borrowing operation.
     function decayBaseRateFromBorrowing() external override {
         _requireCallerIsBorrowerOperations();
 
@@ -1481,8 +1481,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         require(Troves[_borrower].status == Status.active, "TroveManager: Trove does not exist or is closed");
     }
 
-    function _requireMoUSDBalanceCoversRedemption(IMoUSDToken _msicToken, address _redeemer, uint _amount) internal view {
-        require(_msicToken.balanceOf(_redeemer) >= _amount, "TroveManager: Requested redemption amount must be <= user's MoUSD token balance");
+    function _requireMEURBalanceCoversRedemption(IMEURToken _msicToken, address _redeemer, uint _amount) internal view {
+        require(_msicToken.balanceOf(_redeemer) >= _amount, "TroveManager: Requested redemption amount must be <= user's MEUR token balance");
     }
 
     function _requireMoreThanOneTroveInSystem(uint TroveOwnersArrayLength) internal view {

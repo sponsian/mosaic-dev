@@ -14,8 +14,8 @@ contract BorrowerOperationsScript is CheckContract {
         borrowerOperations = _borrowerOperations;
     }
 
-    function openTrove(uint _maxFee, uint _MoUSDAmount, address _upperHint, address _lowerHint) external payable {
-        borrowerOperations.openTrove{ value: msg.value }(_maxFee, _MoUSDAmount, _upperHint, _lowerHint);
+    function openTrove(uint _maxFee, uint _MEURAmount, address _upperHint, address _lowerHint) external payable {
+        borrowerOperations.openTrove{ value: msg.value }(_maxFee, _MEURAmount, _upperHint, _lowerHint);
     }
 
     function addColl(address _upperHint, address _lowerHint) external payable {
@@ -26,12 +26,12 @@ contract BorrowerOperationsScript is CheckContract {
         borrowerOperations.withdrawColl(_amount, _upperHint, _lowerHint);
     }
 
-    function withdrawMoUSD(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external {
-        borrowerOperations.withdrawMoUSD(_maxFee, _amount, _upperHint, _lowerHint);
+    function withdrawMEUR(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external {
+        borrowerOperations.withdrawMEUR(_maxFee, _amount, _upperHint, _lowerHint);
     }
 
-    function repayMoUSD(uint _amount, address _upperHint, address _lowerHint) external {
-        borrowerOperations.repayMoUSD(_amount, _upperHint, _lowerHint);
+    function repayMEUR(uint _amount, address _upperHint, address _lowerHint) external {
+        borrowerOperations.repayMEUR(_amount, _upperHint, _lowerHint);
     }
 
     function closeTrove() external {

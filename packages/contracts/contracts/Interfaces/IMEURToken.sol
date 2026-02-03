@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "../Dependencies/IERC20.sol";
 import "../Dependencies/IERC2612.sol";
 
-interface IMoUSDToken is IERC20, IERC2612 { 
+interface IMEURToken is IERC20, IERC2612 { 
     
     // --- Events ---
 
@@ -13,7 +13,7 @@ interface IMoUSDToken is IERC20, IERC2612 {
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
 
-    event MoUSDTokenBalanceUpdated(address _user, uint _amount);
+    event MEURTokenBalanceUpdated(address _user, uint _amount);
 
     // --- Functions ---
 

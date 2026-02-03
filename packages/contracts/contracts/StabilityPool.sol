@@ -6,7 +6,7 @@ import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
-import './Interfaces/IMoUSDToken.sol';
+import './Interfaces/IMEURToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/MosaicBase.sol";
@@ -17,17 +17,17 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 /*
- * The Stability Pool holds MoUSD tokens deposited by Stability Pool depositors.
+ * The Stability Pool holds MEUR tokens deposited by Stability Pool depositors.
  *
- * When a trove is liquidated, then depending on system conditions, some of its MoUSD debt gets offset with
- * MoUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of MoUSD tokens in the Stability Pool is burned.
+ * When a trove is liquidated, then depending on system conditions, some of its MEUR debt gets offset with
+ * MEUR in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of MEUR tokens in the Stability Pool is burned.
  *
- * Thus, a liquidation causes each depositor to receive a MoUSD loss, in proportion to their deposit as a share of total deposits.
+ * Thus, a liquidation causes each depositor to receive a MEUR loss, in proportion to their deposit as a share of total deposits.
  * They also receive an REEF gain, as the REEF collateral of the liquidated trove is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
- * of the total MoUSD in the Stability Pool, depletes 40% of each deposit.
+ * of the total MEUR in the Stability Pool, depletes 40% of each deposit.
  *
  * A deposit that has experienced a series of liquidations is termed a "compounded deposit": each liquidation depletes the deposit,
  * multiplying it by some factor in range ]0,1[
@@ -89,7 +89,7 @@ import "./Dependencies/console.sol";
  *
  * Otherwise, we then compare the current scale to the deposit's scale snapshot. If they're equal, the compounded deposit is given by d_t * P/P_t.
  * If it spans one scale change, it is given by d_t * P/(P_t * 1e9). If it spans more than one scale change, we define the compounded deposit
- * as 0, since it is now less than 1e-9'th of its initial value (e.g. a deposit of 1 billion MoUSD has depleted to < 1 MoUSD).
+ * as 0, since it is now less than 1e-9'th of its initial value (e.g. a deposit of 1 billion MEUR has depleted to < 1 MEUR).
  *
  *
  *  --- TRACKING DEPOSITOR'S REEF GAIN OVER SCALE CHANGES AND EPOCHS ---
@@ -154,7 +154,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     ITroveManager public troveManager;
 
-    IMoUSDToken public msicToken;
+    IMEURToken public msicToken;
 
     // Needed to check if there are pending liquidations
     ISortedTroves public sortedTroves;
@@ -163,8 +163,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     uint256 internal REEF;  // deposited ether tracker
 
-    // Tracker for MoUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
-    uint256 internal totalMoUSDDeposits;
+    // Tracker for MEUR held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+    uint256 internal totalMEURDeposits;
 
    // --- Data structures ---
 
@@ -194,7 +194,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     mapping (address => Snapshots) public frontEndSnapshots; // front end address -> snapshots struct
 
     /*  Product 'P': Running product by which to multiply an initial deposit, in order to find the current compounded deposit,
-    * after a series of liquidations have occurred, each of which cancel some MoUSD debt with the deposit.
+    * after a series of liquidations have occurred, each of which cancel some MEUR debt with the deposit.
     *
     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
@@ -232,18 +232,18 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     uint public lastMSICError;
     // Error trackers for the error correction in the offset calculation
     uint public lastETHError_Offset;
-    uint public lastMoUSDLossError_Offset;
+    uint public lastMEURLossError_Offset;
 
     // --- Events ---
 
     event StabilityPoolETHBalanceUpdated(uint _newBalance);
-    event StabilityPoolMoUSDBalanceUpdated(uint _newBalance);
+    event StabilityPoolMEURBalanceUpdated(uint _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
-    event MoUSDTokenAddressChanged(address _newMoUSDTokenAddress);
+    event MEURTokenAddressChanged(address _newMEURTokenAddress);
     event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
@@ -262,7 +262,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     event UserDepositChanged(address indexed _depositor, uint _newDeposit);
     event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
 
-    event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _MoUSDLoss);
+    event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _MEURLoss);
     event MSICPaidToDepositor(address indexed _depositor, uint _MSIC);
     event MSICPaidToFrontEnd(address indexed _frontEnd, uint _MSIC);
     event EtherSent(address _to, uint _amount);
@@ -293,7 +293,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
-        msicToken = IMoUSDToken(_msicTokenAddress);
+        msicToken = IMEURToken(_msicTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
         communityIssuance = ICommunityIssuance(_communityIssuanceAddress);
@@ -301,7 +301,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
-        emit MoUSDTokenAddressChanged(_msicTokenAddress);
+        emit MEURTokenAddressChanged(_msicTokenAddress);
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
@@ -315,8 +315,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         return REEF;
     }
 
-    function getTotalMoUSDDeposits() external view override returns (uint) {
-        return totalMoUSDDeposits;
+    function getTotalMEURDeposits() external view override returns (uint) {
+        return totalMEURDeposits;
     }
 
     // --- External Depositor Functions ---
@@ -342,8 +342,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         if (initialDeposit == 0) {_setFrontEndTag(msg.sender, _frontEndTag);}
         uint depositorETHGain = getDepositorETHGain(msg.sender);
-        uint compoundedMoUSDDeposit = getCompoundedMoUSDDeposit(msg.sender);
-        uint MoUSDLoss = initialDeposit.sub(compoundedMoUSDDeposit); // Needed only for event log
+        uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
+        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
@@ -355,13 +355,13 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
-        _sendMoUSDtoStabilityPool(msg.sender, _amount);
+        _sendMEURtoStabilityPool(msg.sender, _amount);
 
-        uint newDeposit = compoundedMoUSDDeposit.add(_amount);
+        uint newDeposit = compoundedMEURDeposit.add(_amount);
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
-        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MoUSDLoss); // MoUSD Loss required for event log
+        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MEURLoss); // MEUR Loss required for event log
 
         _sendETHGainToDepositor(depositorETHGain);
      }
@@ -387,9 +387,9 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         uint depositorETHGain = getDepositorETHGain(msg.sender);
 
-        uint compoundedMoUSDDeposit = getCompoundedMoUSDDeposit(msg.sender);
-        uint MoUSDtoWithdraw = MosaicMath._min(_amount, compoundedMoUSDDeposit);
-        uint MoUSDLoss = initialDeposit.sub(compoundedMoUSDDeposit); // Needed only for event log
+        uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
+        uint MEURtoWithdraw = MosaicMath._min(_amount, compoundedMEURDeposit);
+        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
@@ -397,18 +397,18 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         
         // Update front end stake
         uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake.sub(MoUSDtoWithdraw);
+        uint newFrontEndStake = compoundedFrontEndStake.sub(MEURtoWithdraw);
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
-        _sendMoUSDToDepositor(msg.sender, MoUSDtoWithdraw);
+        _sendMEURToDepositor(msg.sender, MEURtoWithdraw);
 
         // Update deposit
-        uint newDeposit = compoundedMoUSDDeposit.sub(MoUSDtoWithdraw);
+        uint newDeposit = compoundedMEURDeposit.sub(MEURtoWithdraw);
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
-        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MoUSDLoss);  // MoUSD Loss required for event log
+        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MEURLoss);  // MEUR Loss required for event log
 
         _sendETHGainToDepositor(depositorETHGain);
     }
@@ -432,8 +432,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         uint depositorETHGain = getDepositorETHGain(msg.sender);
 
-        uint compoundedMoUSDDeposit = getCompoundedMoUSDDeposit(msg.sender);
-        uint MoUSDLoss = initialDeposit.sub(compoundedMoUSDDeposit); // Needed only for event log
+        uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
+        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
@@ -445,13 +445,13 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
-        _updateDepositAndSnapshots(msg.sender, compoundedMoUSDDeposit);
+        _updateDepositAndSnapshots(msg.sender, compoundedMEURDeposit);
 
         /* Emit events before transferring REEF gain to Trove.
          This lets the event log make more sense (i.e. so it appears that first the REEF gain is withdrawn
         and then it is deposited into the Trove, not the other way around). */
-        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MoUSDLoss);
-        emit UserDepositChanged(msg.sender, compoundedMoUSDDeposit);
+        emit ETHGainWithdrawn(msg.sender, depositorETHGain, MEURLoss);
+        emit UserDepositChanged(msg.sender, compoundedMEURDeposit);
 
         REEF = REEF.sub(depositorETHGain);
         emit StabilityPoolETHBalanceUpdated(REEF);
@@ -468,16 +468,16 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     }
 
     function _updateG(uint _MSICIssuance) internal {
-        uint totalMoUSD = totalMoUSDDeposits; // cached to save an SLOAD
+        uint totalMEUR = totalMEURDeposits; // cached to save an SLOAD
         /*
         * When total deposits is 0, G is not updated. In this case, the MSIC issued can not be obtained by later
         * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
         *
         */
-        if (totalMoUSD == 0 || _MSICIssuance == 0) {return;}
+        if (totalMEUR == 0 || _MSICIssuance == 0) {return;}
 
         uint MSICPerUnitStaked;
-        MSICPerUnitStaked =_computeMSICPerUnitStaked(_MSICIssuance, totalMoUSD);
+        MSICPerUnitStaked =_computeMSICPerUnitStaked(_MSICIssuance, totalMEUR);
 
         uint marginalMSICGain = MSICPerUnitStaked.mul(P);
         epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale].add(marginalMSICGain);
@@ -485,7 +485,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
 
-    function _computeMSICPerUnitStaked(uint _MSICIssuance, uint _totalMoUSDDeposits) internal returns (uint) {
+    function _computeMSICPerUnitStaked(uint _MSICIssuance, uint _totalMEURDeposits) internal returns (uint) {
         /*  
         * Calculate the MSIC-per-unit staked.  Division uses a "feedback" error correction, to keep the 
         * cumulative error low in the running total G:
@@ -499,8 +499,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         */
         uint MSICNumerator = _MSICIssuance.mul(DECIMAL_PRECISION).add(lastMSICError);
 
-        uint MSICPerUnitStaked = MSICNumerator.div(_totalMoUSDDeposits);
-        lastMSICError = MSICNumerator.sub(MSICPerUnitStaked.mul(_totalMoUSDDeposits));
+        uint MSICPerUnitStaked = MSICNumerator.div(_totalMEURDeposits);
+        lastMSICError = MSICNumerator.sub(MSICPerUnitStaked.mul(_totalMEURDeposits));
 
         return MSICPerUnitStaked;
     }
@@ -508,21 +508,21 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     // --- Liquidation functions ---
 
     /*
-    * Cancels out the specified debt against the MoUSD contained in the Stability Pool (as far as possible)
+    * Cancels out the specified debt against the MEUR contained in the Stability Pool (as far as possible)
     * and transfers the Trove's REEF collateral from ActivePool to StabilityPool.
     * Only called by liquidation functions in the TroveManager.
     */
     function offset(uint _debtToOffset, uint _collToAdd) external override {
         _requireCallerIsTroveManager();
-        uint totalMoUSD = totalMoUSDDeposits; // cached to save an SLOAD
-        if (totalMoUSD == 0 || _debtToOffset == 0) { return; }
+        uint totalMEUR = totalMEURDeposits; // cached to save an SLOAD
+        if (totalMEUR == 0 || _debtToOffset == 0) { return; }
 
         _triggerMSICIssuance(communityIssuance);
 
         (uint ETHGainPerUnitStaked,
-            uint MoUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalMoUSD);
+            uint MEURLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalMEUR);
 
-        _updateRewardSumAndProduct(ETHGainPerUnitStaked, MoUSDLossPerUnitStaked);  // updates S and P
+        _updateRewardSumAndProduct(ETHGainPerUnitStaked, MEURLossPerUnitStaked);  // updates S and P
 
         _moveOffsetCollAndDebt(_collToAdd, _debtToOffset);
     }
@@ -532,13 +532,13 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     function _computeRewardsPerUnitStaked(
         uint _collToAdd,
         uint _debtToOffset,
-        uint _totalMoUSDDeposits
+        uint _totalMEURDeposits
     )
         internal
-        returns (uint ETHGainPerUnitStaked, uint MoUSDLossPerUnitStaked)
+        returns (uint ETHGainPerUnitStaked, uint MEURLossPerUnitStaked)
     {
         /*
-        * Compute the MoUSD and REEF rewards. Uses a "feedback" error correction, to keep
+        * Compute the MEUR and REEF rewards. Uses a "feedback" error correction, to keep
         * the cumulative error in the P and S state variables low:
         *
         * 1) Form numerators which compensate for the floor division errors that occurred the last time this 
@@ -550,37 +550,37 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         */
         uint ETHNumerator = _collToAdd.mul(DECIMAL_PRECISION).add(lastETHError_Offset);
 
-        assert(_debtToOffset <= _totalMoUSDDeposits);
-        if (_debtToOffset == _totalMoUSDDeposits) {
-            MoUSDLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
-            lastMoUSDLossError_Offset = 0;
+        assert(_debtToOffset <= _totalMEURDeposits);
+        if (_debtToOffset == _totalMEURDeposits) {
+            MEURLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
+            lastMEURLossError_Offset = 0;
         } else {
-            uint MoUSDLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(lastMoUSDLossError_Offset);
+            uint MEURLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(lastMEURLossError_Offset);
             /*
-            * Add 1 to make error in quotient positive. We want "slightly too much" MoUSD loss,
-            * which ensures the error in any given compoundedMoUSDDeposit favors the Stability Pool.
+            * Add 1 to make error in quotient positive. We want "slightly too much" MEUR loss,
+            * which ensures the error in any given compoundedMEURDeposit favors the Stability Pool.
             */
-            MoUSDLossPerUnitStaked = (MoUSDLossNumerator.div(_totalMoUSDDeposits)).add(1);
-            lastMoUSDLossError_Offset = (MoUSDLossPerUnitStaked.mul(_totalMoUSDDeposits)).sub(MoUSDLossNumerator);
+            MEURLossPerUnitStaked = (MEURLossNumerator.div(_totalMEURDeposits)).add(1);
+            lastMEURLossError_Offset = (MEURLossPerUnitStaked.mul(_totalMEURDeposits)).sub(MEURLossNumerator);
         }
 
-        ETHGainPerUnitStaked = ETHNumerator.div(_totalMoUSDDeposits);
-        lastETHError_Offset = ETHNumerator.sub(ETHGainPerUnitStaked.mul(_totalMoUSDDeposits));
+        ETHGainPerUnitStaked = ETHNumerator.div(_totalMEURDeposits);
+        lastETHError_Offset = ETHNumerator.sub(ETHGainPerUnitStaked.mul(_totalMEURDeposits));
 
-        return (ETHGainPerUnitStaked, MoUSDLossPerUnitStaked);
+        return (ETHGainPerUnitStaked, MEURLossPerUnitStaked);
     }
 
     // Update the Stability Pool reward sum S and product P
-    function _updateRewardSumAndProduct(uint _ETHGainPerUnitStaked, uint _MoUSDLossPerUnitStaked) internal {
+    function _updateRewardSumAndProduct(uint _ETHGainPerUnitStaked, uint _MEURLossPerUnitStaked) internal {
         uint currentP = P;
         uint newP;
 
-        assert(_MoUSDLossPerUnitStaked <= DECIMAL_PRECISION);
+        assert(_MEURLossPerUnitStaked <= DECIMAL_PRECISION);
         /*
-        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool MoUSD in the liquidation.
-        * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - MoUSDLossPerUnitStaked)
+        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool MEUR in the liquidation.
+        * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - MEURLossPerUnitStaked)
         */
-        uint newProductFactor = uint(DECIMAL_PRECISION).sub(_MoUSDLossPerUnitStaked);
+        uint newProductFactor = uint(DECIMAL_PRECISION).sub(_MEURLossPerUnitStaked);
 
         uint128 currentScaleCached = currentScale;
         uint128 currentEpochCached = currentEpoch;
@@ -624,9 +624,9 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     function _moveOffsetCollAndDebt(uint _collToAdd, uint _debtToOffset) internal {
         IActivePool activePoolCached = activePool;
 
-        // Cancel the liquidated MoUSD debt with the MoUSD in the stability pool
-        activePoolCached.decreaseMoUSDDebt(_debtToOffset);
-        _decreaseMoUSD(_debtToOffset);
+        // Cancel the liquidated MEUR debt with the MEUR in the stability pool
+        activePoolCached.decreaseMEURDebt(_debtToOffset);
+        _decreaseMEUR(_debtToOffset);
 
         // Burn the debt that was successfully offset
         msicToken.burn(address(this), _debtToOffset);
@@ -634,10 +634,10 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         activePoolCached.sendETH(address(this), _collToAdd);
     }
 
-    function _decreaseMoUSD(uint _amount) internal {
-        uint newTotalMoUSDDeposits = totalMoUSDDeposits.sub(_amount);
-        totalMoUSDDeposits = newTotalMoUSDDeposits;
-        emit StabilityPoolMoUSDBalanceUpdated(newTotalMoUSDDeposits);
+    function _decreaseMEUR(uint _amount) internal {
+        uint newTotalMEURDeposits = totalMEURDeposits.sub(_amount);
+        totalMEURDeposits = newTotalMEURDeposits;
+        emit StabilityPoolMEURBalanceUpdated(newTotalMEURDeposits);
     }
 
     // --- Reward calculator functions for depositor and front end ---
@@ -747,7 +747,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
     * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
     */
-    function getCompoundedMoUSDDeposit(address _depositor) public view override returns (uint) {
+    function getCompoundedMEURDeposit(address _depositor) public view override returns (uint) {
         uint initialDeposit = deposits[_depositor].initialValue;
         if (initialDeposit == 0) { return 0; }
 
@@ -819,14 +819,14 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         return compoundedStake;
     }
 
-    // --- Sender functions for MoUSD deposit, REEF gains and MSIC gains ---
+    // --- Sender functions for MEUR deposit, REEF gains and MSIC gains ---
 
-    // Transfer the MoUSD tokens from the user to the Stability Pool's address, and update its recorded MoUSD
-    function _sendMoUSDtoStabilityPool(address _address, uint _amount) internal {
+    // Transfer the MEUR tokens from the user to the Stability Pool's address, and update its recorded MEUR
+    function _sendMEURtoStabilityPool(address _address, uint _amount) internal {
         msicToken.sendToPool(_address, address(this), _amount);
-        uint newTotalMoUSDDeposits = totalMoUSDDeposits.add(_amount);
-        totalMoUSDDeposits = newTotalMoUSDDeposits;
-        emit StabilityPoolMoUSDBalanceUpdated(newTotalMoUSDDeposits);
+        uint newTotalMEURDeposits = totalMEURDeposits.add(_amount);
+        totalMEURDeposits = newTotalMEURDeposits;
+        emit StabilityPoolMEURBalanceUpdated(newTotalMEURDeposits);
     }
 
     function _sendETHGainToDepositor(uint _amount) internal {
@@ -840,12 +840,12 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         require(success, "StabilityPool: sending REEF failed");
     }
 
-    // Send MoUSD to user and decrease MoUSD in Pool
-    function _sendMoUSDToDepositor(address _depositor, uint MoUSDWithdrawal) internal {
-        if (MoUSDWithdrawal == 0) {return;}
+    // Send MEUR to user and decrease MEUR in Pool
+    function _sendMEURToDepositor(address _depositor, uint MEURWithdrawal) internal {
+        if (MEURWithdrawal == 0) {return;}
 
-        msicToken.returnFromPool(address(this), _depositor, MoUSDWithdrawal);
-        _decreaseMoUSD(MoUSDWithdrawal);
+        msicToken.returnFromPool(address(this), _depositor, MEURWithdrawal);
+        _decreaseMEUR(MEURWithdrawal);
     }
 
     // --- External Front End functions ---

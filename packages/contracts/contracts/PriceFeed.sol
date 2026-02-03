@@ -13,7 +13,7 @@ import "./Dependencies/MosaicMath.sol";
 import "./Dependencies/console.sol";
 
 /*
-* PriceFeed for mainnet deployment, to be connected to Chainlink's live REEF:USD aggregator reference 
+* PriceFeed for mainnet deployment, to be connected to Chainlink's live REEF:EUR aggregator reference
 * contract, and a wrapper contract TellorCaller, which connects to TellorMaster contract.
 *
 * The PriceFeed uses Chainlink as primary oracle, and Tellor as fallback. It contains logic for
@@ -32,7 +32,7 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
     address borrowerOperationsAddress;
     address troveManagerAddress;
 
-    uint constant public ETHUSD_TELLOR_REQ_ID = 1;
+    uint constant public REEFEUR_TELLOR_REQ_ID = 1;
 
     // Use to convert a price answer to an 18-digit precision uint
     uint constant public TARGET_DIGITS = 18;  
@@ -488,7 +488,7 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
     // --- Oracle response wrapper functions ---
 
     function _getCurrentTellorResponse() internal view returns (TellorResponse memory tellorResponse) {
-        try tellorCaller.getTellorCurrentValue(ETHUSD_TELLOR_REQ_ID) returns
+        try tellorCaller.getTellorCurrentValue(REEFEUR_TELLOR_REQ_ID) returns
         (
             bool ifRetrieve,
             uint256 value,

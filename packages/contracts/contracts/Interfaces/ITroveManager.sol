@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 
 import "./IMosaicBase.sol";
 import "./IStabilityPool.sol";
-import "./IMoUSDToken.sol";
+import "./IMEURToken.sol";
 import "./IMSICToken.sol";
 import "./IMSICStaking.sol";
 
@@ -16,7 +16,7 @@ interface ITroveManager is IMosaicBase {
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event MoUSDTokenAddressChanged(address _newMoUSDTokenAddress);
+    event MEURTokenAddressChanged(address _newMEURTokenAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
     event StabilityPoolAddressChanged(address _stabilityPoolAddress);
@@ -26,16 +26,16 @@ interface ITroveManager is IMosaicBase {
     event MSICTokenAddressChanged(address _msicTokenAddress);
     event MSICStakingAddressChanged(address _msicStakingAddress);
 
-    event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _MoUSDGasCompensation);
-    event Redemption(uint _attemptedMoUSDAmount, uint _actualMoUSDAmount, uint _ETHSent, uint _ETHFee);
+    event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _MEURGasCompensation);
+    event Redemption(uint _attemptedMEURAmount, uint _actualMEURAmount, uint _ETHSent, uint _ETHFee);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, uint8 operation);
     event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, uint8 operation);
     event BaseRateUpdated(uint _baseRate);
     event LastFeeOpTimeUpdated(uint _lastFeeOpTime);
     event TotalStakesUpdated(uint _newTotalStakes);
     event SystemSnapshotsUpdated(uint _totalStakesSnapshot, uint _totalCollateralSnapshot);
-    event LTermsUpdated(uint _L_ETH, uint _L_MoUSDDebt);
-    event TroveSnapshotsUpdated(uint _L_ETH, uint _L_MoUSDDebt);
+    event LTermsUpdated(uint _L_ETH, uint _L_MEURDebt);
+    event TroveSnapshotsUpdated(uint _L_ETH, uint _L_MEURDebt);
     event TroveIndexUpdated(address _borrower, uint _newIndex);
 
     // --- Functions ---
@@ -55,7 +55,7 @@ interface ITroveManager is IMosaicBase {
     ) external;
 
     function stabilityPool() external view returns (IStabilityPool);
-    function msicToken() external view returns (IMoUSDToken);
+    function msicToken() external view returns (IMEURToken);
     function msicToken() external view returns (IMSICToken);
     function msicStaking() external view returns (IMSICStaking);
 
@@ -73,7 +73,7 @@ interface ITroveManager is IMosaicBase {
     function batchLiquidateTroves(address[] calldata _troveArray) external;
 
     function redeemCollateral(
-        uint _MoUSDAmount,
+        uint _MEURAmount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
@@ -92,14 +92,14 @@ interface ITroveManager is IMosaicBase {
 
     function getPendingETHReward(address _borrower) external view returns (uint);
 
-    function getPendingMoUSDDebtReward(address _borrower) external view returns (uint);
+    function getPendingMEURDebtReward(address _borrower) external view returns (uint);
 
      function hasPendingRewards(address _borrower) external view returns (bool);
 
     function getEntireDebtAndColl(address _borrower) external view returns (
         uint debt, 
         uint coll, 
-        uint pendingMoUSDDebtReward, 
+        uint pendingMEURDebtReward, 
         uint pendingETHReward
     );
 
@@ -115,8 +115,8 @@ interface ITroveManager is IMosaicBase {
     function getBorrowingRate() external view returns (uint);
     function getBorrowingRateWithDecay() external view returns (uint);
 
-    function getBorrowingFee(uint MoUSDDebt) external view returns (uint);
-    function getBorrowingFeeWithDecay(uint _MoUSDDebt) external view returns (uint);
+    function getBorrowingFee(uint MEURDebt) external view returns (uint);
+    function getBorrowingFeeWithDecay(uint _MEURDebt) external view returns (uint);
 
     function decayBaseRateFromBorrowing() external;
 

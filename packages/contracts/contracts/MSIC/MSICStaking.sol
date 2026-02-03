@@ -10,7 +10,7 @@ import "../Dependencies/console.sol";
 import "../Interfaces/IMSICToken.sol";
 import "../Interfaces/IMSICStaking.sol";
 import "../Dependencies/MosaicMath.sol";
-import "../Interfaces/IMoUSDToken.sol";
+import "../Interfaces/IMEURToken.sol";
 
 contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     using SafeMath for uint;
@@ -22,18 +22,18 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     uint public totalMSICStaked;
 
     uint public F_ETH;  // Running sum of REEF fees per-MSIC-staked
-    uint public F_MoUSD; // Running sum of MSIC fees per-MSIC-staked
+    uint public F_MEUR; // Running sum of MSIC fees per-MSIC-staked
 
-    // User snapshots of F_ETH and F_MoUSD, taken at the point at which their latest deposit was made
+    // User snapshots of F_ETH and F_MEUR, taken at the point at which their latest deposit was made
     mapping (address => Snapshot) public snapshots; 
 
     struct Snapshot {
         uint F_ETH_Snapshot;
-        uint F_MoUSD_Snapshot;
+        uint F_MEUR_Snapshot;
     }
     
     IMSICToken public msicToken;
-    IMoUSDToken public mousdToken;
+    IMEURToken public msicToken;
 
     address public troveManagerAddress;
     address public borrowerOperationsAddress;
@@ -42,18 +42,18 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     // --- Events ---
 
     event MSICTokenAddressSet(address _msicTokenAddress);
-    event MoUSDTokenAddressSet(address _mousdTokenAddress);
+    event MEURTokenAddressSet(address _msicTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint MoUSDGain, uint ETHGain);
+    event StakingGainsWithdrawn(address indexed staker, uint MEURGain, uint ETHGain);
     event F_ETHUpdated(uint _F_ETH);
-    event F_MoUSDUpdated(uint _F_MoUSD);
+    event F_MEURUpdated(uint _F_MEUR);
     event TotalMSICStakedUpdated(uint _totalMSICStaked);
     event EtherSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MoUSD);
+    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MEUR);
 
     // --- Functions ---
 
@@ -76,7 +76,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         checkContract(_activePoolAddress);
 
         msicToken = IMSICToken(_msicTokenAddress);
-        mousdToken = IMoUSDToken(_mousdTokenAddress);
+        msicToken = IMEURToken(_msicTokenAddress);
         troveManagerAddress = _troveManagerAddress;
         borrowerOperationsAddress = _borrowerOperationsAddress;
         activePoolAddress = _activePoolAddress;
@@ -90,18 +90,18 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         _renounceOwnership();
     }
 
-    // If caller has a pre-existing stake, send any accumulated REEF and MoUSD gains to them. 
+    // If caller has a pre-existing stake, send any accumulated REEF and MEUR gains to them. 
     function stake(uint _MSICamount) external override {
         _requireNonZeroAmount(_MSICamount);
 
         uint currentStake = stakes[msg.sender];
 
         uint ETHGain;
-        uint MoUSDGain;
-        // Grab any accumulated REEF and MoUSD gains from the current stake
+        uint MEURGain;
+        // Grab any accumulated REEF and MEUR gains from the current stake
         if (currentStake != 0) {
             ETHGain = _getPendingETHGain(msg.sender);
-            MoUSDGain = _getPendingMoUSDGain(msg.sender);
+            MEURGain = _getPendingMEURGain(msg.sender);
         }
     
        _updateUserSnapshots(msg.sender);
@@ -117,24 +117,24 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         msicToken.sendToMSICStaking(msg.sender, _MSICamount);
 
         emit StakeChanged(msg.sender, newStake);
-        emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, MEURGain, ETHGain);
 
-         // Send accumulated MoUSD and REEF gains to the caller
+         // Send accumulated MEUR and REEF gains to the caller
         if (currentStake != 0) {
-            mousdToken.transfer(msg.sender, MoUSDGain);
+            msicToken.transfer(msg.sender, MEURGain);
             _sendETHGainToUser(ETHGain);
         }
     }
 
-    // Unstake the MSIC and send the it back to the caller, along with their accumulated MoUSD & REEF gains. 
+    // Unstake the MSIC and send the it back to the caller, along with their accumulated MEUR & REEF gains. 
     // If requested amount > stake, send their entire stake.
     function unstake(uint _MSICamount) external override {
         uint currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
-        // Grab any accumulated REEF and MoUSD gains from the current stake
+        // Grab any accumulated REEF and MEUR gains from the current stake
         uint ETHGain = _getPendingETHGain(msg.sender);
-        uint MoUSDGain = _getPendingMoUSDGain(msg.sender);
+        uint MEURGain = _getPendingMEURGain(msg.sender);
         
         _updateUserSnapshots(msg.sender);
 
@@ -154,10 +154,10 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
             emit StakeChanged(msg.sender, newStake);
         }
 
-        emit StakingGainsWithdrawn(msg.sender, MoUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, MEURGain, ETHGain);
 
-        // Send accumulated MoUSD and REEF gains to the caller
-        moUSDToken.transfer(msg.sender, MoUSDGain);
+        // Send accumulated MEUR and REEF gains to the caller
+        msicToken.transfer(msg.sender, MEURGain);
         _sendETHGainToUser(ETHGain);
     }
 
@@ -173,14 +173,14 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         emit F_ETHUpdated(F_ETH);
     }
 
-    function increaseF_MoUSD(uint _MoUSDFee) external override {
+    function increaseF_MEUR(uint _MEURFee) external override {
         _requireCallerIsBorrowerOperations();
-        uint MoUSDFeePerMSICStaked;
+        uint MEURFeePerMSICStaked;
         
-        if (totalMSICStaked > 0) {MoUSDFeePerMSICStaked = _MoUSDFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
+        if (totalMSICStaked > 0) {MEURFeePerMSICStaked = _MEURFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
         
-        F_MoUSD = F_MoUSD.add(MoUSDFeePerMSICStaked);
-        emit F_MoUSDUpdated(F_MoUSD);
+        F_MEUR = F_MEUR.add(MEURFeePerMSICStaked);
+        emit F_MEURUpdated(F_MEUR);
     }
 
     // --- Pending reward functions ---
@@ -195,22 +195,22 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         return ETHGain;
     }
 
-    function getPendingMoUSDGain(address _user) external view override returns (uint) {
-        return _getPendingMoUSDGain(_user);
+    function getPendingMEURGain(address _user) external view override returns (uint) {
+        return _getPendingMEURGain(_user);
     }
 
-    function _getPendingMoUSDGain(address _user) internal view returns (uint) {
-        uint F_MoUSD_Snapshot = snapshots[_user].F_MoUSD_Snapshot;
-        uint MoUSDGain = stakes[_user].mul(F_MoUSD.sub(F_MoUSD_Snapshot)).div(DECIMAL_PRECISION);
-        return MoUSDGain;
+    function _getPendingMEURGain(address _user) internal view returns (uint) {
+        uint F_MEUR_Snapshot = snapshots[_user].F_MEUR_Snapshot;
+        uint MEURGain = stakes[_user].mul(F_MEUR.sub(F_MEUR_Snapshot)).div(DECIMAL_PRECISION);
+        return MEURGain;
     }
 
     // --- Internal helper functions ---
 
     function _updateUserSnapshots(address _user) internal {
         snapshots[_user].F_ETH_Snapshot = F_ETH;
-        snapshots[_user].F_MoUSD_Snapshot = F_MoUSD;
-        emit StakerSnapshotsUpdated(_user, F_ETH, F_MoUSD);
+        snapshots[_user].F_MEUR_Snapshot = F_MEUR;
+        emit StakerSnapshotsUpdated(_user, F_ETH, F_MEUR);
     }
 
     function _sendETHGainToUser(uint ETHGain) internal {

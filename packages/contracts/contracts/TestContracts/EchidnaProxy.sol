@@ -5,19 +5,19 @@ pragma solidity 0.6.11;
 import "../TroveManager.sol";
 import "../BorrowerOperations.sol";
 import "../StabilityPool.sol";
-import "../MoUSDToken.sol";
+import "../MEURToken.sol";
 
 contract EchidnaProxy {
     TroveManager troveManager;
     BorrowerOperations borrowerOperations;
     StabilityPool stabilityPool;
-    MoUSDToken msicToken;
+    MEURToken msicToken;
 
     constructor(
         TroveManager _troveManager,
         BorrowerOperations _borrowerOperations,
         StabilityPool _stabilityPool,
-        MoUSDToken _msicToken
+        MEURToken _msicToken
     ) public {
         troveManager = _troveManager;
         borrowerOperations = _borrowerOperations;
@@ -44,7 +44,7 @@ contract EchidnaProxy {
     }
 
     function redeemCollateralPrx(
-        uint _MoUSDAmount,
+        uint _MEURAmount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
@@ -52,12 +52,12 @@ contract EchidnaProxy {
         uint _maxIterations,
         uint _maxFee
     ) external {
-        troveManager.redeemCollateral(_MoUSDAmount, _firstRedemptionHint, _upperPartialRedemptionHint, _lowerPartialRedemptionHint, _partialRedemptionHintNICR, _maxIterations, _maxFee);
+        troveManager.redeemCollateral(_MEURAmount, _firstRedemptionHint, _upperPartialRedemptionHint, _lowerPartialRedemptionHint, _partialRedemptionHintNICR, _maxIterations, _maxFee);
     }
 
     // Borrower Operations
-    function openTrovePrx(uint _ETH, uint _MoUSDAmount, address _upperHint, address _lowerHint, uint _maxFee) external payable {
-        borrowerOperations.openTrove{value: _ETH}(_maxFee, _MoUSDAmount, _upperHint, _lowerHint);
+    function openTrovePrx(uint _ETH, uint _MEURAmount, address _upperHint, address _lowerHint, uint _maxFee) external payable {
+        borrowerOperations.openTrove{value: _ETH}(_maxFee, _MEURAmount, _upperHint, _lowerHint);
     }
 
     function addCollPrx(uint _ETH, address _upperHint, address _lowerHint) external payable {
@@ -68,12 +68,12 @@ contract EchidnaProxy {
         borrowerOperations.withdrawColl(_amount, _upperHint, _lowerHint);
     }
 
-    function withdrawMoUSDPrx(uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
-        borrowerOperations.withdrawMoUSD(_maxFee, _amount, _upperHint, _lowerHint);
+    function withdrawMEURPrx(uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
+        borrowerOperations.withdrawMEUR(_maxFee, _amount, _upperHint, _lowerHint);
     }
 
-    function repayMoUSDPrx(uint _amount, address _upperHint, address _lowerHint) external {
-        borrowerOperations.repayMoUSD(_amount, _upperHint, _lowerHint);
+    function repayMEURPrx(uint _amount, address _upperHint, address _lowerHint) external {
+        borrowerOperations.repayMEUR(_amount, _upperHint, _lowerHint);
     }
 
     function closeTrovePrx() external {
@@ -93,7 +93,7 @@ contract EchidnaProxy {
         stabilityPool.withdrawFromSP(_amount);
     }
 
-    // MoUSD Token
+    // MEUR Token
 
     function transferPrx(address recipient, uint256 amount) external returns (bool) {
         return msicToken.transfer(recipient, amount);

@@ -15,12 +15,12 @@ interface IBorrowerOperations {
     event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
     event PriceFeedAddressChanged(address  _newPriceFeedAddress);
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event MoUSDTokenAddressChanged(address _msicTokenAddress);
+    event MEURTokenAddressChanged(address _msicTokenAddress);
     event MSICStakingAddressChanged(address _msicStakingAddress);
 
     event TroveCreated(address indexed _borrower, uint arrayIndex);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, uint8 operation);
-    event MoUSDBorrowingFeePaid(address indexed _borrower, uint _MoUSDFee);
+    event MEURBorrowingFeePaid(address indexed _borrower, uint _MEURFee);
 
     // --- Functions ---
 
@@ -37,7 +37,7 @@ interface IBorrowerOperations {
         address _msicStakingAddress
     ) external;
 
-    function openTrove(uint _maxFee, uint _MoUSDAmount, address _upperHint, address _lowerHint) external payable;
+    function openTrove(uint _maxFee, uint _MEURAmount, address _upperHint, address _lowerHint) external payable;
 
     function addColl(address _upperHint, address _lowerHint) external payable;
 
@@ -45,9 +45,9 @@ interface IBorrowerOperations {
 
     function withdrawColl(uint _amount, address _upperHint, address _lowerHint) external;
 
-    function withdrawMoUSD(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external;
+    function withdrawMEUR(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external;
 
-    function repayMoUSD(uint _amount, address _upperHint, address _lowerHint) external;
+    function repayMEUR(uint _amount, address _upperHint, address _lowerHint) external;
 
     function closeTrove() external;
 

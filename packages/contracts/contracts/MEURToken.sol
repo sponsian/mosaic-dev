@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/IMoUSDToken.sol";
+import "./Interfaces/IMEURToken.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -15,21 +15,21 @@ import "./Dependencies/console.sol";
 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/53516bc555a454862470e7860a9b5254db4d00f5/contracts/token/ERC20/ERC20Permit.sol
 * 
 *
-* --- Functionality added specific to the MoUSDToken ---
+* --- Functionality added specific to the MEURToken ---
 * 
 * 1) Transfer protection: blacklist of addresses that are invalid recipients (i.e. core Mosaic contracts) in external 
-* transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending MoUSD directly to a Mosaic 
+* transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending MEUR directly to a Mosaic 
 * core contract, when they should rather call the right function. 
 *
-* 2) sendToPool() and returnFromPool(): functions callable only Mosaic core contracts, which move MoUSD tokens between Mosaic <-> user.
+* 2) sendToPool() and returnFromPool(): functions callable only Mosaic core contracts, which move MEUR tokens between Mosaic <-> user.
 */
 
-contract MoUSDToken is CheckContract, IMoUSDToken {
+contract MEURToken is CheckContract, IMEURToken {
     using SafeMath for uint256;
     
     uint256 private _totalSupply;
-    string constant internal _NAME = "MoUSD Stablecoin";
-    string constant internal _SYMBOL = "MoUSD";
+    string constant internal _NAME = "MEUR Stablecoin";
+    string constant internal _SYMBOL = "MEUR";
     string constant internal _VERSION = "1";
     uint8 constant internal _DECIMALS = 18;
     
@@ -50,7 +50,7 @@ contract MoUSDToken is CheckContract, IMoUSDToken {
     
     mapping (address => uint256) private _nonces;
     
-    // User data for MoUSD token
+    // User data for MEUR token
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;  
     
@@ -181,13 +181,13 @@ contract MoUSDToken is CheckContract, IMoUSDToken {
         external 
         override 
     {            
-        require(deadline >= now, 'MoUSD: expired deadline');
+        require(deadline >= now, 'MEUR: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
                          _nonces[owner]++, deadline))));
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == owner, 'MoUSD: invalid signature');
+        require(recoveredAddress == owner, 'MEUR: invalid signature');
         _approve(owner, spender, amount);
     }
 
@@ -249,18 +249,18 @@ contract MoUSDToken is CheckContract, IMoUSDToken {
         require(
             _recipient != address(0) && 
             _recipient != address(this),
-            "MoUSD: Cannot transfer tokens directly to the MoUSD token contract or the zero address"
+            "MEUR: Cannot transfer tokens directly to the MEUR token contract or the zero address"
         );
         require(
             _recipient != stabilityPoolAddress && 
             _recipient != troveManagerAddress && 
             _recipient != borrowerOperationsAddress, 
-            "MoUSD: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
+            "MEUR: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
         );
     }
 
     function _requireCallerIsBorrowerOperations() internal view {
-        require(msg.sender == borrowerOperationsAddress, "MoUSDToken: Caller is not BorrowerOperations");
+        require(msg.sender == borrowerOperationsAddress, "MEURToken: Caller is not BorrowerOperations");
     }
 
     function _requireCallerIsBOorTroveMorSP() internal view {
@@ -268,18 +268,18 @@ contract MoUSDToken is CheckContract, IMoUSDToken {
             msg.sender == borrowerOperationsAddress ||
             msg.sender == troveManagerAddress ||
             msg.sender == stabilityPoolAddress,
-            "MoUSD: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "MEUR: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
         );
     }
 
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == stabilityPoolAddress, "MoUSD: Caller is not the StabilityPool");
+        require(msg.sender == stabilityPoolAddress, "MEUR: Caller is not the StabilityPool");
     }
 
     function _requireCallerIsTroveMorSP() internal view {
         require(
             msg.sender == troveManagerAddress || msg.sender == stabilityPoolAddress,
-            "MoUSD: Caller is neither TroveManager nor StabilityPool");
+            "MEUR: Caller is neither TroveManager nor StabilityPool");
     }
 
     // --- Optional functions ---

@@ -44,15 +44,15 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
 
     /* getRedemptionHints() - Helper function for finding the right hints to pass to redeemCollateral().
      *
-     * It simulates a redemption of `_MoUSDamount` to figure out where the redemption sequence will start and what state the final Trove
+     * It simulates a redemption of `_MEURamount` to figure out where the redemption sequence will start and what state the final Trove
      * of the sequence will end up in.
      *
      * Returns three hints:
      *  - `firstRedemptionHint` is the address of the first Trove with ICR >= MCR (i.e. the first Trove that will be redeemed).
      *  - `partialRedemptionHintNICR` is the final nominal ICR of the last Trove of the sequence after being hit by partial redemption,
      *     or zero in case of no partial redemption.
-     *  - `truncatedMoUSDamount` is the maximum amount that can be redeemed out of the the provided `_MoUSDamount`. This can be lower than
-     *    `_MoUSDamount` when redeeming the full amount would leave the last Trove of the redemption sequence with less net debt than the
+     *  - `truncatedMEURamount` is the maximum amount that can be redeemed out of the the provided `_MEURamount`. This can be lower than
+     *    `_MEURamount` when redeeming the full amount would leave the last Trove of the redemption sequence with less net debt than the
      *    minimum allowed value (i.e. MIN_NET_DEBT).
      *
      * The number of Troves to consider for redemption can be capped by passing a non-zero value as `_maxIterations`, while passing zero
@@ -60,7 +60,7 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
      */
 
     function getRedemptionHints(
-        uint _MoUSDamount, 
+        uint _MEURamount, 
         uint _price,
         uint _maxIterations
     )
@@ -69,12 +69,12 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
         returns (
             address firstRedemptionHint,
             uint partialRedemptionHintNICR,
-            uint truncatedMoUSDamount
+            uint truncatedMEURamount
         )
     {
         ISortedTroves sortedTrovesCached = sortedTroves;
 
-        uint remainingMoUSD = _MoUSDamount;
+        uint remainingMEUR = _MEURamount;
         address currentTroveuser = sortedTrovesCached.getLast();
 
         while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < MCR) {
@@ -87,34 +87,34 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
             _maxIterations = uint(-1);
         }
 
-        while (currentTroveuser != address(0) && remainingMoUSD > 0 && _maxIterations-- > 0) {
-            uint netMoUSDDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
-                .add(troveManager.getPendingMoUSDDebtReward(currentTroveuser));
+        while (currentTroveuser != address(0) && remainingMEUR > 0 && _maxIterations-- > 0) {
+            uint netMEURDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
+                .add(troveManager.getPendingMEURDebtReward(currentTroveuser));
 
-            if (netMoUSDDebt > remainingMoUSD) {
-                if (netMoUSDDebt > MIN_NET_DEBT) {
-                    uint maxRedeemableMoUSD = MosaicMath._min(remainingMoUSD, netMoUSDDebt.sub(MIN_NET_DEBT));
+            if (netMEURDebt > remainingMEUR) {
+                if (netMEURDebt > MIN_NET_DEBT) {
+                    uint maxRedeemableMEUR = MosaicMath._min(remainingMEUR, netMEURDebt.sub(MIN_NET_DEBT));
 
                     uint REEF = troveManager.getTroveColl(currentTroveuser)
                         .add(troveManager.getPendingETHReward(currentTroveuser));
 
-                    uint newColl = REEF.sub(maxRedeemableMoUSD.mul(DECIMAL_PRECISION).div(_price));
-                    uint newDebt = netMoUSDDebt.sub(maxRedeemableMoUSD);
+                    uint newColl = REEF.sub(maxRedeemableMEUR.mul(DECIMAL_PRECISION).div(_price));
+                    uint newDebt = netMEURDebt.sub(maxRedeemableMEUR);
 
                     uint compositeDebt = _getCompositeDebt(newDebt);
                     partialRedemptionHintNICR = MosaicMath._computeNominalCR(newColl, compositeDebt);
 
-                    remainingMoUSD = remainingMoUSD.sub(maxRedeemableMoUSD);
+                    remainingMEUR = remainingMEUR.sub(maxRedeemableMEUR);
                 }
                 break;
             } else {
-                remainingMoUSD = remainingMoUSD.sub(netMoUSDDebt);
+                remainingMEUR = remainingMEUR.sub(netMEURDebt);
             }
 
             currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
         }
 
-        truncatedMoUSDamount = _MoUSDamount.sub(remainingMoUSD);
+        truncatedMEURamount = _MEURamount.sub(remainingMEUR);
     }
 
     /* getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 

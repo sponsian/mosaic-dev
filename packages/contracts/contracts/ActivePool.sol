@@ -9,9 +9,9 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 /*
- * The Active Pool holds the REEF collateral and MoUSD debt (but not MoUSD tokens) for all active troves.
+ * The Active Pool holds the REEF collateral and MEUR debt (but not MEUR tokens) for all active troves.
  *
- * When a trove is liquidated, it's REEF and MoUSD debt are transferred from the Active Pool, to either the
+ * When a trove is liquidated, it's REEF and MEUR debt are transferred from the Active Pool, to either the
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  *
  */
@@ -25,13 +25,13 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
     uint256 internal REEF;  // deposited ether tracker
-    uint256 internal MoUSDDebt;
+    uint256 internal MEURDebt;
 
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolMoUSDDebtUpdated(uint _MoUSDDebt);
+    event ActivePoolMEURDebtUpdated(uint _MEURDebt);
     event ActivePoolETHBalanceUpdated(uint _ETH);
 
     // --- Contract setters ---
@@ -74,8 +74,8 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         return REEF;
     }
 
-    function getMoUSDDebt() external view override returns (uint) {
-        return MoUSDDebt;
+    function getMEURDebt() external view override returns (uint) {
+        return MEURDebt;
     }
 
     // --- Pool functionality ---
@@ -90,16 +90,16 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         require(success, "ActivePool: sending REEF failed");
     }
 
-    function increaseMoUSDDebt(uint _amount) external override {
+    function increaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
-        MoUSDDebt  = MoUSDDebt.add(_amount);
-        ActivePoolMoUSDDebtUpdated(MoUSDDebt);
+        MEURDebt  = MEURDebt.add(_amount);
+        ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
-    function decreaseMoUSDDebt(uint _amount) external override {
+    function decreaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        MoUSDDebt = MoUSDDebt.sub(_amount);
-        ActivePoolMoUSDDebtUpdated(MoUSDDebt);
+        MEURDebt = MEURDebt.sub(_amount);
+        ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
     // --- 'require' functions ---

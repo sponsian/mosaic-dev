@@ -7,18 +7,18 @@ interface IMSICStaking {
     // --- Events --
     
     event MSICTokenAddressSet(address _msicTokenAddress);
-    event MoUSDTokenAddressSet(address _msicTokenAddress);
+    event MEURTokenAddressSet(address _msicTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint MoUSDGain, uint ETHGain);
+    event StakingGainsWithdrawn(address indexed staker, uint MEURGain, uint ETHGain);
     event F_ETHUpdated(uint _F_ETH);
-    event F_MoUSDUpdated(uint _F_MoUSD);
+    event F_MEURUpdated(uint _F_MEUR);
     event TotalMSICStakedUpdated(uint _totalMSICStaked);
     event EtherSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MoUSD);
+    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MEUR);
 
     // --- Functions ---
 
@@ -37,9 +37,9 @@ interface IMSICStaking {
 
     function increaseF_ETH(uint _ETHFee) external; 
 
-    function increaseF_MoUSD(uint _MSICFee) external;  
+    function increaseF_MEUR(uint _MSICFee) external;  
 
     function getPendingETHGain(address _user) external view returns (uint);
 
-    function getPendingMoUSDGain(address _user) external view returns (uint);
+    function getPendingMEURGain(address _user) external view returns (uint);
 }
