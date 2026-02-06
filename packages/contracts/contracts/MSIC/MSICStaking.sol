@@ -33,7 +33,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     }
     
     IMSICToken public msicToken;
-    IMEURToken public msicToken;
+    IMEURToken public meurToken;
 
     address public troveManagerAddress;
     address public borrowerOperationsAddress;
@@ -42,7 +42,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     // --- Events ---
 
     event MSICTokenAddressSet(address _msicTokenAddress);
-    event MEURTokenAddressSet(address _msicTokenAddress);
+    event MEURTokenAddressSet(address _meurTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -60,29 +60,29 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     function setAddresses
     (
         address _msicTokenAddress,
-        address _mousdTokenAddress,
-        address _troveManagerAddress, 
+        address _meurTokenAddress,
+        address _troveManagerAddress,
         address _borrowerOperationsAddress,
         address _activePoolAddress
-    ) 
-        external 
-        onlyOwner 
-        override 
+    )
+        external
+        onlyOwner
+        override
     {
         checkContract(_msicTokenAddress);
-        checkContract(_mousdTokenAddress);
+        checkContract(_meurTokenAddress);
         checkContract(_troveManagerAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_activePoolAddress);
 
         msicToken = IMSICToken(_msicTokenAddress);
-        msicToken = IMEURToken(_msicTokenAddress);
+        meurToken = IMEURToken(_meurTokenAddress);
         troveManagerAddress = _troveManagerAddress;
         borrowerOperationsAddress = _borrowerOperationsAddress;
         activePoolAddress = _activePoolAddress;
 
         emit MSICTokenAddressSet(_msicTokenAddress);
-        emit MoUSDTokenAddressSet(_mousdTokenAddress);
+        emit MEURTokenAddressSet(_meurTokenAddress);
         emit TroveManagerAddressSet(_troveManagerAddress);
         emit BorrowerOperationsAddressSet(_borrowerOperationsAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
@@ -121,7 +121,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
 
          // Send accumulated MEUR and REEF gains to the caller
         if (currentStake != 0) {
-            msicToken.transfer(msg.sender, MEURGain);
+            meurToken.transfer(msg.sender, MEURGain);
             _sendETHGainToUser(ETHGain);
         }
     }
@@ -157,7 +157,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         emit StakingGainsWithdrawn(msg.sender, MEURGain, ETHGain);
 
         // Send accumulated MEUR and REEF gains to the caller
-        msicToken.transfer(msg.sender, MEURGain);
+        meurToken.transfer(msg.sender, MEURGain);
         _sendETHGainToUser(ETHGain);
     }
 

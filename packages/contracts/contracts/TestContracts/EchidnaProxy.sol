@@ -11,18 +11,18 @@ contract EchidnaProxy {
     TroveManager troveManager;
     BorrowerOperations borrowerOperations;
     StabilityPool stabilityPool;
-    MEURToken msicToken;
+    MEURToken meurToken;
 
     constructor(
         TroveManager _troveManager,
         BorrowerOperations _borrowerOperations,
         StabilityPool _stabilityPool,
-        MEURToken _msicToken
+        MEURToken _meurToken
     ) public {
         troveManager = _troveManager;
         borrowerOperations = _borrowerOperations;
         stabilityPool = _stabilityPool;
-        msicToken = _msicToken;
+        meurToken = _meurToken;
     }
 
     receive() external payable {
@@ -96,22 +96,22 @@ contract EchidnaProxy {
     // MEUR Token
 
     function transferPrx(address recipient, uint256 amount) external returns (bool) {
-        return msicToken.transfer(recipient, amount);
+        return meurToken.transfer(recipient, amount);
     }
 
     function approvePrx(address spender, uint256 amount) external returns (bool) {
-        return msicToken.approve(spender, amount);
+        return meurToken.approve(spender, amount);
     }
 
     function transferFromPrx(address sender, address recipient, uint256 amount) external returns (bool) {
-        return msicToken.transferFrom(sender, recipient, amount);
+        return meurToken.transferFrom(sender, recipient, amount);
     }
 
     function increaseAllowancePrx(address spender, uint256 addedValue) external returns (bool) {
-        return msicToken.increaseAllowance(spender, addedValue);
+        return meurToken.increaseAllowance(spender, addedValue);
     }
 
     function decreaseAllowancePrx(address spender, uint256 subtractedValue) external returns (bool) {
-        return msicToken.decreaseAllowance(spender, subtractedValue);
+        return meurToken.decreaseAllowance(spender, subtractedValue);
     }
 }

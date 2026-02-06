@@ -35,7 +35,7 @@ contract EchidnaTester {
     StabilityPool public stabilityPool;
     GasPool public gasPool;
     CollSurplusPool public collSurplusPool;
-    MEURToken public msicToken;
+    MEURToken public meurToken;
     PriceFeedTestnet priceFeedTestnet;
     SortedTroves sortedTroves;
 
@@ -50,7 +50,7 @@ contract EchidnaTester {
         defaultPool = new DefaultPool();
         stabilityPool = new StabilityPool();
         gasPool = new GasPool();
-        msicToken = new MEURToken(
+        meurToken = new MEURToken(
             address(troveManager),
             address(stabilityPool),
             address(borrowerOperations)
@@ -64,14 +64,14 @@ contract EchidnaTester {
         troveManager.setAddresses(address(borrowerOperations), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
-            address(priceFeedTestnet), address(msicToken), 
+            address(priceFeedTestnet), address(meurToken), 
             address(sortedTroves), address(0), address(0));
        
         borrowerOperations.setAddresses(address(troveManager), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
             address(priceFeedTestnet), address(sortedTroves), 
-            address(msicToken), address(0));
+            address(meurToken), address(0));
 
         activePool.setAddresses(address(borrowerOperations), 
             address(troveManager), address(stabilityPool), address(defaultPool));
@@ -79,7 +79,7 @@ contract EchidnaTester {
         defaultPool.setAddresses(address(troveManager), address(activePool));
         
         stabilityPool.setAddresses(address(borrowerOperations), 
-            address(troveManager), address(activePool), address(msicToken), 
+            address(troveManager), address(activePool), address(meurToken), 
             address(sortedTroves), address(priceFeedTestnet), address(0));
 
         collSurplusPool.setAddresses(address(borrowerOperations), 
@@ -88,7 +88,7 @@ contract EchidnaTester {
         sortedTroves.setParams(1e18, address(troveManager), address(borrowerOperations));
 
         for (uint i = 0; i < NUMBER_OF_ACTORS; i++) {
-            echidnaProxies[i] = new EchidnaProxy(troveManager, borrowerOperations, stabilityPool, msicToken);
+            echidnaProxies[i] = new EchidnaProxy(troveManager, borrowerOperations, stabilityPool, meurToken);
             (bool success, ) = address(echidnaProxies[i]).call{value: INITIAL_BALANCE}("");
             require(success);
         }
@@ -373,7 +373,7 @@ contract EchidnaTester {
             return false;
         }
 
-        if (address(msicToken).balance > 0) {
+        if (address(meurToken).balance > 0) {
             return false;
         }
     
@@ -403,8 +403,8 @@ contract EchidnaTester {
 
     // Total MEUR matches
     function echidna_MEUR_global_balances() public view returns(bool) {
-        uint totalSupply = msicToken.totalSupply();
-        uint gasPoolBalance = msicToken.balanceOf(address(gasPool));
+        uint totalSupply = meurToken.totalSupply();
+        uint gasPoolBalance = meurToken.balanceOf(address(gasPool));
 
         uint activePoolBalance = activePool.getMEURDebt();
         uint defaultPoolBalance = defaultPool.getMEURDebt();
@@ -416,7 +416,7 @@ contract EchidnaTester {
         address currentTrove = sortedTroves.getFirst();
         uint trovesBalance;
         while (currentTrove != address(0)) {
-            trovesBalance += msicToken.balanceOf(address(currentTrove));
+            trovesBalance += meurToken.balanceOf(address(currentTrove));
             currentTrove = sortedTroves.getNext(currentTrove);
         }
         // we cannot state equality because tranfers are made to external addresses too

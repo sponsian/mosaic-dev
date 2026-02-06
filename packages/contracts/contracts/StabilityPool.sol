@@ -154,7 +154,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     ITroveManager public troveManager;
 
-    IMEURToken public msicToken;
+    IMEURToken public meurToken;
 
     // Needed to check if there are pending liquidations
     ISortedTroves public sortedTroves;
@@ -273,7 +273,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
-        address _msicTokenAddress,
+        address _meurTokenAddress,
         address _sortedTrovesAddress,
         address _priceFeedAddress,
         address _communityIssuanceAddress
@@ -285,7 +285,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
-        checkContract(_msicTokenAddress);
+        checkContract(_meurTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_priceFeedAddress);
         checkContract(_communityIssuanceAddress);
@@ -293,7 +293,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
-        msicToken = IMEURToken(_msicTokenAddress);
+        meurToken = IMEURToken(_meurTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
         communityIssuance = ICommunityIssuance(_communityIssuanceAddress);
@@ -301,7 +301,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
-        emit MEURTokenAddressChanged(_msicTokenAddress);
+        emit MEURTokenAddressChanged(_meurTokenAddress);
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
@@ -629,7 +629,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         _decreaseMEUR(_debtToOffset);
 
         // Burn the debt that was successfully offset
-        msicToken.burn(address(this), _debtToOffset);
+        meurToken.burn(address(this), _debtToOffset);
 
         activePoolCached.sendETH(address(this), _collToAdd);
     }
@@ -823,7 +823,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     // Transfer the MEUR tokens from the user to the Stability Pool's address, and update its recorded MEUR
     function _sendMEURtoStabilityPool(address _address, uint _amount) internal {
-        msicToken.sendToPool(_address, address(this), _amount);
+        meurToken.sendToPool(_address, address(this), _amount);
         uint newTotalMEURDeposits = totalMEURDeposits.add(_amount);
         totalMEURDeposits = newTotalMEURDeposits;
         emit StabilityPoolMEURBalanceUpdated(newTotalMEURDeposits);
@@ -844,7 +844,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     function _sendMEURToDepositor(address _depositor, uint MEURWithdrawal) internal {
         if (MEURWithdrawal == 0) {return;}
 
-        msicToken.returnFromPool(address(this), _depositor, MEURWithdrawal);
+        meurToken.returnFromPool(address(this), _depositor, MEURWithdrawal);
         _decreaseMEUR(MEURWithdrawal);
     }
 

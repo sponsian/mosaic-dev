@@ -7,7 +7,7 @@ interface IMSICStaking {
     // --- Events --
     
     event MSICTokenAddressSet(address _msicTokenAddress);
-    event MEURTokenAddressSet(address _msicTokenAddress);
+    event MEURTokenAddressSet(address _meurTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -25,8 +25,8 @@ interface IMSICStaking {
     function setAddresses
     (
         address _msicTokenAddress,
-        address _msicTokenAddress,
-        address _troveManagerAddress, 
+        address _meurTokenAddress,
+        address _troveManagerAddress,
         address _borrowerOperationsAddress,
         address _activePoolAddress
     )  external;

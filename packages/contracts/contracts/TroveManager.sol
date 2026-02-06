@@ -27,7 +27,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
 
     ICollSurplusPool collSurplusPool;
 
-    IMEURToken public override msicToken;
+    IMEURToken public override meurToken;
 
     IMSICToken public override msicToken;
 
@@ -170,7 +170,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     struct ContractsCache {
         IActivePool activePool;
         IDefaultPool defaultPool;
-        IMEURToken msicToken;
+        IMEURToken meurToken;
         IMSICStaking msicStaking;
         ISortedTroves sortedTroves;
         ICollSurplusPool collSurplusPool;
@@ -239,7 +239,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         address _gasPoolAddress,
         address _collSurplusPoolAddress,
         address _priceFeedAddress,
-        address _mousdTokenAddress,
+        address _meurTokenAddress,
         address _sortedTrovesAddress,
         address _msicTokenAddress,
         address _msicStakingAddress
@@ -255,7 +255,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         checkContract(_gasPoolAddress);
         checkContract(_collSurplusPoolAddress);
         checkContract(_priceFeedAddress);
-        checkContract(_mousdTokenAddress);
+        checkContract(_meurTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_msicTokenAddress);
         checkContract(_msicStakingAddress);
@@ -267,7 +267,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         gasPoolAddress = _gasPoolAddress;
         collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
-        msicToken = IMEURToken(_msicTokenAddress);
+        meurToken = IMEURToken(_meurTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         msicToken = IMSICToken(_msicTokenAddress);
         msicStaking = IMSICStaking(_msicStakingAddress);
@@ -279,7 +279,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         emit GasPoolAddressChanged(_gasPoolAddress);
         emit CollSurplusPoolAddressChanged(_collSurplusPoolAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
-        emit MEURTokenAddressChanged(_msicTokenAddress);
+        emit MEURTokenAddressChanged(_meurTokenAddress);
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit MSICTokenAddressChanged(_msicTokenAddress);
         emit MSICStakingAddressChanged(_msicStakingAddress);
@@ -880,7 +880,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
     * Any surplus REEF left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
     */
     function _redeemCloseTrove(ContractsCache memory _contractsCache, address _borrower, uint _MEUR, uint _ETH) internal {
-        _contractsCache.msicToken.burn(gasPoolAddress, _MEUR);
+        _contractsCache.meurToken.burn(gasPoolAddress, _MEUR);
         // Update Active Pool MEUR, and send REEF to account
         _contractsCache.activePool.decreaseMEURDebt(_MEUR);
 
@@ -937,7 +937,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         ContractsCache memory contractsCache = ContractsCache(
             activePool,
             defaultPool,
-            msicToken,
+            meurToken,
             msicStaking,
             sortedTroves,
             collSurplusPool,
@@ -950,11 +950,11 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         totals.price = priceFeed.fetchPrice();
         _requireTCRoverMCR(totals.price);
         _requireAmountGreaterThanZero(_MEURamount);
-        _requireMEURBalanceCoversRedemption(contractsCache.msicToken, msg.sender, _MEURamount);
+        _requireMEURBalanceCoversRedemption(contractsCache.meurToken, msg.sender, _MEURamount);
 
         totals.totalMEURSupplyAtStart = getEntireSystemDebt();
         // Confirm redeemer's balance is less than total MEUR supply
-        assert(contractsCache.msicToken.balanceOf(msg.sender) <= totals.totalMEURSupplyAtStart);
+        assert(contractsCache.meurToken.balanceOf(msg.sender) <= totals.totalMEURSupplyAtStart);
 
         totals.remainingMEUR = _MEURamount;
         address currentBorrower;
@@ -1016,7 +1016,7 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         emit Redemption(_MEURamount, totals.totalMEURToRedeem, totals.totalETHDrawn, totals.ETHFee);
 
         // Burn the total MEUR that is cancelled with debt, and send the redeemed REEF to msg.sender
-        contractsCache.msicToken.burn(msg.sender, totals.totalMEURToRedeem);
+        contractsCache.meurToken.burn(msg.sender, totals.totalMEURToRedeem);
         // Update Active Pool MEUR, and send REEF to account
         contractsCache.activePool.decreaseMEURDebt(totals.totalMEURToRedeem);
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
@@ -1481,8 +1481,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         require(Troves[_borrower].status == Status.active, "TroveManager: Trove does not exist or is closed");
     }
 
-    function _requireMEURBalanceCoversRedemption(IMEURToken _msicToken, address _redeemer, uint _amount) internal view {
-        require(_msicToken.balanceOf(_redeemer) >= _amount, "TroveManager: Requested redemption amount must be <= user's MEUR token balance");
+    function _requireMEURBalanceCoversRedemption(IMEURToken _meurToken, address _redeemer, uint _amount) internal view {
+        require(_meurToken.balanceOf(_redeemer) >= _amount, "TroveManager: Requested redemption amount must be <= user's MEUR token balance");
     }
 
     function _requireMoreThanOneTroveInSystem(uint TroveOwnersArrayLength) internal view {

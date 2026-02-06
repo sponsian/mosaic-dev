@@ -48,14 +48,14 @@ interface ITroveManager is IMosaicBase {
         address _gasPoolAddress,
         address _collSurplusPoolAddress,
         address _priceFeedAddress,
-        address _msicTokenAddress,
+        address _meurTokenAddress,
         address _sortedTrovesAddress,
         address _msicTokenAddress,
         address _msicStakingAddress
     ) external;
 
     function stabilityPool() external view returns (IStabilityPool);
-    function msicToken() external view returns (IMEURToken);
+    function meurToken() external view returns (IMEURToken);
     function msicToken() external view returns (IMSICToken);
     function msicStaking() external view returns (IMSICStaking);
 
