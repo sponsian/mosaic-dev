@@ -93,13 +93,13 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     function increaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
         MEURDebt  = MEURDebt.add(_amount);
-        ActivePoolMEURDebtUpdated(MEURDebt);
+        emit ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
     function decreaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         MEURDebt = MEURDebt.sub(_amount);
-        ActivePoolMEURDebtUpdated(MEURDebt);
+        emit ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
     // --- 'require' functions ---

@@ -993,6 +993,6 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     receive() external payable {
         _requireCallerIsActivePool();
         REEF = REEF.add(msg.value);
-        StabilityPoolETHBalanceUpdated(REEF);
+        emit StabilityPoolETHBalanceUpdated(REEF);
     }
 }
