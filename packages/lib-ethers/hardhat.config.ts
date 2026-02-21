@@ -127,6 +127,11 @@ const config: HardhatUserConfig = {
       accounts: [deployerAccount]
     },
 
+    reefTestnet: {
+      url: process.env.REEF_TESTNET_RPC_URL || "https://rpc-testnet.reefscan.com",
+      accounts: [deployerAccount]
+    },
+
     forkedMainnet: {
       url: "http://localhost:8545"
     }
