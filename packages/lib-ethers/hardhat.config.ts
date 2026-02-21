@@ -128,7 +128,7 @@ const config: HardhatUserConfig = {
     },
 
     reefTestnet: {
-      url: process.env.REEF_TESTNET_RPC_URL || "https://rpc-testnet.reefscan.com",
+      url: process.env.REEF_TESTNET_RPC_URL || "http://34.123.142.246:8545",
       accounts: [deployerAccount]
     },
 
