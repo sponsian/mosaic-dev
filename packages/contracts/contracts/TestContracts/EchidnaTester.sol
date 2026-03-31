@@ -137,7 +137,7 @@ contract EchidnaTester {
     function getAdjustedETH(uint actorBalance, uint _ETH, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         require(price > 0);
-        uint minETH = ratio.mul(MEUR_GAS_COMPENSATION).div(price);
+        uint minETH = ratio.mul(MEUR_GAS_COMPENSATION).div(price).div(MosaicMath.COLL_DECIMALS_OFFSET);
         require(actorBalance > minETH);
         uint REEF = minETH + _ETH % (actorBalance - minETH);
         return REEF;
@@ -149,7 +149,7 @@ contract EchidnaTester {
         uint compositeDebt = MEURAmount.add(MEUR_GAS_COMPENSATION);
         uint ICR = MosaicMath._computeCR(REEF, compositeDebt, price);
         if (ICR < ratio) {
-            compositeDebt = REEF.mul(price).div(ratio);
+            compositeDebt = REEF.mul(price).mul(MosaicMath.COLL_DECIMALS_OFFSET).div(ratio);
             MEURAmount = compositeDebt.sub(MEUR_GAS_COMPENSATION);
         }
         return MEURAmount;

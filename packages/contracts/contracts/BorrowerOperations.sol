@@ -374,7 +374,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     }
 
     function _getUSDValue(uint _coll, uint _price) internal pure returns (uint) {
-        uint usdValue = _price.mul(_coll).div(DECIMAL_PRECISION);
+        // Multiply by COLL_DECIMALS_OFFSET to normalize 12-decimal REEF collateral to 18-decimal result
+        uint usdValue = _price.mul(_coll).mul(COLL_DECIMALS_OFFSET).div(DECIMAL_PRECISION);
 
         return usdValue;
     }

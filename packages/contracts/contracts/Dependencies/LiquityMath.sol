@@ -10,6 +10,10 @@ library MosaicMath {
 
     uint internal constant DECIMAL_PRECISION = 1e18;
 
+    // Scaling factor to normalize 12-decimal REEF collateral to 18-decimal precision
+    // Equal to 10^(18 - REEF_DECIMALS) = 10^(18 - 12) = 1e6
+    uint internal constant COLL_DECIMALS_OFFSET = 1e6;
+
     /* Precision for Nominal ICR (independent of price). Rationale for the value:
      *
      * - Making it “too high” could lead to overflows.
@@ -91,7 +95,7 @@ library MosaicMath {
 
     function _computeNominalCR(uint _coll, uint _debt) internal pure returns (uint) {
         if (_debt > 0) {
-            return _coll.mul(NICR_PRECISION).div(_debt);
+            return _coll.mul(NICR_PRECISION).mul(COLL_DECIMALS_OFFSET).div(_debt);
         }
         // Return the maximal value for uint256 if the Trove has a debt of 0. Represents "infinite" CR.
         else { // if (_debt == 0)
@@ -101,7 +105,7 @@ library MosaicMath {
 
     function _computeCR(uint _coll, uint _debt, uint _price) internal pure returns (uint) {
         if (_debt > 0) {
-            uint newCollRatio = _coll.mul(_price).div(_debt);
+            uint newCollRatio = _coll.mul(_price).mul(COLL_DECIMALS_OFFSET).div(_debt);
 
             return newCollRatio;
         }

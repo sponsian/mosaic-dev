@@ -162,10 +162,11 @@ class TestHelper {
     const collBN = web3.utils.toBN(coll)
     const debtBN = web3.utils.toBN(debt)
     const priceBN = web3.utils.toBN(price)
+    const COLL_DECIMALS_OFFSET = web3.utils.toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
 
     const ICR = debtBN.eq(this.toBN('0')) ?
       this.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
-      : collBN.mul(priceBN).div(debtBN)
+      : collBN.mul(priceBN).mul(COLL_DECIMALS_OFFSET).div(debtBN)
 
     return ICR
   }
@@ -689,7 +690,8 @@ class TestHelper {
 
     if (ICR) {
       const price = await contracts.priceFeedTestnet.getPrice()
-      extraParams.value = ICR.mul(totalDebt).div(price)
+      const COLL_DECIMALS_OFFSET = web3.utils.toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
+      extraParams.value = ICR.mul(totalDebt).div(price).div(COLL_DECIMALS_OFFSET)
     }
 
     const tx = await contracts.borrowerOperations.openTrove(maxFeePercentage, msicAmount, upperHint, lowerHint, extraParams)
@@ -723,7 +725,8 @@ class TestHelper {
       assert(extraParams.from, "A from account is needed")
       const { debt, coll } = await contracts.troveManager.getEntireDebtAndColl(extraParams.from)
       const price = await contracts.priceFeedTestnet.getPrice()
-      const targetDebt = coll.mul(price).div(ICR)
+      const COLL_DECIMALS_OFFSET = web3.utils.toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
+      const targetDebt = coll.mul(price).mul(COLL_DECIMALS_OFFSET).div(ICR)
       assert(targetDebt > debt, "ICR is already greater than or equal to target")
       increasedTotalDebt = targetDebt.sub(debt)
       msicAmount = await this.getNetBorrowingAmount(contracts, increasedTotalDebt)

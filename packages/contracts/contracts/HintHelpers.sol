@@ -98,7 +98,7 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
                     uint REEF = troveManager.getTroveColl(currentTroveuser)
                         .add(troveManager.getPendingETHReward(currentTroveuser));
 
-                    uint newColl = REEF.sub(maxRedeemableMEUR.mul(DECIMAL_PRECISION).div(_price));
+                    uint newColl = REEF.sub(maxRedeemableMEUR.mul(DECIMAL_PRECISION).div(_price).div(COLL_DECIMALS_OFFSET));
                     uint newDebt = netMEURDebt.sub(maxRedeemableMEUR);
 
                     uint compositeDebt = _getCompositeDebt(newDebt);

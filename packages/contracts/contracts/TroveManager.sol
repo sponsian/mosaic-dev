@@ -828,7 +828,8 @@ contract TroveManager is MosaicBase, Ownable, CheckContract, ITroveManager {
         singleRedemption.MEURLot = MosaicMath._min(_maxMEURamount, Troves[_borrower].debt.sub(MEUR_GAS_COMPENSATION));
 
         // Get the ETHLot of equivalent value in EUR
-        singleRedemption.ETHLot = singleRedemption.MEURLot.mul(DECIMAL_PRECISION).div(_price);
+        // Divide by COLL_DECIMALS_OFFSET to convert from 18-decimal MEUR to 12-decimal REEF
+        singleRedemption.ETHLot = singleRedemption.MEURLot.mul(DECIMAL_PRECISION).div(_price).div(COLL_DECIMALS_OFFSET);
 
         // Decrease the debt and collateral of the current Trove according to the MEUR lot and corresponding REEF to send
         uint newDebt = (Troves[_borrower].debt).sub(singleRedemption.MEURLot);

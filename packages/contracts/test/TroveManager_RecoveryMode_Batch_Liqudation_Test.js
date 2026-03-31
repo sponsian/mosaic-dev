@@ -5,6 +5,8 @@ const { toBN, dec, ZERO_ADDRESS } = th
 const TroveManagerTester = artifacts.require("./TroveManagerTester")
 const MEURToken = artifacts.require("./MEURToken.sol")
 
+const COLL_DECIMALS_OFFSET = toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
+
 contract('TroveManager - in Recovery Mode - back to normal mode in 1 tx', async accounts => {
   const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
   const [
@@ -130,11 +132,11 @@ contract('TroveManager - in Recovery Mode - back to normal mode in 1 tx', async 
       const spMousdAfter = await stabilityPool.getTotalMEURDeposits()
 
       // liquidate collaterals with the gas compensation fee subtracted
-      const expectedCollateralLiquidatedA = th.applyLiquidationFee(A_totalDebt.mul(mv._MCR).div(price))
+      const expectedCollateralLiquidatedA = th.applyLiquidationFee(A_totalDebt.mul(mv._MCR).div(price).div(COLL_DECIMALS_OFFSET))
       const expectedCollateralLiquidatedC = th.applyLiquidationFee(C_coll)
       // Stability Pool gains
-      const expectedGainInMEUR = expectedCollateralLiquidatedA.mul(price).div(mv._1e18BN).sub(A_totalDebt)
-      const realGainInMEUR = spEthAfter.sub(spEthBefore).mul(price).div(mv._1e18BN).sub(spMousdBefore.sub(spMousdAfter))
+      const expectedGainInMEUR = expectedCollateralLiquidatedA.mul(price).mul(COLL_DECIMALS_OFFSET).div(mv._1e18BN).sub(A_totalDebt)
+      const realGainInMEUR = spEthAfter.sub(spEthBefore).mul(price).mul(COLL_DECIMALS_OFFSET).div(mv._1e18BN).sub(spMousdBefore.sub(spMousdAfter))
 
       assert.equal(spEthAfter.sub(spEthBefore).toString(), expectedCollateralLiquidatedA.toString(), 'Stability Pool REEF doesn’t match')
       assert.equal(spMousdBefore.sub(spMousdAfter).toString(), A_totalDebt.toString(), 'Stability Pool MEUR doesn’t match')

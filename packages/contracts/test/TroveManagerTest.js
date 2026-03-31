@@ -11,6 +11,7 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 const GAS_PRICE = 10000000
+const COLL_DECIMALS_OFFSET = toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
 
 
 /* NOTE: Some tests involving REEF redemption fees do not test for specific fee values.
@@ -625,7 +626,7 @@ contract('TroveManager', async accounts => {
     const entireSystemCollBefore = await troveManager.getEntireSystemColl()
     const entireSystemDebtBefore = await troveManager.getEntireSystemDebt()
 
-    const expectedTCR_0 = entireSystemCollBefore.mul(price).div(entireSystemDebtBefore)
+    const expectedTCR_0 = entireSystemCollBefore.mul(price).mul(COLL_DECIMALS_OFFSET).div(entireSystemDebtBefore)
 
     assert.isTrue(expectedTCR_0.eq(TCR_0))
 
@@ -642,6 +643,7 @@ contract('TroveManager', async accounts => {
     const expectedTCR_1 = (entireSystemCollBefore
       .sub(gasComp_1))
       .mul(price)
+      .mul(COLL_DECIMALS_OFFSET)
       .div(entireSystemDebtBefore)
 
     assert.isTrue(expectedTCR_1.eq(TCR_1))
@@ -656,6 +658,7 @@ contract('TroveManager', async accounts => {
       .sub(gasComp_1)
       .sub(gasComp_2))
       .mul(price)
+      .mul(COLL_DECIMALS_OFFSET)
       .div(entireSystemDebtBefore)
 
     assert.isTrue(expectedTCR_2.eq(TCR_2))
@@ -671,6 +674,7 @@ contract('TroveManager', async accounts => {
       .sub(gasComp_2)
       .sub(gasComp_3))
       .mul(price)
+      .mul(COLL_DECIMALS_OFFSET)
       .div(entireSystemDebtBefore)
 
     assert.isTrue(expectedTCR_3.eq(TCR_3))
@@ -688,6 +692,7 @@ contract('TroveManager', async accounts => {
       .sub(gasComp_3)
       .sub(gasComp_4))
       .mul(price)
+      .mul(COLL_DECIMALS_OFFSET)
       .div(entireSystemDebtBefore)
 
     assert.isTrue(expectedTCR_4.eq(TCR_4))
@@ -1571,7 +1576,7 @@ contract('TroveManager', async accounts => {
     await priceFeed.setPrice(price)
 
     const TCR_Before = await th.getTCR(contracts)
-    assert.isAtMost(th.getDifference(TCR_Before, totalColl.mul(price).div(totalDebt)), 1000)
+    assert.isAtMost(th.getDifference(TCR_Before, totalColl.mul(price).mul(COLL_DECIMALS_OFFSET).div(totalDebt)), 1000)
 
     // Check pool is empty before liquidation
     assert.equal((await stabilityPool.getTotalMEURDeposits()).toString(), '0')
@@ -1594,7 +1599,7 @@ contract('TroveManager', async accounts => {
     // Check that the liquidation sequence has reduced the TCR
     const TCR_After = await th.getTCR(contracts)
     // ((100+1+7+2+20)+(1+2+3+4)*0.995)*100/(2050+50+50+50+50+101+257+328+480)
-    assert.isAtMost(th.getDifference(TCR_After, totalCollNonDefaulters.add(th.applyLiquidationFee(totalCollDefaulters)).mul(price).div(totalDebt)), 1000)
+    assert.isAtMost(th.getDifference(TCR_After, totalCollNonDefaulters.add(th.applyLiquidationFee(totalCollDefaulters)).mul(price).mul(COLL_DECIMALS_OFFSET).div(totalDebt)), 1000)
     assert.isTrue(TCR_Before.gte(TCR_After))
     assert.isTrue(TCR_After.gte(TCR_Before.mul(toBN(995)).div(toBN(1000))))
   })
@@ -2298,7 +2303,7 @@ contract('TroveManager', async accounts => {
     } = await hintHelpers.getRedemptionHints(redemptionAmount, price, 0)
 
     assert.equal(firstRedemptionHint, carol)
-    const expectedICR = A_coll.mul(price).sub(partialRedemptionAmount.mul(mv._1e18BN)).div(A_totalDebt.sub(partialRedemptionAmount))
+    const expectedICR = A_coll.mul(price).mul(COLL_DECIMALS_OFFSET).sub(partialRedemptionAmount.mul(mv._1e18BN)).div(A_totalDebt.sub(partialRedemptionAmount))
     th.assertIsApproximatelyEqual(partialRedemptionHintNICR, expectedICR)
   });
 
@@ -3182,7 +3187,7 @@ contract('TroveManager', async accounts => {
 
     // Attempt with maxFee > 5.5%
     const price = await priceFeed.getPrice()
-    const ETHDrawn = attemptedMEURRedemption.mul(mv._1e18BN).div(price)
+    const ETHDrawn = attemptedMEURRedemption.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)
     const slightlyMoreThanFee = (await troveManager.getRedemptionFeeWithDecay(ETHDrawn))
     const tx1 = await th.redeemCollateralAndGetTxObject(A, contracts, attemptedMEURRedemption, slightlyMoreThanFee)
     assert.isTrue(tx1.receipt.status)
@@ -3569,7 +3574,7 @@ contract('TroveManager', async accounts => {
     Total active REEF = 280 - 0.6 = 279.4 REEF */
 
     const activeETH_1 = await activePool.getETH()
-    assert.equal(activeETH_1.toString(), activeETH_0.sub(toBN(_120_MEUR).mul(mv._1e18BN).div(price)));
+    assert.equal(activeETH_1.toString(), activeETH_0.sub(toBN(_120_MEUR).mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)));
 
     // Flyn redeems 373 MEUR
     ({
@@ -3598,7 +3603,7 @@ contract('TroveManager', async accounts => {
     REEF removed = (373/200) = 1.865 REEF
     Total active REEF = 279.4 - 1.865 = 277.535 REEF */
     const activeETH_2 = await activePool.getETH()
-    assert.equal(activeETH_2.toString(), activeETH_1.sub(toBN(_373_MEUR).mul(mv._1e18BN).div(price)));
+    assert.equal(activeETH_2.toString(), activeETH_1.sub(toBN(_373_MEUR).mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)));
 
     // Graham redeems 950 MEUR
     ({
@@ -3627,7 +3632,7 @@ contract('TroveManager', async accounts => {
     REEF removed = (950/200) = 4.75 REEF
     Total active REEF = 277.535 - 4.75 = 272.785 REEF */
     const activeETH_3 = (await activePool.getETH()).toString()
-    assert.equal(activeETH_3.toString(), activeETH_2.sub(toBN(_950_MEUR).mul(mv._1e18BN).div(price)));
+    assert.equal(activeETH_3.toString(), activeETH_2.sub(toBN(_950_MEUR).mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)));
   })
 
   // it doesn’t make much sense as there’s now min debt enforced and at least one trove must remain active
@@ -4031,7 +4036,7 @@ contract('TroveManager', async accounts => {
 
     // check A's REEF balance has increased by 0.045 REEF 
     const price = await priceFeed.getPrice()
-    const ETHDrawn = redemptionAmount.mul(mv._1e18BN).div(price)
+    const ETHDrawn = redemptionAmount.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)
     th.assertIsApproximatelyEqual(
       A_balanceAfter.sub(A_balanceBefore),
       ETHDrawn.sub(
@@ -4196,7 +4201,7 @@ contract('TroveManager', async accounts => {
     So, expect remaining debt = (85 - 15) = 70, and remaining REEF = 1 - 15/200 = 0.925 remaining. */
     const price = await priceFeed.getPrice()
     th.assertIsApproximatelyEqual(D_emittedDebt, D_totalDebt.sub(partialAmount))
-    th.assertIsApproximatelyEqual(D_emittedColl, D_coll.sub(partialAmount.mul(mv._1e18BN).div(price)))
+    th.assertIsApproximatelyEqual(D_emittedColl, D_coll.sub(partialAmount.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)))
   })
 
   it("redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner to claim", async () => {
@@ -4227,9 +4232,9 @@ contract('TroveManager', async accounts => {
 
     const price = toBN(await priceFeed.getPrice())
 
-    th.assertIsApproximatelyEqual(A_balanceAfter, A_expectedBalance.add(A_coll.sub(A_netDebt.mul(mv._1e18BN).div(price))))
-    th.assertIsApproximatelyEqual(B_balanceAfter, B_expectedBalance.add(B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price))))
-    th.assertIsApproximatelyEqual(C_balanceAfter, C_expectedBalance.add(C_coll.sub(C_netDebt.mul(mv._1e18BN).div(price))))
+    th.assertIsApproximatelyEqual(A_balanceAfter, A_expectedBalance.add(A_coll.sub(A_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))))
+    th.assertIsApproximatelyEqual(B_balanceAfter, B_expectedBalance.add(B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))))
+    th.assertIsApproximatelyEqual(C_balanceAfter, C_expectedBalance.add(C_coll.sub(C_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))))
   })
 
   it("redeemCollateral(): a redemption that closes a trove leaves the trove's REEF surplus (collateral - REEF drawn) available for the trove owner after re-opening trove", async () => {
@@ -4240,9 +4245,9 @@ contract('TroveManager', async accounts => {
     } = await redeemCollateral3Full1Partial()
 
     const price = await priceFeed.getPrice()
-    const A_surplus = A_collBefore.sub(A_netDebt.mul(mv._1e18BN).div(price))
-    const B_surplus = B_collBefore.sub(B_netDebt.mul(mv._1e18BN).div(price))
-    const C_surplus = C_collBefore.sub(C_netDebt.mul(mv._1e18BN).div(price))
+    const A_surplus = A_collBefore.sub(A_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))
+    const B_surplus = B_collBefore.sub(B_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))
+    const C_surplus = C_collBefore.sub(C_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))
 
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(200, 16)), extraMEURAmount: dec(100, 18), extraParams: { from: A } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(190, 16)), extraMEURAmount: dec(100, 18), extraParams: { from: B } })
@@ -4313,7 +4318,7 @@ contract('TroveManager', async accounts => {
       )
 
       await openTrove({ ICR: toBN(dec(150, 16)), extraParams: { from: bob } })
-      await borrowerOperations.adjustTrove(th._100pct, 0, msicAmount, true, alice, alice, { from: alice, value: msicAmount.mul(mv._1e18BN).div(price) })
+      await borrowerOperations.adjustTrove(th._100pct, 0, msicAmount, true, alice, alice, { from: alice, value: msicAmount.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET) })
     }
 
     const {

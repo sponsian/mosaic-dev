@@ -15,6 +15,7 @@ const timeValues = testHelpers.TimeValues
 
 const ZERO_ADDRESS = th.ZERO_ADDRESS
 const assertRevert = th.assertRevert
+const COLL_DECIMALS_OFFSET = toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
 
 /* NOTE: Some of the borrowing tests do not test for specific MEUR fee values. They only test that the
  * fees are non-zero when they should occur, and that they decay over time.
@@ -4051,7 +4052,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, true, price)
 
         const expectedTCR = (troveColl.add(liquidatedColl)).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4081,7 +4082,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, true, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl)).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).add(toBN(debtChange)))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).add(toBN(debtChange)))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4110,7 +4111,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, false, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl)).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4139,7 +4140,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, true, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).add(toBN(collChange))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4169,7 +4170,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, false, debtChange, true, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).sub(toBN(dec(1, 'ether')))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4199,7 +4200,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, false, debtChange, false, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).sub(toBN(dec(1, 'ether')))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4229,7 +4230,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, true, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).add(toBN(dec(1, 'ether')))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).add(toBN(dec(100, 18))))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).add(toBN(dec(100, 18))))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4259,7 +4260,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, true, debtChange, false, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).add(toBN(dec(1, 'ether')))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).sub(toBN(dec(100, 18))))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })
@@ -4289,7 +4290,7 @@ contract('BorrowerOperations', async accounts => {
         const newTCR = (await borrowerOperations.getNewTCRFromTroveChange(collChange, false, debtChange, true, price))
 
         const expectedTCR = (troveColl.add(liquidatedColl).sub(toBN(collChange))).mul(price)
-          .div(troveTotalDebt.add(liquidatedDebt).add(toBN(debtChange)))
+          .mul(COLL_DECIMALS_OFFSET).div(troveTotalDebt.add(liquidatedDebt).add(toBN(debtChange)))
 
         assert.isTrue(newTCR.eq(expectedTCR))
       })

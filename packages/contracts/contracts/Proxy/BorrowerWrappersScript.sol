@@ -145,7 +145,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint price = priceFeed.fetchPrice();
         uint ICR = troveManager.getCurrentICR(address(this), price);
 
-        uint MEURAmount = _collateral.mul(price).div(ICR);
+        uint MEURAmount = _collateral.mul(price).mul(MosaicMath.COLL_DECIMALS_OFFSET).div(ICR);
         uint borrowingRate = troveManager.getBorrowingRateWithDecay();
         uint netDebt = MEURAmount.mul(MosaicMath.DECIMAL_PRECISION).div(MosaicMath.DECIMAL_PRECISION.add(borrowingRate));
 

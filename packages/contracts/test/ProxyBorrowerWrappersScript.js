@@ -13,6 +13,7 @@ const timeValues = testHelpers.TimeValues
 
 const ZERO_ADDRESS = th.ZERO_ADDRESS
 const assertRevert = th.assertRevert
+const COLL_DECIMALS_OFFSET = toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
 
 const GAS_PRICE = 10000000
 
@@ -182,7 +183,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // surplus: 5 - 150/200
     const price = await priceFeed.getPrice();
-    const expectedSurplus = collateral.sub(redeemAmount.mul(mv._1e18BN).div(price))
+    const expectedSurplus = collateral.sub(redeemAmount.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))
     th.assertIsApproximatelyEqual(await collSurplusPool.getCollateral(proxyAddress), expectedSurplus)
     assert.equal(await troveManager.getTroveStatus(proxyAddress), 4) // closed by redemption
 
@@ -214,7 +215,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // surplus: 5 - 150/200
     const price = await priceFeed.getPrice();
-    const expectedSurplus = collateral.sub(redeemAmount.mul(mv._1e18BN).div(price))
+    const expectedSurplus = collateral.sub(redeemAmount.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET))
     th.assertIsApproximatelyEqual(await collSurplusPool.getCollateral(proxyAddress), expectedSurplus)
     assert.equal(await troveManager.getTroveStatus(proxyAddress), 4) // closed by redemption
 
@@ -301,7 +302,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await msicStaking.stakes(alice)
 
-    const proportionalMEUR = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalMEUR = expectedETHGain_A.mul(price).mul(COLL_DECIMALS_OFFSET).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalMEUR.mul(mv._1e18BN).div(mv._1e18BN.add(borrowingRate))
 
@@ -489,7 +490,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // Alice REEF gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
-    const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)
 
     const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
@@ -500,7 +501,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await msicStaking.stakes(alice)
 
-    const proportionalMEUR = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalMEUR = expectedETHGain_A.mul(price).mul(COLL_DECIMALS_OFFSET).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalMEUR.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
 
@@ -650,7 +651,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // Alice REEF gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
-    const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedETHGain_A = redemptionFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)
 
     const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
@@ -661,7 +662,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await msicStaking.stakes(alice)
 
-    const proportionalMEUR = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalMEUR = expectedETHGain_A.mul(price).mul(COLL_DECIMALS_OFFSET).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalMEUR.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
     const expectedTotalMEUR = expectedMEURGain_A.add(netDebtChange)

@@ -10,6 +10,7 @@ const timeValues = testHelpers.TimeValues
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
 const MEURToken = artifacts.require("MEURToken")
+const COLL_DECIMALS_OFFSET = toBN('1000000') // 1e6: 10^(18-12) for 12-decimal REEF
 
 contract('CollSurplusPool', async accounts => {
   const [
@@ -63,7 +64,7 @@ contract('CollSurplusPool', async accounts => {
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
     const ETH_2 = await collSurplusPool.getETH()
-    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)))
   })
 
   it("CollSurplusPool: claimColl(): Reverts if caller is not Borrower Operations", async () => {
@@ -95,7 +96,7 @@ contract('CollSurplusPool', async accounts => {
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
     const ETH_2 = await collSurplusPool.getETH()
-    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price).div(COLL_DECIMALS_OFFSET)))
 
     const claimCollateralData = th.getTransactionData('claimCollateral()', [])
     await th.assertRevert(nonPayable.forward(borrowerOperations.address, claimCollateralData), 'CollSurplusPool: sending REEF failed')
