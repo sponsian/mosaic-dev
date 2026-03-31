@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../MSIC/CommunityIssuance.sol";
 
@@ -15,10 +15,10 @@ contract CommunityIssuanceTester is CommunityIssuance {
 
     function unprotectedIssueMSIC() external returns (uint) {
         // No checks on caller address
-       
-        uint latestTotalMSICIssued = MSICSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalMSICIssued.sub(totalMSICIssued);
-      
+
+        uint latestTotalMSICIssued = MSICSupplyCap * _getCumulativeIssuanceFraction() / DECIMAL_PRECISION;
+        uint issuance = latestTotalMSICIssued - totalMSICIssued;
+
         totalMSICIssued = latestTotalMSICIssued;
         return issuance;
     }

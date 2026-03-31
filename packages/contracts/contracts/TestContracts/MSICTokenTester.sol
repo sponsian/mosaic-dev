@@ -1,21 +1,20 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../MSIC/MSICToken.sol";
 
 contract MSICTokenTester is MSICToken {
     constructor
     (
-        address _communityIssuanceAddress, 
+        address _communityIssuanceAddress,
         address _msicStakingAddress,
         address _lockupFactoryAddress,
         address _bountyAddress,
         address _lpRewardsAddress,
         address _multisigAddress
-    ) 
-        public 
-        MSICToken 
+    )
+        MSICToken
     (
         _communityIssuanceAddress,
         _msicStakingAddress,
@@ -47,7 +46,7 @@ contract MSICTokenTester is MSICToken {
         _transfer(sender, recipient, amount);
     }
 
-    function getChainId() external pure returns (uint256 chainID) {
+    function getChainId() external view returns (uint256 chainID) {
         //return _chainID(); // it’s private
         assembly {
             chainID := chainid()

@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../Dependencies/BaseMath.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/console.sol";
 import "../Interfaces/IMSICToken.sol";
 import "../Interfaces/IMSICStaking.sol";
 import "../Dependencies/MosaicMath.sol";
 import "../Interfaces/IMEURToken.sol";
 
 contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
-    using SafeMath for uint;
 
     // --- Data ---
     string constant public NAME = "MSICStaking";
@@ -38,22 +35,6 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     address public troveManagerAddress;
     address public borrowerOperationsAddress;
     address public activePoolAddress;
-
-    // --- Events ---
-
-    event MSICTokenAddressSet(address _msicTokenAddress);
-    event MEURTokenAddressSet(address _meurTokenAddress);
-    event TroveManagerAddressSet(address _troveManager);
-    event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
-    event ActivePoolAddressSet(address _activePoolAddress);
-
-    event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint MEURGain, uint ETHGain);
-    event F_ETHUpdated(uint _F_ETH);
-    event F_MEURUpdated(uint _F_MEUR);
-    event TotalMSICStakedUpdated(uint _totalMSICStaked);
-    event EtherSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_MEUR);
 
     // --- Functions ---
 
@@ -106,11 +87,11 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
     
        _updateUserSnapshots(msg.sender);
 
-        uint newStake = currentStake.add(_MSICamount);
+        uint newStake = currentStake + _MSICamount;
 
         // Increase user’s stake and total MSIC staked
         stakes[msg.sender] = newStake;
-        totalMSICStaked = totalMSICStaked.add(_MSICamount);
+        totalMSICStaked = totalMSICStaked + _MSICamount;
         emit TotalMSICStakedUpdated(totalMSICStaked);
 
         // Transfer MSIC from caller to this contract
@@ -141,11 +122,11 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         if (_MSICamount > 0) {
             uint MSICToWithdraw = MosaicMath._min(_MSICamount, currentStake);
 
-            uint newStake = currentStake.sub(MSICToWithdraw);
+            uint newStake = currentStake - MSICToWithdraw;
 
             // Decrease user's stake and total MSIC staked
             stakes[msg.sender] = newStake;
-            totalMSICStaked = totalMSICStaked.sub(MSICToWithdraw);
+            totalMSICStaked = totalMSICStaked - MSICToWithdraw;
             emit TotalMSICStakedUpdated(totalMSICStaked);
 
             // Transfer unstaked MSIC to user
@@ -167,9 +148,9 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         _requireCallerIsTroveManager();
         uint ETHFeePerMSICStaked;
      
-        if (totalMSICStaked > 0) {ETHFeePerMSICStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
+        if (totalMSICStaked > 0) {ETHFeePerMSICStaked = _ETHFee * DECIMAL_PRECISION / totalMSICStaked;}
 
-        F_ETH = F_ETH.add(ETHFeePerMSICStaked); 
+        F_ETH = F_ETH + ETHFeePerMSICStaked; 
         emit F_ETHUpdated(F_ETH);
     }
 
@@ -177,9 +158,9 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
         _requireCallerIsBorrowerOperations();
         uint MEURFeePerMSICStaked;
         
-        if (totalMSICStaked > 0) {MEURFeePerMSICStaked = _MEURFee.mul(DECIMAL_PRECISION).div(totalMSICStaked);}
-        
-        F_MEUR = F_MEUR.add(MEURFeePerMSICStaked);
+        if (totalMSICStaked > 0) {MEURFeePerMSICStaked = _MEURFee * DECIMAL_PRECISION / totalMSICStaked;}
+
+        F_MEUR = F_MEUR + MEURFeePerMSICStaked;
         emit F_MEURUpdated(F_MEUR);
     }
 
@@ -191,7 +172,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
 
     function _getPendingETHGain(address _user) internal view returns (uint) {
         uint F_ETH_Snapshot = snapshots[_user].F_ETH_Snapshot;
-        uint ETHGain = stakes[_user].mul(F_ETH.sub(F_ETH_Snapshot)).div(DECIMAL_PRECISION);
+        uint ETHGain = stakes[_user] * (F_ETH - F_ETH_Snapshot) / DECIMAL_PRECISION;
         return ETHGain;
     }
 
@@ -201,7 +182,7 @@ contract MSICStaking is IMSICStaking, Ownable, CheckContract, BaseMath {
 
     function _getPendingMEURGain(address _user) internal view returns (uint) {
         uint F_MEUR_Snapshot = snapshots[_user].F_MEUR_Snapshot;
-        uint MEURGain = stakes[_user].mul(F_MEUR.sub(F_MEUR_Snapshot)).div(DECIMAL_PRECISION);
+        uint MEURGain = stakes[_user] * (F_MEUR - F_MEUR_Snapshot) / DECIMAL_PRECISION;
         return MEURGain;
     }
 

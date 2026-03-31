@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Dependencies/SafeMath.sol";
+
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -44,14 +44,8 @@ import "./Dependencies/console.sol";
 * - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
 */
 contract SortedTroves is Ownable, CheckContract, ISortedTroves {
-    using SafeMath for uint256;
 
     string constant public NAME = "SortedTroves";
-
-    event TroveManagerAddressChanged(address _troveManagerAddress);
-    event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event NodeAdded(address _id, uint _NICR);
-    event NodeRemoved(address _id);
 
     address public borrowerOperationsAddress;
 
@@ -78,7 +72,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
     // --- Dependency setters ---
 
     function setParams(uint256 _size, address _troveManagerAddress, address _borrowerOperationsAddress) external override onlyOwner {
-        require(_size > 0, "SortedTroves: Size can’t be zero");
+        require(_size > 0, "SortedTroves: Size cannot be zero");
         checkContract(_troveManagerAddress);
         checkContract(_borrowerOperationsAddress);
 
@@ -151,7 +145,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
             data.nodes[nextId].prevId = _id;
         }
 
-        data.size = data.size.add(1);
+        data.size = data.size + 1;
         emit NodeAdded(_id, _NICR);
     }
 
@@ -197,7 +191,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
         }
 
         delete data.nodes[_id];
-        data.size = data.size.sub(1);
+        data.size = data.size - 1;
         emit NodeRemoved(_id);
     }
 
@@ -318,7 +312,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
 
     /*
      * @dev Descend the list (larger NICRs to smaller NICRs) to find a valid insert position
-     * @param _troveManager TroveManager contract, passed in as param to save SLOAD’s
+     * @param _troveManager TroveManager contract, passed in as param to save SLOAD's
      * @param _NICR Node's NICR
      * @param _startId Id of node to start descending the list from
      */
@@ -342,7 +336,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
 
     /*
      * @dev Ascend the list (smaller NICRs to larger NICRs) to find a valid insert position
-     * @param _troveManager TroveManager contract, passed in as param to save SLOAD’s
+     * @param _troveManager TroveManager contract, passed in as param to save SLOAD's
      * @param _NICR Node's NICR
      * @param _startId Id of node to start ascending the list from
      */

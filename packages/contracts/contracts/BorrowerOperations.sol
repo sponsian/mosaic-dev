@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
@@ -78,21 +78,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         adjustTrove
     }
 
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _activePoolAddress);
-    event DefaultPoolAddressChanged(address _defaultPoolAddress);
-    event StabilityPoolAddressChanged(address _stabilityPoolAddress);
-    event GasPoolAddressChanged(address _gasPoolAddress);
-    event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
-    event PriceFeedAddressChanged(address  _newPriceFeedAddress);
-    event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event MEURTokenAddressChanged(address _meurTokenAddress);
-    event MSICStakingAddressChanged(address _msicStakingAddress);
-
-    event TroveCreated(address indexed _borrower, uint arrayIndex);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, BorrowerOperation operation);
-    event MEURBorrowingFeePaid(address indexed _borrower, uint _MEURFee);
-    
+
     // --- Dependency setters ---
 
     function setAddresses(
@@ -168,7 +155,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
         if (!isRecoveryMode) {
             vars.MEURFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.meurToken, _MEURAmount, _maxFeePercentage);
-            vars.netDebt = vars.netDebt.add(vars.MEURFee);
+            vars.netDebt = vars.netDebt + vars.MEURFee;
         }
         _requireAtLeastMinNetDebt(vars.netDebt);
 
@@ -274,7 +261,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a borrowing fee
         if (_isDebtIncrease && !isRecoveryMode) { 
             vars.MEURFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.meurToken, _MEURChange, _maxFeePercentage);
-            vars.netDebtChange = vars.netDebtChange.add(vars.MEURFee); // The raw debt change includes the fee
+            vars.netDebtChange = vars.netDebtChange + vars.MEURFee; // The raw debt change includes the fee
         }
 
         vars.debt = contractsCache.troveManager.getTroveDebt(_borrower);
@@ -290,7 +277,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
             
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough MEUR
         if (!_isDebtIncrease && _MEURChange > 0) {
-            _requireAtLeastMinNetDebt(_getNetDebt(vars.debt).sub(vars.netDebtChange));
+            _requireAtLeastMinNetDebt(_getNetDebt(vars.debt) - vars.netDebtChange);
             _requireValidMEURRepayment(vars.debt, vars.netDebtChange);
             _requireSufficientMEURBalance(contractsCache.meurToken, _borrower, vars.netDebtChange);
         }
@@ -332,7 +319,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         uint coll = troveManagerCached.getTroveColl(msg.sender);
         uint debt = troveManagerCached.getTroveDebt(msg.sender);
 
-        _requireSufficientMEURBalance(meurTokenCached, msg.sender, debt.sub(MEUR_GAS_COMPENSATION));
+        _requireSufficientMEURBalance(meurTokenCached, msg.sender, debt - MEUR_GAS_COMPENSATION);
 
         uint newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
         _requireNewTCRisAboveCCR(newTCR);
@@ -343,7 +330,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
 
         // Burn the repaid MEUR from the user's balance and the gas compensation from the Gas Pool
-        _repayMEUR(activePoolCached, meurTokenCached, msg.sender, debt.sub(MEUR_GAS_COMPENSATION));
+        _repayMEUR(activePoolCached, meurTokenCached, msg.sender, debt - MEUR_GAS_COMPENSATION);
         _repayMEUR(activePoolCached, meurTokenCached, gasPoolAddress, MEUR_GAS_COMPENSATION);
 
         // Send the collateral back to the user
@@ -375,7 +362,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
 
     function _getUSDValue(uint _coll, uint _price) internal pure returns (uint) {
         // Multiply by COLL_DECIMALS_OFFSET to normalize 12-decimal REEF collateral to 18-decimal result
-        uint usdValue = _price.mul(_coll).mul(COLL_DECIMALS_OFFSET).div(DECIMAL_PRECISION);
+        uint usdValue = _price * _coll * COLL_DECIMALS_OFFSET / DECIMAL_PRECISION;
 
         return usdValue;
     }
@@ -554,7 +541,7 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
     }
 
     function _requireValidMEURRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
-        require(_debtRepayment <= _currentDebt.sub(MEUR_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
+        require(_debtRepayment <= _currentDebt - MEUR_GAS_COMPENSATION, "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
     }
 
     function _requireCallerIsStabilityPool() internal view {
@@ -633,8 +620,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         uint newColl = _coll;
         uint newDebt = _debt;
 
-        newColl = _isCollIncrease ? _coll.add(_collChange) :  _coll.sub(_collChange);
-        newDebt = _isDebtIncrease ? _debt.add(_debtChange) : _debt.sub(_debtChange);
+        newColl = _isCollIncrease ? _coll + _collChange :  _coll - _collChange;
+        newDebt = _isDebtIncrease ? _debt + _debtChange : _debt - _debtChange;
 
         return (newColl, newDebt);
     }
@@ -654,8 +641,8 @@ contract BorrowerOperations is MosaicBase, Ownable, CheckContract, IBorrowerOper
         uint totalColl = getEntireSystemColl();
         uint totalDebt = getEntireSystemDebt();
 
-        totalColl = _isCollIncrease ? totalColl.add(_collChange) : totalColl.sub(_collChange);
-        totalDebt = _isDebtIncrease ? totalDebt.add(_debtChange) : totalDebt.sub(_debtChange);
+        totalColl = _isCollIncrease ? totalColl + _collChange : totalColl - _collChange;
+        totalDebt = _isDebtIncrease ? totalDebt + _debtChange : totalDebt - _debtChange;
 
         uint newTCR = MosaicMath._computeCR(totalColl, totalDebt, _price);
         return newTCR;

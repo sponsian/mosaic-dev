@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ISortedTroves.sol";
@@ -84,37 +84,37 @@ contract HintHelpers is MosaicBase, Ownable, CheckContract {
         firstRedemptionHint = currentTroveuser;
 
         if (_maxIterations == 0) {
-            _maxIterations = uint(-1);
+            _maxIterations = type(uint256).max;
         }
 
         while (currentTroveuser != address(0) && remainingMEUR > 0 && _maxIterations-- > 0) {
             uint netMEURDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
-                .add(troveManager.getPendingMEURDebtReward(currentTroveuser));
+                + troveManager.getPendingMEURDebtReward(currentTroveuser);
 
             if (netMEURDebt > remainingMEUR) {
                 if (netMEURDebt > MIN_NET_DEBT) {
-                    uint maxRedeemableMEUR = MosaicMath._min(remainingMEUR, netMEURDebt.sub(MIN_NET_DEBT));
+                    uint maxRedeemableMEUR = MosaicMath._min(remainingMEUR, netMEURDebt - MIN_NET_DEBT);
 
                     uint REEF = troveManager.getTroveColl(currentTroveuser)
-                        .add(troveManager.getPendingETHReward(currentTroveuser));
+                        + troveManager.getPendingETHReward(currentTroveuser);
 
-                    uint newColl = REEF.sub(maxRedeemableMEUR.mul(DECIMAL_PRECISION).div(_price).div(COLL_DECIMALS_OFFSET));
-                    uint newDebt = netMEURDebt.sub(maxRedeemableMEUR);
+                    uint newColl = REEF - (maxRedeemableMEUR * DECIMAL_PRECISION / _price / COLL_DECIMALS_OFFSET);
+                    uint newDebt = netMEURDebt - maxRedeemableMEUR;
 
                     uint compositeDebt = _getCompositeDebt(newDebt);
                     partialRedemptionHintNICR = MosaicMath._computeNominalCR(newColl, compositeDebt);
 
-                    remainingMEUR = remainingMEUR.sub(maxRedeemableMEUR);
+                    remainingMEUR = remainingMEUR - maxRedeemableMEUR;
                 }
                 break;
             } else {
-                remainingMEUR = remainingMEUR.sub(netMEURDebt);
+                remainingMEUR = remainingMEUR - netMEURDebt;
             }
 
             currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
         }
 
-        truncatedMEURamount = _MEURamount.sub(remainingMEUR);
+        truncatedMEURamount = _MEURamount - remainingMEUR;
     }
 
     /* getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 

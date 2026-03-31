@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../DefaultPool.sol";
 
 contract DefaultPoolTester is DefaultPool {
     
     function unprotectedIncreaseMEURDebt(uint _amount) external {
-        MEURDebt  = MEURDebt.add(_amount);
+        MEURDebt  = MEURDebt + _amount;
     }
 
     function unprotectedPayable() external payable {
-        REEF = REEF.add(msg.value);
+        REEF = REEF + msg.value;
     }
 }

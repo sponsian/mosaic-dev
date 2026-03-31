@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 pragma experimental ABIEncoderV2;
 
 import "./TroveManager.sol";
@@ -22,7 +22,7 @@ contract MultiTroveGetter {
     TroveManager public troveManager; // XXX Troves missing from ITroveManager?
     ISortedTroves public sortedTroves;
 
-    constructor(TroveManager _troveManager, ISortedTroves _sortedTroves) public {
+    constructor(TroveManager _troveManager, ISortedTroves _sortedTroves) {
         troveManager = _troveManager;
         sortedTroves = _sortedTroves;
     }

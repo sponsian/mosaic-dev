@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../Interfaces/IMSICToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
@@ -8,11 +8,9 @@ import "../Dependencies/BaseMath.sol";
 import "../Dependencies/MosaicMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 
 
 contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMath {
-    using SafeMath for uint;
 
     // --- Data ---
 
@@ -51,15 +49,9 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     uint public totalMSICIssued;
     uint public immutable deploymentTime;
 
-    // --- Events ---
-
-    event MSICTokenAddressSet(address _msicTokenAddress);
-    event StabilityPoolAddressSet(address _stabilityPoolAddress);
-    event TotalMSICIssuedUpdated(uint _totalMSICIssued);
-
     // --- Functions ---
 
-    constructor() public {
+    constructor() {
         deploymentTime = block.timestamp;
     }
 
@@ -91,8 +83,8 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     function issueMSIC() external override returns (uint) {
         _requireCallerIsStabilityPool();
 
-        uint latestTotalMSICIssued = MSICSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalMSICIssued.sub(totalMSICIssued);
+        uint latestTotalMSICIssued = MSICSupplyCap * _getCumulativeIssuanceFraction() / DECIMAL_PRECISION;
+        uint issuance = latestTotalMSICIssued - totalMSICIssued;
 
         totalMSICIssued = latestTotalMSICIssued;
         emit TotalMSICIssuedUpdated(latestTotalMSICIssued);
@@ -106,13 +98,13 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     t:  time passed since last MSIC issuance event  */
     function _getCumulativeIssuanceFraction() internal view returns (uint) {
         // Get the time passed since deployment
-        uint timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
+        uint timePassedInMinutes = (block.timestamp - deploymentTime) / SECONDS_IN_ONE_MINUTE;
 
         // f^t
         uint power = MosaicMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
 
         //  (1 - f^t)
-        uint cumulativeIssuanceFraction = (uint(DECIMAL_PRECISION).sub(power));
+        uint cumulativeIssuanceFraction = DECIMAL_PRECISION - power;
         assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
 
         return cumulativeIssuanceFraction;

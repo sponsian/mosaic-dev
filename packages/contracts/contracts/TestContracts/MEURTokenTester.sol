@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../MEURToken.sol";
 
 contract MEURTokenTester is MEURToken {
-    
+
     bytes32 private immutable _PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    
-    constructor( 
+
+    constructor(
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) public MEURToken(_troveManagerAddress,
+    ) MEURToken(_troveManagerAddress,
                       _stabilityPoolAddress,
                       _borrowerOperationsAddress) {}
     
@@ -44,7 +44,7 @@ contract MEURTokenTester is MEURToken {
         _approve(owner, spender, amount);
     }
 
-    function getChainId() external pure returns (uint256 chainID) {
+    function getChainId() external view returns (uint256 chainID) {
         //return _chainID(); // it’s private
         assembly {
             chainID := chainid()

@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import './Interfaces/IActivePool.sol';
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -16,7 +15,6 @@ import "./Dependencies/console.sol";
  *
  */
 contract ActivePool is Ownable, CheckContract, IActivePool {
-    using SafeMath for uint256;
 
     string constant public NAME = "ActivePool";
 
@@ -26,13 +24,6 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     address public defaultPoolAddress;
     uint256 internal REEF;  // deposited ether tracker
     uint256 internal MEURDebt;
-
-    // --- Events ---
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolMEURDebtUpdated(uint _MEURDebt);
-    event ActivePoolETHBalanceUpdated(uint _ETH);
 
     // --- Contract setters ---
 
@@ -82,7 +73,7 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     function sendETH(address _account, uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        REEF = REEF.sub(_amount);
+        REEF -= _amount;
         emit ActivePoolETHBalanceUpdated(REEF);
         emit EtherSent(_account, _amount);
 
@@ -92,13 +83,13 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     function increaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
-        MEURDebt  = MEURDebt.add(_amount);
+        MEURDebt += _amount;
         emit ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
     function decreaseMEURDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        MEURDebt = MEURDebt.sub(_amount);
+        MEURDebt -= _amount;
         emit ActivePoolMEURDebtUpdated(MEURDebt);
     }
 
@@ -130,7 +121,7 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
 
     receive() external payable {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
-        REEF = REEF.add(msg.value);
+        REEF += msg.value;
         emit ActivePoolETHBalanceUpdated(REEF);
     }
 }

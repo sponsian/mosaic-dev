@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
@@ -10,8 +10,7 @@ import './Interfaces/IMEURToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/MosaicBase.sol";
-import "./Dependencies/SafeMath.sol";
-import "./Dependencies/MosaicSafeMath128.sol";
+
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -146,7 +145,6 @@ import "./Dependencies/console.sol";
  *
  */
 contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
-    using MosaicSafeMath128 for uint128;
 
     string constant public NAME = "StabilityPool";
 
@@ -234,39 +232,6 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     uint public lastETHError_Offset;
     uint public lastMEURLossError_Offset;
 
-    // --- Events ---
-
-    event StabilityPoolETHBalanceUpdated(uint _newBalance);
-    event StabilityPoolMEURBalanceUpdated(uint _newBalance);
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _newActivePoolAddress);
-    event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
-    event MEURTokenAddressChanged(address _newMEURTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
-    event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
-
-    event P_Updated(uint _P);
-    event S_Updated(uint _S, uint128 _epoch, uint128 _scale);
-    event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
-    event EpochUpdated(uint128 _currentEpoch);
-    event ScaleUpdated(uint128 _currentScale);
-
-    event FrontEndRegistered(address indexed _frontEnd, uint _kickbackRate);
-    event FrontEndTagSet(address indexed _depositor, address indexed _frontEnd);
-
-    event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
-    event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
-    event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
-
-    event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _MEURLoss);
-    event MSICPaidToDepositor(address indexed _depositor, uint _MSIC);
-    event MSICPaidToFrontEnd(address indexed _frontEnd, uint _MSIC);
-    event EtherSent(address _to, uint _amount);
-
     // --- Contract setters ---
 
     function setAddresses(
@@ -343,7 +308,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         if (initialDeposit == 0) {_setFrontEndTag(msg.sender, _frontEndTag);}
         uint depositorETHGain = getDepositorETHGain(msg.sender);
         uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
-        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
+        uint MEURLoss = initialDeposit - compoundedMEURDeposit; // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
@@ -351,13 +316,13 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         // Update front end stake
         uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake.add(_amount);
+        uint newFrontEndStake = compoundedFrontEndStake + _amount;
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
         _sendMEURtoStabilityPool(msg.sender, _amount);
 
-        uint newDeposit = compoundedMEURDeposit.add(_amount);
+        uint newDeposit = compoundedMEURDeposit + _amount;
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
@@ -389,22 +354,22 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
         uint MEURtoWithdraw = MosaicMath._min(_amount, compoundedMEURDeposit);
-        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
+        uint MEURLoss = initialDeposit - compoundedMEURDeposit; // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
         _payOutMSICGains(communityIssuanceCached, msg.sender, frontEnd);
-        
+
         // Update front end stake
         uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake.sub(MEURtoWithdraw);
+        uint newFrontEndStake = compoundedFrontEndStake - MEURtoWithdraw;
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
         _sendMEURToDepositor(msg.sender, MEURtoWithdraw);
 
         // Update deposit
-        uint newDeposit = compoundedMEURDeposit.sub(MEURtoWithdraw);
+        uint newDeposit = compoundedMEURDeposit - MEURtoWithdraw;
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
@@ -433,7 +398,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         uint depositorETHGain = getDepositorETHGain(msg.sender);
 
         uint compoundedMEURDeposit = getCompoundedMEURDeposit(msg.sender);
-        uint MEURLoss = initialDeposit.sub(compoundedMEURDeposit); // Needed only for event log
+        uint MEURLoss = initialDeposit - compoundedMEURDeposit; // Needed only for event log
 
         // First pay out any MSIC gains
         address frontEnd = deposits[msg.sender].frontEndTag;
@@ -453,7 +418,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         emit ETHGainWithdrawn(msg.sender, depositorETHGain, MEURLoss);
         emit UserDepositChanged(msg.sender, compoundedMEURDeposit);
 
-        REEF = REEF.sub(depositorETHGain);
+        REEF = REEF - depositorETHGain;
         emit StabilityPoolETHBalanceUpdated(REEF);
         emit EtherSent(msg.sender, depositorETHGain);
 
@@ -479,8 +444,8 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         uint MSICPerUnitStaked;
         MSICPerUnitStaked =_computeMSICPerUnitStaked(_MSICIssuance, totalMEUR);
 
-        uint marginalMSICGain = MSICPerUnitStaked.mul(P);
-        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale].add(marginalMSICGain);
+        uint marginalMSICGain = MSICPerUnitStaked * P;
+        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale] + marginalMSICGain;
 
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
@@ -497,10 +462,10 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         * 4) Store this error for use in the next correction when this function is called.
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
-        uint MSICNumerator = _MSICIssuance.mul(DECIMAL_PRECISION).add(lastMSICError);
+        uint MSICNumerator = _MSICIssuance * DECIMAL_PRECISION + lastMSICError;
 
-        uint MSICPerUnitStaked = MSICNumerator.div(_totalMEURDeposits);
-        lastMSICError = MSICNumerator.sub(MSICPerUnitStaked.mul(_totalMEURDeposits));
+        uint MSICPerUnitStaked = MSICNumerator / _totalMEURDeposits;
+        lastMSICError = MSICNumerator - MSICPerUnitStaked * _totalMEURDeposits;
 
         return MSICPerUnitStaked;
     }
@@ -548,24 +513,24 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         * 4) Store these errors for use in the next correction when this function is called.
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
-        uint ETHNumerator = _collToAdd.mul(DECIMAL_PRECISION).add(lastETHError_Offset);
+        uint ETHNumerator = _collToAdd * DECIMAL_PRECISION + lastETHError_Offset;
 
         assert(_debtToOffset <= _totalMEURDeposits);
         if (_debtToOffset == _totalMEURDeposits) {
             MEURLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
             lastMEURLossError_Offset = 0;
         } else {
-            uint MEURLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(lastMEURLossError_Offset);
+            uint MEURLossNumerator = _debtToOffset * DECIMAL_PRECISION - lastMEURLossError_Offset;
             /*
             * Add 1 to make error in quotient positive. We want "slightly too much" MEUR loss,
             * which ensures the error in any given compoundedMEURDeposit favors the Stability Pool.
             */
-            MEURLossPerUnitStaked = (MEURLossNumerator.div(_totalMEURDeposits)).add(1);
-            lastMEURLossError_Offset = (MEURLossPerUnitStaked.mul(_totalMEURDeposits)).sub(MEURLossNumerator);
+            MEURLossPerUnitStaked = (MEURLossNumerator / _totalMEURDeposits) + 1;
+            lastMEURLossError_Offset = (MEURLossPerUnitStaked * _totalMEURDeposits) - MEURLossNumerator;
         }
 
-        ETHGainPerUnitStaked = ETHNumerator.div(_totalMEURDeposits);
-        lastETHError_Offset = ETHNumerator.sub(ETHGainPerUnitStaked.mul(_totalMEURDeposits));
+        ETHGainPerUnitStaked = ETHNumerator / _totalMEURDeposits;
+        lastETHError_Offset = ETHNumerator - ETHGainPerUnitStaked * _totalMEURDeposits;
 
         return (ETHGainPerUnitStaked, MEURLossPerUnitStaked);
     }
@@ -580,7 +545,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool MEUR in the liquidation.
         * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - MEURLossPerUnitStaked)
         */
-        uint newProductFactor = uint(DECIMAL_PRECISION).sub(_MEURLossPerUnitStaked);
+        uint newProductFactor = uint(DECIMAL_PRECISION) - _MEURLossPerUnitStaked;
 
         uint128 currentScaleCached = currentScale;
         uint128 currentEpochCached = currentEpoch;
@@ -593,26 +558,26 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         *
         * Since S corresponds to REEF gain, and P to deposit loss, we update S first.
         */
-        uint marginalETHGain = _ETHGainPerUnitStaked.mul(currentP);
-        uint newS = currentS.add(marginalETHGain);
+        uint marginalETHGain = _ETHGainPerUnitStaked * currentP;
+        uint newS = currentS + marginalETHGain;
         epochToScaleToSum[currentEpochCached][currentScaleCached] = newS;
         emit S_Updated(newS, currentEpochCached, currentScaleCached);
 
         // If the Stability Pool was emptied, increment the epoch, and reset the scale and product P
         if (newProductFactor == 0) {
-            currentEpoch = currentEpochCached.add(1);
+            currentEpoch = currentEpochCached + 1;
             emit EpochUpdated(currentEpoch);
             currentScale = 0;
             emit ScaleUpdated(currentScale);
             newP = DECIMAL_PRECISION;
 
         // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
-        } else if (currentP.mul(newProductFactor).div(DECIMAL_PRECISION) < SCALE_FACTOR) {
-            newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION); 
-            currentScale = currentScaleCached.add(1);
+        } else if (currentP * newProductFactor / DECIMAL_PRECISION < SCALE_FACTOR) {
+            newP = currentP * newProductFactor * SCALE_FACTOR / DECIMAL_PRECISION;
+            currentScale = currentScaleCached + 1;
             emit ScaleUpdated(currentScale);
         } else {
-            newP = currentP.mul(newProductFactor).div(DECIMAL_PRECISION);
+            newP = currentP * newProductFactor / DECIMAL_PRECISION;
         }
 
         assert(newP > 0);
@@ -635,7 +600,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     }
 
     function _decreaseMEUR(uint _amount) internal {
-        uint newTotalMEURDeposits = totalMEURDeposits.sub(_amount);
+        uint newTotalMEURDeposits = totalMEURDeposits - _amount;
         totalMEURDeposits = newTotalMEURDeposits;
         emit StabilityPoolMEURBalanceUpdated(newTotalMEURDeposits);
     }
@@ -669,10 +634,10 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         uint S_Snapshot = snapshots.S;
         uint P_Snapshot = snapshots.P;
 
-        uint firstPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot].sub(S_Snapshot);
-        uint secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint firstPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot] - S_Snapshot;
+        uint secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot + 1] / SCALE_FACTOR;
 
-        uint ETHGain = initialDeposit.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
+        uint ETHGain = initialDeposit * (firstPortion + secondPortion) / P_Snapshot / DECIMAL_PRECISION;
 
         return ETHGain;
     }
@@ -698,7 +663,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint MSICGain = kickbackRate.mul(_getMSICGainFromSnapshots(initialDeposit, snapshots)).div(DECIMAL_PRECISION);
+        uint MSICGain = kickbackRate * _getMSICGainFromSnapshots(initialDeposit, snapshots) / DECIMAL_PRECISION;
 
         return MSICGain;
     }
@@ -714,11 +679,11 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         if (frontEndStake == 0) { return 0; }
 
         uint kickbackRate = frontEnds[_frontEnd].kickbackRate;
-        uint frontEndShare = uint(DECIMAL_PRECISION).sub(kickbackRate);
+        uint frontEndShare = uint(DECIMAL_PRECISION) - kickbackRate;
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
-        uint MSICGain = frontEndShare.mul(_getMSICGainFromSnapshots(frontEndStake, snapshots)).div(DECIMAL_PRECISION);
+        uint MSICGain = frontEndShare * _getMSICGainFromSnapshots(frontEndStake, snapshots) / DECIMAL_PRECISION;
         return MSICGain;
     }
 
@@ -733,10 +698,10 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         uint G_Snapshot = snapshots.G;
         uint P_Snapshot = snapshots.P;
 
-        uint firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot].sub(G_Snapshot);
-        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
+        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / SCALE_FACTOR;
 
-        uint MSICGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
+        uint MSICGain = initialStake * (firstPortion + secondPortion) / P_Snapshot / DECIMAL_PRECISION;
 
         return MSICGain;
     }
@@ -791,16 +756,16 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         if (epochSnapshot < currentEpoch) { return 0; }
 
         uint compoundedStake;
-        uint128 scaleDiff = currentScale.sub(scaleSnapshot);
+        uint128 scaleDiff = currentScale - scaleSnapshot;
 
         /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
         * account for it. If more than one scale change was made, then the stake has decreased by a factor of
         * at least 1e-9 -- so return 0.
         */
         if (scaleDiff == 0) {
-            compoundedStake = initialStake.mul(P).div(snapshot_P);
+            compoundedStake = initialStake * P / snapshot_P;
         } else if (scaleDiff == 1) {
-            compoundedStake = initialStake.mul(P).div(snapshot_P).div(SCALE_FACTOR);
+            compoundedStake = initialStake * P / snapshot_P / SCALE_FACTOR;
         } else { // if scaleDiff >= 2
             compoundedStake = 0;
         }
@@ -814,7 +779,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
         *
         * Thus it's unclear whether this line is still really needed.
         */
-        if (compoundedStake < initialStake.div(1e9)) {return 0;}
+        if (compoundedStake < initialStake / 1e9) {return 0;}
 
         return compoundedStake;
     }
@@ -824,14 +789,14 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
     // Transfer the MEUR tokens from the user to the Stability Pool's address, and update its recorded MEUR
     function _sendMEURtoStabilityPool(address _address, uint _amount) internal {
         meurToken.sendToPool(_address, address(this), _amount);
-        uint newTotalMEURDeposits = totalMEURDeposits.add(_amount);
+        uint newTotalMEURDeposits = totalMEURDeposits + _amount;
         totalMEURDeposits = newTotalMEURDeposits;
         emit StabilityPoolMEURBalanceUpdated(newTotalMEURDeposits);
     }
 
     function _sendETHGainToDepositor(uint _amount) internal {
         if (_amount == 0) {return;}
-        uint newETH = REEF.sub(_amount);
+        uint newETH = REEF - _amount;
         REEF = newETH;
         emit StabilityPoolETHBalanceUpdated(newETH);
         emit EtherSent(msg.sender, _amount);
@@ -992,7 +957,7 @@ contract StabilityPool is MosaicBase, Ownable, CheckContract, IStabilityPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        REEF = REEF.add(msg.value);
+        REEF = REEF + msg.value;
         emit StabilityPoolETHBalanceUpdated(REEF);
     }
 }

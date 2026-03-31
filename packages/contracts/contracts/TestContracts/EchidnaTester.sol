@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../TroveManager.sol";
 import "../BorrowerOperations.sol";
@@ -20,7 +20,6 @@ import "./EchidnaProxy.sol";
 // ~/.local/bin/echidna-test contracts/TestContracts/EchidnaTester.sol --contract EchidnaTester --config fuzzTests/echidna_config.yaml
 
 contract EchidnaTester {
-    using SafeMath for uint;
 
     uint constant private NUMBER_OF_ACTORS = 100;
     uint constant private INITIAL_BALANCE = 1e24;
@@ -43,7 +42,7 @@ contract EchidnaTester {
 
     uint private numberOfTroves;
 
-    constructor() public payable {
+    constructor() payable {
         troveManager = new TroveManager();
         borrowerOperations = new BorrowerOperations();
         activePool = new ActivePool();
@@ -137,7 +136,7 @@ contract EchidnaTester {
     function getAdjustedETH(uint actorBalance, uint _ETH, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         require(price > 0);
-        uint minETH = ratio.mul(MEUR_GAS_COMPENSATION).div(price).div(MosaicMath.COLL_DECIMALS_OFFSET);
+        uint minETH = ratio * MEUR_GAS_COMPENSATION / price / MosaicMath.COLL_DECIMALS_OFFSET;
         require(actorBalance > minETH);
         uint REEF = minETH + _ETH % (actorBalance - minETH);
         return REEF;
@@ -146,11 +145,11 @@ contract EchidnaTester {
     function getAdjustedMEUR(uint REEF, uint _MEURAmount, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         uint MEURAmount = _MEURAmount;
-        uint compositeDebt = MEURAmount.add(MEUR_GAS_COMPENSATION);
+        uint compositeDebt = MEURAmount + MEUR_GAS_COMPENSATION;
         uint ICR = MosaicMath._computeCR(REEF, compositeDebt, price);
         if (ICR < ratio) {
-            compositeDebt = REEF.mul(price).mul(MosaicMath.COLL_DECIMALS_OFFSET).div(ratio);
-            MEURAmount = compositeDebt.sub(MEUR_GAS_COMPENSATION);
+            compositeDebt = REEF * price * MosaicMath.COLL_DECIMALS_OFFSET / ratio;
+            MEURAmount = compositeDebt - MEUR_GAS_COMPENSATION;
         }
         return MEURAmount;
     }

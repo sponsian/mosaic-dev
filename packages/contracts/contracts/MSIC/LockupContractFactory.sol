@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Interfaces/ILockupContractFactory.sol";
 import "./LockupContract.sol";
-import "../Dependencies/console.sol";
 
 /*
 * The LockupContractFactory deploys LockupContracts - its main purpose is to keep a registry of valid deployed 
@@ -24,7 +22,6 @@ import "../Dependencies/console.sol";
 */
 
 contract LockupContractFactory is ILockupContractFactory, Ownable, CheckContract {
-    using SafeMath for uint;
 
     // --- Data ---
     string constant public NAME = "LockupContractFactory";
@@ -34,11 +31,6 @@ contract LockupContractFactory is ILockupContractFactory, Ownable, CheckContract
     address public msicTokenAddress;
     
     mapping (address => address) public lockupContractToDeployer;
-
-    // --- Events ---
-
-    event MSICTokenAddressSet(address _msicTokenAddress);
-    event LockupContractDeployedThroughFactory(address _lockupContractAddress, address _beneficiary, uint _unlockTime, address _deployer);
 
     // --- Functions ---
 

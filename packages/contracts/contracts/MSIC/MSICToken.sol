@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IMSICToken.sol";
 import "../Interfaces/ILockupContractFactory.sol";
-import "../Dependencies/console.sol";
 
 /*
 * Based upon OpenZeppelin's ERC20 contract:
@@ -48,7 +46,6 @@ import "../Dependencies/console.sol";
 */
 
 contract MSICToken is CheckContract, IMSICToken {
-    using SafeMath for uint256;
 
     // --- ERC20 Data ---
 
@@ -82,7 +79,6 @@ contract MSICToken is CheckContract, IMSICToken {
 
     uint public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
 
-    // uint for use with SafeMath
     uint internal _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
     uint internal immutable deploymentStartTime;
@@ -95,12 +91,6 @@ contract MSICToken is CheckContract, IMSICToken {
 
     ILockupContractFactory public immutable lockupContractFactory;
 
-    // --- Events ---
-
-    event CommunityIssuanceAddressSet(address _communityIssuanceAddress);
-    event MSICStakingAddressSet(address _msicStakingAddress);
-    event LockupContractFactoryAddressSet(address _lockupContractFactoryAddress);
-
     // --- Functions ---
 
     constructor
@@ -111,8 +101,7 @@ contract MSICToken is CheckContract, IMSICToken {
         address _bountyAddress,
         address _lpRewardsAddress,
         address _multisigAddress
-    ) 
-        public 
+    )
     {
         checkContract(_communityIssuanceAddress);
         checkContract(_msicStakingAddress);
@@ -135,21 +124,21 @@ contract MSICToken is CheckContract, IMSICToken {
         
         // --- Initial MSIC allocations ---
      
-        uint bountyEntitlement = _1_MILLION.mul(2); // Allocate 2 million for bounties/hackathons
+        uint bountyEntitlement = _1_MILLION * 2; // Allocate 2 million for bounties/hackathons
         _mint(_bountyAddress, bountyEntitlement);
 
-        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(32); // Allocate 32 million to the algorithmic issuance schedule
+        uint depositorsAndFrontEndsEntitlement = _1_MILLION * 32; // Allocate 32 million to the algorithmic issuance schedule
         _mint(_communityIssuanceAddress, depositorsAndFrontEndsEntitlement);
 
-        uint _lpRewardsEntitlement = _1_MILLION.mul(4).div(3);  // Allocate 1.33 million for LP rewards
+        uint _lpRewardsEntitlement = _1_MILLION * 4 / 3;  // Allocate 1.33 million for LP rewards
         lpRewardsEntitlement = _lpRewardsEntitlement;
         _mint(_lpRewardsAddress, _lpRewardsEntitlement);
         
         // Allocate the remainder to the MSIC Multisig: (100 - 2 - 32 - 1.33) million = 64.66 million
-        uint multisigEntitlement = _1_MILLION.mul(100)
-            .sub(bountyEntitlement)
-            .sub(depositorsAndFrontEndsEntitlement)
-            .sub(_lpRewardsEntitlement);
+        uint multisigEntitlement = _1_MILLION * 100
+            - bountyEntitlement
+            - depositorsAndFrontEndsEntitlement
+            - _lpRewardsEntitlement;
 
         _mint(_multisigAddress, multisigEntitlement);
     }
@@ -202,21 +191,23 @@ contract MSICToken is CheckContract, IMSICToken {
         _requireValidRecipient(recipient);
 
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        require(_allowances[sender][msg.sender] >= amount, "ERC20: transfer amount exceeds allowance");
+        _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
         if (_isFirstYear()) { _requireCallerIsNotMultisig(); }
         
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
         if (_isFirstYear()) { _requireCallerIsNotMultisig(); }
         
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        require(_allowances[msg.sender][spender] >= subtractedValue, "ERC20: decreased allowance below zero");
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
         return true;
     }
 
@@ -249,7 +240,7 @@ contract MSICToken is CheckContract, IMSICToken {
         external 
         override 
     {            
-        require(deadline >= now, 'MSIC: expired deadline');
+        require(deadline >= block.timestamp, 'MSIC: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
@@ -265,7 +256,7 @@ contract MSICToken is CheckContract, IMSICToken {
 
     // --- Internal operations ---
 
-    function _chainID() private pure returns (uint256 chainID) {
+    function _chainID() private view returns (uint256 chainID) {
         assembly {
             chainID := chainid()
         }
@@ -279,16 +270,17 @@ contract MSICToken is CheckContract, IMSICToken {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
-        _balances[recipient] = _balances[recipient].add(amount);
+        require(_balances[sender] >= amount, "ERC20: transfer amount exceeds balance");
+        _balances[sender] = _balances[sender] - amount;
+        _balances[recipient] = _balances[recipient] + amount;
         emit Transfer(sender, recipient, amount);
     }
 
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
+        _totalSupply = _totalSupply + amount;
+        _balances[account] = _balances[account] + amount;
         emit Transfer(address(0), account, amount);
     }
 
@@ -307,7 +299,7 @@ contract MSICToken is CheckContract, IMSICToken {
     }
 
     function _isFirstYear() internal view returns (bool) {
-        return (block.timestamp.sub(deploymentStartTime) < ONE_YEAR_IN_SECONDS);
+        return (block.timestamp - deploymentStartTime < ONE_YEAR_IN_SECONDS);
     }
 
     // --- 'require' functions ---

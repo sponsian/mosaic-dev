@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
-import "../Dependencies/SafeMath.sol";
 import "../Dependencies/MosaicMath.sol";
 import "../Dependencies/IERC20.sol";
 import "../Interfaces/IBorrowerOperations.sol";
@@ -11,20 +10,17 @@ import "../Interfaces/IStabilityPool.sol";
 import "../Interfaces/IPriceFeed.sol";
 import "../Interfaces/IMSICStaking.sol";
 import "./BorrowerOperationsScript.sol";
-import "./ETHTransferScript.sol";
+import "./REEFTransferScript.sol";
 import "./MSICStakingScript.sol";
-import "../Dependencies/console.sol";
 
 
-contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, MSICStakingScript {
-    using SafeMath for uint;
+contract BorrowerWrappersScript is BorrowerOperationsScript, REEFTransferScript, MSICStakingScript {
 
     string constant public NAME = "BorrowerWrappersScript";
 
     ITroveManager immutable troveManager;
     IStabilityPool immutable stabilityPool;
     IPriceFeed immutable priceFeed;
-    IERC20 immutable msicToken;
     IERC20 immutable msicToken;
     IMSICStaking immutable msicStaking;
 
@@ -35,7 +31,6 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
     )
         BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress))
         MSICStakingScript(_msicStakingAddress)
-        public
     {
         checkContract(_troveManagerAddress);
         ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
@@ -48,10 +43,6 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         IPriceFeed priceFeedCached = troveManagerCached.priceFeed();
         checkContract(address(priceFeedCached));
         priceFeed = priceFeedCached;
-
-        address msicTokenCached = address(troveManagerCached.msicToken());
-        checkContract(msicTokenCached);
-        msicToken = IERC20(msicTokenCached);
 
         address msicTokenCached = address(troveManagerCached.msicToken());
         checkContract(msicTokenCached);
@@ -73,7 +64,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         // already checked in CollSurplusPool
         assert(balanceAfter > balanceBefore);
 
-        uint totalCollateral = balanceAfter.sub(balanceBefore).add(msg.value);
+        uint totalCollateral = balanceAfter - balanceBefore + msg.value;
 
         // Open trove with obtained collateral, plus collateral sent by user
         borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _MEURAmount, _upperHint, _lowerHint);
@@ -88,7 +79,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
 
         uint collBalanceAfter = address(this).balance;
         uint msicBalanceAfter = msicToken.balanceOf(address(this));
-        uint claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
+        uint claimedCollateral = collBalanceAfter - collBalanceBefore;
 
         // Add claimed REEF to trove, get more MEUR and stake it into the Stability Pool
         if (claimedCollateral > 0) {
@@ -102,7 +93,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         }
 
         // Stake claimed MSIC
-        uint claimedMSIC = msicBalanceAfter.sub(msicBalanceBefore);
+        uint claimedMSIC = msicBalanceAfter - msicBalanceBefore;
         if (claimedMSIC > 0) {
             msicStaking.stake(claimedMSIC);
         }
@@ -111,13 +102,12 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
     function claimStakingGainsAndRecycle(uint _maxFee, address _upperHint, address _lowerHint) external {
         uint collBalanceBefore = address(this).balance;
         uint msicBalanceBefore = msicToken.balanceOf(address(this));
-        uint msicBalanceBefore = msicToken.balanceOf(address(this));
 
         // Claim gains
         msicStaking.unstake(0);
 
-        uint gainedCollateral = address(this).balance.sub(collBalanceBefore); // stack too deep issues :'(
-        uint gainedMEUR = msicToken.balanceOf(address(this)).sub(msicBalanceBefore);
+        uint gainedCollateral = address(this).balance - collBalanceBefore; // stack too deep issues :'(
+        uint gainedMEUR = msicToken.balanceOf(address(this)) - msicBalanceBefore;
 
         uint netMEURAmount;
         // Top up trove and get more MEUR, keeping ICR constant
@@ -127,13 +117,13 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
             borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netMEURAmount, true, _upperHint, _lowerHint);
         }
 
-        uint totalMEUR = gainedMEUR.add(netMEURAmount);
+        uint totalMEUR = gainedMEUR + netMEURAmount;
         if (totalMEUR > 0) {
             stabilityPool.provideToSP(totalMEUR, address(0));
 
             // Providing to Stability Pool also triggers MSIC claim, so stake it if any
             uint msicBalanceAfter = msicToken.balanceOf(address(this));
-            uint claimedMSIC = msicBalanceAfter.sub(msicBalanceBefore);
+            uint claimedMSIC = msicBalanceAfter - msicBalanceBefore;
             if (claimedMSIC > 0) {
                 msicStaking.stake(claimedMSIC);
             }
@@ -145,9 +135,9 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint price = priceFeed.fetchPrice();
         uint ICR = troveManager.getCurrentICR(address(this), price);
 
-        uint MEURAmount = _collateral.mul(price).mul(MosaicMath.COLL_DECIMALS_OFFSET).div(ICR);
+        uint MEURAmount = _collateral * price * MosaicMath.COLL_DECIMALS_OFFSET / ICR;
         uint borrowingRate = troveManager.getBorrowingRateWithDecay();
-        uint netDebt = MEURAmount.mul(MosaicMath.DECIMAL_PRECISION).div(MosaicMath.DECIMAL_PRECISION.add(borrowingRate));
+        uint netDebt = MEURAmount * MosaicMath.DECIMAL_PRECISION / (MosaicMath.DECIMAL_PRECISION + borrowingRate);
 
         return netDebt;
     }

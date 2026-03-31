@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
-import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IMSICToken.sol";
 
 /*
@@ -17,7 +16,6 @@ import "../Interfaces/IMSICToken.sol";
 * enter circulating supply and cannot be staked to earn system revenue.
 */
 contract LockupContract {
-    using SafeMath for uint;
 
     // --- Data ---
     string constant public NAME = "LockupContract";
@@ -44,7 +42,6 @@ contract LockupContract {
         address _beneficiary, 
         uint _unlockTime
     )
-        public 
     {
         msicToken = IMSICToken(_msicTokenAddress);
 
@@ -81,6 +78,6 @@ contract LockupContract {
 
     function _requireUnlockTimeIsAtLeastOneYearAfterSystemDeployment(uint _unlockTime) internal view {
         uint systemDeploymentTime = msicToken.getDeploymentStartTime();
-        require(_unlockTime >= systemDeploymentTime.add(SECONDS_IN_ONE_YEAR), "LockupContract: unlock time must be at least one year after system deployment");
+        require(_unlockTime >= systemDeploymentTime + SECONDS_IN_ONE_YEAR, "LockupContract: unlock time must be at least one year after system deployment");
     }
 }

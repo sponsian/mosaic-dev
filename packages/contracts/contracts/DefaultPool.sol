@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.24;
 
 import './Interfaces/IDefaultPool.sol';
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -16,7 +15,6 @@ import "./Dependencies/console.sol";
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is Ownable, CheckContract, IDefaultPool {
-    using SafeMath for uint256;
 
     string constant public NAME = "DefaultPool";
 
@@ -24,10 +22,6 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     address public activePoolAddress;
     uint256 internal REEF;  // deposited REEF tracker
     uint256 internal MEURDebt;  // debt
-
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolMEURDebtUpdated(uint _MEURDebt);
-    event DefaultPoolETHBalanceUpdated(uint _ETH);
 
     // --- Dependency setters ---
 
@@ -70,7 +64,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
     function sendETHToActivePool(uint _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        REEF = REEF.sub(_amount);
+        REEF -= _amount;
         emit DefaultPoolETHBalanceUpdated(REEF);
         emit EtherSent(activePool, _amount);
 
@@ -80,13 +74,13 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     function increaseMEURDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        MEURDebt = MEURDebt.add(_amount);
+        MEURDebt += _amount;
         emit DefaultPoolMEURDebtUpdated(MEURDebt);
     }
 
     function decreaseMEURDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        MEURDebt = MEURDebt.sub(_amount);
+        MEURDebt -= _amount;
         emit DefaultPoolMEURDebtUpdated(MEURDebt);
     }
 
@@ -104,7 +98,7 @@ contract DefaultPool is Ownable, CheckContract, IDefaultPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        REEF = REEF.add(msg.value);
+        REEF += msg.value;
         emit DefaultPoolETHBalanceUpdated(REEF);
     }
 }
