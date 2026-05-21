@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1.6
+#
+# Mosaic CMC price feed updater — Railway worker service.
+# Long-running Node process; no exposed port.
+
+FROM node:16-bullseye
+
+ENV NODE_OPTIONS=--max_old_space_size=4096 \
+    CI=true \
+    YARN_ENABLE_IMMUTABLE_INSTALLS=true
+
+WORKDIR /app
+
+RUN corepack enable
+
+COPY . .
+
+RUN yarn install --immutable
+
+# The updater script imports from lib-base and reads contract ABIs from lib-ethers;
+# lib-ethers' typechain step requires compiled contract artifacts.
+RUN yarn prepare:contracts \
+ && yarn prepare:lib-base \
+ && yarn prepare:lib-ethers
+
+WORKDIR /app/packages/lib-ethers
+
+# Env (set in the Railway service):
+#   CMC_API_KEY, PRICE_FEED_ADDRESS, RPC_URL, UPDATER_PRIVATE_KEY
+#   UPDATE_INTERVAL_MS (default 300000), MAX_PRICE_DEVIATION_PERCENT (default 50)
+CMD ["yarn", "ts-node", "scripts/update-price-feed.ts"]

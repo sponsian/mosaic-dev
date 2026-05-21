@@ -1,0 +1,23 @@
+server {
+  listen       ${PORT};
+  server_name  _;
+
+  root  /usr/share/nginx/html;
+  index index.html;
+
+  # SPA fallback so react-router deep links resolve to index.html
+  location / {
+    try_files $uri /index.html;
+  }
+
+  # Vite emits hashed bundles under /assets/ — safe to cache aggressively
+  location /assets/ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+  }
+
+  # Runtime-generated config — must not be cached, or env changes won't take effect on redeploy
+  location = /config.json {
+    add_header Cache-Control "no-store";
+  }
+}

@@ -1,0 +1,27 @@
+# Railway config for the Mosaic dev-frontend (web service).
+#
+# Two services from this same repo:
+#   1. Web (this file's defaults) — Dockerfile at repo root, served by nginx on $PORT.
+#   2. Price updater bot — same repo, but set the service env var
+#        RAILWAY_DOCKERFILE_PATH=Dockerfile.bot
+#      in the Railway dashboard. The bot has no public port and needs no Railway domain.
+#
+# Service env vars (set in Railway dashboard, not here):
+#   Web:
+#     TESTNET_ONLY=true
+#     WALLET_CONNECT_PROJECT_ID=<your WalletConnect Cloud id>
+#     FRONTEND_TAG=<frontend registry address, or unset for AddressZero>
+#     ALCHEMY_API_KEY / INFURA_API_KEY — optional, unused on Reef
+#   Bot:
+#     CMC_API_KEY, PRICE_FEED_ADDRESS, RPC_URL, UPDATER_PRIVATE_KEY
+#     UPDATE_INTERVAL_MS (optional), MAX_PRICE_DEVIATION_PERCENT (optional)
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
