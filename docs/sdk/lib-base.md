@@ -31,10 +31,10 @@
 |  [PopulatedMosaicTransaction](./lib-base.populatedmosaictransaction.md) | A transaction that has been prepared for sending. |
 |  [PopulatedRedemption](./lib-base.populatedredemption.md) | A redemption transaction that has been prepared for sending. |
 |  [ReadableMosaic](./lib-base.readablemosaic.md) | Read the state of the Mosaic protocol. |
-|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemMEUR()](./lib-base.transactablemosaic.redeemmsic.md) transaction. |
+|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemMEUR()](./lib-base.transactablemosaic.redeemmeur.md) transaction. |
 |  [SendableMosaic](./lib-base.sendablemosaic.md) | Send Mosaic transactions. |
 |  [SentMosaicTransaction](./lib-base.sentmosaictransaction.md) | A transaction that has already been sent. |
-|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositMEURInStabilityPool()](./lib-base.transactablemosaic.depositmsicinstabilitypool.md) or [withdrawMEURFromStabilityPool()](./lib-base.transactablemosaic.withdrawmsicfromstabilitypool.md) transaction. |
+|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositMEURInStabilityPool()](./lib-base.transactablemosaic.depositmeurinstabilitypool.md) or [withdrawMEURFromStabilityPool()](./lib-base.transactablemosaic.withdrawmeurfromstabilitypool.md) transaction. |
 |  [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md) | Details of a [withdrawGainsFromStabilityPool()](./lib-base.transactablemosaic.withdrawgainsfromstabilitypool.md) transaction. |
 |  [TransactableMosaic](./lib-base.transactablemosaic.md) | Send Mosaic transactions and wait for them to succeed. |
 |  [TroveAdjustmentDetails](./lib-base.troveadjustmentdetails.md) | Details of an [adjustTrove()](./lib-base.transactablemosaic.adjusttrove.md) transaction. |
@@ -47,10 +47,10 @@
 |  Variable | Description |
 |  --- | --- |
 |  [CRITICAL\_COLLATERAL\_RATIO](./lib-base.critical_collateral_ratio.md) | Total collateral ratio below which recovery mode is triggered. |
-|  [MEUR\_LIQUIDATION\_RESERVE](./lib-base.msic_liquidation_reserve.md) | Amount of MEUR that's reserved for compensating the liquidator of a Trove. |
-|  [MEUR\_MINIMUM\_DEBT](./lib-base.msic_minimum_debt.md) | A Trove must always have at least this much debt. |
-|  [MEUR\_MINIMUM\_NET\_DEBT](./lib-base.msic_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.msic_liquidation_reserve.md)<!-- -->. |
 |  [MAXIMUM\_BORROWING\_RATE](./lib-base.maximum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never exceed. |
+|  [MEUR\_LIQUIDATION\_RESERVE](./lib-base.meur_liquidation_reserve.md) | Amount of MEUR that's reserved for compensating the liquidator of a Trove. |
+|  [MEUR\_MINIMUM\_DEBT](./lib-base.meur_minimum_debt.md) | A Trove must always have at least this much debt. |
+|  [MEUR\_MINIMUM\_NET\_DEBT](./lib-base.meur_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.meur_liquidation_reserve.md)<!-- -->. |
 |  [MINIMUM\_BORROWING\_RATE](./lib-base.minimum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never decay below. |
 |  [MINIMUM\_COLLATERAL\_RATIO](./lib-base.minimum_collateral_ratio.md) | Collateral ratio below which a Trove can be liquidated in normal mode. |
 |  [MINIMUM\_REDEMPTION\_RATE](./lib-base.minimum_redemption_rate.md) | Value that the [redemption rate](./lib-base.fees.redemptionrate.md) will never decay below. |
@@ -62,10 +62,10 @@
 |  [Decimalish](./lib-base.decimalish.md) | Types that can be converted into a Decimal. |
 |  [FailedReceipt](./lib-base.failedreceipt.md) | Indicates that the transaction has been mined, but it failed. |
 |  [FrontendStatus](./lib-base.frontendstatus.md) | Represents whether an address has been registered as a Mosaic frontend. |
+|  [MinedReceipt](./lib-base.minedreceipt.md) | Either a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](./lib-base.successfulreceipt.md)<!-- -->. |
 |  [MosaicReceipt](./lib-base.mosaicreceipt.md) | One of either a [PendingReceipt](./lib-base.pendingreceipt.md)<!-- -->, a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](./lib-base.successfulreceipt.md)<!-- -->. |
 |  [MosaicStoreState](./lib-base.mosaicstorestate.md) | Type of [MosaicStore](./lib-base.mosaicstore.md)<!-- -->'s [state](./lib-base.mosaicstore.state.md)<!-- -->. |
 |  [MSICStakeChange](./lib-base.msicstakechange.md) | Represents the change between two states of an MSIC Stake. |
-|  [MinedReceipt](./lib-base.minedreceipt.md) | Either a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](./lib-base.successfulreceipt.md)<!-- -->. |
 |  [PendingReceipt](./lib-base.pendingreceipt.md) | Indicates that the transaction hasn't been mined yet. |
 |  [StabilityDepositChange](./lib-base.stabilitydepositchange.md) | Represents the change between two Stability Deposit states. |
 |  [SuccessfulReceipt](./lib-base.successfulreceipt.md) | Indicates that the transaction has succeeded. |

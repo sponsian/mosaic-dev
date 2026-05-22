@@ -5,19 +5,6 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_msicTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MSICTokenAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
         "name": "_lockupContractAddress",
         "type": "address"
       },
@@ -41,6 +28,19 @@
       }
     ],
     "name": "LockupContractDeployedThroughFactory",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_msicTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MSICTokenAddressSet",
     "type": "event"
   },
   {

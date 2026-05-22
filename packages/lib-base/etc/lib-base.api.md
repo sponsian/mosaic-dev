@@ -18,13 +18,13 @@ export class _CachedReadableMosaic<T extends unknown[]> implements _ReadableMosa
     // (undocumented)
     getLiquidityMiningStake(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
-    getMSICBalance(address?: string, ...extraParams: T): Promise<Decimal>;
-    // (undocumented)
-    getMSICStake(address?: string, ...extraParams: T): Promise<MSICStake>;
-    // (undocumented)
     getMEURBalance(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
     getMEURInStabilityPool(...extraParams: T): Promise<Decimal>;
+    // (undocumented)
+    getMSICBalance(address?: string, ...extraParams: T): Promise<Decimal>;
+    // (undocumented)
+    getMSICStake(address?: string, ...extraParams: T): Promise<MSICStake>;
     // (undocumented)
     getNumberOfTroves(...extraParams: T): Promise<number>;
     // (undocumented)
@@ -219,6 +219,40 @@ export interface LiquidationDetails {
     totalLiquidated: Trove;
 }
 
+// @public
+export const MAXIMUM_BORROWING_RATE: Decimal;
+
+// @public
+export const MEUR_LIQUIDATION_RESERVE: Decimal;
+
+// @public
+export const MEUR_MINIMUM_DEBT: Decimal;
+
+// @public
+export const MEUR_MINIMUM_NET_DEBT: Decimal;
+
+// @internal (undocumented)
+export type _MEURBorrowing<T> = {
+    borrowMEUR: T;
+};
+
+// @internal (undocumented)
+export type _MEURRepayment<T> = {
+    repayMEUR: T;
+};
+
+// @public
+export type MinedReceipt<R = unknown, D = unknown> = FailedReceipt<R> | SuccessfulReceipt<R, D>;
+
+// @public
+export const MINIMUM_BORROWING_RATE: Decimal;
+
+// @public
+export const MINIMUM_COLLATERAL_RATIO: Decimal;
+
+// @public
+export const MINIMUM_REDEMPTION_RATE: Decimal;
+
 // @internal (undocumented)
 export interface _MosaicReadCache<T extends unknown[]> extends _MosaicReadCacheBase<T> {
     // (undocumented)
@@ -265,10 +299,10 @@ export interface MosaicStoreBaseState {
     frontend: FrontendStatus;
     liquidityMiningMSICReward: Decimal;
     liquidityMiningStake: Decimal;
-    msicBalance: Decimal;
-    msicStake: MSICStake;
+    meurBalance: Decimal;
     msicBalance: Decimal;
     msicInStabilityPool: Decimal;
+    msicStake: MSICStake;
     numberOfTroves: number;
     ownFrontend: FrontendStatus;
     price: Decimal;
@@ -330,40 +364,6 @@ export type MSICStakeChange<T> = {
     unstakeMSIC: T;
     unstakeAllMSIC: boolean;
 };
-
-// @public
-export const MEUR_LIQUIDATION_RESERVE: Decimal;
-
-// @public
-export const MEUR_MINIMUM_DEBT: Decimal;
-
-// @public
-export const MEUR_MINIMUM_NET_DEBT: Decimal;
-
-// @internal (undocumented)
-export type _MEURBorrowing<T> = {
-    borrowMEUR: T;
-};
-
-// @internal (undocumented)
-export type _MEURRepayment<T> = {
-    repayMEUR: T;
-};
-
-// @public
-export const MAXIMUM_BORROWING_RATE: Decimal;
-
-// @public
-export type MinedReceipt<R = unknown, D = unknown> = FailedReceipt<R> | SuccessfulReceipt<R, D>;
-
-// @public
-export const MINIMUM_BORROWING_RATE: Decimal;
-
-// @public
-export const MINIMUM_COLLATERAL_RATIO: Decimal;
-
-// @public
-export const MINIMUM_REDEMPTION_RATE: Decimal;
 
 // @internal (undocumented)
 export type _NoCollateralChange = _NoCollateralDeposit & _NoCollateralWithdrawal;
@@ -458,8 +458,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown> extend
     redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     registerFrontend(kickbackRate: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     repayMEUR(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
-    sendMSIC(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     sendMEUR(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
+    sendMSIC(toAddress: string, amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     stakeMSIC(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
@@ -470,8 +470,8 @@ export interface PopulatableMosaic<R = unknown, S = unknown, P = unknown> extend
     withdrawCollateral(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>>;
     withdrawGainsFromStabilityPool(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
     withdrawGainsFromStaking(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
-    withdrawMSICRewardFromLiquidityMining(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
     withdrawMEURFromStabilityPool(amount: Decimalish): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>>;
+    withdrawMSICRewardFromLiquidityMining(): Promise<PopulatedMosaicTransaction<P, SentMosaicTransaction<S, MosaicReceipt<R, void>>>>;
 }
 
 // @public
@@ -495,10 +495,10 @@ export interface ReadableMosaic {
     getFrontendStatus(address?: string): Promise<FrontendStatus>;
     getLiquidityMiningMSICReward(address?: string): Promise<Decimal>;
     getLiquidityMiningStake(address?: string): Promise<Decimal>;
-    getMSICBalance(address?: string): Promise<Decimal>;
-    getMSICStake(address?: string): Promise<MSICStake>;
     getMEURBalance(address?: string): Promise<Decimal>;
     getMEURInStabilityPool(): Promise<Decimal>;
+    getMSICBalance(address?: string): Promise<Decimal>;
+    getMSICStake(address?: string): Promise<MSICStake>;
     getNumberOfTroves(): Promise<number>;
     getPrice(): Promise<Decimal>;
     getRemainingLiquidityMiningMSICReward(): Promise<Decimal>;
@@ -565,8 +565,8 @@ export interface SendableMosaic<R = unknown, S = unknown> extends _SendableFrom<
     redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, RedemptionDetails>>>;
     registerFrontend(kickbackRate: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     repayMEUR(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
-    sendMSIC(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     sendMEUR(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
+    sendMSIC(toAddress: string, amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     stakeMSIC(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
@@ -577,8 +577,8 @@ export interface SendableMosaic<R = unknown, S = unknown> extends _SendableFrom<
     withdrawCollateral(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, TroveAdjustmentDetails>>>;
     withdrawGainsFromStabilityPool(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
     withdrawGainsFromStaking(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
-    withdrawMSICRewardFromLiquidityMining(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
     withdrawMEURFromStabilityPool(amount: Decimalish): Promise<SentMosaicTransaction<S, MosaicReceipt<R, StabilityDepositChangeDetails>>>;
+    withdrawMSICRewardFromLiquidityMining(): Promise<SentMosaicTransaction<S, MosaicReceipt<R, void>>>;
 }
 
 // @public
@@ -624,8 +624,8 @@ export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdra
 // @public
 export interface StabilityPoolGainsWithdrawalDetails {
     collateralGain: Decimal;
-    msicReward: Decimal;
     msicLoss: Decimal;
+    msicReward: Decimal;
     newMEURDeposit: Decimal;
 }
 
@@ -655,8 +655,8 @@ export interface TransactableMosaic {
     redeemMEUR(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
     registerFrontend(kickbackRate: Decimalish): Promise<void>;
     repayMEUR(amount: Decimalish): Promise<TroveAdjustmentDetails>;
-    sendMSIC(toAddress: string, amount: Decimalish): Promise<void>;
     sendMEUR(toAddress: string, amount: Decimalish): Promise<void>;
+    sendMSIC(toAddress: string, amount: Decimalish): Promise<void>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<void>;
     stakeMSIC(amount: Decimalish): Promise<void>;
@@ -667,8 +667,8 @@ export interface TransactableMosaic {
     withdrawCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
     withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
     withdrawGainsFromStaking(): Promise<void>;
-    withdrawMSICRewardFromLiquidityMining(): Promise<void>;
     withdrawMEURFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
+    withdrawMSICRewardFromLiquidityMining(): Promise<void>;
 }
 
 // @public

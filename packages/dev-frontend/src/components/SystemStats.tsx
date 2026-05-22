@@ -8,20 +8,20 @@ import { useMosaic } from "../hooks/MosaicContext";
 import { Statistic } from "./Statistic";
 import * as l from "../lexicon";
 
-const selectBalances = ({ accountBalance, msicBalance, msicBalance }: MosaicStoreState) => ({
+const selectBalances = ({ accountBalance, meurBalance, msicBalance }: MosaicStoreState) => ({
   accountBalance,
-  msicBalance,
+  meurBalance,
   msicBalance
 });
 
 const Balances: React.FC = () => {
-  const { accountBalance, msicBalance, msicBalance } = useMosaicSelector(selectBalances);
+  const { accountBalance, meurBalance, msicBalance } = useMosaicSelector(selectBalances);
 
   return (
     <Box sx={{ mb: 3 }}>
       <Heading>My Account Balances</Heading>
       <Statistic lexicon={l.REEF}>{accountBalance.prettify(4)}</Statistic>
-      <Statistic lexicon={l.MEUR}>{msicBalance.prettify()}</Statistic>
+      <Statistic lexicon={l.MEUR}>{meurBalance.prettify()}</Statistic>
       <Statistic lexicon={l.MSIC}>{msicBalance.prettify()}</Statistic>
     </Box>
   );

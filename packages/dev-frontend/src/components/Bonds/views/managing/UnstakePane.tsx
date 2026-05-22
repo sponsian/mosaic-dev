@@ -47,7 +47,7 @@ export const UnstakePane: React.FC = () => {
       <StaticRow label="bMEUR LP APR">
         <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
           <PoolBalance symbol="%">
-            {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
+            {(protocolInfo?.bMeurLpApr ?? Decimal.INFINITY).prettify(2)}
           </PoolBalance>{" "}
         </StaticAmounts>
       </StaticRow>

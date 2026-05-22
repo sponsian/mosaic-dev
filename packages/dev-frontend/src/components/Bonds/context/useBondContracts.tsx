@@ -24,8 +24,8 @@ import { useContract } from "../../../hooks/useContract";
 import { useMosaic } from "../../../hooks/MosaicContext";
 import { useCallback } from "react";
 import type { BondsApi } from "./api";
-import type { BMousdLpRewards, Bond, ProtocolInfo, Stats } from "./transitions";
-import { BMousdAmmTokenIndex } from "./transitions";
+import type { BMeurLpRewards, Bond, ProtocolInfo, Stats } from "./transitions";
+import { BMeurAmmTokenIndex } from "./transitions";
 import type { Addresses } from "./transitions";
 import { useChainId } from "wagmi";
 import { useBondAddresses } from "./BondAddressesContext";
@@ -35,25 +35,25 @@ type BondsInformation = {
   protocolInfo: ProtocolInfo;
   bonds: Bond[];
   stats: Stats;
-  bMousdBalance: Decimal;
-  msicBalance: Decimal;
+  bMeurBalance: Decimal;
+  meurBalance: Decimal;
   lpTokenBalance: Decimal;
   stakedLpTokenBalance: Decimal;
   lpTokenSupply: Decimal;
-  bMousdAmmBMousdBalance: Decimal;
-  bMousdAmmMousdBalance: Decimal;
-  lpRewards: BMousdLpRewards;
+  bMeurAmmBMeurBalance: Decimal;
+  bMeurAmmMeurBalance: Decimal;
+  lpRewards: BMeurLpRewards;
 };
 
 type BondContracts = {
   addresses: Addresses;
-  msicToken: MEURToken | undefined;
-  bMousdToken: BMEURToken | undefined;
+  meurToken: MEURToken | undefined;
+  bMeurToken: BMEURToken | undefined;
   bondNft: BondNFT | undefined;
   chickenBondManager: ChickenBondManager | undefined;
-  bMousdAmm: CurveCryptoSwap2ETH | undefined;
-  bMousdAmmZapper: BMEURLPZap | undefined;
-  bMousdGauge: CurveLiquidityGaugeV5 | undefined;
+  bMeurAmm: CurveCryptoSwap2ETH | undefined;
+  bMeurAmmZapper: BMEURLPZap | undefined;
+  bMeurGauge: CurveLiquidityGaugeV5 | undefined;
   hasFoundContracts: boolean;
   getLatestData: (account: string, api: BondsApi) => Promise<BondsInformation | undefined>;
 };
@@ -75,22 +75,22 @@ export const useBondContracts = (): BondContracts => {
     BMEUR_AMM_STAKING_ADDRESS
   } = addresses;
 
-  const [msicTokenDefault, msicTokenDefaultStatus] = useContract<MEURToken>(
-    mosaic.connection.addresses.msicToken,
+  const [meurTokenDefault, meurTokenDefaultStatus] = useContract<MEURToken>(
+    mosaic.connection.addresses.meurToken,
     MEURTokenAbi
   );
 
-  const [msicTokenOverride, msicTokenOverrideStatus] = useContract<ERC20Faucet>(
+  const [meurTokenOverride, meurTokenOverrideStatus] = useContract<ERC20Faucet>(
     MEUR_OVERRIDE_ADDRESS,
     ERC20Faucet__factory.abi
   );
 
-  const [msicToken, msicTokenStatus] =
+  const [meurToken, meurTokenStatus] =
     MEUR_OVERRIDE_ADDRESS === null
-      ? [msicTokenDefault, msicTokenDefaultStatus]
-      : [(msicTokenOverride as unknown) as MEURToken, msicTokenOverrideStatus];
+      ? [meurTokenDefault, meurTokenDefaultStatus]
+      : [(meurTokenOverride as unknown) as MEURToken, meurTokenOverrideStatus];
 
-  const [bMousdToken, bMousdTokenStatus] = useContract<BMEURToken>(
+  const [bMeurToken, bMeurTokenStatus] = useContract<BMEURToken>(
     BMEUR_TOKEN_ADDRESS,
     BMEURToken__factory.abi
   );
@@ -101,48 +101,48 @@ export const useBondContracts = (): BondContracts => {
     ChickenBondManager__factory.abi
   );
 
-  const [bMousdAmm, bMousdAmmStatus] = useContract<CurveCryptoSwap2ETH>(
+  const [bMeurAmm, bMeurAmmStatus] = useContract<CurveCryptoSwap2ETH>(
     BMEUR_AMM_ADDRESS,
     CurveCryptoSwap2ETH__factory.abi
   );
 
-  const [bMousdAmmZapper, bMousdAmmZapperStatus] = useContract<BMEURLPZap>(
+  const [bMeurAmmZapper, bMeurAmmZapperStatus] = useContract<BMEURLPZap>(
     BMEUR_LP_ZAP_ADDRESS,
     BMEURLPZap__factory.abi
   );
 
-  const [bMousdGauge, bMousdGaugeStatus] = useContract<CurveLiquidityGaugeV5>(
+  const [bMeurGauge, bMeurGaugeStatus] = useContract<CurveLiquidityGaugeV5>(
     BMEUR_AMM_STAKING_ADDRESS,
     CurveLiquidityGaugeV5__factory.abi
   );
 
   const hasFoundContracts =
     [
-      msicTokenStatus,
+      meurTokenStatus,
       bondNftStatus,
       chickenBondManagerStatus,
-      bMousdTokenStatus,
-      bMousdAmmStatus,
-      ...(isMainnet ? [bMousdAmmZapperStatus] : []),
-      bMousdGaugeStatus
+      bMeurTokenStatus,
+      bMeurAmmStatus,
+      ...(isMainnet ? [bMeurAmmZapperStatus] : []),
+      bMeurGaugeStatus
     ].find(status => status === "FAILED") === undefined;
 
   const getLatestData = useCallback(
     async (account: string, api: BondsApi): Promise<BondsInformation | undefined> => {
       if (
-        msicToken === undefined ||
+        meurToken === undefined ||
         bondNft === undefined ||
         chickenBondManager === undefined ||
-        bMousdToken === undefined ||
-        bMousdAmm === undefined ||
-        bMousdGauge === undefined
+        bMeurToken === undefined ||
+        bMeurAmm === undefined ||
+        bMeurGauge === undefined
       ) {
         return undefined;
       }
 
       const protocolInfoPromise = api.getProtocolInfo(
-        bMousdToken,
-        bMousdAmm,
+        bMeurToken,
+        bMeurAmm,
         chickenBondManager,
         isMainnet
       );
@@ -157,25 +157,25 @@ export const useBondContracts = (): BondContracts => {
       const [protocolInfo, stats, lpToken] = await Promise.all([
         protocolInfoPromise,
         api.getStats(chickenBondManager),
-        api.getLpToken(bMousdAmm)
+        api.getLpToken(bMeurAmm)
       ]);
 
       const [
-        bMousdBalance,
-        msicBalance,
+        bMeurBalance,
+        meurBalance,
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bMousdAmmCoinBalances,
+        bMeurAmmCoinBalances,
         lpRewards
       ] = await Promise.all([
-        api.getTokenBalance(account, bMousdToken),
-        api.getTokenBalance(account, msicToken),
+        api.getTokenBalance(account, bMeurToken),
+        api.getTokenBalance(account, meurToken),
         api.getTokenBalance(account, lpToken),
-        isMainnet ? api.getTokenBalance(account, bMousdGauge) : Decimal.ZERO,
+        isMainnet ? api.getTokenBalance(account, bMeurGauge) : Decimal.ZERO,
         api.getTokenTotalSupply(lpToken),
-        api.getCoinBalances(bMousdAmm),
-        isMainnet ? api.getLpRewards(account, bMousdGauge) : []
+        api.getCoinBalances(bMeurAmm),
+        isMainnet ? api.getLpRewards(account, bMeurGauge) : []
       ]);
 
       const bonds = await bondsPromise;
@@ -184,28 +184,28 @@ export const useBondContracts = (): BondContracts => {
         protocolInfo,
         bonds,
         stats,
-        bMousdBalance,
-        msicBalance,
+        bMeurBalance,
+        meurBalance,
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bMousdAmmBMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.BMEUR],
-        bMousdAmmMousdBalance: bMousdAmmCoinBalances[BMousdAmmTokenIndex.MEUR],
+        bMeurAmmBMeurBalance: bMeurAmmCoinBalances[BMeurAmmTokenIndex.BMEUR],
+        bMeurAmmMeurBalance: bMeurAmmCoinBalances[BMeurAmmTokenIndex.MEUR],
         lpRewards
       };
     },
-    [chickenBondManager, bondNft, bMousdToken, msicToken, bMousdAmm, isMainnet, bMousdGauge]
+    [chickenBondManager, bondNft, bMeurToken, meurToken, bMeurAmm, isMainnet, bMeurGauge]
   );
 
   return {
     addresses,
-    msicToken,
-    bMousdToken,
+    meurToken,
+    bMeurToken,
     bondNft,
     chickenBondManager,
-    bMousdAmm,
-    bMousdAmmZapper,
-    bMousdGauge,
+    bMeurAmm,
+    bMeurAmmZapper,
+    bMeurGauge,
     getLatestData,
     hasFoundContracts
   };

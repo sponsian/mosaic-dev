@@ -167,8 +167,8 @@ export class ObservableEthersMosaic implements ObservableMosaic {
   watchMEURInStabilityPool(
     onMEURInStabilityPoolChanged: (msicInStabilityPool: Decimal) => void
   ): () => void {
-    const { msicToken, stabilityPool } = _getContracts(this._readable.connection);
-    const { Transfer } = msicToken.filters;
+    const { meurToken, stabilityPool } = _getContracts(this._readable.connection);
+    const { Transfer } = meurToken.filters;
 
     const transferMEURFromStabilityPool = Transfer(stabilityPool.address);
     const transferMEURToStabilityPool = Transfer(null, stabilityPool.address);
@@ -179,31 +179,31 @@ export class ObservableEthersMosaic implements ObservableMosaic {
       this._readable.getMEURInStabilityPool({ blockTag }).then(onMEURInStabilityPoolChanged);
     });
 
-    stabilityPoolMEURFilters.forEach(filter => msicToken.on(filter, stabilityPoolMEURListener));
+    stabilityPoolMEURFilters.forEach(filter => meurToken.on(filter, stabilityPoolMEURListener));
 
     return () =>
       stabilityPoolMEURFilters.forEach(filter =>
-        msicToken.removeListener(filter, stabilityPoolMEURListener)
+        meurToken.removeListener(filter, stabilityPoolMEURListener)
       );
   }
 
   watchMEURBalance(onMEURBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
     address ??= _requireAddress(this._readable.connection);
 
-    const { msicToken } = _getContracts(this._readable.connection);
-    const { Transfer } = msicToken.filters;
+    const { meurToken } = _getContracts(this._readable.connection);
+    const { Transfer } = meurToken.filters;
     const transferMEURFromUser = Transfer(address);
     const transferMEURToUser = Transfer(null, address);
 
-    const msicTransferFilters = [transferMEURFromUser, transferMEURToUser];
+    const meurTransferFilters = [transferMEURFromUser, transferMEURToUser];
 
-    const msicTransferListener = debounce((blockTag: number) => {
+    const meurTransferListener = debounce((blockTag: number) => {
       this._readable.getMEURBalance(address, { blockTag }).then(onMEURBalanceChanged);
     });
 
-    msicTransferFilters.forEach(filter => msicToken.on(filter, msicTransferListener));
+    meurTransferFilters.forEach(filter => meurToken.on(filter, meurTransferListener));
 
     return () =>
-      msicTransferFilters.forEach(filter => msicToken.removeListener(filter, msicTransferListener));
+      meurTransferFilters.forEach(filter => meurToken.removeListener(filter, meurTransferListener));
   }
 }

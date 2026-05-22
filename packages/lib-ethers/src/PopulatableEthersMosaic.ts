@@ -537,14 +537,14 @@ export class PopulatableEthersMosaic
   private async _wrapTroveClosure(
     rawPopulatedTransaction: EthersPopulatedTransaction
   ): Promise<PopulatedEthersMosaicTransaction<TroveClosureDetails>> {
-    const { activePool, msicToken } = _getContracts(this._readable.connection);
+    const { activePool, meurToken } = _getContracts(this._readable.connection);
 
     return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
       ({ logs, from: userAddress }) => {
-        const [repayMEUR] = msicToken
+        const [repayMEUR] = meurToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === userAddress && to === AddressZero)
           .map(({ args: { value } }) => decimalify(value));
@@ -648,7 +648,7 @@ export class PopulatableEthersMosaic
   private async _wrapStabilityDepositWithdrawal(
     rawPopulatedTransaction: EthersPopulatedTransaction
   ): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>> {
-    const { stabilityPool, msicToken } = _getContracts(this._readable.connection);
+    const { stabilityPool, meurToken } = _getContracts(this._readable.connection);
 
     return new PopulatedEthersMosaicTransaction(
       rawPopulatedTransaction,
@@ -657,7 +657,7 @@ export class PopulatableEthersMosaic
       ({ logs, from: userAddress }) => {
         const gainsWithdrawalDetails = this._extractStabilityPoolGainsWithdrawalDetails(logs);
 
-        const [withdrawMEUR] = msicToken
+        const [withdrawMEUR] = meurToken
           .extractEvents(logs, "Transfer")
           .filter(({ args: { from, to } }) => from === stabilityPool.address && to === userAddress)
           .map(({ args: { value } }) => decimalify(value));
@@ -1183,10 +1183,10 @@ export class PopulatableEthersMosaic
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersMosaicTransaction<void>> {
     overrides = this._prepareOverrides(overrides);
-    const { msicToken } = _getContracts(this._readable.connection);
+    const { meurToken } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
-      await msicToken.estimateAndPopulate.transfer(
+      await meurToken.estimateAndPopulate.transfer(
         overrides,
         id,
         toAddress,

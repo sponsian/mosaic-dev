@@ -5,7 +5,7 @@ import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { EditableRow, StaticAmounts, StaticRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { ApprovePressedPayload, BMousdAmmTokenIndex } from "../../context/transitions";
+import { ApprovePressedPayload, BMeurAmmTokenIndex } from "../../context/transitions";
 import { PoolBalance } from "./PoolBalance";
 
 export const StakePane: React.FC = () => {
@@ -13,7 +13,7 @@ export const StakePane: React.FC = () => {
     dispatchEvent,
     statuses,
     lpTokenBalance,
-    isBMousdLpApprovedWithGauge,
+    isBMeurLpApprovedWithGauge,
     addresses,
     protocolInfo
   } = useBondView();
@@ -28,9 +28,9 @@ export const StakePane: React.FC = () => {
 
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map();
-    if (!isBMousdLpApprovedWithGauge) {
+    if (!isBMeurLpApprovedWithGauge) {
       tokensNeedingApproval.set(
-        BMousdAmmTokenIndex.BMEUR_MEUR_LP,
+        BMeurAmmTokenIndex.BMEUR_MEUR_LP,
         addresses.BMEUR_AMM_STAKING_ADDRESS
       );
     }
@@ -67,7 +67,7 @@ export const StakePane: React.FC = () => {
         <StaticRow label="bMEUR LP APR">
           <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
             <PoolBalance symbol="%">
-              {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
+              {(protocolInfo?.bMeurLpApr ?? Decimal.INFINITY).prettify(2)}
             </PoolBalance>{" "}
           </StaticAmounts>
         </StaticRow>
@@ -90,7 +90,7 @@ export const StakePane: React.FC = () => {
           Back
         </Button>
 
-        {!isBMousdLpApprovedWithGauge && (
+        {!isBMeurLpApprovedWithGauge && (
           <Button
             variant="primary"
             onClick={handleApprovePressed}
@@ -100,7 +100,7 @@ export const StakePane: React.FC = () => {
           </Button>
         )}
 
-        {isBMousdLpApprovedWithGauge && (
+        {isBMeurLpApprovedWithGauge && (
           <Button
             variant="primary"
             onClick={handleConfirmPressed}

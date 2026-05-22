@@ -46,7 +46,7 @@
   },
   {
     "inputs": [],
-    "name": "DECIMAL_PRECISION",
+    "name": "COLL_DECIMALS_OFFSET",
     "outputs": [
       {
         "internalType": "uint256",
@@ -59,7 +59,7 @@
   },
   {
     "inputs": [],
-    "name": "ETHUSD_TELLOR_REQ_ID",
+    "name": "DECIMAL_PRECISION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -104,6 +104,19 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "REEFEUR_TELLOR_REQ_ID",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

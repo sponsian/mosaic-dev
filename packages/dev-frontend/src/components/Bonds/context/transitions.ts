@@ -90,7 +90,7 @@ export const transitions: BondEventTransitions = {
   }
 };
 
-export enum BMousdAmmTokenIndex {
+export enum BMeurAmmTokenIndex {
   BMEUR,
   MEUR,
   BMEUR_MEUR_LP
@@ -101,7 +101,7 @@ export type CreateBondPayload = { deposit: Decimal };
 export type SelectBondPayload = { bondId: string };
 
 export type SwapPressedPayload = {
-  inputToken: BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR;
+  inputToken: BMeurAmmTokenIndex.BMEUR | BMeurAmmTokenIndex.MEUR;
 };
 
 export type SwapPayload = {
@@ -123,12 +123,12 @@ export type Addresses = {
 
 // This payload is only dispatched by "Manage liquidity"
 export type ApprovePressedPayload = {
-  tokensNeedingApproval: Map<BMousdAmmTokenIndex, Address>;
+  tokensNeedingApproval: Map<BMeurAmmTokenIndex, Address>;
 };
 
 export type AddLiquidityPayload = {
   action: "addLiquidity";
-  bMousdAmount: Decimal;
+  bMeurAmount: Decimal;
   msicAmount: Decimal;
   minLpTokens: Decimal;
   shouldStakeInGauge: boolean;
@@ -137,14 +137,14 @@ export type AddLiquidityPayload = {
 export type RemoveLiquidityPayload = {
   action: "removeLiquidity";
   burnLpTokens: Decimal;
-  minBMousdAmount: Decimal;
-  minMousdAmount: Decimal;
+  minBMeurAmount: Decimal;
+  minMeurAmount: Decimal;
 };
 
 export type RemoveLiquidityOneCoinPayload = {
   action: "removeLiquidityOneCoin";
   burnLpTokens: Decimal;
-  output: BMousdAmmTokenIndex;
+  output: BMeurAmmTokenIndex;
   minAmount: Decimal;
 };
 
@@ -221,7 +221,7 @@ export type Stats = {
 
 export type ProtocolInfo = {
   treasury: Treasury;
-  bMousdSupply: Decimal;
+  bMeurSupply: Decimal;
   marketPrice: Decimal;
   fairPrice: { lower: Decimal; upper: Decimal };
   floorPrice: Decimal;
@@ -235,8 +235,8 @@ export type ProtocolInfo = {
   breakEvenPeriodInDays: Decimal;
   rebondPeriodInDays: Decimal;
   yieldAmplification?: Decimal;
-  bMousdApr?: Decimal;
-  bMousdLpApr?: Decimal;
+  bMeurApr?: Decimal;
+  bMeurLpApr?: Decimal;
   controllerTargetAge: Decimal;
   averageBondAge: Decimal;
   floorPriceWithoutPendingHarvests: Decimal;
@@ -259,4 +259,4 @@ export type BondTransactionStatuses = Record<BondTransaction, TransactionStatus>
 
 export type Maybe<T> = T | undefined;
 
-export type BMousdLpRewards = Array<{ name: string; address: string; amount: Decimal }>;
+export type BMeurLpRewards = Array<{ name: string; address: string; amount: Decimal }>;

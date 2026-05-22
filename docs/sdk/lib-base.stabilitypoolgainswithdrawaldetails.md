@@ -17,7 +17,7 @@ export interface StabilityPoolGainsWithdrawalDetails
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [collateralGain](./lib-base.stabilitypoolgainswithdrawaldetails.collateralgain.md) | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) paid out to the depositor in this transaction. |
-|  [msicReward](./lib-base.stabilitypoolgainswithdrawaldetails.msicreward.md) | [Decimal](./lib-base.decimal.md) | Amount of MSIC rewarded to the depositor in this transaction. |
 |  [msicLoss](./lib-base.stabilitypoolgainswithdrawaldetails.msicloss.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR burned from the deposit by liquidations since the last modification. |
-|  [newMEURDeposit](./lib-base.stabilitypoolgainswithdrawaldetails.newmsicdeposit.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR in the deposit directly after this transaction. |
+|  [msicReward](./lib-base.stabilitypoolgainswithdrawaldetails.msicreward.md) | [Decimal](./lib-base.decimal.md) | Amount of MSIC rewarded to the depositor in this transaction. |
+|  [newMEURDeposit](./lib-base.stabilitypoolgainswithdrawaldetails.newmeurdeposit.md) | [Decimal](./lib-base.decimal.md) | Amount of MEUR in the deposit directly after this transaction. |
 

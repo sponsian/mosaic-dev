@@ -12,12 +12,12 @@ import { StabilityActionDescription } from "../StabilityActionDescription";
 
 export const selectForStabilityDepositChangeValidation = ({
   trove,
-  msicBalance,
+  meurBalance,
   ownFrontend,
   haveUndercollateralizedTroves
 }: MosaicStoreState) => ({
   trove,
-  msicBalance,
+  meurBalance,
   haveOwnFrontend: ownFrontend.status === "registered",
   haveUndercollateralizedTroves
 });
@@ -30,7 +30,7 @@ export const validateStabilityDepositChange = (
   originalDeposit: StabilityDeposit,
   editedMEUR: Decimal,
   {
-    msicBalance,
+    meurBalance,
     haveOwnFrontend,
     haveUndercollateralizedTroves
   }: StabilityDepositChangeValidationContext
@@ -53,13 +53,13 @@ export const validateStabilityDepositChange = (
     return [undefined, undefined];
   }
 
-  if (change.depositMEUR?.gt(msicBalance)) {
+  if (change.depositMEUR?.gt(meurBalance)) {
     return [
       undefined,
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
         <Amount>
-          {change.depositMEUR.sub(msicBalance).prettify()} {COIN}
+          {change.depositMEUR.sub(meurBalance).prettify()} {COIN}
         </Amount>
         .
       </ErrorDescription>

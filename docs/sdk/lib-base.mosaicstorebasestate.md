@@ -21,10 +21,10 @@ export interface MosaicStoreBaseState
 |  [frontend](./lib-base.mosaicstorebasestate.frontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of currently used frontend. |
 |  [liquidityMiningMSICReward](./lib-base.mosaicstorebasestate.liquidityminingmsicreward.md) | [Decimal](./lib-base.decimal.md) | Amount of MSIC the user has earned through mining liquidity. |
 |  [liquidityMiningStake](./lib-base.mosaicstorebasestate.liquidityminingstake.md) | [Decimal](./lib-base.decimal.md) | Amount of Uniswap REEF/MEUR LP tokens the user has staked in liquidity mining. |
+|  [meurBalance](./lib-base.mosaicstorebasestate.meurbalance.md) | [Decimal](./lib-base.decimal.md) | User's MEUR token balance. |
 |  [msicBalance](./lib-base.mosaicstorebasestate.msicbalance.md) | [Decimal](./lib-base.decimal.md) | User's MSIC token balance. |
-|  [msicStake](./lib-base.mosaicstorebasestate.msicstake.md) | [MSICStake](./lib-base.msicstake.md) | User's MSIC stake. |
-|  [msicBalance](./lib-base.mosaicstorebasestate.msicbalance.md) | [Decimal](./lib-base.decimal.md) | User's MEUR token balance. |
 |  [msicInStabilityPool](./lib-base.mosaicstorebasestate.msicinstabilitypool.md) | [Decimal](./lib-base.decimal.md) | Total amount of MEUR currently deposited in the Stability Pool. |
+|  [msicStake](./lib-base.mosaicstorebasestate.msicstake.md) | [MSICStake](./lib-base.msicstake.md) | User's MSIC stake. |
 |  [numberOfTroves](./lib-base.mosaicstorebasestate.numberoftroves.md) | number | Number of Troves that are currently open. |
 |  [ownFrontend](./lib-base.mosaicstorebasestate.ownfrontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of user's own frontend. |
 |  [price](./lib-base.mosaicstorebasestate.price.md) | [Decimal](./lib-base.decimal.md) | Current price of the native currency (e.g. Ether) in USD. |

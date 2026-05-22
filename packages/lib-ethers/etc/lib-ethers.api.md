@@ -14,11 +14,11 @@ import { FailedReceipt } from '@mosaic/lib-base';
 import { Fees } from '@mosaic/lib-base';
 import { FrontendStatus } from '@mosaic/lib-base';
 import { LiquidationDetails } from '@mosaic/lib-base';
+import { MinedReceipt } from '@mosaic/lib-base';
 import { MosaicReceipt } from '@mosaic/lib-base';
 import { MosaicStore } from '@mosaic/lib-base';
 import { MosaicStoreState } from '@mosaic/lib-base';
 import { MSICStake } from '@mosaic/lib-base';
-import { MinedReceipt } from '@mosaic/lib-base';
 import { ObservableMosaic } from '@mosaic/lib-base';
 import { PopulatableMosaic } from '@mosaic/lib-base';
 import { PopulatedMosaicTransaction } from '@mosaic/lib-base';
@@ -142,13 +142,13 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     // (undocumented)
     getLiquidityMiningStake(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
-    getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
-    // (undocumented)
-    getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake>;
-    // (undocumented)
     getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getMEURInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal>;
+    // (undocumented)
+    getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
+    // (undocumented)
+    getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake>;
     // (undocumented)
     getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
@@ -202,9 +202,9 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     repayMEUR(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
     readonly send: SendableEthersMosaic;
     // (undocumented)
-    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
-    // (undocumented)
     sendMEUR(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
+    // (undocumented)
+    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // @internal (undocumented)
     setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
@@ -224,9 +224,9 @@ export class EthersMosaic implements ReadableEthersMosaic, TransactableMosaic {
     // (undocumented)
     withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
-    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<void>;
-    // (undocumented)
     withdrawMEURFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<StabilityDepositChangeDetails>;
+    // (undocumented)
+    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<void>;
 }
 
 // @public
@@ -361,9 +361,9 @@ export class PopulatableEthersMosaic implements PopulatableMosaic<EthersTransact
     // (undocumented)
     repayMEUR(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
-    // (undocumented)
     sendMEUR(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
+    // (undocumented)
+    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
     // @internal (undocumented)
     setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
     // (undocumented)
@@ -383,9 +383,9 @@ export class PopulatableEthersMosaic implements PopulatableMosaic<EthersTransact
     // (undocumented)
     withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
     // (undocumented)
-    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
-    // (undocumented)
     withdrawMEURFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<StabilityDepositChangeDetails>>;
+    // (undocumented)
+    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersMosaicTransaction<void>>;
     }
 
 // @public
@@ -477,13 +477,13 @@ export class ReadableEthersMosaic implements ReadableMosaic {
     // (undocumented)
     getLiquidityMiningStake(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
-    getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
-    // (undocumented)
-    getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake>;
-    // (undocumented)
     getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getMEURInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal>;
+    // (undocumented)
+    getMSICBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
+    // (undocumented)
+    getMSICStake(address?: string, overrides?: EthersCallOverrides): Promise<MSICStake>;
     // (undocumented)
     getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
@@ -564,9 +564,9 @@ export class SendableEthersMosaic implements SendableMosaic<EthersTransactionRec
     // (undocumented)
     repayMEUR(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
-    // (undocumented)
     sendMEUR(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
+    // (undocumented)
+    sendMSIC(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
     // @internal (undocumented)
     setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
     // (undocumented)
@@ -586,9 +586,9 @@ export class SendableEthersMosaic implements SendableMosaic<EthersTransactionRec
     // (undocumented)
     withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
     // (undocumented)
-    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
-    // (undocumented)
     withdrawMEURFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<StabilityDepositChangeDetails>>;
+    // (undocumented)
+    withdrawMSICRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): Promise<SentEthersMosaicTransaction<void>>;
 }
 
 // @public

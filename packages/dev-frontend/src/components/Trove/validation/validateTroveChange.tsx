@@ -87,9 +87,9 @@ export const selectForTroveChangeValidation = ({
   price,
   total,
   accountBalance,
-  msicBalance,
+  meurBalance,
   numberOfTroves
-}: MosaicStoreState) => ({ price, total, accountBalance, msicBalance, numberOfTroves });
+}: MosaicStoreState) => ({ price, total, accountBalance, meurBalance, numberOfTroves });
 
 type TroveChangeValidationSelectedState = ReturnType<typeof selectForTroveChangeValidation>;
 
@@ -232,7 +232,7 @@ const validateTroveAdjustment = (
     wouldTriggerRecoveryMode,
     price,
     accountBalance,
-    msicBalance
+    meurBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
   if (recoveryMode) {
@@ -294,12 +294,12 @@ const validateTroveAdjustment = (
       );
     }
 
-    if (repayMEUR.gt(msicBalance)) {
+    if (repayMEUR.gt(meurBalance)) {
       return (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
           <Amount>
-            {repayMEUR.sub(msicBalance).prettify()} {COIN}
+            {repayMEUR.sub(meurBalance).prettify()} {COIN}
           </Amount>
           .
         </ErrorDescription>
@@ -325,7 +325,7 @@ const validateTroveClosure = (
     recoveryMode,
     wouldTriggerRecoveryMode,
     numberOfTroves,
-    msicBalance
+    meurBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
   if (numberOfTroves === 1) {
@@ -344,12 +344,12 @@ const validateTroveClosure = (
     );
   }
 
-  if (repayMEUR?.gt(msicBalance)) {
+  if (repayMEUR?.gt(meurBalance)) {
     return (
       <ErrorDescription>
         You need{" "}
         <Amount>
-          {repayMEUR.sub(msicBalance).prettify()} {COIN}
+          {repayMEUR.sub(meurBalance).prettify()} {COIN}
         </Amount>{" "}
         more to close your Trove.
       </ErrorDescription>

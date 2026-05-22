@@ -15,7 +15,7 @@ import {
 import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
 import troveManagerAbi from "../abi/TroveManager.json";
-import msicTokenAbi from "../abi/MEURToken.json";
+import meurTokenAbi from "../abi/MEURToken.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
 import communityIssuanceAbi from "../abi/CommunityIssuance.json";
 import defaultPoolAbi from "../abi/DefaultPool.json";
@@ -168,7 +168,7 @@ export interface _MosaicContracts {
   activePool: ActivePool;
   borrowerOperations: BorrowerOperations;
   troveManager: TroveManager;
-  msicToken: MEURToken;
+  meurToken: MEURToken;
   collSurplusPool: CollSurplusPool;
   communityIssuance: CommunityIssuance;
   defaultPool: DefaultPool;
@@ -205,7 +205,7 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): MosaicCon
   activePool: activePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
   troveManager: troveManagerAbi,
-  msicToken: msicTokenAbi,
+  meurToken: meurTokenAbi,
   communityIssuance: communityIssuanceAbi,
   defaultPool: defaultPoolAbi,
   msicToken: msicTokenAbi,

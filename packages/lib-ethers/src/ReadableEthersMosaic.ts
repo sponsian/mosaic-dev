@@ -297,9 +297,9 @@ export class ReadableEthersMosaic implements ReadableMosaic {
   /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMEURBalance} */
   getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
-    const { msicToken } = _getContracts(this.connection);
+    const { meurToken } = _getContracts(this.connection);
 
-    return msicToken.balanceOf(address, { ...overrides }).then(decimalify);
+    return meurToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
   /** {@inheritDoc @mosaic/lib-base#ReadableMosaic.getMSICBalance} */
@@ -634,7 +634,7 @@ class _BlockPolledReadableEthersMosaic
 
   async getMEURBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._userHit(address, overrides)
-      ? this.store.state.msicBalance
+      ? this.store.state.meurBalance
       : this._readable.getMEURBalance(address, overrides);
   }
 

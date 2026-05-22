@@ -24,8 +24,8 @@ const dateWithoutHours = (timestamp: number) => new Date(new Date(timestamp).toD
 
 // Decimal type doesn't support negatives so use number instead
 const getReturn = (accrued: Decimal, deposit: Decimal, marketPrice: Decimal): number => {
-  const accruedMousdValue = accrued.mul(marketPrice);
-  return parseFloat(accruedMousdValue.toString()) - parseFloat(deposit.toString());
+  const accruedMeurValue = accrued.mul(marketPrice);
+  return parseFloat(accruedMeurValue.toString()) - parseFloat(deposit.toString());
 };
 
 const dummyTokenUri =
@@ -52,7 +52,7 @@ const getBreakEvenPeriodInDays = (
   return alphaAccrualFactor.div(effectivePremium.sub(Decimal.ONE));
 };
 
-const getFutureBMousdAccrualFactor = (
+const getFutureBMeurAccrualFactor = (
   floorPrice: Decimal,
   daysInFuture: Decimal,
   alphaAccrualFactor: Decimal,
@@ -80,21 +80,21 @@ const getFutureDateInDays = (days: number): Date => {
 };
 
 const getFloorPrice = (
-  bammMousdDebt: Decimal,
-  totalMousdInCurve: Decimal,
-  pendingMousd: Decimal,
-  permanentMousd: Decimal,
-  bMousdSupply: Decimal
+  bammMeurDebt: Decimal,
+  totalMeurInCurve: Decimal,
+  pendingMeur: Decimal,
+  permanentMeur: Decimal,
+  bMeurSupply: Decimal
 ): Decimal => {
-  return bammMousdDebt.add(totalMousdInCurve).sub(pendingMousd).sub(permanentMousd).div(bMousdSupply);
+  return bammMeurDebt.add(totalMeurInCurve).sub(pendingMeur).sub(permanentMeur).div(bMeurSupply);
 };
 
 const getAverageBondAgeInSeconds = (
   totalWeightedStartTimes: Decimal,
-  pendingBucketMousd: Decimal
+  pendingBucketMeur: Decimal
 ): Decimal => {
   const averageStartTimeMs =
-    Math.round(parseFloat(totalWeightedStartTimes.div(pendingBucketMousd).toString())) * 1000;
+    Math.round(parseFloat(totalWeightedStartTimes.div(pendingBucketMeur).toString())) * 1000;
   const averageBondAgeInSeconds = Decimal.from(Date.now() - averageStartTimeMs).div(1000);
 
   return averageBondAgeInSeconds;
@@ -182,7 +182,7 @@ export {
   dateWithoutHours,
   getReturn,
   getTokenUri,
-  getFutureBMousdAccrualFactor,
+  getFutureBMeurAccrualFactor,
   getBreakEvenPeriodInDays,
   getRebondPeriodInDays,
   getAverageBondAgeInSeconds,

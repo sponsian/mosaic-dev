@@ -82,32 +82,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "_msicStakingAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MSICStakingAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_msicTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MSICTokenAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "_L_ETH",
         "type": "uint256"
@@ -120,19 +94,6 @@
       }
     ],
     "name": "LTermsUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_newMEURTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MEURTokenAddressChanged",
     "type": "event"
   },
   {
@@ -177,6 +138,45 @@
       }
     ],
     "name": "Liquidation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newMEURTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MEURTokenAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_msicStakingAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MSICStakingAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_msicTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MSICTokenAddressChanged",
     "type": "event"
   },
   {
@@ -342,6 +342,37 @@
       },
       {
         "indexed": false,
+        "internalType": "uint8",
+        "name": "operation",
+        "type": "uint8"
+      }
+    ],
+    "name": "TroveLiquidated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_debt",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_coll",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "enum TroveManager.TroveManagerOperation",
         "name": "_operation",
         "type": "uint8"
@@ -367,6 +398,43 @@
       }
     ],
     "name": "TroveSnapshotsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_debt",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_coll",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stake",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "operation",
+        "type": "uint8"
+      }
+    ],
+    "name": "TroveUpdated",
     "type": "event"
   },
   {
@@ -460,7 +528,7 @@
   },
   {
     "inputs": [],
-    "name": "DECIMAL_PRECISION",
+    "name": "COLL_DECIMALS_OFFSET",
     "outputs": [
       {
         "internalType": "uint256",
@@ -473,7 +541,7 @@
   },
   {
     "inputs": [],
-    "name": "MEUR_GAS_COMPENSATION",
+    "name": "DECIMAL_PRECISION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -526,6 +594,19 @@
   {
     "inputs": [],
     "name": "MCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1393,6 +1474,19 @@
   },
   {
     "inputs": [],
+    "name": "meurToken",
+    "outputs": [
+      {
+        "internalType": "contract IMEURToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "msicStaking",
     "outputs": [
       {
@@ -1410,19 +1504,6 @@
     "outputs": [
       {
         "internalType": "contract IMSICToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "msicToken",
-    "outputs": [
-      {
-        "internalType": "contract IMEURToken",
         "name": "",
         "type": "address"
       }
@@ -1575,7 +1656,7 @@
       },
       {
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       },
       {

@@ -25,10 +25,10 @@ Implemented by [EthersMosaic](./lib-ethers.ethersmosaic.md)<!-- -->.
 |  [getFrontendStatus(address)](./lib-base.readablemosaic.getfrontendstatus.md) | Check whether an address is registered as a Mosaic frontend, and what its kickback rate is. |
 |  [getLiquidityMiningMSICReward(address)](./lib-base.readablemosaic.getliquidityminingmsicreward.md) | Get the amount of MSIC earned by an address through mining liquidity. |
 |  [getLiquidityMiningStake(address)](./lib-base.readablemosaic.getliquidityminingstake.md) | Get the amount of Uniswap REEF/MEUR LP tokens currently staked by an address in liquidity mining. |
+|  [getMEURBalance(address)](./lib-base.readablemosaic.getmeurbalance.md) | Get the amount of MEUR held by an address. |
+|  [getMEURInStabilityPool()](./lib-base.readablemosaic.getmeurinstabilitypool.md) | Get the total amount of MEUR currently deposited in the Stability Pool. |
 |  [getMSICBalance(address)](./lib-base.readablemosaic.getmsicbalance.md) | Get the amount of MSIC held by an address. |
 |  [getMSICStake(address)](./lib-base.readablemosaic.getmsicstake.md) | Get the current state of an MSIC Stake. |
-|  [getMEURBalance(address)](./lib-base.readablemosaic.getmsicbalance.md) | Get the amount of MEUR held by an address. |
-|  [getMEURInStabilityPool()](./lib-base.readablemosaic.getmsicinstabilitypool.md) | Get the total amount of MEUR currently deposited in the Stability Pool. |
 |  [getNumberOfTroves()](./lib-base.readablemosaic.getnumberoftroves.md) | Get number of Troves that are currently open. |
 |  [getPrice()](./lib-base.readablemosaic.getprice.md) | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingLiquidityMiningMSICReward()](./lib-base.readablemosaic.getremainingliquidityminingmsicreward.md) | Get the remaining MSIC that will be collectively rewarded to liquidity miners. |

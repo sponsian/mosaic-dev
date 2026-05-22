@@ -29,7 +29,7 @@ import type {
 } from "@mosaic/chicken-bonds/msic/types/ChickenBondManager";
 import { Decimal } from "@mosaic/lib-base";
 import type { MEURToken } from "@mosaic/lib-ethers/dist/types";
-import type { ProtocolInfo, Bond, BondStatus, Stats, Maybe, BMousdLpRewards } from "./transitions";
+import type { ProtocolInfo, Bond, BondStatus, Stats, Maybe, BMeurLpRewards } from "./transitions";
 import {
   numberify,
   decimalify,
@@ -38,7 +38,7 @@ import {
   toFloat,
   getReturn,
   getTokenUri,
-  getFutureBMousdAccrualFactor,
+  getFutureBMeurAccrualFactor,
   getRebondPeriodInDays,
   getBreakEvenPeriodInDays,
   getAverageBondAgeInSeconds,
@@ -47,7 +47,7 @@ import {
   getFloorPrice
 } from "../utils";
 import { UNKNOWN_DATE } from "../../HorizontalTimeline";
-import { BMousdAmmTokenIndex } from "./transitions";
+import { BMeurAmmTokenIndex } from "./transitions";
 import {
   TokenExchangeEvent,
   TokenExchangeEventObject
@@ -85,7 +85,7 @@ const MSIC_ISSUANCE_GAS_HEADROOM = BigNumber.from(50000);
 //   pool_{n-1},
 //   token_{n}
 // ]
-const bMousdToMousdRoute: [string, string, string, string, string] = [
+const bMeurToMeurRoute: [string, string, string, string, string] = [
   mainnet.BMEUR_TOKEN_ADDRESS ?? "",
   mainnet.BMEUR_AMM_ADDRESS ?? "",
   MEUR_3CRV_POOL_ADDRESS, // LP token of MEUR-3Crv-f has same address as pool
@@ -93,15 +93,15 @@ const bMousdToMousdRoute: [string, string, string, string, string] = [
   MEUR_TOKEN_ADDRESS
 ];
 
-const msicToBMousdRoute = [...bMousdToMousdRoute].reverse() as typeof bMousdToMousdRoute;
+const msicToBMeurRoute = [...bMeurToMeurRoute].reverse() as typeof bMeurToMeurRoute;
 
 type RouteAddresses = [string, string, string, string, string, string, string, string, string];
 type RouteSwapParams = [BigNumberish, BigNumberish, BigNumberish];
 type RouteSwaps = [RouteSwapParams, RouteSwapParams, RouteSwapParams, RouteSwapParams];
 
-const getRoute = (inputToken: BMousdAmmTokenIndex): [RouteAddresses, RouteSwaps] => [
+const getRoute = (inputToken: BMeurAmmTokenIndex): [RouteAddresses, RouteSwaps] => [
   [
-    ...(inputToken === BMousdAmmTokenIndex.BMEUR ? bMousdToMousdRoute : msicToBMousdRoute),
+    ...(inputToken === BMeurAmmTokenIndex.BMEUR ? bMeurToMeurRoute : msicToBMeurRoute),
     constants.AddressZero,
     constants.AddressZero,
     constants.AddressZero,
@@ -123,8 +123,8 @@ const getRoute = (inputToken: BMousdAmmTokenIndex): [RouteAddresses, RouteSwaps]
     // - MEUR-3Crv-f pool: { 0: MEUR, 1: 3Crv }
 
     //                                          bMEUR        MEUR
-    inputToken === BMousdAmmTokenIndex.BMEUR ? [0, 1, 3] : [0, 0, 6], // step 1
-    inputToken === BMousdAmmTokenIndex.BMEUR ? [0, 0, 9] : [1, 0, 3], // step 2
+    inputToken === BMeurAmmTokenIndex.BMEUR ? [0, 1, 3] : [0, 0, 6], // step 1
+    inputToken === BMeurAmmTokenIndex.BMEUR ? [0, 0, 9] : [1, 0, 3], // step 2
     [0, 0, 0], //                                MEUR       bMEUR
     [0, 0, 0]
   ]
@@ -133,13 +133,13 @@ const getRoute = (inputToken: BMousdAmmTokenIndex): [RouteAddresses, RouteSwaps]
 type CachedYearnApys = {
   msic3Crv: Decimal | undefined;
   stabilityPool: Decimal | undefined;
-  bMousdMousd3Crv: Decimal | undefined;
+  bMeurMeur3Crv: Decimal | undefined;
 };
 
 const cachedApys: CachedYearnApys = {
   msic3Crv: undefined,
   stabilityPool: undefined,
-  bMousdMousd3Crv: undefined
+  bMeurMeur3Crv: undefined
 };
 
 type YearnVault = Partial<{
@@ -185,7 +185,7 @@ const cacheCurveLpApy = async (): Promise<void> => {
 
     const apr = (rewardsApr ?? 0) + (baseApr ?? 0);
 
-    cachedApys.bMousdMousd3Crv = Decimal.from(apr);
+    cachedApys.bMeurMeur3Crv = Decimal.from(apr);
   } catch (error: unknown) {
     console.log("cacheCurveLpApy failed");
     console.error(error);
@@ -305,14 +305,14 @@ const getAccountBonds = async (
         const rebondAccrual =
           rebondPeriodInDays === Decimal.INFINITY
             ? Decimal.INFINITY
-            : getFutureBMousdAccrualFactor(floorPrice, rebondPeriodInDays, alphaAccrualFactor).mul(
+            : getFutureBMeurAccrualFactor(floorPrice, rebondPeriodInDays, alphaAccrualFactor).mul(
                 depositMinusClaimBondFee
               );
 
         const breakEvenAccrual =
           breakEvenPeriodInDays === Decimal.INFINITY
             ? Decimal.INFINITY
-            : getFutureBMousdAccrualFactor(floorPrice, breakEvenPeriodInDays, alphaAccrualFactor).mul(
+            : getFutureBMeurAccrualFactor(floorPrice, breakEvenPeriodInDays, alphaAccrualFactor).mul(
                 depositMinusClaimBondFee
               );
 
@@ -399,12 +399,12 @@ export const _getProtocolInfo = (
     marketPricePremium,
     claimBondFee
   );
-  const breakEvenAccrualFactor = getFutureBMousdAccrualFactor(
+  const breakEvenAccrualFactor = getFutureBMeurAccrualFactor(
     floorPrice,
     breakEvenPeriodInDays,
     alphaAccrualFactor
   );
-  const rebondAccrualFactor = getFutureBMousdAccrualFactor(
+  const rebondAccrualFactor = getFutureBMeurAccrualFactor(
     floorPrice,
     rebondPeriodInDays,
     alphaAccrualFactor
@@ -422,12 +422,12 @@ export const _getProtocolInfo = (
 
 const marginalInputAmount = Decimal.ONE.div(1000);
 
-const getBmsicAmmPrice = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
+const getBmsicAmmPrice = async (bMeurAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutput(
-      BMousdAmmTokenIndex.BMEUR,
+      BMeurAmmTokenIndex.BMEUR,
       marginalInputAmount,
-      bMousdAmm
+      bMeurAmm
     );
 
     return marginalOutputAmount.div(marginalInputAmount);
@@ -435,15 +435,15 @@ const getBmsicAmmPrice = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal
     console.error("bMEUR AMM get_dy() price failed, probably has no liquidity?", error);
   }
 
-  return Decimal.ONE.div(decimalify(await bMousdAmm.price_oracle()));
+  return Decimal.ONE.div(decimalify(await bMeurAmm.price_oracle()));
 };
 
-const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
+const getBmsicAmmPriceMainnet = async (bMeurAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutputMainnet(
-      BMousdAmmTokenIndex.BMEUR,
+      BMeurAmmTokenIndex.BMEUR,
       marginalInputAmount,
-      bMousdAmm
+      bMeurAmm
     );
 
     return marginalOutputAmount.div(marginalInputAmount);
@@ -456,11 +456,11 @@ const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<
     [
       "function calc_withdraw_one_coin(uint256 burn_amount, int128 i) external view returns (uint256)"
     ],
-    bMousdAmm.provider
+    bMeurAmm.provider
   );
 
   const [oraclePrice, marginalOutputAmount] = await Promise.all([
-    bMousdAmm.price_oracle().then(decimalify),
+    bMeurAmm.price_oracle().then(decimalify),
     msic3CrvPool.calc_withdraw_one_coin(marginalInputAmount.hex, 0 /* MEUR */).then(decimalify)
   ]);
 
@@ -468,28 +468,28 @@ const getBmsicAmmPriceMainnet = async (bMousdAmm: CurveCryptoSwap2ETH): Promise<
 };
 
 const getProtocolInfo = async (
-  bMousdToken: BMEURToken,
-  bMousdAmm: CurveCryptoSwap2ETH,
+  bMeurToken: BMEURToken,
+  bMeurAmm: CurveCryptoSwap2ETH,
   chickenBondManager: ChickenBondManager,
   isMainnet: boolean
 ): Promise<ProtocolInfo> => {
   // TS breaks when including this call, or any more than 10 elements, in the Promise.all below.
-  const bammMousdDebtRequest = chickenBondManager.getBAMMMEURDebt().then(decimalify);
+  const bammMeurDebtRequest = chickenBondManager.getBAMMMEURDebt().then(decimalify);
 
   const [
-    bMousdSupply,
+    bMeurSupply,
     marketPrice,
     _treasury,
-    protocolOwnedMousdInStabilityPool,
-    protocolMousdInCurve,
+    protocolOwnedMeurInStabilityPool,
+    protocolMeurInCurve,
     _floorPrice,
     claimBondFee,
     alphaAccrualFactor,
     controllerTargetAge,
     totalWeightedStartTimes
   ] = await Promise.all([
-    bMousdToken.totalSupply().then(decimalify),
-    isMainnet ? getBmsicAmmPriceMainnet(bMousdAmm) : getBmsicAmmPrice(bMousdAmm),
+    bMeurToken.totalSupply().then(decimalify),
+    isMainnet ? getBmsicAmmPriceMainnet(bMeurAmm) : getBmsicAmmPrice(bMeurAmm),
     chickenBondManager.getTreasury().then(bucket => bucket.map(decimalify)),
     chickenBondManager.getOwnedMEURInSP().then(decimalify),
     chickenBondManager.getTotalMEURInCurve().then(decimalify),
@@ -500,7 +500,7 @@ const getProtocolInfo = async (
     chickenBondManager.totalWeightedStartTimes().then(decimalify)
   ]);
 
-  const bammMousdDebt = await bammMousdDebtRequest;
+  const bammMeurDebt = await bammMeurDebtRequest;
 
   const treasury = {
     pending: _treasury[0],
@@ -512,33 +512,33 @@ const getProtocolInfo = async (
   const cachedApysRequests =
     cachedApys.msic3Crv === undefined ||
     cachedApys.stabilityPool === undefined ||
-    cachedApys.bMousdMousd3Crv === undefined
+    cachedApys.bMeurMeur3Crv === undefined
       ? [cacheYearnVaultApys(), cacheCurveLpApy()]
       : null;
 
-  const protocolMousdInStabilityPool = treasury.pending.add(protocolOwnedMousdInStabilityPool);
+  const protocolMeurInStabilityPool = treasury.pending.add(protocolOwnedMeurInStabilityPool);
 
-  const floorPrice = bMousdSupply.isZero ? Decimal.ONE : _floorPrice;
+  const floorPrice = bMeurSupply.isZero ? Decimal.ONE : _floorPrice;
 
-  const floorPriceWithoutPendingHarvests = bMousdSupply.isZero
+  const floorPriceWithoutPendingHarvests = bMeurSupply.isZero
     ? Decimal.ONE
     : getFloorPrice(
-        bammMousdDebt,
-        protocolMousdInCurve,
+        bammMeurDebt,
+        protocolMeurInCurve,
         treasury.pending,
         treasury.permanent,
-        bMousdSupply
+        bMeurSupply
       );
 
   const averageBondAge = getAverageBondAgeInSeconds(totalWeightedStartTimes, treasury.pending);
 
   let yieldAmplification: Maybe<Decimal> = undefined;
-  let bMousdApr: Maybe<Decimal> = undefined;
-  const bMousdLpApr: Maybe<Decimal> = cachedApys.bMousdMousd3Crv;
+  let bMeurApr: Maybe<Decimal> = undefined;
+  const bMeurLpApr: Maybe<Decimal> = cachedApys.bMeurMeur3Crv;
 
   const fairPrice = {
-    lower: treasury.total.sub(treasury.pending).div(bMousdSupply),
-    upper: treasury.total.div(bMousdSupply)
+    lower: treasury.total.sub(treasury.pending).div(bMeurSupply),
+    upper: treasury.total.div(bMeurSupply)
   };
 
   const {
@@ -552,7 +552,7 @@ const getProtocolInfo = async (
 
   const simulatedMarketPrice = marketPrice;
 
-  const windDownPrice = treasury.reserve.add(treasury.permanent).div(bMousdSupply);
+  const windDownPrice = treasury.reserve.add(treasury.permanent).div(bMeurSupply);
 
   // We need to know APYs to calculate the stats below
   if (cachedApysRequests) await Promise.all(cachedApysRequests);
@@ -562,23 +562,23 @@ const getProtocolInfo = async (
     cachedApys.stabilityPool !== undefined &&
     treasury.reserve.gt(0)
   ) {
-    const protocolStabilityPoolYield = cachedApys.stabilityPool.mul(protocolMousdInStabilityPool);
-    const protocolCurveYield = cachedApys.msic3Crv.mul(protocolMousdInCurve);
-    bMousdApr = protocolStabilityPoolYield.add(protocolCurveYield).div(treasury.reserve);
-    yieldAmplification = bMousdApr.div(cachedApys.stabilityPool);
+    const protocolStabilityPoolYield = cachedApys.stabilityPool.mul(protocolMeurInStabilityPool);
+    const protocolCurveYield = cachedApys.msic3Crv.mul(protocolMeurInCurve);
+    bMeurApr = protocolStabilityPoolYield.add(protocolCurveYield).div(treasury.reserve);
+    yieldAmplification = bMeurApr.div(cachedApys.stabilityPool);
 
-    fairPrice.lower = protocolMousdInStabilityPool
+    fairPrice.lower = protocolMeurInStabilityPool
       .sub(treasury.pending)
-      .add(protocolMousdInCurve.mul(cachedApys.msic3Crv.div(cachedApys.stabilityPool)))
-      .div(bMousdSupply);
+      .add(protocolMeurInCurve.mul(cachedApys.msic3Crv.div(cachedApys.stabilityPool)))
+      .div(bMeurSupply);
 
-    fairPrice.upper = protocolMousdInStabilityPool
-      .add(protocolMousdInCurve.mul(cachedApys.msic3Crv.div(cachedApys.stabilityPool)))
-      .div(bMousdSupply);
+    fairPrice.upper = protocolMeurInStabilityPool
+      .add(protocolMeurInCurve.mul(cachedApys.msic3Crv.div(cachedApys.stabilityPool)))
+      .div(bMeurSupply);
   }
 
   return {
-    bMousdSupply,
+    bMeurSupply,
     marketPrice,
     treasury,
     fairPrice,
@@ -593,8 +593,8 @@ const getProtocolInfo = async (
     rebondPeriodInDays,
     simulatedMarketPrice,
     yieldAmplification,
-    bMousdApr,
-    bMousdLpApr,
+    bMeurApr,
+    bMeurLpApr,
     controllerTargetAge,
     averageBondAge,
     floorPriceWithoutPendingHarvests,
@@ -656,10 +656,10 @@ const getTokenTotalSupply = async (token: ERC20): Promise<Decimal> => {
 
 const isInfiniteBondApproved = async (
   account: string,
-  msicToken: MEURToken,
+  meurToken: MEURToken,
   chickenBondManager: ChickenBondManager
 ): Promise<boolean> => {
-  const allowance = await msicToken.allowance(account, chickenBondManager.address);
+  const allowance = await meurToken.allowance(account, chickenBondManager.address);
 
   // Unlike bMEUR, MEUR doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
@@ -668,11 +668,11 @@ const isInfiniteBondApproved = async (
 };
 
 const approveInfiniteBond = async (
-  msicToken: MEURToken | undefined,
+  meurToken: MEURToken | undefined,
   chickenBondManager: ChickenBondManager | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
-  if (msicToken === undefined || chickenBondManager === undefined || signer === undefined) {
+  if (meurToken === undefined || chickenBondManager === undefined || signer === undefined) {
     throw new Error("approveInfiniteBond() failed: a dependency is null");
   }
 
@@ -680,7 +680,7 @@ const approveInfiniteBond = async (
 
   try {
     await (
-      await ((msicToken as unknown) as Contract)
+      await ((meurToken as unknown) as Contract)
         .connect(signer)
         .approve(chickenBondManager.address, constants.MaxUint256._hex)
     ).wait();
@@ -735,20 +735,20 @@ const createBondWithPermit = async (
   msicAmount: Decimal,
   owner: string,
   msicAddress: string,
-  msicToken: MEURToken | undefined,
+  meurToken: MEURToken | undefined,
   chickenBondManager: ChickenBondManager | undefined,
   signer: EthersSigner
 ): Promise<BondCreatedEventObject> => {
-  if (chickenBondManager === undefined || msicToken === undefined) {
+  if (chickenBondManager === undefined || meurToken === undefined) {
     throw new Error("createBondWithPermit() failed: a dependency is null");
   }
 
   const TEN_MINUTES_IN_SECONDS = 60 * 10;
   const spender = chickenBondManager.address;
   const deadline = Math.round(Date.now() / 1000) + TEN_MINUTES_IN_SECONDS;
-  const nonce = (await msicToken.nonces(owner)).toNumber();
+  const nonce = (await meurToken.nonces(owner)).toNumber();
   const domain = {
-    name: await msicToken.name(),
+    name: await meurToken.name(),
     version: "1",
     chainId: await signer.getChainId(),
     verifyingContract: msicAddress
@@ -811,7 +811,7 @@ const createBondWithPermit = async (
 
 const cancelBond = async (
   bondId: string,
-  minimumMousd: Decimal,
+  minimumMeur: Decimal,
   owner: string,
   chickenBondManager: ChickenBondManager | undefined,
   signer: Signer | undefined
@@ -820,14 +820,14 @@ const cancelBond = async (
     throw new Error("cancelBond() failed: a dependency is null");
   }
 
-  console.log("cancelBond() started:", bondId, minimumMousd.toString());
+  console.log("cancelBond() started:", bondId, minimumMeur.toString());
 
-  const gasEstimate = await chickenBondManager.estimateGas.chickenOut(bondId, minimumMousd.hex, {
+  const gasEstimate = await chickenBondManager.estimateGas.chickenOut(bondId, minimumMeur.hex, {
     from: owner
   });
 
   const receipt = await (
-    await chickenBondManager.connect(signer).chickenOut(bondId, minimumMousd.hex, {
+    await chickenBondManager.connect(signer).chickenOut(bondId, minimumMeur.hex, {
       gasLimit: gasEstimate.add(MSIC_ISSUANCE_GAS_HEADROOM)
     })
   ).wait();
@@ -881,16 +881,16 @@ const claimBond = async (
   }
 };
 
-const isTokenApprovedWithBMousdAmm = async (
+const isTokenApprovedWithBMeurAmm = async (
   account: string,
   token: MEURToken | BMEURToken,
-  bMousdAmmAddress: string | null
+  bMeurAmmAddress: string | null
 ): Promise<boolean> => {
-  if (bMousdAmmAddress === null) {
-    throw new Error("isTokenApprovedWithBMousdAmm() failed: a dependency is null");
+  if (bMeurAmmAddress === null) {
+    throw new Error("isTokenApprovedWithBMeurAmm() failed: a dependency is null");
   }
 
-  const allowance = await token.allowance(account, bMousdAmmAddress);
+  const allowance = await token.allowance(account, bMeurAmmAddress);
 
   // Unlike bMEUR, MEUR doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
@@ -898,7 +898,7 @@ const isTokenApprovedWithBMousdAmm = async (
   return allowance.gt(constants.MaxInt256);
 };
 
-const isTokenApprovedWithBMousdAmmMainnet = async (
+const isTokenApprovedWithBMeurAmmMainnet = async (
   account: string,
   token: MEURToken | BMEURToken
 ): Promise<boolean> => {
@@ -922,17 +922,17 @@ const isTokenApprovedWithAmmZapper = async (
   return allowance.gt(constants.MaxInt256);
 };
 
-const approveTokenWithBMousdAmm = async (
+const approveTokenWithBMeurAmm = async (
   token: MEURToken | BMEURToken | undefined,
-  bMousdAmmAddress: string | null,
+  bMeurAmmAddress: string | null,
   signer: Signer | undefined
 ) => {
-  if (token === undefined || bMousdAmmAddress === null || signer === undefined) {
-    throw new Error("approveTokenWithBMousdAmm() failed: a dependency is null");
+  if (token === undefined || bMeurAmmAddress === null || signer === undefined) {
+    throw new Error("approveTokenWithBMeurAmm() failed: a dependency is null");
   }
 
   await (
-    await (token as Contract).connect(signer).approve(bMousdAmmAddress, constants.MaxUint256)
+    await (token as Contract).connect(signer).approve(bMeurAmmAddress, constants.MaxUint256)
   ).wait();
   return;
 };
@@ -952,12 +952,12 @@ const approveToken = async (
   return;
 };
 
-const approveTokenWithBMousdAmmMainnet = async (
+const approveTokenWithBMeurAmmMainnet = async (
   token: MEURToken | BMEURToken | undefined,
   signer: Signer | undefined
 ) => {
   if (token === undefined || signer === undefined) {
-    throw new Error("approveTokenWithBMousdAmmMainnet() failed: a dependency is null");
+    throw new Error("approveTokenWithBMeurAmmMainnet() failed: a dependency is null");
   }
 
   await (
@@ -968,27 +968,27 @@ const approveTokenWithBMousdAmmMainnet = async (
   return;
 };
 
-const getOtherToken = (thisToken: BMousdAmmTokenIndex) =>
-  thisToken === BMousdAmmTokenIndex.BMEUR ? BMousdAmmTokenIndex.MEUR : BMousdAmmTokenIndex.BMEUR;
+const getOtherToken = (thisToken: BMeurAmmTokenIndex) =>
+  thisToken === BMeurAmmTokenIndex.BMEUR ? BMeurAmmTokenIndex.MEUR : BMeurAmmTokenIndex.BMEUR;
 
 const getExpectedSwapOutput = async (
-  inputToken: BMousdAmmTokenIndex,
+  inputToken: BMeurAmmTokenIndex,
   inputAmount: Decimal,
-  bMousdAmm: CurveCryptoSwap2ETH
+  bMeurAmm: CurveCryptoSwap2ETH
 ): Promise<Decimal> =>
-  decimalify(await bMousdAmm.get_dy(inputToken, getOtherToken(inputToken), inputAmount.hex));
+  decimalify(await bMeurAmm.get_dy(inputToken, getOtherToken(inputToken), inputAmount.hex));
 
 const getExpectedSwapOutputMainnet = async (
-  inputToken: BMousdAmmTokenIndex,
+  inputToken: BMeurAmmTokenIndex,
   inputAmount: Decimal,
-  bMousdAmm: CurveCryptoSwap2ETH
+  bMeurAmm: CurveCryptoSwap2ETH
 ): Promise<Decimal> => {
-  const bMousdAmmBalance = await bMousdAmm.balances(0);
+  const bMeurAmmBalance = await bMeurAmm.balances(0);
   // Initial Curve bMEUR price before liquidity = 1.29, reciprocal expected
   const reciprocal = Decimal.from(1).div(1.29);
-  if (bMousdAmmBalance.eq(0)) return inputAmount.div(reciprocal);
+  if (bMeurAmmBalance.eq(0)) return inputAmount.div(reciprocal);
 
-  const swaps = CurveRegistrySwaps__factory.connect(CURVE_REGISTRY_SWAPS_ADDRESS, bMousdAmm.provider);
+  const swaps = CurveRegistrySwaps__factory.connect(CURVE_REGISTRY_SWAPS_ADDRESS, bMeurAmm.provider);
 
   return decimalify(
     await swaps["get_exchange_multiple_amount(address[9],uint256[3][4],uint256)"](
@@ -999,23 +999,23 @@ const getExpectedSwapOutputMainnet = async (
 };
 
 const swapTokens = async (
-  inputToken: BMousdAmmTokenIndex,
+  inputToken: BMeurAmmTokenIndex,
   inputAmount: Decimal,
   minOutputAmount: Decimal,
-  bMousdAmm: CurveCryptoSwap2ETH | undefined,
+  bMeurAmm: CurveCryptoSwap2ETH | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<TokenExchangeEventObject> => {
-  if (bMousdAmm === undefined || signer === undefined) {
+  if (bMeurAmm === undefined || signer === undefined) {
     throw new Error("swapTokens() failed: a dependency is null");
   }
 
-  const gasEstimate = await bMousdAmm.estimateGas[
+  const gasEstimate = await bMeurAmm.estimateGas[
     "exchange(uint256,uint256,uint256,uint256)"
   ](inputToken, getOtherToken(inputToken), inputAmount.hex, minOutputAmount.hex, { from: account });
 
   const receipt = await (
-    await bMousdAmm.connect(signer)["exchange(uint256,uint256,uint256,uint256)"](
+    await bMeurAmm.connect(signer)["exchange(uint256,uint256,uint256,uint256)"](
       inputToken,
       getOtherToken(inputToken),
       inputAmount.hex,
@@ -1037,18 +1037,18 @@ const swapTokens = async (
 };
 
 const swapTokensMainnet = async (
-  inputToken: BMousdAmmTokenIndex,
+  inputToken: BMeurAmmTokenIndex,
   inputAmount: Decimal,
   minOutputAmount: Decimal,
-  bMousdAmm: CurveCryptoSwap2ETH | undefined,
+  bMeurAmm: CurveCryptoSwap2ETH | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (bMousdAmm === undefined || signer === undefined) {
+  if (bMeurAmm === undefined || signer === undefined) {
     throw new Error("swapTokensMainnet() failed: a dependency is null");
   }
 
-  const swaps = CurveRegistrySwaps__factory.connect(CURVE_REGISTRY_SWAPS_ADDRESS, bMousdAmm.provider);
+  const swaps = CurveRegistrySwaps__factory.connect(CURVE_REGISTRY_SWAPS_ADDRESS, bMeurAmm.provider);
   const route = getRoute(inputToken);
 
   const gasEstimate = await swaps.estimateGas[
@@ -1072,27 +1072,27 @@ const swapTokensMainnet = async (
 };
 
 const getExpectedLpTokensAmountViaZapper = async (
-  bMousdAmount: Decimal,
+  bMeurAmount: Decimal,
   msicAmount: Decimal,
-  bMousdZapper: BMEURLPZap
+  bMeurZapper: BMEURLPZap
 ): Promise<Decimal> => {
   // allow 0.1% rounding error
-  return decimalify(await bMousdZapper.getMinLPTokens(bMousdAmount.hex, msicAmount.hex)).mul(0.99);
+  return decimalify(await bMeurZapper.getMinLPTokens(bMeurAmount.hex, msicAmount.hex)).mul(0.99);
 };
 
 const getExpectedLpTokens = async (
-  bMousdAmount: Decimal,
+  bMeurAmount: Decimal,
   msicAmount: Decimal,
-  bMousdZapper: BMEURLPZap
+  bMeurZapper: BMEURLPZap
 ): Promise<Decimal> => {
   // Curve's calc_token_amount has rounding errors and they enforce a minimum 0.1% slippage
   let expectedLpTokenAmount = Decimal.ZERO;
   try {
     // If the user is depositing bMEUR single sided, they won't have approved any.. WONT-FIX
     expectedLpTokenAmount = await getExpectedLpTokensAmountViaZapper(
-      bMousdAmount,
+      bMeurAmount,
       msicAmount,
-      bMousdZapper
+      bMeurZapper
     );
   } catch {
     // Curve throws if there's no liquidity
@@ -1102,30 +1102,30 @@ const getExpectedLpTokens = async (
 };
 
 const addLiquidity = async (
-  bMousdAmount: Decimal,
+  bMeurAmount: Decimal,
   msicAmount: Decimal,
   minLpTokens: Decimal,
   shouldStakeInGauge: boolean,
-  bMousdZapper: BMEURLPZap | undefined,
+  bMeurZapper: BMEURLPZap | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (bMousdZapper === undefined || signer === undefined) {
+  if (bMeurZapper === undefined || signer === undefined) {
     throw new Error("addLiquidity() failed: a dependency is null");
   }
 
   const zapperFunction = shouldStakeInGauge ? "addLiquidityAndStake" : "addLiquidity";
 
-  const gasEstimate = await bMousdZapper.estimateGas[zapperFunction](
-    bMousdAmount.hex,
+  const gasEstimate = await bMeurZapper.estimateGas[zapperFunction](
+    bMeurAmount.hex,
     msicAmount.hex,
     minLpTokens.hex,
     { from: account }
   );
 
   const receipt = await (
-    await bMousdZapper.connect(signer)[zapperFunction](
-      bMousdAmount.hex,
+    await bMeurZapper.connect(signer)[zapperFunction](
+      bMeurAmount.hex,
       msicAmount.hex,
       minLpTokens.hex,
       { gasLimit: gasEstimate.mul(6).div(5) } // Add 20% overhead (we've seen it fail otherwise)
@@ -1144,41 +1144,41 @@ const getCoinBalances = (pool: CurveCryptoSwap2ETH) =>
 
 const getExpectedWithdrawal = async (
   burnLp: Decimal,
-  output: BMousdAmmTokenIndex | "both",
-  bMousdZapper: BMEURLPZap,
-  bMousdAmm: CurveCryptoSwap2ETH
-): Promise<Map<BMousdAmmTokenIndex, Decimal>> => {
+  output: BMeurAmmTokenIndex | "both",
+  bMeurZapper: BMEURLPZap,
+  bMeurAmm: CurveCryptoSwap2ETH
+): Promise<Map<BMeurAmmTokenIndex, Decimal>> => {
   if (output === "both") {
-    const [bMousdAmount, msicAmount] = await bMousdZapper.getMinWithdrawBalanced(burnLp.hex);
+    const [bMeurAmount, msicAmount] = await bMeurZapper.getMinWithdrawBalanced(burnLp.hex);
 
     return new Map([
-      [BMousdAmmTokenIndex.BMEUR, decimalify(bMousdAmount)],
-      [BMousdAmmTokenIndex.MEUR, decimalify(msicAmount)]
+      [BMeurAmmTokenIndex.BMEUR, decimalify(bMeurAmount)],
+      [BMeurAmmTokenIndex.MEUR, decimalify(msicAmount)]
     ]);
   } else {
     const withdrawEstimatorFunction =
-      output === BMousdAmmTokenIndex.MEUR
-        ? () => bMousdZapper.getMinWithdrawMEUR(burnLp.hex)
-        : () => bMousdAmm.calc_withdraw_one_coin(burnLp.hex, 0);
+      output === BMeurAmmTokenIndex.MEUR
+        ? () => bMeurZapper.getMinWithdrawMEUR(burnLp.hex)
+        : () => bMeurAmm.calc_withdraw_one_coin(burnLp.hex, 0);
     return new Map([[output, await withdrawEstimatorFunction().then(decimalify)]]);
   }
 };
 
 const removeLiquidity = async (
   burnLpTokens: Decimal,
-  minBMousdAmount: Decimal,
-  minMousdAmount: Decimal,
-  bMousdZapper: BMEURLPZap | undefined,
+  minBMeurAmount: Decimal,
+  minMeurAmount: Decimal,
+  bMeurZapper: BMEURLPZap | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
-  if (bMousdZapper === undefined || signer === undefined) {
+  if (bMeurZapper === undefined || signer === undefined) {
     throw new Error("removeLiquidity() failed: a dependency is null");
   }
 
   const receipt = await (
-    await bMousdZapper
+    await bMeurZapper
       .connect(signer)
-      .removeLiquidityBalanced(burnLpTokens.hex, minBMousdAmount.hex, minMousdAmount.hex)
+      .removeLiquidityBalanced(burnLpTokens.hex, minBMeurAmount.hex, minMeurAmount.hex)
   ).wait();
 
   if (!receipt.status) {
@@ -1191,24 +1191,24 @@ const removeLiquidity = async (
 const removeLiquidityMEUR = async (
   burnLpTokens: Decimal,
   minAmount: Decimal,
-  bMousdZapper: BMEURLPZap | undefined,
+  bMeurZapper: BMEURLPZap | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (bMousdZapper === undefined || signer === undefined) {
+  if (bMeurZapper === undefined || signer === undefined) {
     throw new Error("removeLiquidityMEUR() failed: a dependency is null");
   }
 
   const removeLiquidityFunction = "removeLiquidityMEUR";
 
-  const gasEstimate = await bMousdZapper.estimateGas[removeLiquidityFunction](
+  const gasEstimate = await bMeurZapper.estimateGas[removeLiquidityFunction](
     burnLpTokens.hex,
     minAmount.hex,
     { from: account }
   );
 
   const receipt = await (
-    await bMousdZapper.connect(signer)[removeLiquidityFunction](
+    await bMeurZapper.connect(signer)[removeLiquidityFunction](
       burnLpTokens.hex,
       minAmount.hex,
       { gasLimit: gasEstimate.mul(6).div(5) } // Add 20% overhead (we've seen it fail otherwise)
@@ -1225,17 +1225,17 @@ const removeLiquidityMEUR = async (
 const removeLiquidityBMEUR = async (
   burnLpTokens: Decimal,
   minAmount: Decimal,
-  bMousdAmm: CurveCryptoSwap2ETH | undefined,
+  bMeurAmm: CurveCryptoSwap2ETH | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (bMousdAmm === undefined || signer === undefined) {
+  if (bMeurAmm === undefined || signer === undefined) {
     throw new Error("removeLiquidityBMEUR() failed: a dependency is null");
   }
 
   const removeLiquidityFunction = "remove_liquidity_one_coin(uint256,uint256,uint256,bool)";
 
-  const gasEstimate = await bMousdAmm.estimateGas[removeLiquidityFunction](
+  const gasEstimate = await bMeurAmm.estimateGas[removeLiquidityFunction](
     burnLpTokens.hex,
     0,
     minAmount.hex,
@@ -1244,7 +1244,7 @@ const removeLiquidityBMEUR = async (
   );
 
   const receipt = await (
-    await bMousdAmm.connect(signer)[removeLiquidityFunction](
+    await bMeurAmm.connect(signer)[removeLiquidityFunction](
       burnLpTokens.hex,
       0,
       minAmount.hex,
@@ -1262,31 +1262,31 @@ const removeLiquidityBMEUR = async (
 
 const removeLiquidityOneCoin = async (
   burnLpTokens: Decimal,
-  output: BMousdAmmTokenIndex,
+  output: BMeurAmmTokenIndex,
   minAmount: Decimal,
-  bMousdZapper: BMEURLPZap | undefined,
-  bMousdAmm: CurveCryptoSwap2ETH | undefined,
+  bMeurZapper: BMEURLPZap | undefined,
+  bMeurAmm: CurveCryptoSwap2ETH | undefined,
   signer: Signer | undefined,
   account: string
 ): Promise<void> => {
-  if (output === BMousdAmmTokenIndex.MEUR) {
-    return removeLiquidityMEUR(burnLpTokens, minAmount, bMousdZapper, signer, account);
+  if (output === BMeurAmmTokenIndex.MEUR) {
+    return removeLiquidityMEUR(burnLpTokens, minAmount, bMeurZapper, signer, account);
   } else {
-    return removeLiquidityBMEUR(burnLpTokens, minAmount, bMousdAmm, signer, account);
+    return removeLiquidityBMEUR(burnLpTokens, minAmount, bMeurAmm, signer, account);
   }
 };
 
 const stakeLiquidity = async (
   stakeAmount: Decimal,
-  bMousdGauge: CurveLiquidityGaugeV5 | undefined,
+  bMeurGauge: CurveLiquidityGaugeV5 | undefined,
   signer: Signer | undefined
 ): Promise<DepositEventObject> => {
-  if (bMousdGauge === undefined || signer === undefined) {
+  if (bMeurGauge === undefined || signer === undefined) {
     throw new Error("stakeLiquidity() failed: a dependency is null");
   }
 
   const receipt = await (
-    await bMousdGauge.connect(signer)["deposit(uint256)"](stakeAmount.hex)
+    await bMeurGauge.connect(signer)["deposit(uint256)"](stakeAmount.hex)
   ).wait();
 
   const depositEvent = receipt?.events?.find(e => e?.event === "Deposit") as Maybe<DepositEvent>;
@@ -1301,15 +1301,15 @@ const stakeLiquidity = async (
 
 const unstakeLiquidity = async (
   unstakeAmount: Decimal,
-  bMousdGauge: CurveLiquidityGaugeV5 | undefined,
+  bMeurGauge: CurveLiquidityGaugeV5 | undefined,
   signer: Signer | undefined
 ): Promise<WithdrawEventObject> => {
-  if (bMousdGauge === undefined || signer === undefined) {
+  if (bMeurGauge === undefined || signer === undefined) {
     throw new Error("unstakeLiquidity() failed: a dependency is null");
   }
 
   const receipt = await (
-    await bMousdGauge.connect(signer)["withdraw(uint256,bool)"](unstakeAmount.hex, true)
+    await bMeurGauge.connect(signer)["withdraw(uint256,bool)"](unstakeAmount.hex, true)
   ).wait();
 
   const withdrawEvent = receipt?.events?.find(e => e?.event === "Withdraw") as Maybe<WithdrawEvent>;
@@ -1323,14 +1323,14 @@ const unstakeLiquidity = async (
 };
 
 const claimLpRewards = async (
-  bMousdGauge: CurveLiquidityGaugeV5 | undefined,
+  bMeurGauge: CurveLiquidityGaugeV5 | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
-  if (bMousdGauge === undefined || signer === undefined) {
+  if (bMeurGauge === undefined || signer === undefined) {
     throw new Error("claimLpRewards() failed: a dependency is null");
   }
 
-  const receipt = await (await bMousdGauge.connect(signer)["claim_rewards()"]()).wait();
+  const receipt = await (await bMeurGauge.connect(signer)["claim_rewards()"]()).wait();
 
   if (!receipt.status) {
     throw new Error("claimLpRewards() failed: no transaction receipt status received.");
@@ -1339,15 +1339,15 @@ const claimLpRewards = async (
 
 const getLpRewards = async (
   account: string,
-  bMousdGauge: CurveLiquidityGaugeV5
-): Promise<BMousdLpRewards> => {
-  const rewards: BMousdLpRewards = [];
+  bMeurGauge: CurveLiquidityGaugeV5
+): Promise<BMeurLpRewards> => {
+  const rewards: BMeurLpRewards = [];
 
-  const totalRewardTokens = (await bMousdGauge.reward_count()).toNumber();
+  const totalRewardTokens = (await bMeurGauge.reward_count()).toNumber();
 
   for (let tokenIndex = 0; tokenIndex < totalRewardTokens; tokenIndex++) {
-    const tokenAddress = await bMousdGauge.reward_tokens(tokenIndex);
-    const tokenRewards = decimalify(await bMousdGauge.claimable_reward(account, tokenAddress));
+    const tokenAddress = await bMeurGauge.reward_tokens(tokenIndex);
+    const tokenRewards = decimalify(await bMeurGauge.claimable_reward(account, tokenAddress));
     const tokenName =
       TOKEN_ADDRESS_NAME_MAP[tokenAddress] ||
       `${tokenAddress.slice(0, 5)}..${tokenAddress.slice(tokenAddress.length - 3)}`;
@@ -1370,10 +1370,10 @@ export const api = {
   createBond,
   cancelBond,
   claimBond,
-  isTokenApprovedWithBMousdAmm,
-  isTokenApprovedWithBMousdAmmMainnet,
-  approveTokenWithBMousdAmm,
-  approveTokenWithBMousdAmmMainnet,
+  isTokenApprovedWithBMeurAmm,
+  isTokenApprovedWithBMeurAmmMainnet,
+  approveTokenWithBMeurAmm,
+  approveTokenWithBMeurAmmMainnet,
   isTokenApprovedWithAmmZapper,
   approveToken,
   getExpectedSwapOutput,

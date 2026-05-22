@@ -109,7 +109,7 @@ const deployContracts = async (
   return [
     {
       ...addresses,
-      msicToken: await deployContract(
+      meurToken: await deployContract(
         deployer,
         getContractFactory,
         "MEURToken",
@@ -159,7 +159,7 @@ const connectContracts = async (
     activePool,
     borrowerOperations,
     troveManager,
-    msicToken,
+    meurToken,
     collSurplusPool,
     communityIssuance,
     defaultPool,
@@ -199,7 +199,7 @@ const connectContracts = async (
         gasPool.address,
         collSurplusPool.address,
         priceFeed.address,
-        msicToken.address,
+        meurToken.address,
         sortedTroves.address,
         msicToken.address,
         msicStaking.address,
@@ -216,7 +216,7 @@ const connectContracts = async (
         collSurplusPool.address,
         priceFeed.address,
         sortedTroves.address,
-        msicToken.address,
+        meurToken.address,
         msicStaking.address,
         { ...overrides, nonce }
       ),
@@ -226,7 +226,7 @@ const connectContracts = async (
         borrowerOperations.address,
         troveManager.address,
         activePool.address,
-        msicToken.address,
+        meurToken.address,
         sortedTroves.address,
         priceFeed.address,
         communityIssuance.address,
@@ -265,7 +265,7 @@ const connectContracts = async (
     nonce =>
       msicStaking.setAddresses(
         msicToken.address,
-        msicToken.address,
+        meurToken.address,
         troveManager.address,
         borrowerOperations.address,
         activePool.address,
@@ -347,7 +347,7 @@ export const deployAndSetupContracts = async (
           ...addresses,
 
           uniToken: await (wethAddress
-            ? createUniswapV2Pair(deployer, wethAddress, addresses.msicToken, overrides)
+            ? createUniswapV2Pair(deployer, wethAddress, addresses.meurToken, overrides)
             : deployMockUniToken(deployer, getContractFactory, overrides))
         }
       })

@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-Mosaic is a fork of the well-audited Liquity v1 protocol, rebranded to use REEF as collateral instead of ETH, MoUSD as the stablecoin (replacing LUSD), and MSIC as the governance token (replacing LQTY). The audit identified **4 Critical/High**, **6 Medium**, and **8 Low** severity findings. Most critical issues stem from variable naming collisions introduced during the fork renaming process, which would cause compilation failures or severe runtime bugs. Additional concerns exist around oracle compatibility on Reef Chain and hardcoded Ethereum mainnet addresses.
+Mosaic is a fork of the well-audited Liquity v1 protocol, rebranded to use REEF as collateral instead of ETH, MEUR as the stablecoin (replacing LUSD), and MSIC as the governance token (replacing LQTY). The audit identified **4 Critical/High**, **6 Medium**, and **8 Low** severity findings. Most critical issues stem from variable naming collisions introduced during the fork renaming process, which would cause compilation failures or severe runtime bugs. Additional concerns exist around oracle compatibility on Reef Chain and hardcoded Ethereum mainnet addresses.
 
 ---
 
@@ -27,20 +27,20 @@ Mosaic is a fork of the well-audited Liquity v1 protocol, rebranded to use REEF 
 Two state variables share the identical name `msicToken` but are declared with different types:
 
 ```solidity
-IMoUSDToken public override msicToken;   // Line 30
+IMEURToken public override msicToken;   // Line 30
 IMSICToken public override msicToken;    // Line 32
 ```
 
-The same collision occurs in `setAddresses()` (lines 270-272), where the parameter `_msicTokenAddress` is used twice (lines 243-244), meaning the MoUSD token address and the MSIC token address are the **same parameter name**, and the second assignment silently overwrites the first.
+The same collision occurs in `setAddresses()` (lines 270-272), where the parameter `_msicTokenAddress` is used twice (lines 243-244), meaning the MEUR token address and the MSIC token address are the **same parameter name**, and the second assignment silently overwrites the first.
 
 **Impact:**
-- This will either fail to compile (Solidity does not allow duplicate state variable names of the same visibility) or, if the compiler allows shadowing, the second declaration overwrites the first. This means `msicToken` would only point to the MSIC token, and the MoUSD token reference would be lost entirely.
-- The `_sendGasCompensation()` function on line 798 calls `msicToken.returnFromPool()`, which is a MoUSD-specific function. If `msicToken` points to the MSIC token contract, this call would revert or behave unexpectedly, **breaking all liquidation gas compensation payments**.
-- The `redeemCollateral()` function (line 937-1023) uses `contractsCache.msicToken` to check MoUSD balances and burn MoUSD. If this is the MSIC token instead, **all redemptions would fail or burn the wrong token**.
+- This will either fail to compile (Solidity does not allow duplicate state variable names of the same visibility) or, if the compiler allows shadowing, the second declaration overwrites the first. This means `msicToken` would only point to the MSIC token, and the MEUR token reference would be lost entirely.
+- The `_sendGasCompensation()` function on line 798 calls `msicToken.returnFromPool()`, which is a MEUR-specific function. If `msicToken` points to the MSIC token contract, this call would revert or behave unexpectedly, **breaking all liquidation gas compensation payments**.
+- The `redeemCollateral()` function (line 937-1023) uses `contractsCache.msicToken` to check MEUR balances and burn MEUR. If this is the MSIC token instead, **all redemptions would fail or burn the wrong token**.
 
 **Recommendation:**
 Rename the variables to be distinct:
-- `IMoUSDToken public moUSDToken;` for the stablecoin
+- `IMEURToken public meurToken;` for the stablecoin
 - `IMSICToken public msicToken;` for the governance token
 
 Update `setAddresses()` to accept separate, distinctly named parameters for each token address.
@@ -58,18 +58,18 @@ Same pattern as H-01:
 
 ```solidity
 IMSICToken public msicToken;    // Line 35
-IMoUSDToken public msicToken;   // Line 36
+IMEURToken public msicToken;   // Line 36
 ```
 
-The `setAddresses()` function (lines 60-91) also has duplicate parameter names `_msicTokenAddress` on lines 62-63. The second assignment (`msicToken = IMoUSDToken(_msicTokenAddress)`) overwrites the first (`msicToken = IMSICToken(_msicTokenAddress)`).
+The `setAddresses()` function (lines 60-91) also has duplicate parameter names `_msicTokenAddress` on lines 62-63. The second assignment (`msicToken = IMEURToken(_msicTokenAddress)`) overwrites the first (`msicToken = IMSICToken(_msicTokenAddress)`).
 
 **Impact:**
-- The `stake()` function (line 117) calls `msicToken.sendToMSICStaking()`, which is an MSIC-specific function. If `msicToken` points to MoUSD, this will revert — **users cannot stake MSIC tokens**.
-- The `unstake()` function (line 152) calls `msicToken.transfer()` to return MSIC tokens and (line 160) calls `msicToken.transfer()` to send MoUSD gains. Both reference the same variable, so one token type is inaccessible — **either unstaking or MoUSD reward claims will fail**.
-- `increaseF_ETH` and `increaseF_MoUSD` would function correctly since they only modify running sums, but actual reward distribution in `stake()`/`unstake()` is broken.
+- The `stake()` function (line 117) calls `msicToken.sendToMSICStaking()`, which is an MSIC-specific function. If `msicToken` points to MEUR, this will revert — **users cannot stake MSIC tokens**.
+- The `unstake()` function (line 152) calls `msicToken.transfer()` to return MSIC tokens and (line 160) calls `msicToken.transfer()` to send MEUR gains. Both reference the same variable, so one token type is inaccessible — **either unstaking or MEUR reward claims will fail**.
+- `increaseF_ETH` and `increaseF_MEUR` would function correctly since they only modify running sums, but actual reward distribution in `stake()`/`unstake()` is broken.
 
 **Recommendation:**
-Use distinct variable names: `msicToken` for IMSICToken and `moUSDToken` for IMoUSDToken. Update all function calls to reference the correct variable.
+Use distinct variable names: `msicToken` for IMSICToken and `meurToken` for IMEURToken. Update all function calls to reference the correct variable.
 
 ---
 
@@ -91,7 +91,7 @@ function setAddresses(
     address _gasPoolAddress,
     address _collSurplusPoolAddress,
     address _priceFeedAddress,
-    address _msicTokenAddress,       // Line 242 - intended for MoUSD token
+    address _msicTokenAddress,       // Line 242 - intended for MEUR token
     address _sortedTrovesAddress,
     address _msicTokenAddress,       // Line 244 - intended for MSIC token (DUPLICATE!)
     address _msicStakingAddress
@@ -102,16 +102,16 @@ In Solidity 0.6.11, duplicate function parameter names cause a compilation error
 
 **Impact:**
 - **Deployment will fail** — the contract cannot be compiled and deployed with duplicate parameter names.
-- If it somehow deployed, MoUSD-related operations (minting, burning, balance checks) would incorrectly target the MSIC token contract, breaking the entire borrowing/redemption flow.
+- If it somehow deployed, MEUR-related operations (minting, burning, balance checks) would incorrectly target the MSIC token contract, breaking the entire borrowing/redemption flow.
 
 **Recommendation:**
-Rename parameters distinctly: `_moUSDTokenAddress` and `_msicTokenAddress`.
+Rename parameters distinctly: `_meurTokenAddress` and `_msicTokenAddress`.
 
 ---
 
-### H-04: `MoUSDUsdToMoUSDReef.sol` Uses Hardcoded Ethereum Mainnet Oracle Addresses
+### H-04: `MEUREurToMEURReef.sol` Uses Hardcoded Ethereum Mainnet Oracle Addresses
 
-**File:** `Integrations/MoUSDUsdToMoUSDReef.sol`, Lines 11-12
+**File:** `Integrations/MEUREurToMEURReef.sol`, Lines 11-12
 **Severity:** HIGH
 **Status:** Open
 
@@ -119,7 +119,7 @@ Rename parameters distinctly: `_moUSDTokenAddress` and `_msicTokenAddress`.
 The contract has hardcoded Chainlink oracle addresses that are Ethereum mainnet addresses:
 
 ```solidity
-IPriceFeed public constant MoUSD_USD = IPriceFeed(0x3D7aE7E594f2f2091Ad8798313450130d0Aba3a0);
+IPriceFeed public constant MEUR_EUR = IPriceFeed(0x3D7aE7E594f2f2091Ad8798313450130d0Aba3a0);
 IPriceFeed public constant REEF_USD = IPriceFeed(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
 ```
 
@@ -161,9 +161,9 @@ The Tellor request ID is hardcoded as `ETHUSD_TELLOR_REQ_ID = 1` (line 35), whic
 
 ---
 
-### M-02: `permit()` in MoUSDToken and MSICToken — Missing Zero-Address Check on `ecrecover`
+### M-02: `permit()` in MEURToken and MSICToken — Missing Zero-Address Check on `ecrecover`
 
-**Files:** `MoUSDToken.sol` (Line 189), `MSICToken.sol` (Line 257)
+**Files:** `MEURToken.sol` (Line 189), `MSICToken.sol` (Line 257)
 **Severity:** MEDIUM
 **Status:** Open
 
@@ -172,14 +172,14 @@ The `permit()` function uses `ecrecover` to recover the signer address from the 
 
 ```solidity
 address recoveredAddress = ecrecover(digest, v, r, s);
-require(recoveredAddress == owner, 'MoUSD: invalid signature');
+require(recoveredAddress == owner, 'MEUR: invalid signature');
 ```
 
 **Impact:**
 While the zero address cannot hold tokens in normal operation (minting to address(0) is blocked by an assert), if tokens somehow end up at the zero address (e.g., through a direct `_transfer` call from a privileged contract), an attacker could use `permit()` to approve themselves to spend those tokens.
 
 **Recommendation:**
-Add an explicit check: `require(recoveredAddress != address(0), "MoUSD: invalid signature");`
+Add an explicit check: `require(recoveredAddress != address(0), "MEUR: invalid signature");`
 
 ---
 
@@ -233,10 +233,10 @@ Remove all `import "./Dependencies/console.sol";` statements and any `console.lo
 
 **Description:**
 ```solidity
-IMoUSDToken public msicToken;
+IMEURToken public msicToken;
 ```
 
-The variable is named `msicToken` but has type `IMoUSDToken`. While this is not a duplicate declaration like H-01/H-02 (BorrowerOperations only needs MoUSD, not MSIC directly), the naming is misleading and error-prone. Developers interacting with this contract or building integrations may assume `msicToken` refers to the MSIC governance token.
+The variable is named `msicToken` but has type `IMEURToken`. While this is not a duplicate declaration like H-01/H-02 (BorrowerOperations only needs MEUR, not MSIC directly), the naming is misleading and error-prone. Developers interacting with this contract or building integrations may assume `msicToken` refers to the MSIC governance token.
 
 The same misleading naming appears in `StabilityPool.sol` line 157 and in `ContractsCache` structs throughout the codebase.
 
@@ -246,7 +246,7 @@ The same misleading naming appears in `StabilityPool.sol` line 157 and in `Contr
 - Future contributors may introduce bugs by assuming `msicToken` is the MSIC token.
 
 **Recommendation:**
-Rename to `moUSDToken` throughout the codebase for clarity. This should be a comprehensive find-and-replace across all contracts, interfaces, and test files.
+Rename to `meurToken` throughout the codebase for clarity. This should be a comprehensive find-and-replace across all contracts, interfaces, and test files.
 
 ---
 
@@ -273,7 +273,7 @@ The event will still be emitted (backward compatible in 0.6.x), but this is a co
 **Recommendation:**
 Add the `emit` keyword: `emit StabilityPoolETHBalanceUpdated(REEF);`
 
-Also review `ActivePool.sol` lines 96 and 102 where `ActivePoolMoUSDDebtUpdated(MoUSDDebt)` similarly lacks the `emit` keyword.
+Also review `ActivePool.sol` lines 96 and 102 where `ActivePoolMEURDebtUpdated(MEURDebt)` similarly lacks the `emit` keyword.
 
 ---
 
@@ -309,8 +309,8 @@ Consider upgrading to Solidity 0.8.x for the deployment. This would require remo
 **Description:**
 ```solidity
 // ActivePool.sol
-ActivePoolMoUSDDebtUpdated(MoUSDDebt);  // Line 96 - missing emit
-ActivePoolMoUSDDebtUpdated(MoUSDDebt);  // Line 102 - missing emit
+ActivePoolMEURDebtUpdated(MEURDebt);  // Line 96 - missing emit
+ActivePoolMEURDebtUpdated(MEURDebt);  // Line 102 - missing emit
 ```
 
 Same issue as M-06 but in a different contract.
@@ -433,7 +433,7 @@ Consider adding a time-locked governance mechanism or a minimal proxy upgrade pa
 
 ---
 
-### L-08: `MoUSD_GAS_COMPENSATION` Set to 200 MoUSD — May Not Suit REEF Economics
+### L-08: `MEUR_GAS_COMPENSATION` Set to 200 MEUR — May Not Suit REEF Economics
 
 **File:** `LiquityBase.sol` (`MosaicBase`), Line 28
 **Severity:** LOW
@@ -441,18 +441,18 @@ Consider adding a time-locked governance mechanism or a minimal proxy upgrade pa
 
 **Description:**
 ```solidity
-uint constant public MoUSD_GAS_COMPENSATION = 200e18;
+uint constant public MEUR_GAS_COMPENSATION = 200e18;
 uint constant public MIN_NET_DEBT = 1800e18;
 ```
 
-These constants are inherited directly from Liquity v1, which was tuned for Ethereum's gas costs. The 200 MoUSD gas compensation is designed to incentivize liquidators to cover their gas costs. On Reef Chain, gas costs are likely significantly lower than on Ethereum mainnet.
+These constants are inherited directly from Liquity v1, which was tuned for Ethereum's gas costs. The 200 MEUR gas compensation is designed to incentivize liquidators to cover their gas costs. On Reef Chain, gas costs are likely significantly lower than on Ethereum mainnet.
 
 **Impact:**
-- A 200 MoUSD gas compensation may be excessively generous relative to actual gas costs on Reef Chain, creating unnecessary protocol overhead.
-- The 1800 MoUSD minimum net debt may be too high or too low depending on REEF's value and Reef Chain's typical user base.
+- A 200 MEUR gas compensation may be excessively generous relative to actual gas costs on Reef Chain, creating unnecessary protocol overhead.
+- The 1800 MEUR minimum net debt may be too high or too low depending on REEF's value and Reef Chain's typical user base.
 
 **Recommendation:**
-Model the expected gas costs on Reef Chain and adjust `MoUSD_GAS_COMPENSATION` and `MIN_NET_DEBT` accordingly. These values should reflect the economic reality of the target chain.
+Model the expected gas costs on Reef Chain and adjust `MEUR_GAS_COMPENSATION` and `MIN_NET_DEBT` accordingly. These values should reflect the economic reality of the target chain.
 
 ---
 
@@ -465,7 +465,7 @@ The fork's renaming from Liquity terminology to Mosaic terminology is incomplete
 - Library: `MosaicMath` (renamed) but file is still `LiquityMath.sol`
 - SafeMath: `MosaicSafeMath128` (renamed) but file is still `LiquitySafeMath128.sol`
 - Variable names mix "ETH" and "REEF" freely
-- `msicToken` is used for both MSIC and MoUSD tokens in different contracts
+- `msicToken` is used for both MSIC and MEUR tokens in different contracts
 
 **Recommendation:** Perform a complete, consistent renaming pass across all files, variables, events, and comments.
 
@@ -486,12 +486,12 @@ The test suite appears to be inherited from Liquity v1. Any fork-specific change
 | H-01 | HIGH | Duplicate `msicToken` variable in TroveManager | Open |
 | H-02 | HIGH | Duplicate `msicToken` variable in MSICStaking | Open |
 | H-03 | HIGH | Duplicate parameter names in TroveManager.setAddresses() | Open |
-| H-04 | HIGH | Hardcoded Ethereum mainnet oracle addresses in MoUSDUsdToMoUSDReef | Open |
+| H-04 | HIGH | Hardcoded Ethereum mainnet oracle addresses in MEUREurToMEURReef | Open |
 | M-01 | MEDIUM | Chainlink/Tellor oracle availability on Reef Chain | Open |
 | M-02 | MEDIUM | Missing zero-address check on ecrecover in permit() | Open |
 | M-03 | MEDIUM | Native token transfer semantics may differ on Reef Chain | Open |
 | M-04 | MEDIUM | console.sol import in production contracts | Open |
-| M-05 | MEDIUM | Misleading variable naming (msicToken for MoUSD) | Open |
+| M-05 | MEDIUM | Misleading variable naming (msicToken for MEUR) | Open |
 | M-06 | MEDIUM | Missing `emit` keyword on event emissions | Open |
 | L-01 | LOW | Outdated Solidity version 0.6.11 | Open |
 | L-02 | LOW | Additional missing `emit` keywords in ActivePool | Open |

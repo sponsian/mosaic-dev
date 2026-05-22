@@ -11,7 +11,7 @@ import DefaultPool from "../../contracts/artifacts/contracts/DefaultPool.sol/Def
 import ERC20Mock from "../../contracts/artifacts/contracts/LPRewards/TestContracts/ERC20Mock.sol/ERC20Mock.json";
 import GasPool from "../../contracts/artifacts/contracts/GasPool.sol/GasPool.json";
 import HintHelpers from "../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json";
-import IERC20 from "../../contracts/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
+import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json";
 import LockupContractFactory from "../../contracts/artifacts/contracts/MSIC/LockupContractFactory.sol/LockupContractFactory.json";
 import MEURToken from "../../contracts/artifacts/contracts/MEURToken.sol/MEURToken.json";
 import MSICStaking from "../../contracts/artifacts/contracts/MSIC/MSICStaking.sol/MSICStaking.json";

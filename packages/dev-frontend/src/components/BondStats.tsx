@@ -61,8 +61,8 @@ export const BondStats: React.FC<BondStatsProps> = () => {
       <Statistic lexicon={l.BMEUR_APR}>
         <Metric
           value={
-            protocolInfo.bMousdApr && protocolInfo.bMousdSupply.gt(0)
-              ? protocolInfo.bMousdApr.mul(100).prettify(2)
+            protocolInfo.bMeurApr && protocolInfo.bMeurSupply.gt(0)
+              ? protocolInfo.bMeurApr.mul(100).prettify(2)
               : "N/A"
           }
           unit="%"
@@ -71,7 +71,7 @@ export const BondStats: React.FC<BondStatsProps> = () => {
       <Statistic lexicon={l.BMEUR_LP_APR}>
         <Metric
           value={
-            protocolInfo?.bMousdLpApr !== undefined ? protocolInfo.bMousdLpApr.prettify(2) : "N/A"
+            protocolInfo?.bMeurLpApr !== undefined ? protocolInfo.bMeurLpApr.prettify(2) : "N/A"
           }
           unit="%"
         />
@@ -79,7 +79,7 @@ export const BondStats: React.FC<BondStatsProps> = () => {
       <Statistic lexicon={l.BMEUR_YIELD_AMPLIFICATION}>
         <Metric
           value={
-            protocolInfo.yieldAmplification && protocolInfo.bMousdSupply.gt(0)
+            protocolInfo.yieldAmplification && protocolInfo.bMeurSupply.gt(0)
               ? protocolInfo.yieldAmplification.prettify(2)
               : "N/A"
           }
@@ -87,7 +87,7 @@ export const BondStats: React.FC<BondStatsProps> = () => {
         />
       </Statistic>
       <Statistic lexicon={l.BMEUR_SUPPLY}>
-        <Metric value={protocolInfo.bMousdSupply.shorten()} unit="bMEUR" />
+        <Metric value={protocolInfo.bMeurSupply.shorten()} unit="bMEUR" />
       </Statistic>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>

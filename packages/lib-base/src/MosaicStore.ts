@@ -26,7 +26,7 @@ export interface MosaicStoreBaseState {
   accountBalance: Decimal;
 
   /** User's MEUR token balance. */
-  msicBalance: Decimal;
+  meurBalance: Decimal;
 
   /** User's MSIC token balance. */
   msicBalance: Decimal;
@@ -352,11 +352,11 @@ export abstract class MosaicStore<T = unknown> {
         baseStateUpdate.accountBalance
       ),
 
-      msicBalance: this._updateIfChanged(
+      meurBalance: this._updateIfChanged(
         eq,
-        "msicBalance",
-        baseState.msicBalance,
-        baseStateUpdate.msicBalance
+        "meurBalance",
+        baseState.meurBalance,
+        baseStateUpdate.meurBalance
       ),
 
       msicBalance: this._updateIfChanged(

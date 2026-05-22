@@ -72,6 +72,19 @@
   },
   {
     "inputs": [],
+    "name": "COLL_DECIMALS_OFFSET",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DECIMAL_PRECISION",
     "outputs": [
       {
@@ -85,7 +98,7 @@
   },
   {
     "inputs": [],
-    "name": "MEUR_GAS_COMPENSATION",
+    "name": "MCR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -98,7 +111,7 @@
   },
   {
     "inputs": [],
-    "name": "MCR",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",

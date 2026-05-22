@@ -120,7 +120,7 @@ export class BlockPolledMosaicStore extends MosaicStore<BlockPolledMosaicStoreEx
       ...(userAddress
         ? {
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
-            msicBalance: this._readable.getMEURBalance(userAddress, { blockTag }),
+            meurBalance: this._readable.getMEURBalance(userAddress, { blockTag }),
             msicBalance: this._readable.getMSICBalance(userAddress, { blockTag }),
             uniTokenBalance: this._readable.getUniTokenBalance(userAddress, { blockTag }),
             uniTokenAllowance: this._readable.getUniTokenAllowance(userAddress, { blockTag }),
@@ -140,7 +140,7 @@ export class BlockPolledMosaicStore extends MosaicStore<BlockPolledMosaicStoreEx
           }
         : {
             accountBalance: Decimal.ZERO,
-            msicBalance: Decimal.ZERO,
+            meurBalance: Decimal.ZERO,
             msicBalance: Decimal.ZERO,
             uniTokenBalance: Decimal.ZERO,
             uniTokenAllowance: Decimal.ZERO,

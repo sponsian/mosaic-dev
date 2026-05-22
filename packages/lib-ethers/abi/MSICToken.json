@@ -79,11 +79,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_msicStakingAddress",
+        "name": "_lockupContractFactoryAddress",
         "type": "address"
       }
     ],
-    "name": "MSICStakingAddressSet",
+    "name": "LockupContractFactoryAddressSet",
     "type": "event"
   },
   {
@@ -92,11 +92,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lockupContractFactoryAddress",
+        "name": "_msicStakingAddress",
         "type": "address"
       }
     ],
-    "name": "LockupContractFactoryAddressSet",
+    "name": "MSICStakingAddressSet",
     "type": "event"
   },
   {

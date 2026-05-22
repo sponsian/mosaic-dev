@@ -256,6 +256,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newMEURTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MEURTokenAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "_depositor",
@@ -288,19 +301,6 @@
       }
     ],
     "name": "MSICPaidToFrontEnd",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_newMEURTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MEURTokenAddressChanged",
     "type": "event"
   },
   {
@@ -485,6 +485,19 @@
   },
   {
     "inputs": [],
+    "name": "COLL_DECIMALS_OFFSET",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DECIMAL_PRECISION",
     "outputs": [
       {
@@ -498,7 +511,7 @@
   },
   {
     "inputs": [],
-    "name": "MEUR_GAS_COMPENSATION",
+    "name": "MCR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -511,7 +524,7 @@
   },
   {
     "inputs": [],
-    "name": "MCR",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1046,19 +1059,6 @@
   },
   {
     "inputs": [],
-    "name": "lastMSICError",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "lastMEURLossError_Offset",
     "outputs": [
       {
@@ -1072,7 +1072,20 @@
   },
   {
     "inputs": [],
-    "name": "msicToken",
+    "name": "lastMSICError",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "meurToken",
     "outputs": [
       {
         "internalType": "contract IMEURToken",
@@ -1177,7 +1190,7 @@
       },
       {
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       },
       {

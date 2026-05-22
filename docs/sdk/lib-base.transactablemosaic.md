@@ -24,20 +24,20 @@ Implemented by [EthersMosaic](./lib-ethers.ethersmosaic.md)<!-- -->.
 |  --- | --- |
 |  [adjustTrove(params, maxBorrowingRate)](./lib-base.transactablemosaic.adjusttrove.md) | Adjust existing Trove by changing its collateral, debt, or both. |
 |  [approveUniTokens(allowance)](./lib-base.transactablemosaic.approveunitokens.md) | Allow the liquidity mining contract to use Uniswap REEF/MEUR LP tokens for [staking](./lib-base.transactablemosaic.stakeunitokens.md)<!-- -->. |
-|  [borrowMEUR(amount, maxBorrowingRate)](./lib-base.transactablemosaic.borrowmsic.md) | Adjust existing Trove by borrowing more MEUR. |
+|  [borrowMEUR(amount, maxBorrowingRate)](./lib-base.transactablemosaic.borrowmeur.md) | Adjust existing Trove by borrowing more MEUR. |
 |  [claimCollateralSurplus()](./lib-base.transactablemosaic.claimcollateralsurplus.md) | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove()](./lib-base.transactablemosaic.closetrove.md) | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [depositCollateral(amount)](./lib-base.transactablemosaic.depositcollateral.md) | Adjust existing Trove by depositing more collateral. |
-|  [depositMEURInStabilityPool(amount, frontendTag)](./lib-base.transactablemosaic.depositmsicinstabilitypool.md) | Make a new Stability Deposit, or top up existing one. |
+|  [depositMEURInStabilityPool(amount, frontendTag)](./lib-base.transactablemosaic.depositmeurinstabilitypool.md) | Make a new Stability Deposit, or top up existing one. |
 |  [exitLiquidityMining()](./lib-base.transactablemosaic.exitliquiditymining.md) | Withdraw all staked LP tokens from liquidity mining and claim reward. |
 |  [liquidate(address)](./lib-base.transactablemosaic.liquidate.md) | Liquidate one or more undercollateralized Troves. |
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate)](./lib-base.transactablemosaic.liquidateupto.md) | Liquidate the least collateralized Troves up to a maximum number. |
 |  [openTrove(params, maxBorrowingRate)](./lib-base.transactablemosaic.opentrove.md) | Open a new Trove by depositing collateral and borrowing MEUR. |
-|  [redeemMEUR(amount, maxRedemptionRate)](./lib-base.transactablemosaic.redeemmsic.md) | Redeem MEUR to native currency (e.g. Ether) at face value. |
+|  [redeemMEUR(amount, maxRedemptionRate)](./lib-base.transactablemosaic.redeemmeur.md) | Redeem MEUR to native currency (e.g. Ether) at face value. |
 |  [registerFrontend(kickbackRate)](./lib-base.transactablemosaic.registerfrontend.md) | Register current wallet address as a Mosaic frontend. |
-|  [repayMEUR(amount)](./lib-base.transactablemosaic.repaymsic.md) | Adjust existing Trove by repaying some of its debt. |
+|  [repayMEUR(amount)](./lib-base.transactablemosaic.repaymeur.md) | Adjust existing Trove by repaying some of its debt. |
+|  [sendMEUR(toAddress, amount)](./lib-base.transactablemosaic.sendmeur.md) | Send MEUR tokens to an address. |
 |  [sendMSIC(toAddress, amount)](./lib-base.transactablemosaic.sendmsic.md) | Send MSIC tokens to an address. |
-|  [sendMEUR(toAddress, amount)](./lib-base.transactablemosaic.sendmsic.md) | Send MEUR tokens to an address. |
 |  [stakeMSIC(amount)](./lib-base.transactablemosaic.stakemsic.md) | Stake MSIC to start earning fee revenue or increase existing stake. |
 |  [stakeUniTokens(amount)](./lib-base.transactablemosaic.stakeunitokens.md) | Stake Uniswap REEF/MEUR LP tokens to participate in liquidity mining and earn MSIC. |
 |  [transferCollateralGainToTrove()](./lib-base.transactablemosaic.transfercollateralgaintotrove.md) | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
@@ -46,6 +46,6 @@ Implemented by [EthersMosaic](./lib-ethers.ethersmosaic.md)<!-- -->.
 |  [withdrawCollateral(amount)](./lib-base.transactablemosaic.withdrawcollateral.md) | Adjust existing Trove by withdrawing some of its collateral. |
 |  [withdrawGainsFromStabilityPool()](./lib-base.transactablemosaic.withdrawgainsfromstabilitypool.md) | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [MSIC reward](./lib-base.stabilitydeposit.msicreward.md) from Stability Deposit. |
 |  [withdrawGainsFromStaking()](./lib-base.transactablemosaic.withdrawgainsfromstaking.md) | Withdraw [collateral gain](./lib-base.msicstake.collateralgain.md) and [MEUR gain](./lib-base.msicstake.msicgain.md) from MSIC stake. |
+|  [withdrawMEURFromStabilityPool(amount)](./lib-base.transactablemosaic.withdrawmeurfromstabilitypool.md) | Withdraw MEUR from Stability Deposit. |
 |  [withdrawMSICRewardFromLiquidityMining()](./lib-base.transactablemosaic.withdrawmsicrewardfromliquiditymining.md) | Withdraw MSIC that has been earned by mining liquidity. |
-|  [withdrawMEURFromStabilityPool(amount)](./lib-base.transactablemosaic.withdrawmsicfromstabilitypool.md) | Withdraw MEUR from Stability Deposit. |
 

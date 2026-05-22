@@ -13,19 +13,19 @@ import { useBondView } from "./Bonds/context/BondViewContext";
 import { useBondAddresses } from "./Bonds/context/BondAddressesContext";
 import { ConnectKitButton } from "connectkit";
 
-const select = ({ accountBalance, msicBalance, msicBalance }: MosaicStoreState) => ({
+const select = ({ accountBalance, meurBalance, msicBalance }: MosaicStoreState) => ({
   accountBalance,
-  msicBalance,
+  meurBalance,
   msicBalance
 });
 
 export const UserAccount: React.FC = () => {
   const { account } = useMosaic();
-  const { accountBalance, msicBalance: realMousdBalance, msicBalance } = useMosaicSelector(select);
-  const { bMousdBalance, msicBalance: customMousdBalance } = useBondView();
+  const { accountBalance, meurBalance: realMeurBalance, msicBalance } = useMosaicSelector(select);
+  const { bMeurBalance, meurBalance: customMeurBalance } = useBondView();
   const { MEUR_OVERRIDE_ADDRESS } = useBondAddresses();
 
-  const msicBalance = MEUR_OVERRIDE_ADDRESS === null ? realMousdBalance : customMousdBalance;
+  const meurBalance = MEUR_OVERRIDE_ADDRESS === null ? realMeurBalance : customMeurBalance;
 
   return (
     <Flex>
@@ -54,9 +54,9 @@ export const UserAccount: React.FC = () => {
 
         {([
           ["REEF", accountBalance],
-          [COIN, Decimal.from(msicBalance || 0)],
+          [COIN, Decimal.from(meurBalance || 0)],
           [GT, Decimal.from(msicBalance)],
-          ["bMEUR", Decimal.from(bMousdBalance || 0)]
+          ["bMEUR", Decimal.from(bMeurBalance || 0)]
         ] as const).map(([currency, balance], i) => (
           <Flex key={i} sx={{ ml: 3, flexDirection: "column" }}>
             <Heading sx={{ fontSize: 1 }}>{currency}</Heading>

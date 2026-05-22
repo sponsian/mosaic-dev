@@ -1,6 +1,22 @@
 import React from "react";
 import { createClient, WagmiConfig } from "wagmi";
 import { mainnet, goerli, localhost } from "wagmi/chains";
+import type { Chain } from "wagmi";
+
+const reefPelagia: Chain = {
+  id: 13939,
+  name: "Reef Pelagia",
+  network: "reef-pelagia",
+  nativeCurrency: { name: "REEF", symbol: "REEF", decimals: 18 }, // wagmi requires 18; on-chain REEF is 12 — UI formatting must compensate
+  rpcUrls: {
+    default: { http: ["https://eth.reef-node-reefdevcluster-808c46-72-60-35-83.nip.io/"] },
+    public:  { http: ["https://eth.reef-node-reefdevcluster-808c46-72-60-35-83.nip.io/"] }
+  },
+  blockExplorers: {
+    default: { name: "Blockscout", url: "https://explorer-frontend-ozqgaf-62f0c7-72-60-35-83.nip.io/" }
+  },
+  testnet: true
+};
 import { ConnectKitProvider, getDefaultClient } from "connectkit";
 import { Flex, Heading, ThemeProvider, Paragraph, Link } from "theme-ui";
 
@@ -92,6 +108,7 @@ const App = () => {
               chains:
                 isDemoMode || import.meta.env.MODE === "test"
                   ? [localhost]
+                  : [reefPelagia]
                   : config.value.testnetOnly
                   ? [goerli]
                   : [mainnet, goerli],

@@ -55,19 +55,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_msicStakingAddress",
-        "type": "address"
-      }
-    ],
-    "name": "MSICStakingAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "_borrower",
@@ -89,11 +76,24 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       }
     ],
     "name": "MEURTokenAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_msicStakingAddress",
+        "type": "address"
+      }
+    ],
+    "name": "MSICStakingAddressChanged",
     "type": "event"
   },
   {
@@ -224,6 +224,43 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_debt",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_coll",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stake",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "operation",
+        "type": "uint8"
+      }
+    ],
+    "name": "TroveUpdated",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "BORROWING_FEE_FLOOR",
     "outputs": [
@@ -251,6 +288,19 @@
   },
   {
     "inputs": [],
+    "name": "COLL_DECIMALS_OFFSET",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "DECIMAL_PRECISION",
     "outputs": [
       {
@@ -264,7 +314,7 @@
   },
   {
     "inputs": [],
-    "name": "MEUR_GAS_COMPENSATION",
+    "name": "MCR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -277,7 +327,7 @@
   },
   {
     "inputs": [],
-    "name": "MCR",
+    "name": "MEUR_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -496,33 +546,7 @@
   },
   {
     "inputs": [],
-    "name": "msicStaking",
-    "outputs": [
-      {
-        "internalType": "contract IMSICStaking",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "msicStakingAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "msicToken",
+    "name": "meurToken",
     "outputs": [
       {
         "internalType": "contract IMEURToken",
@@ -554,6 +578,32 @@
     "name": "moveETHGainToTrove",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "msicStaking",
+    "outputs": [
+      {
+        "internalType": "contract IMSICStaking",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "msicStakingAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -677,7 +727,7 @@
       },
       {
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       },
       {

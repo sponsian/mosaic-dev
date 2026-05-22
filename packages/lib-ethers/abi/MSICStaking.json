@@ -76,11 +76,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       }
     ],
-    "name": "MSICTokenAddressSet",
+    "name": "MEURTokenAddressSet",
     "type": "event"
   },
   {
@@ -93,7 +93,7 @@
         "type": "address"
       }
     ],
-    "name": "MEURTokenAddressSet",
+    "name": "MSICTokenAddressSet",
     "type": "event"
   },
   {
@@ -209,6 +209,19 @@
     ],
     "name": "TroveManagerAddressSet",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "COLL_DECIMALS_OFFSET",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -367,10 +380,10 @@
   },
   {
     "inputs": [],
-    "name": "msicToken",
+    "name": "meurToken",
     "outputs": [
       {
-        "internalType": "contract IMSICToken",
+        "internalType": "contract IMEURToken",
         "name": "",
         "type": "address"
       }
@@ -383,7 +396,7 @@
     "name": "msicToken",
     "outputs": [
       {
-        "internalType": "contract IMEURToken",
+        "internalType": "contract IMSICToken",
         "name": "",
         "type": "address"
       }
@@ -413,7 +426,7 @@
       },
       {
         "internalType": "address",
-        "name": "_msicTokenAddress",
+        "name": "_meurTokenAddress",
         "type": "address"
       },
       {

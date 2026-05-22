@@ -3,6 +3,7 @@ import { Signer } from "@ethersproject/abstract-signer";
 
 import { Decimal } from "@mosaic/lib-base";
 
+import reefTestnet from "../deployments/default/reefTestnet.json";
 import devOrNull from "../deployments/dev.json";
 import goerli from "../deployments/goerli.json";
 import kovan from "../deployments/kovan.json";
@@ -28,6 +29,7 @@ const dev = devOrNull as _MosaicDeploymentJSON | null;
 const deployments: {
   [chainId: number]: _MosaicDeploymentJSON | undefined;
 } = {
+  [reefTestnet.chainId]: reefTestnet,
   [mainnet.chainId]: mainnet,
   [ropsten.chainId]: ropsten,
   [rinkeby.chainId]: rinkeby,

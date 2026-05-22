@@ -2,7 +2,7 @@ import { Card, Flex, Button, Image, ThemeUIStyleObject } from "theme-ui";
 import { EventType, HorizontalTimeline } from "../../../HorizontalTimeline";
 import { Record } from "../../Record";
 import { Actions } from "./actions/Actions";
-import { BMousdAmmTokenIndex, Bond as BondType, SwapPressedPayload } from "../../context/transitions";
+import { BMeurAmmTokenIndex, Bond as BondType, SwapPressedPayload } from "../../context/transitions";
 import { Label, SubLabel } from "../../../HorizontalTimeline";
 import * as l from "../../lexicon";
 import { statuses, useBondView } from "../../context/BondViewContext";
@@ -87,8 +87,8 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
   const { dispatchEvent } = useBondView();
   const { BOND_NFT_ADDRESS } = useBondAddresses();
 
-  const handleSellBMousdPressed = () => {
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMEUR } as SwapPressedPayload);
+  const handleSellBMeurPressed = () => {
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMeurAmmTokenIndex.BMEUR } as SwapPressedPayload);
   };
 
   return (
@@ -150,7 +150,7 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
             </Flex>
             {bond.status === "PENDING" && <Actions bondId={bond.id} />}
             {bond.status !== "PENDING" && bond.status === "CLAIMED" && (
-              <Button variant="outline" sx={{ height: "44px" }} onClick={handleSellBMousdPressed}>
+              <Button variant="outline" sx={{ height: "44px" }} onClick={handleSellBMeurPressed}>
                 Sell bMEUR
               </Button>
             )}

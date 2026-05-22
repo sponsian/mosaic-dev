@@ -4,7 +4,7 @@
 
 ## StabilityDepositChangeDetails interface
 
-Details of a [depositMEURInStabilityPool()](./lib-base.transactablemosaic.depositmsicinstabilitypool.md) or [withdrawMEURFromStabilityPool()](./lib-base.transactablemosaic.withdrawmsicfromstabilitypool.md) transaction.
+Details of a [depositMEURInStabilityPool()](./lib-base.transactablemosaic.depositmeurinstabilitypool.md) or [withdrawMEURFromStabilityPool()](./lib-base.transactablemosaic.withdrawmeurfromstabilitypool.md) transaction.
 
 <b>Signature:</b>
 

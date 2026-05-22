@@ -5,7 +5,7 @@ import { BondList } from "./BondList";
 import { useBondView } from "../../context/BondViewContext";
 import { BONDS } from "../../lexicon";
 import { InfoIcon } from "../../../InfoIcon";
-import { BMousdAmmTokenIndex, SwapPressedPayload } from "../../context/transitions";
+import { BMeurAmmTokenIndex, SwapPressedPayload } from "../../context/transitions";
 import { useMosaic } from "../../../../hooks/MosaicContext";
 import { useBondAddresses } from "../../context/BondAddressesContext";
 
@@ -13,7 +13,7 @@ export const Idle: React.FC = () => {
   const { mosaic } = useMosaic();
   const { MEUR_OVERRIDE_ADDRESS } = useBondAddresses();
 
-  const { dispatchEvent, bonds, getMousdFromFaucet, msicBalance, hasLoaded } = useBondView();
+  const { dispatchEvent, bonds, getMeurFromFaucet, meurBalance, hasLoaded } = useBondView();
   const [chain, setChain] = useState<number>();
 
   useEffect(() => {
@@ -28,15 +28,15 @@ export const Idle: React.FC = () => {
 
   const hasBonds = bonds !== undefined && bonds.length > 0;
 
-  const showMousdFaucet = MEUR_OVERRIDE_ADDRESS !== null && msicBalance?.eq(0);
+  const showMeurFaucet = MEUR_OVERRIDE_ADDRESS !== null && meurBalance?.eq(0);
 
   const handleManageLiquidityPressed = () => dispatchEvent("MANAGE_LIQUIDITY_PRESSED");
 
-  const handleBuyBMousdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.MEUR } as SwapPressedPayload);
+  const handleBuyBMeurPressed = () =>
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMeurAmmTokenIndex.MEUR } as SwapPressedPayload);
 
-  const handleSellBMousdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BMousdAmmTokenIndex.BMEUR } as SwapPressedPayload);
+  const handleSellBMeurPressed = () =>
+    dispatchEvent("SWAP_PRESSED", { inputToken: BMeurAmmTokenIndex.BMEUR } as SwapPressedPayload);
 
   return (
     <>
@@ -45,16 +45,16 @@ export const Idle: React.FC = () => {
           Manage liquidity
         </Button>
 
-        <Button variant="outline" onClick={handleBuyBMousdPressed}>
+        <Button variant="outline" onClick={handleBuyBMeurPressed}>
           Buy bMEUR
         </Button>
 
-        <Button variant="outline" onClick={handleSellBMousdPressed}>
+        <Button variant="outline" onClick={handleSellBMeurPressed}>
           Sell bMEUR
         </Button>
 
-        {showMousdFaucet && (
-          <Button variant={hasBonds ? "outline" : "primary"} onClick={() => getMousdFromFaucet()}>
+        {showMeurFaucet && (
+          <Button variant={hasBonds ? "outline" : "primary"} onClick={() => getMeurFromFaucet()}>
             Get 10k MEUR
           </Button>
         )}

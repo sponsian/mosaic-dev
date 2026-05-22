@@ -8,9 +8,9 @@ import type {
   BondTransactionStatuses,
   ProtocolInfo,
   OptimisticBond,
-  BMousdAmmTokenIndex,
+  BMeurAmmTokenIndex,
   Addresses,
-  BMousdLpRewards
+  BMeurLpRewards
 } from "./transitions";
 import { PENDING_STATUS, CANCELLED_STATUS, CLAIMED_STATUS } from "../lexicon";
 import { Decimal } from "@mosaic/lib-base";
@@ -24,39 +24,39 @@ export type BondViewContextType = {
   bonds?: Bond[];
   selectedBond?: Bond;
   optimisticBond?: OptimisticBond;
-  bMousdBalance?: Decimal;
-  msicBalance?: Decimal;
+  bMeurBalance?: Decimal;
+  meurBalance?: Decimal;
   lpTokenBalance?: Decimal;
   stakedLpTokenBalance?: Decimal;
   lpTokenSupply?: Decimal;
-  bMousdAmmBMousdBalance?: Decimal;
-  bMousdAmmMousdBalance?: Decimal;
+  bMeurAmmBMeurBalance?: Decimal;
+  bMeurAmmMeurBalance?: Decimal;
   statuses: BondTransactionStatuses;
   isInfiniteBondApproved: boolean;
   isSynchronizing: boolean;
-  getMousdFromFaucet: () => Promise<void>;
+  getMeurFromFaucet: () => Promise<void>;
   simulatedProtocolInfo?: ProtocolInfo;
   setSimulatedMarketPrice: (marketPrice: Decimal) => void;
   resetSimulatedMarketPrice: () => void;
   hasFoundContracts: boolean;
-  isBMousdApprovedWithBmsicAmm: boolean;
-  isMousdApprovedWithBmsicAmm: boolean;
-  isMousdApprovedWithAmmZapper: boolean;
-  isBMousdApprovedWithAmmZapper: boolean;
-  isBMousdLpApprovedWithAmmZapper: boolean;
-  isBMousdLpApprovedWithGauge: boolean;
-  inputToken: BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR;
-  isInputTokenApprovedWithBMousdAmm: boolean;
-  getExpectedSwapOutput: (inputToken: BMousdAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
-  getExpectedLpTokens: (bMousdAmount: Decimal, msicAmount: Decimal) => Promise<Decimal>;
+  isBMeurApprovedWithBmsicAmm: boolean;
+  isMeurApprovedWithBmsicAmm: boolean;
+  isMeurApprovedWithAmmZapper: boolean;
+  isBMeurApprovedWithAmmZapper: boolean;
+  isBMeurLpApprovedWithAmmZapper: boolean;
+  isBMeurLpApprovedWithGauge: boolean;
+  inputToken: BMeurAmmTokenIndex.BMEUR | BMeurAmmTokenIndex.MEUR;
+  isInputTokenApprovedWithBMeurAmm: boolean;
+  getExpectedSwapOutput: (inputToken: BMeurAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
+  getExpectedLpTokens: (bMeurAmount: Decimal, msicAmount: Decimal) => Promise<Decimal>;
   getExpectedWithdrawal: (
     burnLp: Decimal,
-    output: BMousdAmmTokenIndex | "both"
-  ) => Promise<Map<BMousdAmmTokenIndex, Decimal>>;
+    output: BMeurAmmTokenIndex | "both"
+  ) => Promise<Map<BMeurAmmTokenIndex, Decimal>>;
   isBootstrapPeriodActive?: boolean;
   hasLoaded: boolean;
   addresses: Addresses;
-  lpRewards: BMousdLpRewards | undefined;
+  lpRewards: BMeurLpRewards | undefined;
 };
 
 export const BondViewContext = createContext<BondViewContextType | null>(null);

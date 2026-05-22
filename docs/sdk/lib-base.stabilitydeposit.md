@@ -21,9 +21,9 @@ The constructor for this class is marked as internal. Third-party code should no
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
 |  [collateralGain](./lib-base.stabilitydeposit.collateralgain.md) |  | [Decimal](./lib-base.decimal.md) | Amount of native currency (e.g. Ether) received in exchange for the used-up MEUR. |
-|  [currentMEUR](./lib-base.stabilitydeposit.currentmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR left in the Stability Deposit. |
+|  [currentMEUR](./lib-base.stabilitydeposit.currentmeur.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR left in the Stability Deposit. |
 |  [frontendTag](./lib-base.stabilitydeposit.frontendtag.md) |  | string | Address of frontend through which this Stability Deposit was made. |
-|  [initialMEUR](./lib-base.stabilitydeposit.initialmsic.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR in the Stability Deposit at the time of the last direct modification. |
+|  [initialMEUR](./lib-base.stabilitydeposit.initialmeur.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MEUR in the Stability Deposit at the time of the last direct modification. |
 |  [isEmpty](./lib-base.stabilitydeposit.isempty.md) |  | boolean |  |
 |  [msicReward](./lib-base.stabilitydeposit.msicreward.md) |  | [Decimal](./lib-base.decimal.md) | Amount of MSIC rewarded since the last modification of the Stability Deposit. |
 

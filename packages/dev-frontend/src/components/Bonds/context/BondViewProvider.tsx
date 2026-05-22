@@ -13,9 +13,9 @@ import type {
   SwapPayload,
   ApprovePressedPayload,
   ManageLiquidityPayload,
-  BMousdLpRewards
+  BMeurLpRewards
 } from "./transitions";
-import { BMousdAmmTokenIndex } from "./transitions";
+import { BMeurAmmTokenIndex } from "./transitions";
 import { transitions } from "./transitions";
 import { Decimal } from "@mosaic/lib-base";
 import { useMosaic } from "../../../hooks/MosaicContext";
@@ -52,16 +52,16 @@ export const BondViewProvider: React.FC = props => {
   const [protocolInfo, setProtocolInfo] = useState<ProtocolInfo>();
   const [simulatedProtocolInfo, setSimulatedProtocolInfo] = useState<ProtocolInfo>();
   const [isInfiniteBondApproved, setIsInfiniteBondApproved] = useState(false);
-  const [lpRewards, setLpRewards] = useState<BMousdLpRewards>();
-  const [isMousdApprovedWithBmsicAmm, setIsMousdApprovedWithBmsicAmm] = useState(false);
-  const [isBMousdApprovedWithBmsicAmm, setIsBMousdApprovedWithBmsicAmm] = useState(false);
-  const [isMousdApprovedWithAmmZapper, setIsMousdApprovedWithAmmZapper] = useState(false);
-  const [isBMousdApprovedWithAmmZapper, setIsBMousdApprovedWithAmmZapper] = useState(false);
-  const [isBMousdLpApprovedWithAmmZapper, setIsBMousdLpApprovedWithAmmZapper] = useState(false);
-  const [isBMousdLpApprovedWithGauge, setIsBMousdLpApprovedWithGauge] = useState(false);
+  const [lpRewards, setLpRewards] = useState<BMeurLpRewards>();
+  const [isMeurApprovedWithBmsicAmm, setIsMeurApprovedWithBmsicAmm] = useState(false);
+  const [isBMeurApprovedWithBmsicAmm, setIsBMeurApprovedWithBmsicAmm] = useState(false);
+  const [isMeurApprovedWithAmmZapper, setIsMeurApprovedWithAmmZapper] = useState(false);
+  const [isBMeurApprovedWithAmmZapper, setIsBMeurApprovedWithAmmZapper] = useState(false);
+  const [isBMeurLpApprovedWithAmmZapper, setIsBMeurLpApprovedWithAmmZapper] = useState(false);
+  const [isBMeurLpApprovedWithGauge, setIsBMeurLpApprovedWithGauge] = useState(false);
   const [isSynchronizing, setIsSynchronizing] = useState(false);
-  const [inputToken, setInputToken] = useState<BMousdAmmTokenIndex.BMEUR | BMousdAmmTokenIndex.MEUR>(
-    BMousdAmmTokenIndex.BMEUR
+  const [inputToken, setInputToken] = useState<BMeurAmmTokenIndex.BMEUR | BMeurAmmTokenIndex.MEUR>(
+    BMeurAmmTokenIndex.BMEUR
   );
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({
     APPROVE: "IDLE",
@@ -73,14 +73,14 @@ export const BondViewProvider: React.FC = props => {
     SWAP: "IDLE",
     MANAGE_LIQUIDITY: "IDLE"
   });
-  const [bMousdBalance, setBMousdBalance] = useState<Decimal>();
-  const [msicBalance, setMousdBalance] = useState<Decimal>();
+  const [bMeurBalance, setBMeurBalance] = useState<Decimal>();
+  const [meurBalance, setMeurBalance] = useState<Decimal>();
   const [lpTokenBalance, setLpTokenBalance] = useState<Decimal>();
   const [stakedLpTokenBalance, setStakedLpTokenBalance] = useState<Decimal>();
 
   const [lpTokenSupply, setLpTokenSupply] = useState<Decimal>();
-  const [bMousdAmmBMousdBalance, setBMousdAmmBMousdBalance] = useState<Decimal>();
-  const [bMousdAmmMousdBalance, setBMousdAmmMousdBalance] = useState<Decimal>();
+  const [bMeurAmmBMeurBalance, setBMeurAmmBMeurBalance] = useState<Decimal>();
+  const [bMeurAmmMeurBalance, setBMeurAmmMeurBalance] = useState<Decimal>();
   const [isBootstrapPeriodActive, setIsBootstrapPeriodActive] = useState<boolean>();
   const { account, mosaic } = useMosaic();
   const {
@@ -142,27 +142,27 @@ export const BondViewProvider: React.FC = props => {
     [bonds]
   );
 
-  const getMousdFromFaucet = useCallback(async () => {
-    if (contracts.msicToken === undefined || mosaic.connection.signer === undefined) return;
+  const getMeurFromFaucet = useCallback(async () => {
+    if (contracts.meurToken === undefined || mosaic.connection.signer === undefined) return;
 
     if (
       MEUR_OVERRIDE_ADDRESS !== null &&
-      (await contracts.msicToken.balanceOf(account)).eq(0) &&
-      "tap" in contracts.msicToken
+      (await contracts.meurToken.balanceOf(account)).eq(0) &&
+      "tap" in contracts.meurToken
     ) {
       await (
-        await ((contracts.msicToken as unknown) as ERC20Faucet)
+        await ((contracts.meurToken as unknown) as ERC20Faucet)
           .connect(mosaic.connection.signer)
           .tap()
       ).wait();
       setShouldSynchronize(true);
     }
-  }, [contracts.msicToken, account, MEUR_OVERRIDE_ADDRESS, mosaic.connection.signer]);
+  }, [contracts.meurToken, account, MEUR_OVERRIDE_ADDRESS, mosaic.connection.signer]);
 
   useEffect(() => {
     (async () => {
       if (
-        contracts.msicToken === undefined ||
+        contracts.meurToken === undefined ||
         contracts.chickenBondManager === undefined ||
         account === undefined ||
         isInfiniteBondApproved
@@ -170,101 +170,101 @@ export const BondViewProvider: React.FC = props => {
         return;
       const isApproved = await api.isInfiniteBondApproved(
         account,
-        contracts.msicToken,
+        contracts.meurToken,
         contracts.chickenBondManager
       );
       setIsInfiniteBondApproved(isApproved);
     })();
-  }, [contracts.msicToken, contracts.chickenBondManager, account, isInfiniteBondApproved]);
+  }, [contracts.meurToken, contracts.chickenBondManager, account, isInfiniteBondApproved]);
 
   useEffect(() => {
     (async () => {
       if (
         BMEUR_AMM_ADDRESS === null ||
-        contracts.msicToken === undefined ||
-        isMousdApprovedWithBmsicAmm
+        contracts.meurToken === undefined ||
+        isMeurApprovedWithBmsicAmm
       ) {
         return;
       }
       const isApproved = await (isMainnet
-        ? api.isTokenApprovedWithBMousdAmmMainnet(account, contracts.msicToken)
-        : api.isTokenApprovedWithBMousdAmm(account, contracts.msicToken, BMEUR_AMM_ADDRESS));
+        ? api.isTokenApprovedWithBMeurAmmMainnet(account, contracts.meurToken)
+        : api.isTokenApprovedWithBMeurAmm(account, contracts.meurToken, BMEUR_AMM_ADDRESS));
 
-      setIsMousdApprovedWithBmsicAmm(isApproved);
+      setIsMeurApprovedWithBmsicAmm(isApproved);
     })();
-  }, [contracts.msicToken, account, isMousdApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
+  }, [contracts.meurToken, account, isMeurApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
         BMEUR_AMM_ADDRESS === null ||
-        contracts.bMousdToken === undefined ||
-        isBMousdApprovedWithBmsicAmm
+        contracts.bMeurToken === undefined ||
+        isBMeurApprovedWithBmsicAmm
       ) {
         return;
       }
 
       const isApproved = await (isMainnet
-        ? api.isTokenApprovedWithBMousdAmmMainnet(account, contracts.bMousdToken)
-        : api.isTokenApprovedWithBMousdAmm(account, contracts.bMousdToken, BMEUR_AMM_ADDRESS));
+        ? api.isTokenApprovedWithBMeurAmmMainnet(account, contracts.bMeurToken)
+        : api.isTokenApprovedWithBMeurAmm(account, contracts.bMeurToken, BMEUR_AMM_ADDRESS));
 
-      setIsBMousdApprovedWithBmsicAmm(isApproved);
+      setIsBMeurApprovedWithBmsicAmm(isApproved);
     })();
-  }, [contracts.bMousdToken, account, isBMousdApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
+  }, [contracts.bMeurToken, account, isBMeurApprovedWithBmsicAmm, isMainnet, BMEUR_AMM_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
         BMEUR_LP_ZAP_ADDRESS === null ||
-        contracts.msicToken === undefined ||
-        isMousdApprovedWithAmmZapper
+        contracts.meurToken === undefined ||
+        isMeurApprovedWithAmmZapper
       ) {
         return;
       }
 
-      const isMousdApproved = await api.isTokenApprovedWithAmmZapper(
+      const isMeurApproved = await api.isTokenApprovedWithAmmZapper(
         account,
-        contracts.msicToken,
+        contracts.meurToken,
         BMEUR_LP_ZAP_ADDRESS
       );
 
-      setIsMousdApprovedWithAmmZapper(isMousdApproved);
+      setIsMeurApprovedWithAmmZapper(isMeurApproved);
     })();
-  }, [contracts.msicToken, account, isMousdApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
+  }, [contracts.meurToken, account, isMeurApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     (async () => {
-      if (contracts.bMousdAmm === undefined || isBMousdLpApprovedWithAmmZapper) return;
-      const lpToken = await api.getLpToken(contracts.bMousdAmm);
+      if (contracts.bMeurAmm === undefined || isBMeurLpApprovedWithAmmZapper) return;
+      const lpToken = await api.getLpToken(contracts.bMeurAmm);
       const isLpApproved = await api.isTokenApprovedWithAmmZapper(
         account,
         lpToken,
         BMEUR_LP_ZAP_ADDRESS
       );
 
-      setIsBMousdLpApprovedWithAmmZapper(isLpApproved);
+      setIsBMeurLpApprovedWithAmmZapper(isLpApproved);
     })();
-  }, [contracts.bMousdAmm, account, isBMousdLpApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
+  }, [contracts.bMeurAmm, account, isBMeurLpApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     (async () => {
       if (
         BMEUR_LP_ZAP_ADDRESS === null ||
-        contracts.bMousdToken === undefined ||
-        isBMousdApprovedWithAmmZapper
+        contracts.bMeurToken === undefined ||
+        isBMeurApprovedWithAmmZapper
       ) {
         return;
       }
 
-      const isBMousdApproved = await api.isTokenApprovedWithAmmZapper(
+      const isBMeurApproved = await api.isTokenApprovedWithAmmZapper(
         account,
-        contracts.bMousdToken,
+        contracts.bMeurToken,
         BMEUR_LP_ZAP_ADDRESS
       );
 
-      setIsMousdApprovedWithAmmZapper(isBMousdApproved);
+      setIsMeurApprovedWithAmmZapper(isBMeurApproved);
     })();
-  }, [contracts.bMousdToken, account, isBMousdApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
+  }, [contracts.bMeurToken, account, isBMeurApprovedWithAmmZapper, BMEUR_LP_ZAP_ADDRESS]);
 
   useEffect(() => {
     if (isSynchronizing) return;
@@ -279,12 +279,12 @@ export const BondViewProvider: React.FC = props => {
     (async () => {
       try {
         if (
-          contracts.msicToken === undefined ||
+          contracts.meurToken === undefined ||
           contracts.bondNft === undefined ||
           contracts.chickenBondManager === undefined ||
-          contracts.bMousdToken === undefined ||
-          contracts.bMousdAmm === undefined ||
-          contracts.bMousdGauge === undefined ||
+          contracts.bMeurToken === undefined ||
+          contracts.bMeurAmm === undefined ||
+          contracts.bMeurGauge === undefined ||
           !shouldSynchronize ||
           isSynchronizing
         ) {
@@ -302,13 +302,13 @@ export const BondViewProvider: React.FC = props => {
           protocolInfo,
           bonds,
           stats,
-          bMousdBalance,
-          msicBalance,
+          bMeurBalance,
+          meurBalance,
           lpTokenBalance,
           stakedLpTokenBalance,
           lpTokenSupply,
-          bMousdAmmBMousdBalance,
-          bMousdAmmMousdBalance,
+          bMeurAmmBMeurBalance,
+          bMeurAmmMeurBalance,
           lpRewards
         } = latest;
 
@@ -331,13 +331,13 @@ export const BondViewProvider: React.FC = props => {
 
         setShouldSynchronize(false);
         setLpRewards(lpRewards);
-        setBMousdBalance(bMousdBalance);
-        setMousdBalance(msicBalance);
+        setBMeurBalance(bMeurBalance);
+        setMeurBalance(meurBalance);
         setLpTokenBalance(lpTokenBalance);
         setStakedLpTokenBalance(stakedLpTokenBalance);
         setLpTokenSupply(lpTokenSupply);
-        setBMousdAmmBMousdBalance(bMousdAmmBMousdBalance);
-        setBMousdAmmMousdBalance(bMousdAmmMousdBalance);
+        setBMeurAmmBMeurBalance(bMeurAmmBMeurBalance);
+        setBMeurAmmMeurBalance(bMeurAmmMeurBalance);
         setStats(stats);
         setBonds(bonds);
         setOptimisticBond(undefined);
@@ -351,42 +351,42 @@ export const BondViewProvider: React.FC = props => {
 
   const [approveInfiniteBond, approveStatus] = useTransaction(async () => {
     await api.approveInfiniteBond(
-      contracts.msicToken,
+      contracts.meurToken,
       contracts.chickenBondManager,
       mosaic.connection.signer
     );
     setIsInfiniteBondApproved(true);
-  }, [contracts.msicToken, contracts.chickenBondManager, mosaic.connection.signer]);
+  }, [contracts.meurToken, contracts.chickenBondManager, mosaic.connection.signer]);
 
   const [approveAmm, approveAmmStatus] = useTransaction(
-    async (tokensNeedingApproval: BMousdAmmTokenIndex[]) => {
+    async (tokensNeedingApproval: BMeurAmmTokenIndex[]) => {
       for (const token of tokensNeedingApproval) {
-        if (token === BMousdAmmTokenIndex.BMEUR) {
+        if (token === BMeurAmmTokenIndex.BMEUR) {
           await (isMainnet
-            ? api.approveTokenWithBMousdAmmMainnet(contracts.bMousdToken, mosaic.connection.signer)
-            : api.approveTokenWithBMousdAmm(
-                contracts.bMousdToken,
+            ? api.approveTokenWithBMeurAmmMainnet(contracts.bMeurToken, mosaic.connection.signer)
+            : api.approveTokenWithBMeurAmm(
+                contracts.bMeurToken,
                 BMEUR_AMM_ADDRESS,
                 mosaic.connection.signer
               ));
 
-          setIsBMousdApprovedWithBmsicAmm(true);
+          setIsBMeurApprovedWithBmsicAmm(true);
         } else {
           await (isMainnet
-            ? api.approveTokenWithBMousdAmmMainnet(contracts.msicToken, mosaic.connection.signer)
-            : api.approveTokenWithBMousdAmm(
-                contracts.msicToken,
+            ? api.approveTokenWithBMeurAmmMainnet(contracts.meurToken, mosaic.connection.signer)
+            : api.approveTokenWithBMeurAmm(
+                contracts.meurToken,
                 BMEUR_AMM_ADDRESS,
                 mosaic.connection.signer
               ));
 
-          setIsMousdApprovedWithBmsicAmm(true);
+          setIsMeurApprovedWithBmsicAmm(true);
         }
       }
     },
     [
-      contracts.bMousdToken,
-      contracts.msicToken,
+      contracts.bMeurToken,
+      contracts.meurToken,
       isMainnet,
       BMEUR_AMM_ADDRESS,
       mosaic.connection.signer
@@ -395,41 +395,41 @@ export const BondViewProvider: React.FC = props => {
 
   const [approveTokens, approveTokensStatus] = useTransaction(
     async ({ tokensNeedingApproval }: ApprovePressedPayload) => {
-      if (contracts.bMousdAmm === undefined) return;
+      if (contracts.bMeurAmm === undefined) return;
       for (const [token, spender] of Array.from(tokensNeedingApproval)) {
-        if (token === BMousdAmmTokenIndex.BMEUR) {
-          await api.approveToken(contracts.bMousdToken, spender, mosaic.connection.signer);
+        if (token === BMeurAmmTokenIndex.BMEUR) {
+          await api.approveToken(contracts.bMeurToken, spender, mosaic.connection.signer);
           if (spender === BMEUR_AMM_ADDRESS) {
-            setIsBMousdApprovedWithBmsicAmm(true);
+            setIsBMeurApprovedWithBmsicAmm(true);
           } else if (spender === BMEUR_LP_ZAP_ADDRESS) {
-            setIsBMousdApprovedWithAmmZapper(true);
+            setIsBMeurApprovedWithAmmZapper(true);
           }
-        } else if (token === BMousdAmmTokenIndex.MEUR) {
+        } else if (token === BMeurAmmTokenIndex.MEUR) {
           await api.approveToken(
-            contracts.msicToken,
+            contracts.meurToken,
             BMEUR_LP_ZAP_ADDRESS,
             mosaic.connection.signer
           );
-          setIsMousdApprovedWithAmmZapper(true);
-        } else if (token === BMousdAmmTokenIndex.BMEUR_MEUR_LP && spender === undefined) {
-          const lpToken = await api.getLpToken(contracts.bMousdAmm);
+          setIsMeurApprovedWithAmmZapper(true);
+        } else if (token === BMeurAmmTokenIndex.BMEUR_MEUR_LP && spender === undefined) {
+          const lpToken = await api.getLpToken(contracts.bMeurAmm);
           await api.approveToken(lpToken, BMEUR_LP_ZAP_ADDRESS, mosaic.connection.signer);
-          setIsBMousdLpApprovedWithAmmZapper(true);
-        } else if (token === BMousdAmmTokenIndex.BMEUR_MEUR_LP) {
-          const lpToken = await api.getLpToken(contracts.bMousdAmm);
+          setIsBMeurLpApprovedWithAmmZapper(true);
+        } else if (token === BMeurAmmTokenIndex.BMEUR_MEUR_LP) {
+          const lpToken = await api.getLpToken(contracts.bMeurAmm);
           await api.approveToken(lpToken, spender, mosaic.connection.signer);
           if (spender === BMEUR_LP_ZAP_ADDRESS) {
-            setIsBMousdLpApprovedWithAmmZapper(true);
+            setIsBMeurLpApprovedWithAmmZapper(true);
           } else if (spender === BMEUR_AMM_STAKING_ADDRESS) {
-            setIsBMousdLpApprovedWithGauge(true);
+            setIsBMeurLpApprovedWithGauge(true);
           }
         }
       }
     },
     [
-      contracts.bMousdAmm,
-      contracts.bMousdToken,
-      contracts.msicToken,
+      contracts.bMeurAmm,
+      contracts.bMeurToken,
+      contracts.meurToken,
       BMEUR_LP_ZAP_ADDRESS,
       BMEUR_AMM_STAKING_ADDRESS,
       BMEUR_AMM_ADDRESS,
@@ -458,10 +458,10 @@ export const BondViewProvider: React.FC = props => {
   );
 
   const [cancelBond, cancelStatus] = useTransaction(
-    async (bondId: string, minimumMousd: Decimal) => {
+    async (bondId: string, minimumMeur: Decimal) => {
       await api.cancelBond(
         bondId,
-        minimumMousd,
+        minimumMeur,
         account,
         contracts.chickenBondManager,
         mosaic.connection.signer
@@ -482,59 +482,59 @@ export const BondViewProvider: React.FC = props => {
   );
 
   const getExpectedSwapOutput = useCallback(
-    async (inputToken: BMousdAmmTokenIndex, inputAmount: Decimal) =>
-      contracts.bMousdAmm
+    async (inputToken: BMeurAmmTokenIndex, inputAmount: Decimal) =>
+      contracts.bMeurAmm
         ? (isMainnet ? api.getExpectedSwapOutputMainnet : api.getExpectedSwapOutput)(
             inputToken,
             inputAmount,
-            contracts.bMousdAmm
+            contracts.bMeurAmm
           )
         : Decimal.ZERO,
-    [contracts.bMousdAmm, isMainnet]
+    [contracts.bMeurAmm, isMainnet]
   );
 
   const [swapTokens, swapStatus] = useTransaction(
-    async (inputToken: BMousdAmmTokenIndex, inputAmount: Decimal, minOutputAmount: Decimal) => {
+    async (inputToken: BMeurAmmTokenIndex, inputAmount: Decimal, minOutputAmount: Decimal) => {
       await (isMainnet ? api.swapTokensMainnet : api.swapTokens)(
         inputToken,
         inputAmount,
         minOutputAmount,
-        contracts.bMousdAmm,
+        contracts.bMeurAmm,
         mosaic.connection.signer,
         account
       );
       setShouldSynchronize(true);
     },
-    [contracts.bMousdAmm, isMainnet, mosaic.connection.signer, account]
+    [contracts.bMeurAmm, isMainnet, mosaic.connection.signer, account]
   );
 
   const getExpectedLpTokens = useCallback(
-    async (bMousdAmount: Decimal, msicAmount: Decimal) => {
-      return contracts.bMousdAmmZapper
-        ? api.getExpectedLpTokens(bMousdAmount, msicAmount, contracts.bMousdAmmZapper)
+    async (bMeurAmount: Decimal, msicAmount: Decimal) => {
+      return contracts.bMeurAmmZapper
+        ? api.getExpectedLpTokens(bMeurAmount, msicAmount, contracts.bMeurAmmZapper)
         : Decimal.ZERO;
     },
-    [contracts.bMousdAmmZapper]
+    [contracts.bMeurAmmZapper]
   );
 
   const [manageLiquidity, manageLiquidityStatus] = useTransaction(
     async (params: ManageLiquidityPayload) => {
       if (params.action === "addLiquidity") {
         await api.addLiquidity(
-          params.bMousdAmount,
+          params.bMeurAmount,
           params.msicAmount,
           params.minLpTokens,
           params.shouldStakeInGauge,
-          contracts.bMousdAmmZapper,
+          contracts.bMeurAmmZapper,
           mosaic.connection.signer,
           account
         );
       } else if (params.action === "removeLiquidity") {
         await api.removeLiquidity(
           params.burnLpTokens,
-          params.minBMousdAmount,
-          params.minMousdAmount,
-          contracts.bMousdAmmZapper,
+          params.minBMeurAmount,
+          params.minMeurAmount,
+          contracts.bMeurAmmZapper,
           mosaic.connection.signer
         );
       } else if (params.action === "removeLiquidityOneCoin") {
@@ -542,32 +542,32 @@ export const BondViewProvider: React.FC = props => {
           params.burnLpTokens,
           params.output,
           params.minAmount,
-          contracts.bMousdAmmZapper,
-          contracts.bMousdAmm,
+          contracts.bMeurAmmZapper,
+          contracts.bMeurAmm,
           mosaic.connection.signer,
           account
         );
       } else if (params.action === "stakeLiquidity") {
         await api.stakeLiquidity(
           params.stakeAmount,
-          contracts.bMousdGauge,
+          contracts.bMeurGauge,
           mosaic.connection.signer
         );
       } else if (params.action === "unstakeLiquidity") {
         await api.unstakeLiquidity(
           params.unstakeAmount,
-          contracts.bMousdGauge,
+          contracts.bMeurGauge,
           mosaic.connection.signer
         );
       } else if (params.action === "claimLpRewards") {
-        await api.claimLpRewards(contracts.bMousdGauge, mosaic.connection.signer);
+        await api.claimLpRewards(contracts.bMeurGauge, mosaic.connection.signer);
       }
       setShouldSynchronize(true);
     },
     [
-      contracts.bMousdAmmZapper,
-      contracts.bMousdGauge,
-      contracts.bMousdAmm,
+      contracts.bMeurAmmZapper,
+      contracts.bMeurGauge,
+      contracts.bMeurAmm,
       mosaic.connection.signer,
       account
     ]
@@ -576,19 +576,19 @@ export const BondViewProvider: React.FC = props => {
   const getExpectedWithdrawal = useCallback(
     async (
       burnLp: Decimal,
-      output: BMousdAmmTokenIndex | "both"
-    ): Promise<Map<BMousdAmmTokenIndex, Decimal>> => {
-      if (contracts.bMousdAmm === undefined)
+      output: BMeurAmmTokenIndex | "both"
+    ): Promise<Map<BMeurAmmTokenIndex, Decimal>> => {
+      if (contracts.bMeurAmm === undefined)
         return new Map([
-          [BMousdAmmTokenIndex.MEUR, Decimal.ZERO],
-          [BMousdAmmTokenIndex.BMEUR, Decimal.ZERO]
+          [BMeurAmmTokenIndex.MEUR, Decimal.ZERO],
+          [BMeurAmmTokenIndex.BMEUR, Decimal.ZERO]
         ]);
 
-      return contracts.bMousdAmmZapper
-        ? api.getExpectedWithdrawal(burnLp, output, contracts.bMousdAmmZapper, contracts.bMousdAmm)
+      return contracts.bMeurAmmZapper
+        ? api.getExpectedWithdrawal(burnLp, output, contracts.bMeurAmmZapper, contracts.bMeurAmm)
         : new Map();
     },
-    [contracts.bMousdAmmZapper, contracts.bMousdAmm]
+    [contracts.bMeurAmmZapper, contracts.bMeurAmm]
   );
 
   const selectedBond = useMemo(() => bonds?.find(bond => bond.id === selectedBondId), [
@@ -708,7 +708,7 @@ export const BondViewProvider: React.FC = props => {
       )
         return;
 
-      if (protocolInfo.bMousdSupply.gt(0)) {
+      if (protocolInfo.bMeurSupply.gt(0)) {
         setIsBootstrapPeriodActive(false);
         return;
       }
@@ -733,31 +733,31 @@ export const BondViewProvider: React.FC = props => {
     bonds,
     statuses,
     selectedBond,
-    bMousdBalance,
-    msicBalance,
+    bMeurBalance,
+    meurBalance,
     lpTokenBalance,
     stakedLpTokenBalance,
     lpTokenSupply,
-    bMousdAmmBMousdBalance,
-    bMousdAmmMousdBalance,
+    bMeurAmmBMeurBalance,
+    bMeurAmmMeurBalance,
     isInfiniteBondApproved,
     isSynchronizing,
-    getMousdFromFaucet,
+    getMeurFromFaucet,
     setSimulatedMarketPrice,
     resetSimulatedMarketPrice,
     simulatedProtocolInfo,
     hasFoundContracts: contracts.hasFoundContracts,
-    isBMousdApprovedWithBmsicAmm,
-    isMousdApprovedWithBmsicAmm,
-    isMousdApprovedWithAmmZapper,
-    isBMousdApprovedWithAmmZapper,
-    isBMousdLpApprovedWithAmmZapper,
-    isBMousdLpApprovedWithGauge,
+    isBMeurApprovedWithBmsicAmm,
+    isMeurApprovedWithBmsicAmm,
+    isMeurApprovedWithAmmZapper,
+    isBMeurApprovedWithAmmZapper,
+    isBMeurLpApprovedWithAmmZapper,
+    isBMeurLpApprovedWithGauge,
     inputToken,
-    isInputTokenApprovedWithBMousdAmm:
-      inputToken === BMousdAmmTokenIndex.BMEUR
-        ? isBMousdApprovedWithBmsicAmm
-        : isMousdApprovedWithBmsicAmm,
+    isInputTokenApprovedWithBMeurAmm:
+      inputToken === BMeurAmmTokenIndex.BMEUR
+        ? isBMeurApprovedWithBmsicAmm
+        : isMeurApprovedWithBmsicAmm,
     getExpectedSwapOutput,
     getExpectedLpTokens,
     getExpectedWithdrawal,

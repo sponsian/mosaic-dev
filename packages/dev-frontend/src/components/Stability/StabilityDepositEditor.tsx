@@ -18,8 +18,8 @@ import { EditableRow, StaticRow } from "../Trove/Editor";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { InfoIcon } from "../InfoIcon";
 
-const select = ({ msicBalance, msicInStabilityPool }: MosaicStoreState) => ({
-  msicBalance,
+const select = ({ meurBalance, msicInStabilityPool }: MosaicStoreState) => ({
+  meurBalance,
   msicInStabilityPool
 });
 
@@ -37,12 +37,12 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
   dispatch,
   children
 }) => {
-  const { msicBalance, msicInStabilityPool } = useMosaicSelector(select);
+  const { meurBalance, msicInStabilityPool } = useMosaicSelector(select);
   const editingState = useState<string>();
 
   const edited = !editedMEUR.eq(originalDeposit.currentMEUR);
 
-  const maxAmount = originalDeposit.currentMEUR.add(msicBalance);
+  const maxAmount = originalDeposit.currentMEUR.add(meurBalance);
   const maxedOut = editedMEUR.eq(maxAmount);
 
   const msicInStabilityPoolAfterChange = msicInStabilityPool

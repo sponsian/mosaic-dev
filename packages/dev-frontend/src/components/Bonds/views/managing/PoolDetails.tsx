@@ -5,10 +5,10 @@ import { useBondView } from "../../context/BondViewContext";
 import { PoolBalance } from "./PoolBalance";
 
 export const PoolDetails: React.FC = () => {
-  const { lpTokenSupply, bMousdAmmBMousdBalance, bMousdAmmMousdBalance, protocolInfo } = useBondView();
+  const { lpTokenSupply, bMeurAmmBMeurBalance, bMeurAmmMeurBalance, protocolInfo } = useBondView();
   const poolBalanceRatio =
-    bMousdAmmBMousdBalance && bMousdAmmMousdBalance
-      ? bMousdAmmMousdBalance.div(bMousdAmmBMousdBalance)
+    bMeurAmmBMeurBalance && bMeurAmmMeurBalance
+      ? bMeurAmmMeurBalance.div(bMeurAmmBMeurBalance)
       : Decimal.ONE;
 
   return (
@@ -24,11 +24,11 @@ export const PoolDetails: React.FC = () => {
             inputId="deposit-pool-balance"
           >
             <PoolBalance symbol="bMEUR">
-              {(bMousdAmmBMousdBalance ?? Decimal.ZERO).prettify(2)}
+              {(bMeurAmmBMeurBalance ?? Decimal.ZERO).prettify(2)}
             </PoolBalance>
             <Text sx={{ fontWeight: "light", mx: "12px" }}>+</Text>
             <PoolBalance symbol="MEUR-3CRV">
-              {(bMousdAmmMousdBalance ?? Decimal.ZERO).prettify(2)}
+              {(bMeurAmmMeurBalance ?? Decimal.ZERO).prettify(2)}
             </PoolBalance>
           </StaticAmounts>
         </StaticRow>
@@ -62,7 +62,7 @@ export const PoolDetails: React.FC = () => {
           <StaticRow label="bMEUR LP APR">
             <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
               <PoolBalance symbol="%">
-                {(protocolInfo?.bMousdLpApr ?? Decimal.INFINITY).prettify(2)}
+                {(protocolInfo?.bMeurLpApr ?? Decimal.INFINITY).prettify(2)}
               </PoolBalance>{" "}
             </StaticAmounts>
           </StaticRow>
