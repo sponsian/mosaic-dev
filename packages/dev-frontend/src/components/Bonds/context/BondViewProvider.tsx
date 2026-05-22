@@ -21,7 +21,7 @@ import { Decimal } from "@mosaic/lib-base";
 import { useMosaic } from "../../../hooks/MosaicContext";
 import { api, _getProtocolInfo } from "./api";
 import { useTransaction } from "../../../hooks/useTransaction";
-import type { ERC20Faucet } from "@mosaic/chicken-bonds/msic/types";
+import type { ERC20Faucet } from "@mosaic/chicken-bonds/meur/types";
 import { useBondContracts } from "./useBondContracts";
 import { useChainId } from "wagmi";
 import { useBondAddresses } from "./BondAddressesContext";

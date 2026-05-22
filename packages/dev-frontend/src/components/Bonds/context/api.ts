@@ -14,11 +14,11 @@ import type {
   BondNFT,
   ChickenBondManager,
   BMEURLPZap
-} from "@mosaic/chicken-bonds/msic/types";
+} from "@mosaic/chicken-bonds/meur/types";
 import {
   CurveCryptoSwap2ETH,
   CurveRegistrySwaps__factory
-} from "@mosaic/chicken-bonds/msic/types/external";
+} from "@mosaic/chicken-bonds/meur/types/external";
 import type {
   BondCreatedEventObject,
   BondCreatedEvent,
@@ -26,7 +26,7 @@ import type {
   BondCancelledEvent,
   BondClaimedEventObject,
   BondClaimedEvent
-} from "@mosaic/chicken-bonds/msic/types/ChickenBondManager";
+} from "@mosaic/chicken-bonds/meur/types/ChickenBondManager";
 import { Decimal } from "@mosaic/lib-base";
 import type { MEURToken } from "@mosaic/lib-ethers/dist/types";
 import type { ProtocolInfo, Bond, BondStatus, Stats, Maybe, BMeurLpRewards } from "./transitions";
@@ -51,15 +51,15 @@ import { BMeurAmmTokenIndex } from "./transitions";
 import {
   TokenExchangeEvent,
   TokenExchangeEventObject
-} from "@mosaic/chicken-bonds/msic/types/external/CurveCryptoSwap2ETH";
-import mainnet from "@mosaic/chicken-bonds/msic/addresses/mainnet.json";
+} from "@mosaic/chicken-bonds/meur/types/external/CurveCryptoSwap2ETH";
+import mainnet from "@mosaic/chicken-bonds/meur/addresses/mainnet.json";
 import type {
   CurveLiquidityGaugeV5,
   DepositEvent,
   DepositEventObject,
   WithdrawEvent,
   WithdrawEventObject
-} from "@mosaic/chicken-bonds/msic/types/external/CurveLiquidityGaugeV5";
+} from "@mosaic/chicken-bonds/meur/types/external/CurveLiquidityGaugeV5";
 
 const BOND_STATUS: BondStatus[] = ["NON_EXISTENT", "PENDING", "CANCELLED", "CLAIMED"];
 

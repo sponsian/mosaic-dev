@@ -1,8 +1,8 @@
 import { useChainId } from "wagmi";
 import React, { useContext, createContext } from "react";
 
-import mainnet from "@mosaic/chicken-bonds/msic/addresses/mainnet.json";
-import goerli from "@mosaic/chicken-bonds/msic/addresses/goerli.json";
+import mainnet from "@mosaic/chicken-bonds/meur/addresses/mainnet.json";
+import goerli from "@mosaic/chicken-bonds/meur/addresses/goerli.json";
 import { Addresses } from "./transitions";
 
 const nullAddresses: Addresses = {

@@ -7,17 +7,17 @@ import {
   ChickenBondManager,
   ERC20Faucet,
   ERC20Faucet__factory
-} from "@mosaic/chicken-bonds/msic/types";
+} from "@mosaic/chicken-bonds/meur/types";
 import {
   CurveCryptoSwap2ETH,
   CurveLiquidityGaugeV5__factory
-} from "@mosaic/chicken-bonds/msic/types/external";
-import { CurveCryptoSwap2ETH__factory } from "@mosaic/chicken-bonds/msic/types/external";
+} from "@mosaic/chicken-bonds/meur/types/external";
+import { CurveCryptoSwap2ETH__factory } from "@mosaic/chicken-bonds/meur/types/external";
 import {
   BMEURToken__factory,
   BondNFT__factory,
   ChickenBondManager__factory
-} from "@mosaic/chicken-bonds/msic/types";
+} from "@mosaic/chicken-bonds/meur/types";
 import type { MEURToken } from "@mosaic/lib-ethers/dist/types";
 import MEURTokenAbi from "@mosaic/lib-ethers/abi/MEURToken.json";
 import { useContract } from "../../../hooks/useContract";
@@ -29,7 +29,7 @@ import { BMeurAmmTokenIndex } from "./transitions";
 import type { Addresses } from "./transitions";
 import { useChainId } from "wagmi";
 import { useBondAddresses } from "./BondAddressesContext";
-import type { CurveLiquidityGaugeV5 } from "@mosaic/chicken-bonds/msic/types/external/CurveLiquidityGaugeV5";
+import type { CurveLiquidityGaugeV5 } from "@mosaic/chicken-bonds/meur/types/external/CurveLiquidityGaugeV5";
 
 type BondsInformation = {
   protocolInfo: ProtocolInfo;

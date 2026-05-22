@@ -1,6 +1,6 @@
 import React from "react";
 import { createClient, WagmiConfig } from "wagmi";
-import { mainnet, goerli, localhost } from "wagmi/chains";
+import { localhost } from "wagmi/chains";
 import type { Chain } from "wagmi";
 
 const reefPelagia: Chain = {
@@ -108,10 +108,7 @@ const App = () => {
               chains:
                 isDemoMode || import.meta.env.MODE === "test"
                   ? [localhost]
-                  : [reefPelagia]
-                  : config.value.testnetOnly
-                  ? [goerli]
-                  : [mainnet, goerli],
+                  : [reefPelagia],
               walletConnectProjectId: config.value.walletConnectProjectId,
               infuraId: config.value.infuraApiKey,
               alchemyId: config.value.alchemyApiKey
