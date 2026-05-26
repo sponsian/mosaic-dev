@@ -667,27 +667,32 @@ const isInfiniteBondApproved = async (
   return allowance.gt(constants.MaxInt256);
 };
 
-const approveInfiniteBond = async (
+// Scoped (per-bond) approval. We deliberately avoid MaxUint256 here so that
+// wallet security scanners (Blockaid etc.) don't flag the dapp as a token-theft
+// risk on every bond creation. Tradeoff: the user must re-approve for each new
+// bond, which is one extra wallet popup per bond. Acceptable for testnet.
+const approveBond = async (
+  bondAmount: Decimal,
   meurToken: MEURToken | undefined,
   chickenBondManager: ChickenBondManager | undefined,
   signer: Signer | undefined
 ): Promise<void> => {
   if (meurToken === undefined || chickenBondManager === undefined || signer === undefined) {
-    throw new Error("approveInfiniteBond() failed: a dependency is null");
+    throw new Error("approveBond() failed: a dependency is null");
   }
 
-  console.log("approveInfiniteBond() started");
+  console.log("approveBond() started", { bondAmount: bondAmount.prettify() });
 
   try {
     await (
       await ((meurToken as unknown) as Contract)
         .connect(signer)
-        .approve(chickenBondManager.address, constants.MaxUint256._hex)
+        .approve(chickenBondManager.address, bondAmount.hex)
     ).wait();
 
-    console.log("approveInfiniteBond() succceeded");
+    console.log("approveBond() succeeded");
   } catch (error: unknown) {
-    throw new Error(`approveInfiniteBond() failed: ${error}`);
+    throw new Error(`approveBond() failed: ${error}`);
   }
 };
 
@@ -922,6 +927,18 @@ const isTokenApprovedWithAmmZapper = async (
   return allowance.gt(constants.MaxInt256);
 };
 
+// AMM/swap approvals are intentionally MaxUint256.
+//
+// These approve buttons fire BEFORE the user has entered a swap amount, so we
+// have no scoped value to approve. Switching to scoped approvals here would
+// require a UX redesign (merging Approve + Swap into one button per trade), which
+// is more disruptive than the security benefit warrants on testnet.
+//
+// Wallet security scanners (Blockaid etc.) MAY flag these as "infinite approval"
+// risks. The bond-creation flow is the most visible action on the site and uses
+// scoped approval (see approveBond above), which carries most of the signal
+// reduction. If/when the AMM/swap flow gets a UX overhaul, replace MaxUint256
+// here with the user's pending swap amount.
 const approveTokenWithBMeurAmm = async (
   token: MEURToken | BMEURToken | undefined,
   bMeurAmmAddress: string | null,
@@ -937,6 +954,7 @@ const approveTokenWithBMeurAmm = async (
   return;
 };
 
+// See note above approveTokenWithBMeurAmm — same tradeoff applies.
 const approveToken = async (
   token: MEURToken | BMEURToken | ERC20 | undefined,
   spenderAddress: string | null,
@@ -952,6 +970,7 @@ const approveToken = async (
   return;
 };
 
+// See note above approveTokenWithBMeurAmm — same tradeoff applies.
 const approveTokenWithBMeurAmmMainnet = async (
   token: MEURToken | BMEURToken | undefined,
   signer: Signer | undefined
@@ -1365,7 +1384,7 @@ export const api = {
   getTokenBalance,
   getTokenTotalSupply,
   getProtocolInfo,
-  approveInfiniteBond,
+  approveBond,
   isInfiniteBondApproved,
   createBond,
   cancelBond,

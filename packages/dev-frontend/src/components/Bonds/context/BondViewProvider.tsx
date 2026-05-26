@@ -349,8 +349,9 @@ export const BondViewProvider: React.FC = props => {
     })();
   }, [isSynchronizing, shouldSynchronize, account, contracts, simulatedProtocolInfo]);
 
-  const [approveInfiniteBond, approveStatus] = useTransaction(async () => {
-    await api.approveInfiniteBond(
+  const [approveBond, approveStatus] = useTransaction(async (bondAmount: Decimal) => {
+    await api.approveBond(
+      bondAmount,
       contracts.meurToken,
       contracts.chickenBondManager,
       mosaic.connection.signer
@@ -619,7 +620,7 @@ export const BondViewProvider: React.FC = props => {
 
       try {
         if (isCurrentViewEvent("CREATING", "APPROVE_PRESSED")) {
-          await approveInfiniteBond();
+          await approveBond((payload as CreateBondPayload).deposit);
         } else if (isCurrentViewEvent("CREATING", "CONFIRM_PRESSED")) {
           await createBond((payload as CreateBondPayload).deposit);
           await dispatchEvent("CREATE_BOND_CONFIRMED");
@@ -659,7 +660,7 @@ export const BondViewProvider: React.FC = props => {
     },
     [
       selectedBondId,
-      approveInfiniteBond,
+      approveBond,
       cancelBond,
       createBond,
       claimBond,

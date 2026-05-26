@@ -9,7 +9,13 @@ import RollupPluginPolyfillNode from "rollup-plugin-polyfill-node";
 export default defineConfig({
   base: "./",
   plugins: [react()],
-  define: { "process.env": {} }, // Coinbase SDK wants this
+  define: {
+    "process.env": {}, // Coinbase SDK wants this
+    // True compile-time constant so terser can dead-code-eliminate the demo-mode
+    // bootstrap (including the dev-chain funder private key) out of production
+    // builds. Setting VITE_APP_DEMO_MODE=true at build time keeps it in.
+    __MOSAIC_DEMO__: JSON.stringify(process.env.VITE_APP_DEMO_MODE === "true")
+  },
   optimizeDeps: {
     include: [
       "@mosaic/providers",

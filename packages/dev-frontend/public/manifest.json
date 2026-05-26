@@ -1,0 +1,25 @@
+{
+  "name": "Mosaic — Decentralized Borrowing on Reef",
+  "short_name": "Mosaic",
+  "description": "Mosaic is a decentralized borrowing protocol on the Reef network. Lock REEF as collateral, mint MEUR (a EUR-pegged stablecoin), and earn from the Stability Pool — interest-free and governed by smart contracts.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#0a1a2f",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/images/mosaic-square-logo-2x-trans.png",
+      "sizes": "1600x1600",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/mosaic-square-logo-2x-trans.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "defi"]
+}

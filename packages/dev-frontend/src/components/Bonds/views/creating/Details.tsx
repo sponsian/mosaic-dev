@@ -58,7 +58,9 @@ export const Details: React.FC<DetailsProps> = ({ onBack }) => {
   };
 
   const handleApprovePressed = () => {
-    dispatchEvent("APPROVE_PRESSED");
+    // Carry the deposit through the event so BondViewProvider can issue a
+    // scoped approval (exact amount) instead of MaxUint256.
+    dispatchEvent("APPROVE_PRESSED", { deposit } as CreateBondPayload);
   };
 
   const handleConfirmPressed = () => {

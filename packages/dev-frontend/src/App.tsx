@@ -28,20 +28,24 @@ import { Icon } from "./components/Icon";
 import { getConfig } from "./config";
 import theme from "./theme";
 
-import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 import { MosaicFrontend } from "./MosaicFrontend";
 import { AppLoader } from "./components/AppLoader";
 import { useAsyncValue } from "./hooks/AsyncValue";
 
-const isDemoMode = import.meta.env.VITE_APP_DEMO_MODE === "true";
+// __MOSAIC_DEMO__ is a build-time constant injected by vite.config.ts. The
+// demo bootstrap installs a DisposableWalletProvider keyed by a well-known
+// dev-chain funder. Keeping that string out of the production bundle is
+// critical — static-analysis security scanners (Blockaid etc.) match on
+// inline private-key-shaped hex strings near signing calls and flag the
+// site as a wallet drainer. Because __MOSAIC_DEMO__ is a literal boolean
+// rather than a runtime env-var lookup, terser can dead-code-eliminate the
+// entire if-block, and Rollup skips emitting the demoBootstrap chunk too.
+const isDemoMode = __MOSAIC_DEMO__;
 
-if (isDemoMode) {
-  const ethereum = new DisposableWalletProvider(
-    import.meta.env.VITE_APP_RPC_URL || `http://${window.location.hostname || "localhost"}:8545`,
-    "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7"
-  );
-
-  Object.assign(window, { ethereum });
+if (__MOSAIC_DEMO__) {
+  void import("./testUtils/demoBootstrap").then(({ installDemoWalletProvider }) => {
+    installDemoWalletProvider();
+  });
 }
 
 // Start pre-fetching the config
