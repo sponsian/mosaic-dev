@@ -9,11 +9,11 @@ const reefPelagia: Chain = {
   network: "reef-pelagia",
   nativeCurrency: { name: "REEF", symbol: "REEF", decimals: 18 }, // wagmi requires 18; on-chain REEF is 12 — UI formatting must compensate
   rpcUrls: {
-    default: { http: ["https://eth.reef-node-reefdevcluster-808c46-72-60-35-83.nip.io/"] },
-    public:  { http: ["https://eth.reef-node-reefdevcluster-808c46-72-60-35-83.nip.io/"] }
+    default: { http: ["https://eth.reef-node-reefdevcluster-b0be3e-72-60-35-83.nip.io/"] },
+    public:  { http: ["https://eth.reef-node-reefdevcluster-b0be3e-72-60-35-83.nip.io/"] }
   },
   blockExplorers: {
-    default: { name: "Blockscout", url: "https://explorer-frontend-ozqgaf-62f0c7-72-60-35-83.nip.io/" }
+    default: { name: "Blockscout", url: "https://explorer-frontend-ibcy8d-1204c4-72-60-35-83.nip.io/" }
   },
   testnet: true
 };
@@ -69,11 +69,11 @@ const UnsupportedMainnetFallback: React.FC = () => (
       <Icon name="exclamation-triangle" /> This app is for testing purposes only.
     </Heading>
 
-    <Paragraph sx={{ mb: 3 }}>Please change your network to Görli.</Paragraph>
+    <Paragraph sx={{ mb: 3 }}>Please change your network to Pelagia.</Paragraph>
 
     <Paragraph>
-      If you'd like to use the Mosaic Protocol on mainnet, please pick a frontend{" "}
-      <Link href="https://www.mosaic.org/frontend">
+      If you'd like to use the Mosaic Protocol on Reef testnet, please pick a frontend{" "}
+      <Link href="https://testnet.mosaic.markets/">
         here <Icon name="external-link-alt" size="xs" />
       </Link>
       .
@@ -94,7 +94,7 @@ const UnsupportedNetworkFallback: React.FC = () => (
     <Heading sx={{ mb: 3 }}>
       <Icon name="exclamation-triangle" /> Mosaic is not supported on this network.
     </Heading>
-    Please switch to mainnet or Görli.
+    Please switch to Reef Pelagia.
   </Flex>
 );
 

@@ -1,14 +1,14 @@
 {
   "chainId": 13939,
-  "version": "32f2debb758d8fc3cc389ec06f49d8c8ef1a37ec",
-  "deploymentDate": 1779400980000,
+  "version": "68c1e607de9fe4df7e9fe9d4cb6da3c94679db4f",
+  "deploymentDate": 1781201140000,
   "bootstrapPeriod": 1209600,
   "totalStabilityPoolMSICReward": "32000000",
   "liquidityMiningMSICRewardRate": "0.257201646090534979",
   "_priceFeedIsTestnet": true,
   "_uniTokenIsMock": true,
   "_isDev": false,
-  "startBlock": 29840,
+  "startBlock": 54977,
   "addresses": {
     "activePool": "0x354288C67edeb0EE9245215E4172891bc3Ccf7d5",
     "borrowerOperations": "0x2373e197E6fa2A38d10e67F3268C134E72744A82",
